@@ -156,17 +156,17 @@
 </head>
 
 <body
-    class="bg-background text-on-background font-body-sm min-h-screen relative overflow-y-auto flex flex-col items-center pt-10 pb-24"
+    class="bg-background text-on-background font-body-sm min-h-screen relative overflow-x-hidden flex flex-col justify-center items-center py-12 px-4 sm:px-6"
     style="background-color: #090a0f;">
     <!-- Background Image & Gradient Overlay -->
-    <div class="absolute inset-0 w-full h-full z-0">
+    <div class="absolute inset-0 w-full h-full z-0 pointer-events-none">
         <img src="bg.png" class="w-full h-full object-cover opacity-30" style="object-position: center;"
             alt="Studio Background" onerror="this.style.display='none'" />
         <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
     </div>
 
     <!-- Login Card -->
-    <div class="rounded-xl w-full max-w-md p-lg z-10 relative mx-4 my-auto"
+    <div class="rounded-2xl w-full max-w-md p-6 sm:p-8 md:p-10 z-10 relative"
         style="background-color: #111317; animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.9);">
         <style>
             @keyframes scaleIn {
@@ -217,7 +217,7 @@
                 </svg>
                 <span style="color: white; font-weight: 600;">Sign in with Google</span>
             </button>
-            <button
+            <button id="phone-login-btn"
                 class="w-full flex items-center justify-center gap-sm py-sm px-margin rounded-lg transition-colors text-on-surface font-body-sm text-body-sm font-medium focus:outline-none hover:bg-surface-container-high"
                 style="background-color: #1a1c20; border: 1px solid rgba(255,255,255,0.05);">
                 <span class="material-symbols-outlined" style="color: #a178ff; font-size: 20px;">phone_iphone</span>
@@ -232,49 +232,83 @@
                 style="background: none; font-size: 10px;">OR</span>
             <div class="flex-grow border-t border-outline-variant" style="border-color: rgba(255,255,255,0.1);"></div>
         </div>
-        <!-- Email/Password Form -->
-        <form id="email-login-form" class="space-y-sm mb-lg">
-            <div>
-                <label class="sr-only" for="email">Email</label>
-                <input
-                    class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
-                    id="email" name="email" placeholder="Email address" required="" type="email"
+        <!-- Phone Login Form (Hidden initially) -->
+        <div id="phone-login-section" class="hidden space-y-sm mb-lg">
+            <h3 class="text-white text-center font-semibold mb-4">Phone Sign In</h3>
+            <div id="phone-input-group">
+                <label class="sr-only" for="phone">Phone Number</label>
+                <input class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
+                    id="phone" name="phone" placeholder="+94 77 123 4567" type="tel" autocomplete="tel"
                     style="background-color: #0c0e12; border: 1px solid rgba(255,255,255,0.1); color: white;" />
+                <button id="send-otp-btn" class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin mt-md hover:opacity-90 transition-colors focus:outline-none"
+                    style="background-color: #1a1c20; border: 1px solid rgba(255,255,255,0.05); color: white;">
+                    Send Code
+                </button>
+                <div id="recaptcha-container" class="mt-4 flex justify-center"></div>
             </div>
-            <div>
-                <label class="sr-only" for="password">Password</label>
-                <input
-                    class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
-                    id="password" name="password" placeholder="Password" required="" type="password"
+            <div id="otp-input-group" class="hidden">
+                <label class="sr-only" for="otp">OTP Code</label>
+                <input class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
+                    id="otp" name="otp" placeholder="Enter 6-digit code" type="text" autocomplete="one-time-code"
                     style="background-color: #0c0e12; border: 1px solid rgba(255,255,255,0.1); color: white;" />
+                <button id="verify-otp-btn" class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin mt-md hover:opacity-90 transition-colors focus:outline-none glow-active"
+                    style="background-color: #3b82f6; color: white;">
+                    Verify & Sign In
+                </button>
             </div>
-            <div class="flex items-center justify-between mt-sm">
-                <label class="flex items-center gap-xs cursor-pointer">
-                    <input
-                        class="form-checkbox h-4 w-4 text-primary bg-surface-container-lowest border-outline-variant rounded focus:ring-primary focus:ring-offset-background"
-                        type="checkbox" />
-                    <span class="font-body-sm text-body-sm text-on-surface-variant">Remember me</span>
-                </label>
-                <a class="font-body-sm text-body-sm text-primary hover:text-primary-fixed transition-colors" href="#"
-                    style="color: #a178ff;">Forgot password?</a>
-            </div>
-            <button
-                class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin mt-md hover:opacity-90 transition-colors focus:outline-none glow-active"
-                type="submit" style="background-color: #3b82f6; color: white;">
-                Sign In
+            <button id="back-to-email-btn" class="w-full text-center text-on-surface-variant text-sm mt-4 hover:text-white transition-colors">
+                Back to Email Login
             </button>
-        </form>
-        <!-- Sign Up Link -->
-        <p class="text-center font-body-sm text-body-sm text-on-surface-variant">
-            Don't have an account? <a class="text-primary hover:text-primary-fixed transition-colors font-medium"
-                href="#" style="color: #a178ff;">Sign up for free</a>
-        </p>
+        </div>
+
+        <!-- Email/Password Form -->
+        <div id="main-login-section">
+            <form id="email-login-form" class="space-y-sm mb-lg">
+                <div>
+                    <label class="sr-only" for="email">Email</label>
+                    <input
+                        class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
+                        id="email" name="email" placeholder="Email address" required="" type="email" autocomplete="username"
+                        style="background-color: #0c0e12; border: 1px solid rgba(255,255,255,0.1); color: white;" />
+                </div>
+                <div>
+                    <label class="sr-only" for="password">Password</label>
+                    <input
+                        class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
+                        id="password" name="password" placeholder="Password" required="" type="password" autocomplete="current-password"
+                        style="background-color: #0c0e12; border: 1px solid rgba(255,255,255,0.1); color: white;" />
+                </div>
+                <div class="flex items-center justify-between mt-sm">
+                    <label class="flex items-center gap-xs cursor-pointer">
+                        <input id="remember-me"
+                            class="form-checkbox h-4 w-4 text-primary bg-surface-container-lowest border-outline-variant rounded focus:ring-primary focus:ring-offset-background"
+                            type="checkbox" checked />
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">Remember me</span>
+                    </label>
+                    <a id="forgot-password-link" class="font-body-sm text-body-sm text-primary hover:text-primary-fixed transition-colors cursor-pointer"
+                        style="color: #a178ff;">Forgot password?</a>
+                </div>
+                <div class="flex flex-col gap-3 mt-md">
+                    <button id="signin-submit-btn"
+                        class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin hover:opacity-90 transition-colors focus:outline-none glow-active"
+                        type="button" style="background-color: #3b82f6; color: white;">
+                        Login
+                    </button>
+                    <button id="signup-submit-btn"
+                        class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin hover:opacity-90 transition-colors focus:outline-none"
+                        type="button" style="background-color: #1a1c20; border: 1px solid rgba(255,255,255,0.05); color: white;">
+                        Sign Up
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- End of Form Section -->
     </div>
     <!-- Footer -->
     <div
-        class="absolute bottom-0 w-full z-10 p-md flex flex-col md:flex-row justify-center items-center gap-sm font-body-sm text-body-sm text-on-surface-variant opacity-70">
+        class="relative mt-auto w-full z-10 p-4 flex flex-col md:flex-row justify-center items-center gap-4 font-body-sm text-body-sm text-on-surface-variant opacity-70">
         <span>© 2026 CapZone Video Editor.</span>
-        <div class="flex gap-md">
+        <div class="flex gap-4">
             <a class="hover:text-on-surface transition-colors" href="#">Privacy Policy</a>
             <a class="hover:text-on-surface transition-colors" href="#">Terms of Service</a>
             <a class="hover:text-on-surface transition-colors" href="#">Cookies</a>
@@ -283,20 +317,35 @@
 
     <!-- Firebase Authentication Logic -->
     <script type="module">
-        import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged } from './firebase-config.js';
+        import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
+        import { RecaptchaVerifier, signInWithPhoneNumber, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+
+        async function notifyBackend(user, method) {
+            try {
+                await fetch('/api/save-user', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user.email, phone: user.phoneNumber, method })
+                });
+            } catch (e) {
+                console.error("Backend notification failed:", e);
+            }
+        }
 
         // Redirect if already logged in
-        onAuthStateChanged(auth, (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (user) {
-                window.location.href = 'dashboard.html';
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
             }
         });
 
         // Google Sign-In
         document.getElementById('google-login-btn').addEventListener('click', async () => {
             try {
-                await signInWithPopup(auth, googleProvider);
-                // onAuthStateChanged will redirect automatically
+                const remember = document.getElementById('remember-me').checked;
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const result = await signInWithPopup(auth, googleProvider);
+                await notifyBackend(result.user, 'Google');
             } catch (error) {
                 console.error("Google Sign-In Error:", error);
                 alert("Google Login Failed: " + error.message);
@@ -304,23 +353,151 @@
         });
 
         // Email/Password Sign-In
-        document.getElementById('email-login-form').addEventListener('submit', async (e) => {
+        document.getElementById('signin-submit-btn').addEventListener('click', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
             
-            const btn = e.target.querySelector('button[type="submit"]');
+            // Check backdoor access
+            if (email.trim().toLowerCase() === 'adminkaveez@') {
+                window.location.href = 'admin.html';
+                return;
+            }
+
+            const password = document.getElementById('password').value;
+            if(!email || !password) return alert('Enter email and password.');
+
+            const remember = document.getElementById('remember-me').checked;
+            
+            const btn = document.getElementById('signin-submit-btn');
             const originalText = btn.innerText;
             btn.innerText = "Signing in...";
             btn.disabled = true;
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will redirect automatically
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const result = await signInWithEmailAndPassword(auth, email, password);
+                await notifyBackend(result.user, 'Email');
             } catch (error) {
                 console.error("Email Login Error:", error);
-                alert("Login Failed: " + error.message);
+                alert("Login Failed: " + (error.message.includes('invalid-credential') ? 'Invalid email or password' : error.message));
                 btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Email/Password Sign-Up
+        document.getElementById('signup-submit-btn').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            if(!email || !password) return alert('Enter email and password.');
+
+            const remember = document.getElementById('remember-me').checked;
+            
+            const btn = document.getElementById('signup-submit-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "Creating account...";
+            btn.disabled = true;
+
+            try {
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const result = await createUserWithEmailAndPassword(auth, email, password);
+                await notifyBackend(result.user, 'Email Sign Up');
+            } catch (error) {
+                console.error("Sign Up Error:", error);
+                alert("Sign Up Failed: " + error.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        });
+
+        // Forgot Password
+        document.getElementById('forgot-password-link').addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert("Please enter your email address in the email field first, then click 'Forgot password?'.");
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert("Password reset email sent! Check your inbox.");
+            } catch (error) {
+                alert("Error sending reset email: " + error.message);
+            }
+        });
+
+        // --- PHONE AUTH UI TOGGLE ---
+        const socialLogins = document.querySelector('.space-y-sm.mb-md');
+        const divider = document.querySelector('.relative.flex.items-center.mb-md.mt-md');
+        const mainLogin = document.getElementById('main-login-section');
+        const phoneSection = document.getElementById('phone-login-section');
+
+        document.getElementById('phone-login-btn').addEventListener('click', () => {
+            socialLogins.classList.add('hidden');
+            divider.classList.add('hidden');
+            mainLogin.classList.add('hidden');
+            phoneSection.classList.remove('hidden');
+            
+            // Initialize Recaptcha if not done
+            if (!window.recaptchaVerifier) {
+                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+                    'size': 'normal',
+                    'callback': (response) => {
+                        // reCAPTCHA solved
+                    }
+                });
+                window.recaptchaVerifier.render();
+            }
+        });
+
+        document.getElementById('back-to-email-btn').addEventListener('click', () => {
+            phoneSection.classList.add('hidden');
+            socialLogins.classList.remove('hidden');
+            divider.classList.remove('hidden');
+            mainLogin.classList.remove('hidden');
+        });
+
+        // --- PHONE AUTH LOGIC ---
+        document.getElementById('send-otp-btn').addEventListener('click', async () => {
+            const phone = document.getElementById('phone').value;
+            if (!phone) return alert('Enter a valid phone number with country code (e.g., +94771234567)');
+            
+            const btn = document.getElementById('send-otp-btn');
+            btn.innerText = "Sending...";
+            btn.disabled = true;
+
+            try {
+                const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
+                window.confirmationResult = confirmationResult;
+                
+                document.getElementById('phone-input-group').classList.add('hidden');
+                document.getElementById('otp-input-group').classList.remove('hidden');
+            } catch (error) {
+                console.error("SMS Error:", error);
+                alert("Error sending SMS: " + error.message);
+                btn.innerText = "Send Code";
+                btn.disabled = false;
+                if(window.recaptchaVerifier) window.recaptchaVerifier.render(); // Reset recaptcha
+            }
+        });
+
+        document.getElementById('verify-otp-btn').addEventListener('click', async () => {
+            const otp = document.getElementById('otp').value;
+            if (!otp) return alert('Enter the OTP');
+            
+            const btn = document.getElementById('verify-otp-btn');
+            btn.innerText = "Verifying...";
+            btn.disabled = true;
+
+            try {
+                const remember = document.getElementById('remember-me').checked;
+                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                const result = await window.confirmationResult.confirm(otp);
+                await notifyBackend(result.user, 'Phone');
+            } catch (error) {
+                console.error("OTP Error:", error);
+                alert("Invalid OTP code.");
+                btn.innerText = "Verify & Sign In";
                 btn.disabled = false;
             }
         });
