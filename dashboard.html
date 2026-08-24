@@ -1915,7 +1915,7 @@
 
                 if (data.downloadUrl) {
                     updateStepProgress('audio', 'audioProgressBar', 'Step 4: 100% Sound Enhancement Complete!');
-                    document.getElementById('audioDownloadLink').href = data.downloadUrl;
+                    document.getElementById('audioDownloadLink').href = `https://capzone.kaveesha.top${data.downloadUrl}`;
                     document.getElementById('audioDownloadLink').download = data.filename || 'enhanced_audio.mp3';
                     document.getElementById('audioResultArea').style.display = 'block';
                 } else {
