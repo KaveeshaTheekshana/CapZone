@@ -1835,10 +1835,13 @@
                     document.getElementById('fbDownloadLink').href = `https://capzone.kaveesha.top/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
                     document.getElementById('fbResultArea').style.display = 'block';
                 } else {
-                    showPopup('Error: ' + (data.error || 'Failed to fetch Facebook video'));
+                    const errDetails = data.error || data.message || 'Unknown Server Error';
+                    alert("SERVER RETURNED ERROR: " + errDetails); // Direct alert to bypass any UI popup truncation
+                    showPopup('Error: ' + errDetails);
                 }
             } catch (err) {
                 es.close();
+                alert("NETWORK FETCH FAILED: " + err.message); // Direct alert to bypass UI hiding
                 showPopup('Fetch failed: ' + err.message);
             } finally {
                 document.getElementById('fbSubmitBtn').disabled = false;
