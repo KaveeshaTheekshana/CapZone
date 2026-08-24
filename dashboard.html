@@ -1613,13 +1613,13 @@
             const icon = isError ? "error" : "check_circle";
             const color = isError ? "#ff3c3c" : "#00e676";
             
-            // Hide the raw error from the user and show a generic message
-            const finalMessage = isError ? "An unexpected error occurred. Please Contact Developer BUG fix." : message;
+            // Show the actual error message for debugging
+            const finalMessage = isError ? "An unexpected error occurred. Please Contact Developer BUG fix.<br><br><small style='color:#ff8a80'>Error Details: " + message + "</small>" : message;
             
             document.getElementById('popupModalIcon').textContent = icon;
             document.getElementById('popupModalIcon').style.color = color;
             document.getElementById('popupModalTitle').textContent = title;
-            document.getElementById('popupModalMessage').textContent = finalMessage;
+            document.getElementById('popupModalMessage').innerHTML = finalMessage;
             
             const btn = document.getElementById('popupModalBtn');
             btn.style.color = color;
