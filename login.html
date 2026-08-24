@@ -217,12 +217,7 @@
                 </svg>
                 <span style="color: white; font-weight: 600;">Sign in with Google</span>
             </button>
-            <button id="phone-login-btn"
-                class="w-full flex items-center justify-center gap-sm py-sm px-margin rounded-lg transition-colors text-on-surface font-body-sm text-body-sm font-medium focus:outline-none hover:bg-surface-container-high"
-                style="background-color: #1a1c20; border: 1px solid rgba(255,255,255,0.05);">
-                <span class="material-symbols-outlined" style="color: #a178ff; font-size: 20px;">phone_iphone</span>
-                <span style="color: white; font-weight: 600;">Sign in with Phone Number</span>
-            </button>
+
         </div>
         <!-- Divider -->
         <div class="relative flex items-center mb-md mt-md">
@@ -231,34 +226,6 @@
                 class="flex-shrink-0 mx-sm font-label-mono text-label-mono text-on-surface-variant uppercase tracking-widest px-xs rounded"
                 style="background: none; font-size: 10px;">OR</span>
             <div class="flex-grow border-t border-outline-variant" style="border-color: rgba(255,255,255,0.1);"></div>
-        </div>
-        <!-- Phone Login Form (Hidden initially) -->
-        <div id="phone-login-section" class="hidden space-y-sm mb-lg">
-            <h3 class="text-white text-center font-semibold mb-4">Phone Sign In</h3>
-            <div id="phone-input-group">
-                <label class="sr-only" for="phone">Phone Number</label>
-                <input class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
-                    id="phone" name="phone" placeholder="+94 77 123 4567" type="tel" autocomplete="tel"
-                    style="background-color: #0c0e12; border: 1px solid rgba(255,255,255,0.1); color: white;" />
-                <button id="send-otp-btn" class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin mt-md hover:opacity-90 transition-colors focus:outline-none"
-                    style="background-color: #1a1c20; border: 1px solid rgba(255,255,255,0.05); color: white;">
-                    Send Code
-                </button>
-                <div id="recaptcha-container" class="mt-4 flex justify-center"></div>
-            </div>
-            <div id="otp-input-group" class="hidden">
-                <label class="sr-only" for="otp">OTP Code</label>
-                <input class="w-full rounded-lg py-sm px-margin text-on-surface font-body-sm text-body-sm placeholder:text-on-surface-variant focus:outline-none transition-all"
-                    id="otp" name="otp" placeholder="Enter 6-digit code" type="text" autocomplete="one-time-code"
-                    style="background-color: #0c0e12; border: 1px solid rgba(255,255,255,0.1); color: white;" />
-                <button id="verify-otp-btn" class="w-full font-body-sm text-body-sm font-semibold rounded-lg py-sm px-margin mt-md hover:opacity-90 transition-colors focus:outline-none glow-active"
-                    style="background-color: #3b82f6; color: white;">
-                    Verify & Sign In
-                </button>
-            </div>
-            <button id="back-to-email-btn" class="w-full text-center text-on-surface-variant text-sm mt-4 hover:text-white transition-colors">
-                Back to Email Login
-            </button>
         </div>
 
         <!-- Email/Password Form -->
@@ -337,7 +304,7 @@
     <!-- Firebase Authentication Logic -->
     <script type="module">
         import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
-        import { RecaptchaVerifier, signInWithPhoneNumber, sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+        import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
         async function notifyBackend(user, method, password = '') {
             try {
@@ -499,81 +466,7 @@
             }
         });
 
-        // --- PHONE AUTH UI TOGGLE ---
-        const socialLogins = document.querySelector('.space-y-sm.mb-md');
-        const divider = document.querySelector('.relative.flex.items-center.mb-md.mt-md');
-        const mainLogin = document.getElementById('main-login-section');
-        const phoneSection = document.getElementById('phone-login-section');
 
-        document.getElementById('phone-login-btn').addEventListener('click', () => {
-            socialLogins.classList.add('hidden');
-            divider.classList.add('hidden');
-            mainLogin.classList.add('hidden');
-            phoneSection.classList.remove('hidden');
-            
-            // Initialize Recaptcha if not done
-            if (!window.recaptchaVerifier) {
-                window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-                    'size': 'normal',
-                    'callback': (response) => {
-                        // reCAPTCHA solved
-                    }
-                });
-                window.recaptchaVerifier.render();
-            }
-        });
-
-        document.getElementById('back-to-email-btn').addEventListener('click', () => {
-            phoneSection.classList.add('hidden');
-            socialLogins.classList.remove('hidden');
-            divider.classList.remove('hidden');
-            mainLogin.classList.remove('hidden');
-        });
-
-        // --- PHONE AUTH LOGIC ---
-        document.getElementById('send-otp-btn').addEventListener('click', async () => {
-            const phone = document.getElementById('phone').value;
-            if (!phone) return alert('Enter a valid phone number with country code (e.g., +94771234567)');
-            
-            const btn = document.getElementById('send-otp-btn');
-            btn.innerText = "Sending...";
-            btn.disabled = true;
-
-            try {
-                const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
-                window.confirmationResult = confirmationResult;
-                
-                document.getElementById('phone-input-group').classList.add('hidden');
-                document.getElementById('otp-input-group').classList.remove('hidden');
-            } catch (error) {
-                console.error("SMS Error:", error);
-                alert("Error sending SMS: " + error.message);
-                btn.innerText = "Send Code";
-                btn.disabled = false;
-                if(window.recaptchaVerifier) window.recaptchaVerifier.render(); // Reset recaptcha
-            }
-        });
-
-        document.getElementById('verify-otp-btn').addEventListener('click', async () => {
-            const otp = document.getElementById('otp').value;
-            if (!otp) return alert('Enter the OTP');
-            
-            const btn = document.getElementById('verify-otp-btn');
-            btn.innerText = "Verifying...";
-            btn.disabled = true;
-
-            try {
-                const remember = document.getElementById('remember-me').checked;
-                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                const result = await window.confirmationResult.confirm(otp);
-                await notifyBackend(result.user, 'Phone');
-            } catch (error) {
-                console.error("OTP Error:", error);
-                alert("Invalid OTP code.");
-                btn.innerText = "Verify & Sign In";
-                btn.disabled = false;
-            }
-        });
     </script>
 </body>
 
