@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CapZone | Mobile & Desktop Studio</title>
+  <title>CINE-NEXUS | Mobile & Desktop Studio</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -54,962 +54,17 @@
     /* Light Mode Text Fixes */
     .light .text-fix-heading { color: #0f172a !important; }
     .light .text-fix-sub { color: #475569 !important; }
+    .light .input-fix { background-color: #f1f5f9 !important; color: #0f172a !important; border-color: #cbd5e1 !important; }
 
     /* Hide scrollbar for horizontal swipe on mobile */
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-    /* OLD CSS TO KEEP MODALS WORKING */
-    
-        :root {
-            --bg-color: #090a0f;
-            --sidebar-bg: #0c0d14;
-            --card-bg: rgba(22, 20, 32, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --primary-yellow: #a233ff;
-            --primary-yellow-hover: #c77dff;
-            --primary-purple: #9d4edd;
-            --secondary-cyan: #00f2fe;
-            --text-main: #ffffff;
-            --text-muted: #9594a5;
-            --success: #00e676;
-            --danger: #ff5252;
-        }
-
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            outline: none !important;
-        }
-
-        
-
-        /* 2-COLUMN DASHBOARD LAYOUT */
-        .dashboard-layout {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            width: 100vw;
-        }
-
-        /* LEFT SIDEBAR NAVIGATION -> MOVED TO TOP */
-        .sidebar {
-            width: 100%;
-            height: 80px;
-            background: rgba(12, 13, 20, 0.45);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 50px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Brand Logo & Star Badge */
-        .sidebar-brand {
-            margin-bottom: 0;
-            padding-left: 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .brand-title-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: white;
-            margin-bottom: 6px;
-        }
-
-        .brand-logo-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #6200ea; /* Solid purple to match image */
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(98, 0, 234, 0.4);
-        }
-
-        .brand-text {
-            font-size: 1.6rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            color: white;
-            text-shadow: 0 0 10px rgba(162, 51, 255, 0.8), 0 0 20px rgba(162, 51, 255, 0.4);
-        }
-
-        .brand-text span {
-            color: var(--primary-yellow);
-        }
-
-        .star-free-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-top: 0;
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-        }
-
-        /* Sidebar Navigation Menu */
-        .sidebar-menu {
-            display: flex;
-            flex-direction: row;
-            gap: 15px;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 20px;
-            border-radius: 18px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1rem;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-        }
-
-        .sidebar-item .material-symbols-outlined {
-            font-size: 22px;
-            transition: transform 0.25s ease;
-        }
-
-        .sidebar-item:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateX(3px);
-        }
-
-        /* Yellow Highlighted Active Menu Button (Image 1 replica) */
-        .sidebar-item.active-yellow {
-            background: var(--primary-yellow);
-            color: #000000;
-            font-weight: 800;
-            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.3);
-        }
-
-        .sidebar-item.active-yellow .material-symbols-outlined {
-            color: #000000;
-        }
-
-        /* Bottom Sidebar Widgets (Image 1 replica) */
-        .sidebar-bottom-widgets {
-            display: none;
-        }
-
-        /* Upgrade to Pro Card */
-        .pro-card-box {
-            background: #14151f;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 22px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .pro-card-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .pro-card-header .material-symbols-outlined {
-            color: var(--primary-yellow);
-            font-size: 24px;
-        }
-
-        .pro-card-box p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin: 0 0 16px 0;
-            line-height: 1.45;
-        }
-
-        .upgrade-yellow-btn {
-            width: 100%;
-            background: var(--primary-yellow);
-            color: #000000;
-            border: none;
-            padding: 13px;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(162, 51, 255, 0.25);
-        }
-
-        .upgrade-yellow-btn:hover {
-            background: var(--primary-yellow-hover);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.5);
-        }
-
-        /* Get Desktop App Card */
-        .desktop-app-widget {
-            background: #101119;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 18px;
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .desktop-app-widget:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .desktop-app-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .desktop-app-info {
-            flex: 1;
-        }
-
-        .desktop-app-title {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .desktop-app-sub {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .desktop-download-icon {
-            color: var(--text-muted);
-            font-size: 20px;
-        }
-
-        /* RIGHT MAIN CONTENT AREA */
-        .main-content {
-            flex: 1;
-            margin-left: 0;
-            padding: 110px 40px 80px 40px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* TOP HEADER BAR (Image 2 replica) */
-        .top-header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 40px;
-            padding-bottom: 10px;
-        }
-
-        .header-welcome {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .header-title-text {
-            font-size: 2.6rem;
-            font-weight: 900;
-            margin: 0;
-            color: white;
-            letter-spacing: -0.5px;
-            text-shadow: 0 0 12px rgba(162, 51, 255, 0.8), 0 0 24px rgba(162, 51, 255, 0.5);
-        }
-
-        /* Profile Yellow Circle Button (Image 2 replica) */
-        .profile-avatar-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--primary-yellow);
-            color: #000000;
-            font-weight: 900;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px rgba(162, 51, 255, 0.35);
-            user-select: none;
-        }
-
-        .profile-avatar-circle:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 8px 30px rgba(162, 51, 255, 0.6);
-        }
-
-        /* GRID CARDS LAYOUT */
-        .grid {
-            display: grid;
-            gap: 24px;
-        }
-
-        .grid-top {
-            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
-            margin-bottom: 24px;
-        }
-
-        .grid-bottom {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-
-        /* Glassmorphism Cards */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 26px;
-            padding: 34px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-        }
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.01);
-            border-color: rgba(162, 51, 255, 0.5);
-            box-shadow: 0 25px 60px rgba(162, 51, 255, 0.25);
-        }
-
-        .card.large {
-            min-height: 320px;
-            padding: 40px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* Card Background Images */
-        #srt-generator {
-            background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-        }
-
-        #video-editor {
-            background-image: url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-        }
-
-        .card.large::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(105deg, rgba(9, 10, 15, 0.96) 0%, rgba(9, 10, 15, 0.8) 55%, rgba(9, 10, 15, 0.3) 100%);
-            z-index: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .card.large:hover::before {
-            opacity: 0.85;
-        }
-
-        .card-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .card h2 {
-            font-size: 2rem;
-            margin: 0 0 5px 0;
-            font-weight: 800;
-            text-shadow: 0 0 10px rgba(162, 51, 255, 0.8), 0 0 20px rgba(162, 51, 255, 0.5);
-        }
-
-        .card h3 {
-            font-size: 0.95rem;
-            margin: 0 0 12px 0;
-            font-weight: 800;
-            color: var(--primary-yellow);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin: 0 0 25px 0;
-            line-height: 1.6;
-            max-width: 90%;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--primary-yellow);
-            color: #000;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            cursor: pointer;
-            width: fit-content;
-            margin-top: auto;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 18px rgba(162, 51, 255, 0.3);
-        }
-
-        .btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.5);
-            background: var(--primary-yellow-hover);
-        }
-
-        .small-card {
-            padding: 30px 25px;
-            min-height: 250px;
-        }
-
-        .small-card h3 {
-            font-size: 1.25rem;
-            color: white;
-            text-transform: none;
-            letter-spacing: normal;
-            margin-bottom: 8px;
-        }
-
-        .icon-container {
-            width: 65px;
-            height: 65px;
-            margin-bottom: 20px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(162, 51, 255, 0.1);
-            border: 1px solid rgba(162, 51, 255, 0.25);
-            box-shadow: inset 0 0 20px rgba(162, 51, 255, 0.1);
-        }
-
-        .icon-container img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-        }
-
-        /* 3D Float Animations */
-        @keyframes float {
-            0% {
-                transform: translateY(0px) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-10px) rotate(5deg);
-            }
-
-            100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-        }
-
-        .animate-3d {
-            animation: float 4s ease-in-out infinite;
-            filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.4));
-            transition: all 0.3s ease;
-        }
-
-        .small-card:hover .animate-3d {
-            animation: none;
-            transform: scale(1.15) rotate(12deg) translateY(-5px);
-            filter: drop-shadow(0 20px 20px rgba(162, 51, 255, 0.6));
-        }
-
-        /* MODAL POPUPS SYSTEM */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(4, 5, 10, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-container {
-            background: rgba(18, 16, 28, 0.95);
-            border: 1px solid rgba(162, 51, 255, 0.25);
-            border-radius: 28px;
-            max-width: 680px;
-            width: 100%;
-            padding: 36px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(162, 51, 255, 0.25);
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-overlay.active .modal-container {
-            transform: scale(1) translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 16px;
-        }
-
-        .modal-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .modal-title h2 {
-            font-size: 1.6rem;
-            margin: 0;
-            font-weight: 800;
-        }
-
-        .modal-close-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-muted);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modal-close-btn:hover {
-            background: rgba(255, 82, 82, 0.2);
-            color: white;
-            border-color: var(--danger);
-        }
-
-        /* Option Tabs & Switches */
-        .option-tabs {
-            display: flex;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px;
-            border-radius: 14px;
-            gap: 6px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 18px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 0.95rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-yellow);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(162, 51, 255, 0.3);
-        }
-
-        /* Inputs & Drag Drop */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .form-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary-yellow);
-            box-shadow: 0 0 15px rgba(162, 51, 255, 0.3);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .dropzone-box {
-            border: 2px dashed rgba(162, 51, 255, 0.4);
-            border-radius: 18px;
-            padding: 28px 20px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.02);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dropzone-box:hover {
-            border-color: var(--primary-yellow);
-            background: rgba(162, 51, 255, 0.05);
-        }
-
-        /* Step-by-Step Live Progress Tracker */
-        .progress-card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #a233ff, #7b2cbf, #00f2fe);
-            border-radius: 10px;
-            transition: width 0.4s ease;
-            box-shadow: 0 0 12px rgba(162, 51, 255, 0.6);
-        }
-
-        .step-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            transition: all 0.3s ease;
-        }
-
-        .step-item.active {
-            color: white;
-            font-weight: 700;
-        }
-
-        .step-item.completed {
-            color: var(--success);
-        }
-
-        .step-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-        }
-
-        .step-item.active .step-icon {
-            background: var(--primary-yellow);
-            color: #000;
-            box-shadow: 0 0 10px var(--primary-yellow);
-        }
-
-        .step-item.completed .step-icon {
-            background: var(--success);
-            color: black;
-        }
-
-        /* Auto Word Count Badge */
-        .word-count-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(162, 51, 255, 0.15);
-            border: 1px solid rgba(162, 51, 255, 0.4);
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-yellow);
-            margin-top: 10px;
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            user-select: none;
-            margin-top: 12px;
-        }
-
-        .checkbox-container input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary-yellow);
-            cursor: pointer;
-        }
-
-        /* Profile Modal Cards */
-        .profile-card-details {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .profile-avatar-large {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--primary-yellow);
-            color: #000;
-            font-weight: 900;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 25px rgba(162, 51, 255, 0.5);
-        }
-
-        /* Footer */
-        .footer {
-            background-color: #04050a;
-            border-top: 1px solid rgba(162, 51, 255, 0.2);
-            padding: 40px 20px;
-            text-align: center;
-            margin-top: 60px;
-            border-radius: 20px;
-        }
-
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .footer-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .footer-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #a233ff, #7b2cbf);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: black;
-            font-weight: 900;
-        }
-
-        .brand-text-footer {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: white;
-        }
-
-        .portfolio-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            border-radius: 50px;
-            background: #181624;
-            border: 1px solid rgba(162, 51, 255, 0.4);
-            color: var(--primary-yellow);
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .portfolio-btn:hover {
-            background: var(--primary-yellow);
-            color: black;
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-                padding: 20px 10px;
-            }
-
-            .brand-text,
-            .star-free-badge,
-            .sidebar-item span:not(.material-symbols-outlined),
-            .sidebar-bottom-widgets {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 80px;
-                padding: 20px;
-            }
-
-            .grid-top {
-                grid-template-columns: 1fr;
-            }
-
-            .header-title-text {
-                font-size: 2rem;
-            }
-        }
-    
-        /* Glow and Top Middle Floating Button */
-        .floating-top-btn {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--primary-yellow), #7b2cbf);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 30px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(162, 51, 255, 0.6), 0 0 20px rgba(162, 51, 255, 0.4);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-        }
-
-        .floating-top-btn.visible {
-            top: 30px;
-            opacity: 1;
-        }
-
-        .floating-top-btn:hover {
-            transform: translateX(-50%) scale(1.1);
-            box-shadow: 0 15px 40px rgba(162, 51, 255, 0.8), 0 0 30px rgba(162, 51, 255, 0.6);
-        }
-        
-        .modal-container {
-            transform: scale(0.9) translateY(-100px) !important;
-        }
-        .modal-overlay.active .modal-container {
-            transform: scale(1) translateY(0) !important;
-        }
-
-    
-
   </style>
 </head>
 <body class="animated-bg text-slate-100 dark:text-slate-100 transition-colors duration-500 font-sans min-h-screen flex flex-col justify-between" id="bodyElement">
 
   <div>
-    <!-- ================= 1. HEADER ================= -->
+    <!-- ================= 1. HEADER (DESKTOP & MOBILE RESPONSIVE) ================= -->
     <nav class="px-4 sm:px-8 py-3.5 border-b border-black/10 dark:border-white/10 glass-card sticky top-0 z-50 transition-colors">
       <div class="max-w-7xl mx-auto flex justify-between items-center">
         
@@ -1020,7 +75,7 @@
           </div>
           <div>
             <span class="bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent font-black text-lg sm:text-2xl tracking-wider uppercase">
-              CapZone
+              CineNexus
             </span>
             <span class="block text-[8px] text-indigo-600 dark:text-purple-400 font-bold tracking-widest font-mono uppercase -mt-1 hidden sm:block">Pro Mobile Engine</span>
           </div>
@@ -1028,20 +83,21 @@
 
         <!-- Right Header Actions -->
         <div class="flex items-center gap-2">
+          <!-- Theme Toggle Button -->
           <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl glass-card text-amber-500 dark:text-amber-400 hover:scale-105 transition-all">
             <i data-lucide="sun" id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </button>
 
-          <!-- User Profile (Calls profile modal) -->
-          <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl glass-card border cursor-pointer" onclick="openModal('profileModal', event)">
-            <div class="w-6 h-6 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-[9px] text-white">
-              PRO
+          <!-- User Profile -->
+          <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl glass-card border cursor-pointer hover:bg-white/5 transition-colors" onclick="openModal('profileModal', event)">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-[9px] text-white" id="navProfileIcon">
+              D
             </div>
-            <span class="text-xs font-bold text-fix-heading hidden sm:inline" id="userEmailNav">Profile</span>
+            <span class="text-xs font-bold text-fix-heading hidden sm:inline" id="navProfileName">Director</span>
           </div>
 
           <!-- Exit / Logout -->
-          <button id="logoutBtnNav" class="p-2 sm:px-3 sm:py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5">
+          <button id="navLogoutBtn" class="p-2 sm:px-3 sm:py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5">
             <i data-lucide="power" class="w-4 h-4"></i>
             <span class="hidden sm:inline">Exit</span>
           </button>
@@ -1049,7 +105,7 @@
       </div>
     </nav>
 
-    <!-- ================= 2. DESKTOP HERO SECTION ================= -->
+    <!-- ================= 2. DESKTOP HERO SECTION (HIDDEN ON MOBILE FOR BETTER UX) ================= -->
     <header class="hidden md:block px-4 pt-8 pb-4 text-center max-w-4xl mx-auto">
       <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-indigo-600 dark:text-cyan-400 px-4 py-1.5 glass-card rounded-full border border-indigo-500/30 mb-3">
         <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Multi-Tool Studio Workspace
@@ -1060,7 +116,7 @@
       <p class="text-fix-sub text-sm max-w-2xl mx-auto">Full control over Video Editing, Subtitle Generation, Audio Noise Cleaning, and Social Media Downloads.</p>
     </header>
 
-    <!-- ================= 3. MOBILE SPECIAL APP UI ================= -->
+    <!-- ================= 3. MOBILE SPECIAL APP UI (VISIBLE ONLY ON MOBILE) ================= -->
     <div class="block md:hidden px-4 pt-4 pb-2">
       <!-- Quick Status Header -->
       <div class="glass-card p-4 rounded-2xl mb-4 flex items-center justify-between border-indigo-500/30">
@@ -1079,14 +135,11 @@
         <button onclick="mobileSwitchTab('m-srt')" id="m-btn-m-srt" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i data-lucide="captions" class="w-3.5 h-3.5"></i> SRT Subtitle
         </button>
-        <button onclick="mobileSwitchTab('m-audio')" id="m-btn-m-audio" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
-          <i data-lucide="mic-off" class="w-3.5 h-3.5"></i> Audio Clean
-        </button>
         <button onclick="mobileSwitchTab('m-downloader')" id="m-btn-m-downloader" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
           <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> Downloader
         </button>
         <button onclick="mobileSwitchTab('m-projects')" id="m-btn-m-projects" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
-          <i data-lucide="facebook" class="w-3.5 h-3.5"></i> Facebook
+          <i data-lucide="folder" class="w-3.5 h-3.5"></i> Projects
         </button>
       </div>
 
@@ -1102,8 +155,8 @@
           <div class="relative h-44 rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
             <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-80" />
             <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-3 text-center">
-              <p class="text-white text-xs font-bold mb-2">Launch Studio Editor</p>
-              <button onclick="window.location.href='editor.html'" class="px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-lg shadow-lg">Open Editor</button>
+              <p class="text-white text-xs font-bold mb-2">Tap to Add Video Footage</p>
+              <button onclick="window.location.href='editor.html'" class="px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-lg shadow-lg">Upload Media</button>
             </div>
           </div>
         </div>
@@ -1114,44 +167,40 @@
             <i data-lucide="captions" class="text-purple-500 w-5 h-5"></i>
             <h3 class="font-bold text-sm text-fix-heading">AI Subtitle Generator</h3>
           </div>
-          <p class="text-xs text-fix-sub">Extract captions from videos. Supports Sinhala fonts & Word Limits.</p>
-          <button onclick="openModal('srtModal', event)" class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
+          <p class="text-xs text-fix-sub">Automatically extract captions from videos and download `.srt` files directly on mobile.</p>
+          <button onclick="openModal('srtModal', event)" class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
         </div>
 
-        <!-- Mobile Tool 3: Audio Denoiser -->
-        <div id="m-audio" class="mobile-tab-content hidden space-y-3">
-          <div class="flex items-center gap-2">
-            <i data-lucide="mic-off" class="text-pink-500 w-5 h-5"></i>
-            <h3 class="font-bold text-sm text-fix-heading">Noise Cleaner</h3>
-          </div>
-          <p class="text-xs text-fix-sub mb-3">Isolate background noise & hiss from audio clips with extreme 100% voice boost.</p>
-          <button onclick="openModal('audioModal', event)" class="w-full py-3 bg-pink-600 text-white font-bold text-xs rounded-xl">Open Audio Cleaner</button>
-        </div>
-
-        <!-- Mobile Tool 4: TikTok Downloader -->
+        <!-- Mobile Tool 3: Social Downloader -->
         <div id="m-downloader" class="mobile-tab-content hidden space-y-3">
           <div class="flex items-center gap-2">
             <i data-lucide="download-cloud" class="text-cyan-500 w-5 h-5"></i>
-            <h3 class="font-bold text-sm text-fix-heading">TikTok HD Downloader</h3>
+            <h3 class="font-bold text-sm text-fix-heading">FB & TikTok Downloader</h3>
           </div>
-          <p class="text-xs text-fix-sub mb-3">Download watermark-free HD TikToks directly.</p>
-          <button onclick="openModal('tiktokModal', event)" class="w-full py-3 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-md">Open TikTok Tool</button>
+          <button onclick="openModal('fbModal', event)" class="w-full py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md mb-2">Download Facebook HD</button>
+          <button onclick="openModal('tiktokModal', event)" class="w-full py-2.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-xs rounded-xl shadow-md">Download TikTok HD</button>
         </div>
 
-        <!-- Mobile Tool 5: Facebook Downloader -->
-        <div id="m-projects" class="mobile-tab-content hidden space-y-3">
+        <!-- Mobile Tool 4: Saved Projects -->
+        <div id="m-projects" class="mobile-tab-content hidden space-y-2">
           <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="facebook" class="text-amber-500 w-5 h-5"></i>
-            <h3 class="font-bold text-sm text-fix-heading">Facebook Downloader</h3>
+            <i data-lucide="folder" class="text-amber-500 w-5 h-5"></i>
+            <h3 class="font-bold text-sm text-fix-heading">Recent Projects</h3>
           </div>
-          <p class="text-xs text-fix-sub mb-3">Download Facebook videos in SD/HD quality.</p>
-          <button onclick="openModal('fbModal', event)" class="w-full py-3 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">Open Facebook Tool</button>
+          <div class="p-2.5 rounded-lg bg-black/20 text-xs flex justify-between items-center">
+            <span class="truncate font-semibold text-fix-heading">Nike_Commercial_v4.mp4</span>
+            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+          </div>
+          <div class="p-2.5 rounded-lg bg-black/20 text-xs flex justify-between items-center">
+            <span class="truncate font-semibold text-fix-heading">Podcast_Cleaned.mp3</span>
+            <i data-lucide="check-circle" class="w-4 h-4 text-cyan-500 shrink-0"></i>
+          </div>
         </div>
 
       </div>
     </div>
 
-    <!-- ================= 4. DESKTOP BENTO GRID ================= -->
+    <!-- ================= 4. DESKTOP BENTO GRID (VISIBLE ONLY ON DESKTOP/LAPTOP) ================= -->
     <main class="hidden md:grid max-w-7xl mx-auto px-6 pb-16 grid-cols-3 gap-6">
       
       <!-- CARD 1: VIDEO EDITOR -->
@@ -1172,8 +221,8 @@
         <div class="relative h-56 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group">
           <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" />
           <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-6 text-center">
-            <p class="text-white font-bold text-base mb-1">Full Studio Workspace</p>
-            <p class="text-slate-300 text-xs mb-4">Add transitions, effects, text, and export in 4K quality</p>
+            <p class="text-white font-bold text-base mb-1">Drag and Drop Video Files Here</p>
+            <p class="text-slate-300 text-xs mb-4">Supports ProRes, MP4, RED RAW up to 10GB</p>
             <button onclick="window.location.href='editor.html'" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg">Launch 4K Editor</button>
           </div>
         </div>
@@ -1199,41 +248,22 @@
             </div>
           </div>
         </div>
-        <button onclick="openModal('srtModal', event)" class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Studio</button>
-      </div>
 
-      <!-- CARD 3: AUDIO DENOISER -->
-      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-3 mb-3">
-            <div class="p-3 bg-pink-500/10 text-pink-500 rounded-2xl border border-pink-500/20">
-              <i data-lucide="mic-off" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-fix-heading">Audio Denoiser</h3>
-              <p class="text-xs text-fix-sub">AI Noise Cleaner</p>
-            </div>
-          </div>
-          <div class="h-24 rounded-xl overflow-hidden my-3 relative border border-black/10 dark:border-white/10">
-            <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-80" />
-            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <span class="text-xs font-bold text-pink-300 bg-black/60 px-3 py-1 rounded-full">Noise Suppressed</span>
-            </div>
-          </div>
+        <div class="space-y-2">
+          <button onclick="openModal('srtModal', event)" class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
         </div>
-        <button onclick="openModal('audioModal', event)" class="w-full py-3 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md">Clean Audio Track</button>
       </div>
 
-      <!-- CARD 4: TIKTOK DOWNLOADER -->
-      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+      <!-- CARD 3: SOCIAL DOWNLOADER -->
+      <div class="col-span-1 glass-card rounded-3xl p-6 flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-3 mb-3">
             <div class="p-3 bg-cyan-500/10 text-cyan-500 rounded-2xl border border-cyan-500/20">
               <i data-lucide="download-cloud" class="w-6 h-6"></i>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-fix-heading">TikTok Grabber</h3>
-              <p class="text-xs text-fix-sub">TikTok HD Rip</p>
+              <h3 class="text-lg font-bold text-fix-heading">Social Grabber</h3>
+              <p class="text-xs text-fix-sub">FB & TikTok HD Rip</p>
             </div>
           </div>
           <div class="h-24 rounded-xl overflow-hidden my-3 relative border border-black/10 dark:border-white/10">
@@ -1243,33 +273,43 @@
             </div>
           </div>
         </div>
-        <button onclick="openModal('tiktokModal', event)" class="w-full py-3 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-md">Open TikTok Downloader</button>
+        <div class="flex gap-2">
+          <button onclick="openModal('fbModal', event)" class="w-full py-3 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">Facebook</button>
+          <button onclick="openModal('tiktokModal', event)" class="w-full py-3 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-xs rounded-xl shadow-md">TikTok</button>
+        </div>
       </div>
 
-      <!-- CARD 5: FB DOWNLOADER -->
+      <!-- CARD 4: PROJECTS -->
       <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
         <div>
           <div class="flex items-center gap-3 mb-4">
             <div class="p-3 bg-amber-500/10 text-amber-500 rounded-2xl border border-amber-500/20">
-              <i data-lucide="facebook" class="w-6 h-6"></i>
+              <i data-lucide="folder" class="w-6 h-6"></i>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-fix-heading">FB Downloader</h3>
-              <p class="text-xs text-fix-sub">Social Downloader</p>
+              <h3 class="text-lg font-bold text-fix-heading">Saved Projects</h3>
+              <p class="text-xs text-fix-sub">Cloud Dashboard</p>
             </div>
           </div>
-          <div class="space-y-2 text-center text-xs text-fix-sub pt-4">
-             Fast Facebook Video downloads in HD & SD.
+          <div class="space-y-2">
+            <div class="p-3 rounded-xl bg-black/10 dark:bg-black/30 flex justify-between items-center">
+              <span class="text-xs font-bold text-fix-heading truncate">Nike_Ad_4K.mp4</span>
+              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
+            </div>
+            <div class="p-3 rounded-xl bg-black/10 dark:bg-black/30 flex justify-between items-center">
+              <span class="text-xs font-bold text-fix-heading truncate">Podcast_Clean.mp3</span>
+              <i data-lucide="check-circle" class="w-4 h-4 text-cyan-500 shrink-0"></i>
+            </div>
           </div>
         </div>
-        <button onclick="openModal('fbModal', event)" class="w-full mt-4 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">Open Facebook Downloader</button>
+        <button class="w-full mt-4 py-2.5 bg-slate-200 dark:bg-slate-800 text-fix-heading font-bold text-xs rounded-xl">View All Projects</button>
       </div>
 
     </main>
   </div>
 
   <!-- ================= 5. MOBILE BOTTOM NATIVE APP NAVIGATION ================= -->
-  <div class="fixed bottom-0 left-0 right-0 glass-card border-t border-black/10 dark:border-white/10 py-2.5 px-2 sm:hidden z-40 flex justify-around items-center">
+  <div class="fixed bottom-0 left-0 right-0 glass-card border-t border-black/10 dark:border-white/10 py-2.5 px-2 sm:hidden z-50 flex justify-around items-center">
     <button onclick="mobileSwitchTab('m-editor')" class="flex flex-col items-center gap-1 text-indigo-500">
       <i data-lucide="film" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">Editor</span>
@@ -1278,26 +318,22 @@
       <i data-lucide="captions" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">SRT</span>
     </button>
-    <button onclick="mobileSwitchTab('m-audio')" class="flex flex-col items-center gap-1 text-fix-sub">
-      <i data-lucide="mic-off" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">Audio</span>
-    </button>
     <button onclick="mobileSwitchTab('m-downloader')" class="flex flex-col items-center gap-1 text-fix-sub">
       <i data-lucide="download-cloud" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">TikTok</span>
+      <span class="text-[9px] font-bold">Tools</span>
     </button>
     <button onclick="mobileSwitchTab('m-projects')" class="flex flex-col items-center gap-1 text-fix-sub">
-      <i data-lucide="facebook" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">FB</span>
+      <i data-lucide="folder" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Projects</span>
     </button>
   </div>
 
   <!-- ================= 6. FOOTER ================= -->
-  <footer class="border-t border-black/10 dark:border-white/10 glass-card py-5 px-4 mb-14 sm:mb-0">
+  <footer class="border-t border-black/10 dark:border-white/10 glass-card py-5 px-4 mb-12 sm:mb-0">
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-fix-sub">
       <div class="flex items-center gap-2">
         <i data-lucide="clapperboard" class="w-4 h-4 text-indigo-500"></i>
-        <span class="font-bold text-fix-heading">CapZone STUDIO</span>
+        <span class="font-bold text-fix-heading">CINE-NEXUS STUDIO</span>
         <span>© 2026 Production Engine</span>
       </div>
       <div class="flex gap-4 text-[10px] sm:text-xs">
@@ -1306,1590 +342,305 @@
       </div>
     </div>
   </footer>
-  
-  <!-- OLD MODALS PLACEHOLDER -->
-  
+
+    <!-- ====================================================================== -->
+  <!-- TAILWIND MODALS SECTION -->
+  <!-- ====================================================================== -->
+
+  <!-- MODAL 0: PROFILE -->
+  <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative">
+      <button onclick="closeModal('profileModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-cyan-500/30 mb-3" id="profileInitial">
+          P
+        </div>
+        <h2 class="text-xl font-bold text-fix-heading" id="profileName">Loading...</h2>
+        <p class="text-xs text-fix-sub mt-1" id="profileEmail">user@example.com</p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5">
+          <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone Pro API Key (Optional)</label>
+          <input type="text" id="geminiApiKey" placeholder="AI Studio Key for bypass limits..." class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
+          <button id="saveApiKeyBtn" class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save API Key</button>
+        </div>
+        <button id="logoutBtn" class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 1: FACEBOOK DOWNLOADER -->
+  <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative">
+      <button onclick="closeModal('fbModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-amber-500/10 text-amber-500 rounded-2xl border border-amber-500/20">
+          <i data-lucide="facebook" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">FB Downloader</h2>
+          <p class="text-xs text-fix-sub">Download high-quality videos instantly</p>
+        </div>
+      </div>
+
+      <form id="fbForm" class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
+          <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..." class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
+        </div>
+        <button type="submit" id="fbSubmitBtn" class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Video
+        </button>
+      </form>
+
+      <!-- Progress Tracking -->
+      <div id="fbProgressCard" class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing Video...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="fbProgressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div id="fbProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1"></div>
+      </div>
+
+      <!-- Result Area -->
+      <div id="fbResultArea" class="mt-4 p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex flex-col items-center gap-3" style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-green-500"></i>
+        <a id="fbDownloadLink" class="w-full py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center" target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save HD Video
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: TIKTOK DOWNLOADER -->
+  <div id="tiktokModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative">
+      <button onclick="closeModal('tiktokModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-cyan-500/10 text-cyan-500 rounded-2xl border border-cyan-500/20">
+          <i data-lucide="download-cloud" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">TikTok Grabber</h2>
+          <p class="text-xs text-fix-sub">No-Watermark Video Downloads</p>
+        </div>
+      </div>
+
+      <form id="tiktokForm" class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
+          <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..." class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
+        </div>
+        <button type="submit" id="tiktokSubmitBtn" class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Get Video
+        </button>
+      </form>
+
+      <!-- Progress Tracking -->
+      <div id="tiktokProgressCard" class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Bypassing Watermark...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="tiktokProgressBar" class="bg-gradient-to-r from-pink-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div id="tiktokProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1"></div>
+      </div>
+
+      <!-- Result Area -->
+      <div id="tiktokResultArea" class="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center gap-3" style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+        <a id="tiktokDownloadLink" class="w-full py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center" target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save HD Video
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: SRT GENERATOR -->
+  <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto py-10" style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative my-auto">
+      <button onclick="closeModal('srtModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
+          <i data-lucide="captions" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">AI Subtitles Studio</h2>
+          <p class="text-xs text-fix-sub">Generate perfectly synced SRT files in seconds.</p>
+        </div>
+      </div>
+
+      <form id="srtForm" class="space-y-4">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Upload Video/Audio File</label>
+          <div class="relative w-full border-2 border-dashed border-purple-500/30 rounded-xl p-4 text-center hover:bg-purple-500/5 transition-colors cursor-pointer" onclick="document.getElementById('srtVideoInput').click()">
+            <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden" />
+            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-purple-500 mb-2"></i>
+            <p class="text-xs text-fix-heading font-bold" id="srtFileLabel">Click to Browse Media</p>
+            <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV, MKV up to 50MB</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Language</label>
+            <select id="srtLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
+              <option value="si">Sinhala (සිංහල)</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
+            <input type="number" id="srtWordsPerLine" value="5" min="1" max="5" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+          <input type="checkbox" id="srtLegacyFont" class="w-4 h-4 rounded accent-indigo-500" />
+          <div class="flex-1">
+            <label for="srtLegacyFont" class="text-xs font-bold text-indigo-500 dark:text-indigo-400 cursor-pointer block">Convert to Legacy Font (FM Abhaya)</label>
+            <p class="text-[9px] text-indigo-500/70">Enable for old video editing software (Premiere Pro, Vegas)</p>
+          </div>
+        </div>
+
+        <button type="submit" id="srtSubmitBtn" class="w-full py-3.5 bg-purple-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Captions
+        </button>
+      </form>
+
+      <!-- Progress Tracking -->
+      <div id="srtProgressCard" class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Analyzing Audio & Timing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="srtProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+        </div>
+        <div id="srtProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-24 overflow-y-auto space-y-1"></div>
+      </div>
+
+      <!-- Result Area -->
+      <div id="srtResultArea" class="mt-4 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex flex-col items-center gap-3" style="display: none;">
+        <i data-lucide="file-text" class="w-8 h-8 text-purple-500"></i>
+        <p class="text-xs font-bold text-fix-heading">Captions Generated Successfully!</p>
+        <a id="srtDownloadLink" class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center" target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download .SRT File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAILWIND TOAST NOTIFICATION -->
+  <div id="toastNotification" class="fixed bottom-20 sm:bottom-6 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-6 z-50 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
+    <div class="glass-card px-4 py-3 rounded-xl flex items-center gap-3 shadow-2xl border border-white/20">
+      <i data-lucide="info" class="w-5 h-5 text-indigo-500"></i>
+      <span id="toastMessage" class="text-xs font-bold text-fix-heading">Notification Message</span>
+    </div>
+  </div>
+
 
   <!-- Scripts -->
-  <script type="module">
-        import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-        
-        onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-            } else {
-                // Check if user was deleted by admin every 60 seconds
-                setInterval(async () => {
-                    try {
-                        await user.getIdToken(true); // Force token refresh
-                    } catch (error) {
-                        console.warn("Session invalidated or user deleted. Logging out.");
-                        await signOut(auth);
-                        window.location.href = 'login.html';
-                    }
-                }, 60000);
-            }
-        });
-
-
-        // Add Sign Out handler
-        document.addEventListener('DOMContentLoaded', () => {
-            const signOutBtn = document.getElementById('sign-out-btn');
-            if (signOutBtn) {
-                signOutBtn.addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    try {
-                        await signOut(auth);
-                    } catch (error) {
-                        console.error("Sign Out Error:", error);
-                        alert("Sign Out Failed: " + error.message);
-                    }
-                });
-            }
-        });
-    </script>
-
-    <style>
-        :root {
-            --bg-color: #090a0f;
-            --sidebar-bg: #0c0d14;
-            --card-bg: rgba(22, 20, 32, 0.7);
-            --card-border: rgba(255, 255, 255, 0.08);
-            --primary-yellow: #a233ff;
-            --primary-yellow-hover: #c77dff;
-            --primary-purple: #9d4edd;
-            --secondary-cyan: #00f2fe;
-            --text-main: #ffffff;
-            --text-muted: #9594a5;
-            --success: #00e676;
-            --danger: #ff5252;
-        }
-
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            outline: none !important;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            background-image:
-                radial-gradient(circle at 10% 20%, rgba(162, 51, 255, 0.05), transparent 30%),
-                radial-gradient(circle at 85% 60%, rgba(157, 78, 221, 0.06), transparent 35%);
-            font-family: 'Poppins', sans-serif;
-            color: var(--text-main);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* 2-COLUMN DASHBOARD LAYOUT */
-        .dashboard-layout {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            width: 100vw;
-        }
-
-        /* LEFT SIDEBAR NAVIGATION -> MOVED TO TOP */
-        .sidebar {
-            width: 100%;
-            height: 80px;
-            background: rgba(12, 13, 20, 0.45);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 50px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 100;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        /* Brand Logo & Star Badge */
-        .sidebar-brand {
-            margin-bottom: 0;
-            padding-left: 0;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .brand-title-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            text-decoration: none;
-            color: white;
-            margin-bottom: 6px;
-        }
-
-        .brand-logo-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: #6200ea; /* Solid purple to match image */
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(98, 0, 234, 0.4);
-        }
-
-        .brand-text {
-            font-size: 1.6rem;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-            color: white;
-            text-shadow: 0 0 10px rgba(162, 51, 255, 0.8), 0 0 20px rgba(162, 51, 255, 0.4);
-        }
-
-        .brand-text span {
-            color: var(--primary-yellow);
-        }
-
-        .star-free-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            margin-top: 0;
-            padding: 4px 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-        }
-
-        /* Sidebar Navigation Menu */
-        .sidebar-menu {
-            display: flex;
-            flex-direction: row;
-            gap: 15px;
-        }
-
-        .sidebar-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 13px 20px;
-            border-radius: 18px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 1rem;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            cursor: pointer;
-        }
-
-        .sidebar-item .material-symbols-outlined {
-            font-size: 22px;
-            transition: transform 0.25s ease;
-        }
-
-        .sidebar-item:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateX(3px);
-        }
-
-        /* Yellow Highlighted Active Menu Button (Image 1 replica) */
-        .sidebar-item.active-yellow {
-            background: var(--primary-yellow);
-            color: #000000;
-            font-weight: 800;
-            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.3);
-        }
-
-        .sidebar-item.active-yellow .material-symbols-outlined {
-            color: #000000;
-        }
-
-        /* Bottom Sidebar Widgets (Image 1 replica) */
-        .sidebar-bottom-widgets {
-            display: none;
-        }
-
-        /* Upgrade to Pro Card */
-        .pro-card-box {
-            background: #14151f;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 22px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .pro-card-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: white;
-            margin-bottom: 8px;
-        }
-
-        .pro-card-header .material-symbols-outlined {
-            color: var(--primary-yellow);
-            font-size: 24px;
-        }
-
-        .pro-card-box p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin: 0 0 16px 0;
-            line-height: 1.45;
-        }
-
-        .upgrade-yellow-btn {
-            width: 100%;
-            background: var(--primary-yellow);
-            color: #000000;
-            border: none;
-            padding: 13px;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(162, 51, 255, 0.25);
-        }
-
-        .upgrade-yellow-btn:hover {
-            background: var(--primary-yellow-hover);
-            transform: translateY(-2px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.5);
-        }
-
-        /* Get Desktop App Card */
-        .desktop-app-widget {
-            background: #101119;
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 18px;
-            padding: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .desktop-app-widget:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(255, 255, 255, 0.15);
-        }
-
-        .desktop-app-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.06);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-        }
-
-        .desktop-app-info {
-            flex: 1;
-        }
-
-        .desktop-app-title {
-            font-size: 0.88rem;
-            font-weight: 700;
-            color: white;
-        }
-
-        .desktop-app-sub {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-        }
-
-        .desktop-download-icon {
-            color: var(--text-muted);
-            font-size: 20px;
-        }
-
-        /* RIGHT MAIN CONTENT AREA */
-        .main-content {
-            flex: 1;
-            margin-left: 0;
-            padding: 110px 40px 80px 40px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* TOP HEADER BAR (Image 2 replica) */
-        .top-header-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 40px;
-            padding-bottom: 10px;
-        }
-
-        .header-welcome {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            font-weight: 600;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .header-title-text {
-            font-size: 2.6rem;
-            font-weight: 900;
-            margin: 0;
-            color: white;
-            letter-spacing: -0.5px;
-            text-shadow: 0 0 12px rgba(162, 51, 255, 0.8), 0 0 24px rgba(162, 51, 255, 0.5);
-        }
-
-        /* Profile Yellow Circle Button (Image 2 replica) */
-        .profile-avatar-circle {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--primary-yellow);
-            color: #000000;
-            font-weight: 900;
-            font-size: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 4px 20px rgba(162, 51, 255, 0.35);
-            user-select: none;
-        }
-
-        .profile-avatar-circle:hover {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow: 0 8px 30px rgba(162, 51, 255, 0.6);
-        }
-
-        /* GRID CARDS LAYOUT */
-        .grid {
-            display: grid;
-            gap: 24px;
-        }
-
-        .grid-top {
-            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
-            margin-bottom: 24px;
-        }
-
-        .grid-bottom {
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        }
-
-        /* Glassmorphism Cards */
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 26px;
-            padding: 34px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            cursor: pointer;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-        }
-
-        .card:hover {
-            transform: translateY(-8px) scale(1.01);
-            border-color: rgba(162, 51, 255, 0.5);
-            box-shadow: 0 25px 60px rgba(162, 51, 255, 0.25);
-        }
-
-        .card.large {
-            min-height: 320px;
-            padding: 40px;
-            background-size: cover;
-            background-position: center;
-        }
-
-        /* Card Background Images */
-        #srt-generator {
-            background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-        }
-
-        #video-editor {
-            background-image: url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
-        }
-
-        .card.large::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(105deg, rgba(9, 10, 15, 0.96) 0%, rgba(9, 10, 15, 0.8) 55%, rgba(9, 10, 15, 0.3) 100%);
-            z-index: 1;
-            transition: opacity 0.3s ease;
-        }
-
-        .card.large:hover::before {
-            opacity: 0.85;
-        }
-
-        .card-content {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-
-        .card h2 {
-            font-size: 2rem;
-            margin: 0 0 5px 0;
-            font-weight: 800;
-            text-shadow: 0 0 10px rgba(162, 51, 255, 0.8), 0 0 20px rgba(162, 51, 255, 0.5);
-        }
-
-        .card h3 {
-            font-size: 0.95rem;
-            margin: 0 0 12px 0;
-            font-weight: 800;
-            color: var(--primary-yellow);
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-
-        .card p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin: 0 0 25px 0;
-            line-height: 1.6;
-            max-width: 90%;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--primary-yellow);
-            color: #000;
-            border: none;
-            padding: 14px 28px;
-            border-radius: 14px;
-            font-family: 'Poppins', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            cursor: pointer;
-            width: fit-content;
-            margin-top: auto;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 18px rgba(162, 51, 255, 0.3);
-        }
-
-        .btn:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.5);
-            background: var(--primary-yellow-hover);
-        }
-
-        .small-card {
-            padding: 30px 25px;
-            min-height: 250px;
-        }
-
-        .small-card h3 {
-            font-size: 1.25rem;
-            color: white;
-            text-transform: none;
-            letter-spacing: normal;
-            margin-bottom: 8px;
-        }
-
-        .icon-container {
-            width: 65px;
-            height: 65px;
-            margin-bottom: 20px;
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(162, 51, 255, 0.1);
-            border: 1px solid rgba(162, 51, 255, 0.25);
-            box-shadow: inset 0 0 20px rgba(162, 51, 255, 0.1);
-        }
-
-        .icon-container img {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-        }
-
-        /* 3D Float Animations */
-        @keyframes float {
-            0% {
-                transform: translateY(0px) rotate(0deg);
-            }
-
-            50% {
-                transform: translateY(-10px) rotate(5deg);
-            }
-
-            100% {
-                transform: translateY(0px) rotate(0deg);
-            }
-        }
-
-        .animate-3d {
-            animation: float 4s ease-in-out infinite;
-            filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.4));
-            transition: all 0.3s ease;
-        }
-
-        .small-card:hover .animate-3d {
-            animation: none;
-            transform: scale(1.15) rotate(12deg) translateY(-5px);
-            filter: drop-shadow(0 20px 20px rgba(162, 51, 255, 0.6));
-        }
-
-        /* MODAL POPUPS SYSTEM */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(4, 5, 10, 0.85);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .modal-container {
-            background: rgba(18, 16, 28, 0.95);
-            border: 1px solid rgba(162, 51, 255, 0.25);
-            border-radius: 28px;
-            max-width: 680px;
-            width: 100%;
-            padding: 36px;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(162, 51, 255, 0.25);
-            transform: scale(0.9) translateY(20px);
-            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 90vh;
-            overflow-y: auto;
-            position: relative;
-        }
-
-        .modal-overlay.active .modal-container {
-            transform: scale(1) translateY(0);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding-bottom: 16px;
-        }
-
-        .modal-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .modal-title h2 {
-            font-size: 1.6rem;
-            margin: 0;
-            font-weight: 800;
-        }
-
-        .modal-close-btn {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: var(--text-muted);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modal-close-btn:hover {
-            background: rgba(255, 82, 82, 0.2);
-            color: white;
-            border-color: var(--danger);
-        }
-
-        /* Option Tabs & Switches */
-        .option-tabs {
-            display: flex;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 5px;
-            border-radius: 14px;
-            gap: 6px;
-            margin-bottom: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 12px 18px;
-            border: none;
-            background: transparent;
-            color: var(--text-muted);
-            font-family: 'Poppins', sans-serif;
-            font-weight: 700;
-            font-size: 0.95rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .tab-btn.active {
-            background: var(--primary-yellow);
-            color: #000;
-            box-shadow: 0 4px 15px rgba(162, 51, 255, 0.3);
-        }
-
-        /* Inputs & Drag Drop */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            color: var(--text-main);
-        }
-
-        .form-input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: white;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.3s ease;
-        }
-
-        .form-input:focus {
-            border-color: var(--primary-yellow);
-            box-shadow: 0 0 15px rgba(162, 51, 255, 0.3);
-            background: rgba(255, 255, 255, 0.08);
-        }
-
-        .dropzone-box {
-            border: 2px dashed rgba(162, 51, 255, 0.4);
-            border-radius: 18px;
-            padding: 28px 20px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.02);
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .dropzone-box:hover {
-            border-color: var(--primary-yellow);
-            background: rgba(162, 51, 255, 0.05);
-        }
-
-        /* Step-by-Step Live Progress Tracker */
-        .progress-card {
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 18px;
-            padding: 20px;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #a233ff, #7b2cbf, #00f2fe);
-            border-radius: 10px;
-            transition: width 0.4s ease;
-            box-shadow: 0 0 12px rgba(162, 51, 255, 0.6);
-        }
-
-        .step-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .step-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.9rem;
-            color: var(--text-muted);
-            transition: all 0.3s ease;
-        }
-
-        .step-item.active {
-            color: white;
-            font-weight: 700;
-        }
-
-        .step-item.completed {
-            color: var(--success);
-        }
-
-        .step-icon {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-muted);
-        }
-
-        .step-item.active .step-icon {
-            background: var(--primary-yellow);
-            color: #000;
-            box-shadow: 0 0 10px var(--primary-yellow);
-        }
-
-        .step-item.completed .step-icon {
-            background: var(--success);
-            color: black;
-        }
-
-        /* Auto Word Count Badge */
-        .word-count-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(162, 51, 255, 0.15);
-            border: 1px solid rgba(162, 51, 255, 0.4);
-            padding: 6px 14px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: var(--primary-yellow);
-            margin-top: 10px;
-        }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            user-select: none;
-            margin-top: 12px;
-        }
-
-        .checkbox-container input {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary-yellow);
-            cursor: pointer;
-        }
-
-        /* Profile Modal Cards */
-        .profile-card-details {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.04);
-            border-radius: 20px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .profile-avatar-large {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--primary-yellow);
-            color: #000;
-            font-weight: 900;
-            font-size: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 25px rgba(162, 51, 255, 0.5);
-        }
-
-        /* Footer */
-        .footer {
-            background-color: #04050a;
-            border-top: 1px solid rgba(162, 51, 255, 0.2);
-            padding: 40px 20px;
-            text-align: center;
-            margin-top: 60px;
-            border-radius: 20px;
-        }
-
-        .footer-content {
-            max-width: 800px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .footer-brand {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .footer-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #a233ff, #7b2cbf);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: black;
-            font-weight: 900;
-        }
-
-        .brand-text-footer {
-            font-size: 1.25rem;
-            font-weight: 800;
-            color: white;
-        }
-
-        .portfolio-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 24px;
-            border-radius: 50px;
-            background: #181624;
-            border: 1px solid rgba(162, 51, 255, 0.4);
-            color: var(--primary-yellow);
-            text-decoration: none;
-            font-weight: 800;
-            font-size: 0.85rem;
-            transition: all 0.3s ease;
-        }
-
-        .portfolio-btn:hover {
-            background: var(--primary-yellow);
-            color: black;
-            transform: scale(1.05);
-        }
-
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-                padding: 20px 10px;
-            }
-
-            .brand-text,
-            .star-free-badge,
-            .sidebar-item span:not(.material-symbols-outlined),
-            .sidebar-bottom-widgets {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 80px;
-                padding: 20px;
-            }
-
-            .grid-top {
-                grid-template-columns: 1fr;
-            }
-
-            .header-title-text {
-                font-size: 2rem;
-            }
-        }
+  <script>
+    lucide.createIcons();
+    let isDark = true;
+
+    function toggleTheme() {
+      isDark = !isDark;
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+
+      if (!isDark) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        themeIcon.setAttribute('data-lucide', 'moon');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        themeIcon.setAttribute('data-lucide', 'sun');
+      }
+      lucide.createIcons();
+    }
+
+    function mobileSwitchTab(tabId) {
+      // Hide all mobile tab contents
+      document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.add('hidden'));
+      
+      // Reset mobile top button styles
+      document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+        btn.className = "mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5";
+      });
+
+      // Show selected mobile content
+      const contentEl = document.getElementById(tabId);
+      if(contentEl) contentEl.classList.remove('hidden');
+
+      // Highlight selected mobile button
+      const activeBtn = document.getElementById('m-btn-' + tabId);
+      if(activeBtn) activeBtn.className = "mobile-tab-btn shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md";
+    }
+  </script>
+<script>
+// --- NEW TAILWIND FUNCTIONS ---
+function showPopup(message, type = 'success') {
+    const toast = document.getElementById('toastNotification');
+    const msg = document.getElementById('toastMessage');
+    const icon = toast.querySelector('i');
     
-        /* Glow and Top Middle Floating Button */
-        .floating-top-btn {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--primary-yellow), #7b2cbf);
-            color: white;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 30px;
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(162, 51, 255, 0.6), 0 0 20px rgba(162, 51, 255, 0.4);
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            opacity: 0;
-        }
+    msg.innerHTML = message;
+    
+    if (type === 'error' || type === true) { // handle the old showPopup signature which was boolean
+        icon.setAttribute('data-lucide', 'alert-circle');
+        icon.classList.remove('text-indigo-500');
+        icon.classList.add('text-red-500');
+    } else {
+        icon.setAttribute('data-lucide', 'check-circle-2');
+        icon.classList.remove('text-red-500');
+        icon.classList.add('text-indigo-500');
+    }
+    if (window.lucide) lucide.createIcons();
+    
+    toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+    toast.classList.add('opacity-100', 'translate-y-0');
+    
+    setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+    }, 5000);
+}
 
-        .floating-top-btn.visible {
-            top: 30px;
-            opacity: 1;
-        }
+function openModal(modalId, event) {
+    if(event) event.preventDefault();
+    const modal = document.getElementById(modalId);
+    if(modal) {
+        modal.style.display = 'flex';
+        // zIndex fixes for bottom nav
+        const bnav = document.querySelector('.fixed.bottom-0');
+        if(bnav) bnav.style.zIndex = '0';
+    }
+}
+function closeModal(modalId, event) {
+    if(event) event.preventDefault();
+    const modal = document.getElementById(modalId);
+    if(modal) {
+        modal.style.display = 'none';
+        const bnav = document.querySelector('.fixed.bottom-0');
+        if(bnav) bnav.style.zIndex = '50';
+    }
+}
+// ------------------------------
 
-        .floating-top-btn:hover {
-            transform: translateX(-50%) scale(1.1);
-            box-shadow: 0 15px 40px rgba(162, 51, 255, 0.8), 0 0 30px rgba(162, 51, 255, 0.6);
-        }
-        
-        .modal-container {
-            transform: scale(0.9) translateY(-100px) !important;
-        }
-        .modal-overlay.active .modal-container {
-            transform: scale(1) translateY(0) !important;
-        }
-
-    </style>
-</head>
-
-<body>
-
-    <div class="dashboard-layout">
-
-        <!-- ====================================================================== -->
-        <!-- LEFT SIDEBAR NAVIGATION (Exact Replica of Image 1) -->
-        <!-- ====================================================================== -->
-        <aside class="sidebar">
-            <!-- Brand Header -->
-            <div class="sidebar-brand">
-                <a href="index.html" class="brand-title-group">
-                    <div class="brand-logo-icon">
-                        <span class="material-symbols-outlined" style="font-size: 22px;">movie_edit</span>
-                    </div>
-                    <div class="brand-text">CapZone</div>
-                </a>
-            </div>
-
-            <!-- Navigation Menu -->
-            <nav class="sidebar-menu">
-                <!-- Home button links directly to index.html -->
-                <a href="index.html" class="sidebar-item active-yellow" title="Home (index.html)">
-                        <span class="material-symbols-outlined">home</span>
-                        <span>Home</span>
-                    </a>
-
-                    <a href="editor.html" class="sidebar-item">
-                        <span class="material-symbols-outlined">folder</span>
-                        <span>Projects</span>
-                    </a>
-
-                    <a href="#" id="sign-out-btn" class="sidebar-item" style="margin-top: auto; color: #ff4a4a;">
-                        <span class="material-symbols-outlined">logout</span>
-                        <span>Sign Out</span>
-                    </a>
-                </nav>
-
-            <!-- Bottom Sidebar Widgets -->
-            <div class="sidebar-bottom-widgets">
-                <!-- Upgrade to Pro Card -->
-                <div class="pro-card-box">
-                    <div class="pro-card-header">
-                        <span class="material-symbols-outlined">crown</span>
-                        <span>Upgrade to Pro</span>
-                    </div>
-                    <p>Unlock premium features and high quality exports.</p>
-                    <button class="upgrade-yellow-btn" onclick="openModal('proModal', event)">
-                        Upgrade Now →
-                    </button>
-                </div>
-
-                <!-- Get Desktop App Card -->
-                <div class="desktop-app-widget" onclick="alert('Downloading CapZone Windows Desktop App...')">
-                    <div class="desktop-app-icon">
-                        <span class="material-symbols-outlined">desktop_windows</span>
-                    </div>
-                    <div class="desktop-app-info">
-                        <div class="desktop-app-title">Get the desktop app</div>
-                        <div class="desktop-app-sub">Windows · faster exports</div>
-                    </div>
-                    <span class="material-symbols-outlined desktop-download-icon">download</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- ====================================================================== -->
-        <!-- RIGHT MAIN CONTENT AREA -->
-        <!-- ====================================================================== -->
-        <main class="main-content">
-
-            <!-- TOP HEADER BAR (Exact Replica of Image 2) -->
-            <header class="top-header-bar">
-                <div>
-                    <div class="header-welcome">👋 Welcome back, Kaveeshatd!</div>
-                    <h1 class="header-title-text">What will you create today ?</h1>
-                </div>
-
-                <!-- Profile Yellow Circle Avatar -->
-                <div class="profile-avatar-circle" onclick="openModal('profileModal', event)" title="View Profile">
-                    K
-                </div>
-            </header>
-
-            <!-- TOP GRID CARDS -->
-            <div class="grid grid-top">
-
-                <!-- CARD 1: AUTO CAPTIONS (SRT) GENERATOR (BACKGROUND IMAGE) -->
-                <div class="card large" id="srt-generator" onclick="openModal('srtModal', event)">
-                    <div class="card-content">
-                        <div>
-                            <h3>KAVEEZCLOUD SRT ENGINE</h3>
-                            <h2>Auto Captions (SRT)</h2>
-                            <p>Generate millisecond-accurate Sinhala & English subtitles via Gemini AI with legacy FM
-                                font support.</p>
-                        </div>
-                        <button class="btn">
-                            Generate SRT
-                            <span class="material-symbols-outlined">subtitles</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- CARD 2: VIDEO EDITOR (BACKGROUND IMAGE) -->
-                <div class="card large" id="video-editor" onclick="window.location.href='editor.html'">
-                    <div class="card-content">
-                        <div>
-                            <h3>FULL VIDEO STUDIO</h3>
-                            <h2>Video Editor</h2>
-                            <p>Edit the whole story. Add transitions, effects, text, Sinhala fonts, and export in 4K
-                                quality.</p>
-                        </div>
-                        <button class="btn">
-                            Open Studio Editor
-                            <span class="material-symbols-outlined">open_in_new</span>
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- BOTTOM GRID CARDS -->
-            <div class="grid grid-bottom">
-
-                <!-- CARD 3: FACEBOOK DOWNLOADER -->
-                <div class="card small-card" id="fb-tool" onclick="openModal('fbModal', event)">
-                    <div class="card-content">
-                        <div class="icon-container">
-                            <img src="https://img.icons8.com/fluency/256/facebook-new.png" alt="Facebook"
-                                class="animate-3d">
-                        </div>
-                        <h3>Facebook Downloader</h3>
-                        <p>Download any Facebook video fast in HD & SD quality with one click.</p>
-                    </div>
-                </div>
-
-                <!-- CARD 4: TIKTOK DOWNLOADER -->
-                <div class="card small-card" id="tk-tool" onclick="openModal('tiktokModal', event)">
-                    <div class="card-content">
-                        <div class="icon-container">
-                            <img src="https://img.icons8.com/3d-fluency/256/tiktok.png" alt="TikTok" class="animate-3d"
-                                style="animation-delay: 0.5s;">
-                        </div>
-                        <h3>TikTok Downloader</h3>
-                        <p>Save TikTok videos directly without watermark in ultra high resolution.</p>
-                    </div>
-                </div>
-
-                <!-- CARD 5: AI AUDIO ENHANCER -->
-                <div class="card small-card" id="au-tool" onclick="openModal('audioModal', event)">
-                    <div class="card-content">
-                        <div class="icon-container">
-                            <img src="https://img.icons8.com/fluency/256/audio-wave.png" alt="Audio Enhancer"
-                                class="animate-3d" style="animation-delay: 1s;">
-                        </div>
-                        <h3>AI Audio Enhancer</h3>
-                        <p>100% VPS sound boost & 0% background noise cleaning for crystal clear audio.</p>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- NEW FOOTER (Matching index.html) -->
-            <footer style="padding: 56px 0; background-color: #000; border-top: 1px solid rgba(255, 255, 255, 0.1); text-align: center; color: rgba(255, 255, 255, 0.7); position: relative; overflow: hidden; margin: 50px -40px -80px -40px;">
-                <div style="max-width: 1200px; margin: 0 auto; padding: 0 16px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                    <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(to top right, #3f0071, #9d4edd); display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);">
-                            <span class="material-symbols-outlined" style="font-size: 20px;">code</span>
-                        </div>
-                        <span style="font-size: 1.25rem; font-weight: 800; color: white; letter-spacing: -0.5px;">CapZone Subtitle Studio</span>
-                    </div>
-
-                    <p style="font-size: 0.875rem; font-weight: 500; color: rgba(255, 255, 255, 0.9); margin: 0;">
-                        Designed & Engineered with ❤️ by <span style="color: #a233ff; font-weight: 700; font-size: 1rem;">Kaveesha Theekshana</span>
-                    </p>
-
-                    <a href="https://kaveesha.top" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 10px; padding: 10px 24px; border-radius: 9999px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(162, 51, 255, 0.4); color: #a233ff; text-decoration: none; font-weight: 800; font-size: 0.75rem; transition: all 0.3s; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-                        <span class="material-symbols-outlined" style="font-size: 16px;">language</span>
-                        Portfolio: kaveesha.top
-                        <span class="material-symbols-outlined" style="font-size: 14px;">open_in_new</span>
-                    </a>
-
-                    <p style="font-size: 11px; color: rgba(255, 255, 255, 0.5); margin-top: 8px;">
-                        © 2026 CapZone Subtitle Studio. All rights reserved. Powered by KaveezCloud Engine.
-                    </p>
-                </div>
-            </footer>
-        
-    <!-- Floating Top Center Button on Scroll -->
-    <button id='floatingTopBtn' class='floating-top-btn' onclick='openModal("srtModal", event)'>
-        <span class='material-symbols-outlined'>add_circle</span> Create Project
-    </button>
-
-        </main>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 1: SRT GENERATOR -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="srtModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span class="material-symbols-outlined"
-                        style="color: var(--primary-yellow); font-size: 28px;">subtitles</span>
-                    <h2>Generate SRT Subtitles</h2>
-                </div>
-                <div class="modal-close-btn" onclick="closeModal('srtModal', event)">
-                    <span class="material-symbols-outlined">close</span>
-                </div>
-            </div>
-
-            <!-- Option Tabs: User API vs KaveezCloud -->
-            <div class="option-tabs">
-                <button class="tab-btn active" id="tab-kaveez" onclick="selectApiMode('kaveez')">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">cloud_done</span>
-                    KaveezCloud Generate SRT
-                </button>
-                <button class="tab-btn" id="tab-user" onclick="selectApiMode('user')">
-                    <span class="material-symbols-outlined" style="font-size: 18px;">key</span>
-                    User API
-                </button>
-            </div>
-
-            <form id="srtForm" onsubmit="handleSrtSubmit(event)">
-                <!-- User API Input field (hidden by default) -->
-                <div class="form-group" id="userApiKeyGroup" style="display: none;">
-                    <label class="form-label">Your Gemini API Key</label>
-                    <input type="password" id="userApiKey" class="form-input" placeholder="AIzaSy..." />
-                </div>
-
-                <!-- Upload Video File -->
-                <div class="form-group">
-                    <label class="form-label">Upload Video or Audio File</label>
-                    <div class="dropzone-box" onclick="document.getElementById('srtVideoInput').click()">
-                        <span class="material-symbols-outlined"
-                            style="font-size: 38px; color: var(--primary-yellow);">cloud_upload</span>
-                        <p style="margin: 8px 0 0 0; font-weight: 700; font-size: 0.95rem;" id="srtFileName">Click or
-                            Drag & Drop Video File Here</p>
-                        <span style="font-size: 0.8rem; color: var(--text-muted);">MP4, MP3, WAV, MKV supported</span>
-                    </div>
-                    <input type="file" id="srtVideoInput" accept="video/*,audio/*" style="display: none;"
-                        onchange="updateSrtFileInfo(this)" />
-                </div>
-
-                <!-- Word Limit & Legacy Font Options -->
-                <div style="display: flex; gap: 16px; flex-wrap: wrap;">
-                    <div class="form-group" style="flex: 1; min-width: 160px;">
-                        <label class="form-label">Words Per Line Limit</label>
-                        <input type="number" id="srtWordsLimit" class="form-input" value="5" min="1" max="5"
-                            oninput="recalculateWordCount()" />
-                    </div>
-
-                    <div class="form-group" style="flex: 1.5; min-width: 220px; align-self: flex-end;">
-                        <label class="checkbox-container">
-                            <input type="checkbox" id="legacyFontCheck" onchange="recalculateWordCount()" />
-                            <span style="font-size: 0.9rem; font-weight: 600;">FM Abhaya Legacy Font (කොම්බු/බැඳි
-                                අකුරු)</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Live Auto Word Count Display -->
-                <div class="word-count-badge" id="srtWordCountBadge">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">calculate</span>
-                    <span id="srtWordCountText">Estimated Word Count: 0 words</span>
-                </div>
-
-                <button type="submit" class="btn" style="width: 100%; margin-top: 20px; justify-content: center;"
-                    id="srtSubmitBtn">
-                    <span class="material-symbols-outlined">auto_awesome</span>
-                    Start Auto SRT Generation
-                </button>
-            </form>
-
-            <!-- Step-by-Step Live Progress Tracker -->
-            <div class="progress-card" id="srtProgressCard">
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="srtProgressBar"></div>
-                </div>
-                <div class="step-list">
-                    <div class="step-item" id="srtStep1">
-                        <div class="step-icon">1</div>
-                        <span>KaveezCloud Server: Uploading & Preprocessing Audio Stream...</span>
-                    </div>
-                    <div class="step-item" id="srtStep2">
-                        <div class="step-icon">2</div>
-                        <span>KaveezCloud Server: Gemini AI Speech Recognition & Timestamping...</span>
-                    </div>
-                    <div class="step-item" id="srtStep3">
-                        <div class="step-icon">3</div>
-                        <span>KaveezCloud Server: Formatting Subtitles & Legacy Font Conversion...</span>
-                    </div>
-                    <div class="step-item" id="srtStep4">
-                        <div class="step-icon">4</div>
-                        <span>KaveezCloud Server: Subtitles Ready for Download!</span>
-                    </div>
-                </div>
-
-                <!-- Action Results area -->
-                <div id="srtResultArea" style="display: none; margin-top: 20px; gap: 10px;">
-                    <a id="srtDownloadLink" class="btn"
-                        style="flex: 1; justify-content: center; text-decoration: none; background: #00e676; color: black;"
-                        download="subtitles.srt">
-                        <span class="material-symbols-outlined">download</span> Download .SRT
-                    </a>
-                    <button onclick="window.location.href='editor.html'" class="btn"
-                        style="flex: 1; justify-content: center; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
-                        <span class="material-symbols-outlined">movie_edit</span> Open in Editor
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 2: FACEBOOK DOWNLOADER -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="fbModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <img src="https://img.icons8.com/fluency/256/facebook-new.png" width="28" alt="FB" />
-                    <h2>Facebook Video Downloader</h2>
-                </div>
-                <div class="modal-close-btn" onclick="closeModal('fbModal', event)">
-                    <span class="material-symbols-outlined">close</span>
-                </div>
-            </div>
-
-            <form onsubmit="handleFbSubmit(event)">
-                <div class="form-group">
-                    <label class="form-label">Facebook Video Link (URL)</label>
-                    <input type="url" id="fbUrlInput" class="form-input"
-                        placeholder="https://www.facebook.com/watch/?v=..." required />
-                </div>
-
-                <button type="submit" class="btn" style="width: 100%; justify-content: center;" id="fbSubmitBtn">
-                    <span class="material-symbols-outlined">downloading</span>
-                    Fetch Facebook Video
-                </button>
-            </form>
-
-            <div class="progress-card" id="fbProgressCard">
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="fbProgressBar"></div>
-                </div>
-                <div class="step-list">
-                    <div class="step-item" id="fbStep1">
-                        <div class="step-icon">1</div><span>KaveezCloud Server: Connecting to Facebook CDN Server...</span>
-                    </div>
-                    <div class="step-item" id="fbStep2">
-                        <div class="step-icon">2</div><span>KaveezCloud Server: Extracting Ultra HD & SD Video Streams...</span>
-                    </div>
-                    <div class="step-item" id="fbStep3">
-                        <div class="step-icon">3</div><span>KaveezCloud Server: Preparing Download Package...</span>
-                    </div>
-                    <div class="step-item" id="fbStep4">
-                        <div class="step-icon">4</div><span>KaveezCloud Server: Facebook Video Ready!</span>
-                    </div>
-                </div>
-
-                <div id="fbResultArea" style="display: none; margin-top: 20px;">
-                    <a id="fbDownloadLink" class="btn"
-                        style="width: 100%; justify-content: center; text-decoration: none; background: linear-gradient(135deg, #1877f2, #00f2fe); color: white;"
-                        target="_blank" download="Facebook_Video_1080p.mp4">
-                        <span class="material-symbols-outlined">download</span> Download Facebook HD Video
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 3: TIKTOK DOWNLOADER -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="tiktokModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <img src="https://img.icons8.com/3d-fluency/256/tiktok.png" width="28" alt="TikTok" />
-                    <h2>TikTok Downloader (No Watermark)</h2>
-                </div>
-                <div class="modal-close-btn" onclick="closeModal('tiktokModal', event)">
-                    <span class="material-symbols-outlined">close</span>
-                </div>
-            </div>
-
-            <form onsubmit="handleTiktokSubmit(event)">
-                <div class="form-group">
-                    <label class="form-label">TikTok Video Link (URL)</label>
-                    <input type="url" id="tiktokUrlInput" class="form-input"
-                        placeholder="https://www.tiktok.com/@user/video/..." required />
-                </div>
-
-                <button type="submit" class="btn" style="width: 100%; justify-content: center;" id="tiktokSubmitBtn">
-                    <span class="material-symbols-outlined">auto_awesome</span>
-                    Fetch No-Watermark TikTok Video
-                </button>
-            </form>
-
-            <div class="progress-card" id="tiktokProgressCard">
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="tiktokProgressBar"></div>
-                </div>
-                <div class="step-list">
-                    <div class="step-item" id="tiktokStep1">
-                        <div class="step-icon">1</div><span>KaveezCloud Server: Parsing TikTok Link & Metadata...</span>
-                    </div>
-                    <div class="step-item" id="tiktokStep2">
-                        <div class="step-icon">2</div><span>KaveezCloud Server: Bypassing TikTok Watermark...</span>
-                    </div>
-                    <div class="step-item" id="tiktokStep3">
-                        <div class="step-icon">3</div><span>KaveezCloud Server: Rendering Clean Ultra HD MP4...</span>
-                    </div>
-                    <div class="step-item" id="tiktokStep4">
-                        <div class="step-icon">4</div><span>KaveezCloud Server: TikTok HD Video Ready!</span>
-                    </div>
-                </div>
-
-                <div id="tiktokResultArea" style="display: none; margin-top: 20px;">
-                    <a id="tiktokDownloadLink" class="btn"
-                        style="width: 100%; justify-content: center; text-decoration: none; background: linear-gradient(135deg, #ff0050, #00f2fe); color: white;"
-                        target="_blank" download="TikTok_No_Watermark.mp4">
-                        <span class="material-symbols-outlined">download</span> Download Watermark-Free Video
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 4: AI AUDIO ENHANCER -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="audioModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span class="material-symbols-outlined"
-                        style="color: var(--primary-yellow); font-size: 28px;">graphic_eq</span>
-                    <h2>AI 100% Sound Enhancer</h2>
-                </div>
-                <div class="modal-close-btn" onclick="closeModal('audioModal', event)">
-                    <span class="material-symbols-outlined">close</span>
-                </div>
-            </div>
-
-            <form onsubmit="handleAudioSubmit(event)">
-                <div class="form-group">
-                    <label class="form-label">Upload Video or Audio File</label>
-                    <div class="dropzone-box" onclick="document.getElementById('audioFileInput').click()">
-                        <span class="material-symbols-outlined"
-                            style="font-size: 38px; color: var(--primary-yellow);">equalizer</span>
-                        <p style="margin: 8px 0 0 0; font-weight: 700; font-size: 0.95rem;" id="audioFileName">Click or
-                            Drag & Drop File Here</p>
-                        <span style="font-size: 0.8rem; color: var(--text-muted);">0% Noise Cleaning + 100% Sound
-                            Boost</span>
-                    </div>
-                    <input type="file" id="audioFileInput" accept="video/*,audio/*" style="display: none;"
-                        onchange="updateAudioFileInfo(this)" required />
-                </div>
-
-                <button type="submit" class="btn" style="width: 100%; justify-content: center;" id="audioSubmitBtn">
-                    <span class="material-symbols-outlined">volume_up</span>
-                    Enhance Sound to 100%
-                </button>
-            </form>
-
-            <div class="progress-card" id="audioProgressCard">
-                <div class="progress-bar-container">
-                    <div class="progress-bar-fill" id="audioProgressBar"></div>
-                </div>
-                <div class="step-list">
-                    <div class="step-item" id="audioStep1">
-                        <div class="step-icon">1</div><span>KaveezCloud Server: Uploading stream to VPS processing engine...</span>
-                    </div>
-                    <div class="step-item" id="audioStep2">
-                        <div class="step-icon">2</div><span>KaveezCloud Server: VPS 100% Sound Enhance & 0% Noise Cancellation...</span>
-                    </div>
-                    <div class="step-item" id="audioStep3">
-                        <div class="step-icon">3</div><span>KaveezCloud Server: Mastering Audio & Dynamic Compression...</span>
-                    </div>
-                    <div class="step-item" id="audioStep4">
-                        <div class="step-icon">4</div><span>KaveezCloud Server: 100% Sound Enhancement Complete!</span>
-                    </div>
-                </div>
-
-                <div id="audioResultArea" style="display: none; margin-top: 20px;">
-                    <a id="audioDownloadLink" class="btn"
-                        style="width: 100%; justify-content: center; text-decoration: none; background: #00e676; color: black;"
-                        download="enhanced_audio.mp3">
-                        <span class="material-symbols-outlined">download</span> Download Enhanced 100% Sound Audio
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 5: USER PROFILE MODAL -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="profileModal">
-        <div class="modal-container">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span class="material-symbols-outlined"
-                        style="color: var(--primary-yellow); font-size: 28px;">account_circle</span>
-                    <h2>User Profile</h2>
-                </div>
-                <div class="modal-close-btn" onclick="closeModal('profileModal', event)">
-                    <span class="material-symbols-outlined">close</span>
-                </div>
-            </div>
-
-            <div class="profile-card-details">
-                <div class="profile-avatar-large">K</div>
-                <div>
-                    <h3 style="margin: 0 0 4px 0; font-size: 1.4rem; color: white; font-weight: 800;">Kaveesh Theekshana
-                    </h3>
-                    <p style="margin: 0; font-size: 0.9rem; color: var(--primary-yellow); font-weight: 700;">@Kaveeshatd
-                        · KaveezCloud Pro Creator</p>
-                    <span
-                        style="display: inline-block; margin-top: 8px; font-size: 0.8rem; background: rgba(0, 230, 118, 0.15); color: #00e676; padding: 4px 10px; border-radius: 20px; font-weight: 700;">Active
-                        Free Account</span>
-                </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 20px;">
-                <a href="index.html" class="btn" style="width: 100%; justify-content: center; text-decoration: none;">
-                    <span class="material-symbols-outlined">home</span> Go to Home Page (index.html)
-                </a>
-                <a href="editor.html" class="btn"
-                    style="width: 100%; justify-content: center; text-decoration: none; background: rgba(255,255,255,0.08); color: white; border: 1px solid rgba(255,255,255,0.15);">
-                    <span class="material-symbols-outlined">video_library</span> Open Studio Video Editor
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 6: PRO UPGRADE MODAL -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="proModal">
-        <div class="modal-container" style="text-align: center;">
-            <div class="modal-header">
-                <div class="modal-title">
-                    <span class="material-symbols-outlined"
-                        style="color: var(--primary-yellow); font-size: 28px;">workspace_premium</span>
-                    <h2>CapZone Pro Plan</h2>
-                </div>
-                <div class="modal-close-btn" onclick="closeModal('proModal', event)">
-                    <span class="material-symbols-outlined">close</span>
-                </div>
-            </div>
-
-            <span class="material-symbols-outlined"
-                style="font-size: 64px; color: var(--primary-yellow); margin-bottom: 16px;">crown</span>
-            <h3 style="font-size: 1.8rem; margin: 0 0 10px 0; color: white;">Unlock KaveezCloud Unlimited</h3>
-            <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 24px;">Get 4K exports, 0% noise
-                filtering, zero watermark downloads, and priority Gemini API processing.</p>
-
-            <button class="upgrade-yellow-btn" style="font-size: 1.1rem; padding: 16px;"
-                onclick="showPopup('Congratulations! You are upgraded to CapZone Pro!', false)">
-                Upgrade to Pro Now →
-            </button>
-        </div>
-    </div>
-
-    <!-- ====================================================================== -->
-    <!-- MODAL 7: CUSTOM POPUP -->
-    <!-- ====================================================================== -->
-    <div class="modal-overlay" id="popupModal" style="z-index: 9999;">
-        <div class="modal-container" id="popupModalContainer" style="max-width: 400px; text-align: center; border: 1px solid rgba(255, 60, 60, 0.3);">
-            <div class="modal-header" style="justify-content: center; padding-bottom: 0;">
-                <span class="material-symbols-outlined" id="popupModalIcon" style="font-size: 64px; color: #ff3c3c; margin-bottom: 10px;">error</span>
-            </div>
-            <h3 style="font-size: 1.5rem; margin: 0 0 10px 0; color: white;" id="popupModalTitle">Oops! Something went wrong</h3>
-            <p style="color: var(--text-muted); font-size: 1rem; margin-bottom: 24px; word-break: break-word;" id="popupModalMessage"></p>
-            <button class="btn" id="popupModalBtn" style="width: 100%; justify-content: center; background: rgba(255, 60, 60, 0.15); color: #ff3c3c; border: 1px solid rgba(255, 60, 60, 0.3);" onclick="closeModal('popupModal', event)">
-                Okay, I understand
-            </button>
-        </div>
-    </div>
-
-    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
-    <script>
         let currentApiMode = 'kaveez';
         let currentSrtFile = null;
 
@@ -3216,40 +967,11 @@
                 document.getElementById('audioSubmitBtn').disabled = false;
             }
         }
-    </script>
-</body>
-
-
-  <script>
-    lucide.createIcons();
     
-    // Default Tailwind dark logic override, integrating with CapZone theme logic
-    function toggleTheme() {
-      const html = document.documentElement;
-      const themeIcon = document.getElementById('themeIcon');
-      
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        html.classList.add('light');
-        themeIcon.setAttribute('data-lucide', 'moon');
-      } else {
-        html.classList.remove('light');
-        html.classList.add('dark');
-        themeIcon.setAttribute('data-lucide', 'sun');
-      }
-      lucide.createIcons();
-    }
 
-    function mobileSwitchTab(tabId) {
-      document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.add('hidden'));
-      document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
-        btn.className = "mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5";
-      });
-      const contentEl = document.getElementById(tabId);
-      if(contentEl) contentEl.classList.remove('hidden');
-      const activeBtn = document.getElementById('m-btn-' + tabId);
-      if(activeBtn) activeBtn.className = "mobile-tab-btn shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md";
-    }
-  </script>
+
+</script>
 </body>
 </html>
+
+
