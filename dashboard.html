@@ -1,32 +1,1317 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creator Dashboard - CapZone AI Subtitle Studio</title>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&family=Noto+Sans+Sinhala:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        rel="stylesheet" />
-    <script src="https://capzone.kaveesha.top/sinhala-converter.js"></script>
-    <script>
-        window.addEventListener('scroll', () => {
-            const btn = document.getElementById('floatingTopBtn');
-            if (btn) {
-                if (window.scrollY > 150) {
-                    btn.classList.add('visible');
-                } else {
-                    btn.classList.remove('visible');
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CapZone | Mobile & Desktop Studio</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#6366f1',
+              purple: '#8b5cf6',
+              cyan: '#06b6d4'
             }
-        });
+          }
+        }
+      }
+    }
+  </script>
 
-    </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    <!-- Firebase Auth Protection -->
-    <script type="module">
+  <style>
+    /* Dark Mode Glass */
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+    }
+    
+    /* Perfected Light Mode Glass */
+    .light .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(203, 213, 225, 0.8);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .animated-bg {
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+    }
+    .light .animated-bg {
+      background: radial-gradient(circle at 50% 0%, #e0e7ff 0%, #f1f5f9 60%, #cbd5e1 100%);
+    }
+
+    /* Light Mode Text Fixes */
+    .light .text-fix-heading { color: #0f172a !important; }
+    .light .text-fix-sub { color: #475569 !important; }
+
+    /* Hide scrollbar for horizontal swipe on mobile */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    /* OLD CSS TO KEEP MODALS WORKING */
+    
+        :root {
+            --bg-color: #090a0f;
+            --sidebar-bg: #0c0d14;
+            --card-bg: rgba(22, 20, 32, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --primary-yellow: #a233ff;
+            --primary-yellow-hover: #c77dff;
+            --primary-purple: #9d4edd;
+            --secondary-cyan: #00f2fe;
+            --text-main: #ffffff;
+            --text-muted: #9594a5;
+            --success: #00e676;
+            --danger: #ff5252;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            outline: none !important;
+        }
+
+        
+
+        /* 2-COLUMN DASHBOARD LAYOUT */
+        .dashboard-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: 100vw;
+        }
+
+        /* LEFT SIDEBAR NAVIGATION -> MOVED TO TOP */
+        .sidebar {
+            width: 100%;
+            height: 80px;
+            background: rgba(12, 13, 20, 0.45);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Brand Logo & Star Badge */
+        .sidebar-brand {
+            margin-bottom: 0;
+            padding-left: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-title-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            color: white;
+            margin-bottom: 6px;
+        }
+
+        .brand-logo-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #6200ea; /* Solid purple to match image */
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(98, 0, 234, 0.4);
+        }
+
+        .brand-text {
+            font-size: 1.6rem;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+            color: white;
+            text-shadow: 0 0 10px rgba(162, 51, 255, 0.8), 0 0 20px rgba(162, 51, 255, 0.4);
+        }
+
+        .brand-text span {
+            color: var(--primary-yellow);
+        }
+
+        .star-free-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            margin-top: 0;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+        }
+
+        /* Sidebar Navigation Menu */
+        .sidebar-menu {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 20px;
+            border-radius: 18px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .sidebar-item .material-symbols-outlined {
+            font-size: 22px;
+            transition: transform 0.25s ease;
+        }
+
+        .sidebar-item:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(3px);
+        }
+
+        /* Yellow Highlighted Active Menu Button (Image 1 replica) */
+        .sidebar-item.active-yellow {
+            background: var(--primary-yellow);
+            color: #000000;
+            font-weight: 800;
+            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.3);
+        }
+
+        .sidebar-item.active-yellow .material-symbols-outlined {
+            color: #000000;
+        }
+
+        /* Bottom Sidebar Widgets (Image 1 replica) */
+        .sidebar-bottom-widgets {
+            display: none;
+        }
+
+        /* Upgrade to Pro Card */
+        .pro-card-box {
+            background: #14151f;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .pro-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 8px;
+        }
+
+        .pro-card-header .material-symbols-outlined {
+            color: var(--primary-yellow);
+            font-size: 24px;
+        }
+
+        .pro-card-box p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin: 0 0 16px 0;
+            line-height: 1.45;
+        }
+
+        .upgrade-yellow-btn {
+            width: 100%;
+            background: var(--primary-yellow);
+            color: #000000;
+            border: none;
+            padding: 13px;
+            border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(162, 51, 255, 0.25);
+        }
+
+        .upgrade-yellow-btn:hover {
+            background: var(--primary-yellow-hover);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.5);
+        }
+
+        /* Get Desktop App Card */
+        .desktop-app-widget {
+            background: #101119;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 18px;
+            padding: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .desktop-app-widget:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .desktop-app-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .desktop-app-info {
+            flex: 1;
+        }
+
+        .desktop-app-title {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .desktop-app-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .desktop-download-icon {
+            color: var(--text-muted);
+            font-size: 20px;
+        }
+
+        /* RIGHT MAIN CONTENT AREA */
+        .main-content {
+            flex: 1;
+            margin-left: 0;
+            padding: 110px 40px 80px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* TOP HEADER BAR (Image 2 replica) */
+        .top-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 40px;
+            padding-bottom: 10px;
+        }
+
+        .header-welcome {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-title-text {
+            font-size: 2.6rem;
+            font-weight: 900;
+            margin: 0;
+            color: white;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 12px rgba(162, 51, 255, 0.8), 0 0 24px rgba(162, 51, 255, 0.5);
+        }
+
+        /* Profile Yellow Circle Button (Image 2 replica) */
+        .profile-avatar-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--primary-yellow);
+            color: #000000;
+            font-weight: 900;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 20px rgba(162, 51, 255, 0.35);
+            user-select: none;
+        }
+
+        .profile-avatar-circle:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 30px rgba(162, 51, 255, 0.6);
+        }
+
+        /* GRID CARDS LAYOUT */
+        .grid {
+            display: grid;
+            gap: 24px;
+        }
+
+        .grid-top {
+            grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+            margin-bottom: 24px;
+        }
+
+        .grid-bottom {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        /* Glassmorphism Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 26px;
+            padding: 34px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.01);
+            border-color: rgba(162, 51, 255, 0.5);
+            box-shadow: 0 25px 60px rgba(162, 51, 255, 0.25);
+        }
+
+        .card.large {
+            min-height: 320px;
+            padding: 40px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Card Background Images */
+        #srt-generator {
+            background-image: url('https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+        }
+
+        #video-editor {
+            background-image: url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');
+        }
+
+        .card.large::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(105deg, rgba(9, 10, 15, 0.96) 0%, rgba(9, 10, 15, 0.8) 55%, rgba(9, 10, 15, 0.3) 100%);
+            z-index: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .card.large:hover::before {
+            opacity: 0.85;
+        }
+
+        .card-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .card h2 {
+            font-size: 2rem;
+            margin: 0 0 5px 0;
+            font-weight: 800;
+            text-shadow: 0 0 10px rgba(162, 51, 255, 0.8), 0 0 20px rgba(162, 51, 255, 0.5);
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            margin: 0 0 12px 0;
+            font-weight: 800;
+            color: var(--primary-yellow);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin: 0 0 25px 0;
+            line-height: 1.6;
+            max-width: 90%;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary-yellow);
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 14px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            width: fit-content;
+            margin-top: auto;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 18px rgba(162, 51, 255, 0.3);
+        }
+
+        .btn:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(162, 51, 255, 0.5);
+            background: var(--primary-yellow-hover);
+        }
+
+        .small-card {
+            padding: 30px 25px;
+            min-height: 250px;
+        }
+
+        .small-card h3 {
+            font-size: 1.25rem;
+            color: white;
+            text-transform: none;
+            letter-spacing: normal;
+            margin-bottom: 8px;
+        }
+
+        .icon-container {
+            width: 65px;
+            height: 65px;
+            margin-bottom: 20px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(162, 51, 255, 0.1);
+            border: 1px solid rgba(162, 51, 255, 0.25);
+            box-shadow: inset 0 0 20px rgba(162, 51, 255, 0.1);
+        }
+
+        .icon-container img {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+        }
+
+        /* 3D Float Animations */
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+
+        .animate-3d {
+            animation: float 4s ease-in-out infinite;
+            filter: drop-shadow(0 15px 15px rgba(0, 0, 0, 0.4));
+            transition: all 0.3s ease;
+        }
+
+        .small-card:hover .animate-3d {
+            animation: none;
+            transform: scale(1.15) rotate(12deg) translateY(-5px);
+            filter: drop-shadow(0 20px 20px rgba(162, 51, 255, 0.6));
+        }
+
+        /* MODAL POPUPS SYSTEM */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(4, 5, 10, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-container {
+            background: rgba(18, 16, 28, 0.95);
+            border: 1px solid rgba(162, 51, 255, 0.25);
+            border-radius: 28px;
+            max-width: 680px;
+            width: 100%;
+            padding: 36px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8), 0 0 40px rgba(162, 51, 255, 0.25);
+            transform: scale(0.9) translateY(20px);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+        }
+
+        .modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-title h2 {
+            font-size: 1.6rem;
+            margin: 0;
+            font-weight: 800;
+        }
+
+        .modal-close-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: var(--text-muted);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255, 82, 82, 0.2);
+            color: white;
+            border-color: var(--danger);
+        }
+
+        /* Option Tabs & Switches */
+        .option-tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px;
+            border-radius: 14px;
+            gap: 6px;
+            margin-bottom: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 18px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: var(--primary-yellow);
+            color: #000;
+            box-shadow: 0 4px 15px rgba(162, 51, 255, 0.3);
+        }
+
+        /* Inputs & Drag Drop */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-main);
+        }
+
+        .form-input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 14px 18px;
+            border-radius: 14px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-yellow);
+            box-shadow: 0 0 15px rgba(162, 51, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .dropzone-box {
+            border: 2px dashed rgba(162, 51, 255, 0.4);
+            border-radius: 18px;
+            padding: 28px 20px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.02);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone-box:hover {
+            border-color: var(--primary-yellow);
+            background: rgba(162, 51, 255, 0.05);
+        }
+
+        /* Step-by-Step Live Progress Tracker */
+        .progress-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 18px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #a233ff, #7b2cbf, #00f2fe);
+            border-radius: 10px;
+            transition: width 0.4s ease;
+            box-shadow: 0 0 12px rgba(162, 51, 255, 0.6);
+        }
+
+        .step-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+        }
+
+        .step-item.active {
+            color: white;
+            font-weight: 700;
+        }
+
+        .step-item.completed {
+            color: var(--success);
+        }
+
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-muted);
+        }
+
+        .step-item.active .step-icon {
+            background: var(--primary-yellow);
+            color: #000;
+            box-shadow: 0 0 10px var(--primary-yellow);
+        }
+
+        .step-item.completed .step-icon {
+            background: var(--success);
+            color: black;
+        }
+
+        /* Auto Word Count Badge */
+        .word-count-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(162, 51, 255, 0.15);
+            border: 1px solid rgba(162, 51, 255, 0.4);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+            margin-top: 10px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            user-select: none;
+            margin-top: 12px;
+        }
+
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-yellow);
+            cursor: pointer;
+        }
+
+        /* Profile Modal Cards */
+        .profile-card-details {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .profile-avatar-large {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: var(--primary-yellow);
+            color: #000;
+            font-weight: 900;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 25px rgba(162, 51, 255, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #04050a;
+            border-top: 1px solid rgba(162, 51, 255, 0.2);
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 60px;
+            border-radius: 20px;
+        }
+
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .footer-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #a233ff, #7b2cbf);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: black;
+            font-weight: 900;
+        }
+
+        .brand-text-footer {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: white;
+        }
+
+        .portfolio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border-radius: 50px;
+            background: #181624;
+            border: 1px solid rgba(162, 51, 255, 0.4);
+            color: var(--primary-yellow);
+            text-decoration: none;
+            font-weight: 800;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+        }
+
+        .portfolio-btn:hover {
+            background: var(--primary-yellow);
+            color: black;
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 80px;
+                padding: 20px 10px;
+            }
+
+            .brand-text,
+            .star-free-badge,
+            .sidebar-item span:not(.material-symbols-outlined),
+            .sidebar-bottom-widgets {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 80px;
+                padding: 20px;
+            }
+
+            .grid-top {
+                grid-template-columns: 1fr;
+            }
+
+            .header-title-text {
+                font-size: 2rem;
+            }
+        }
+    
+        /* Glow and Top Middle Floating Button */
+        .floating-top-btn {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--primary-yellow), #7b2cbf);
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(162, 51, 255, 0.6), 0 0 20px rgba(162, 51, 255, 0.4);
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+        }
+
+        .floating-top-btn.visible {
+            top: 30px;
+            opacity: 1;
+        }
+
+        .floating-top-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 15px 40px rgba(162, 51, 255, 0.8), 0 0 30px rgba(162, 51, 255, 0.6);
+        }
+        
+        .modal-container {
+            transform: scale(0.9) translateY(-100px) !important;
+        }
+        .modal-overlay.active .modal-container {
+            transform: scale(1) translateY(0) !important;
+        }
+
+    
+
+  </style>
+</head>
+<body class="animated-bg text-slate-100 dark:text-slate-100 transition-colors duration-500 font-sans min-h-screen flex flex-col justify-between" id="bodyElement">
+
+  <div>
+    <!-- ================= 1. HEADER ================= -->
+    <nav class="px-4 sm:px-8 py-3.5 border-b border-black/10 dark:border-white/10 glass-card sticky top-0 z-50 transition-colors">
+      <div class="max-w-7xl mx-auto flex justify-between items-center">
+        
+        <!-- Logo -->
+        <div class="flex items-center gap-2.5">
+          <div class="p-2 bg-gradient-to-tr from-indigo-600 to-pink-500 text-white rounded-xl shadow-lg shadow-purple-500/30">
+            <i data-lucide="clapperboard" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent font-black text-lg sm:text-2xl tracking-wider uppercase">
+              CapZone
+            </span>
+            <span class="block text-[8px] text-indigo-600 dark:text-purple-400 font-bold tracking-widest font-mono uppercase -mt-1 hidden sm:block">Pro Mobile Engine</span>
+          </div>
+        </div>
+
+        <!-- Right Header Actions -->
+        <div class="flex items-center gap-2">
+          <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl glass-card text-amber-500 dark:text-amber-400 hover:scale-105 transition-all">
+            <i data-lucide="sun" id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+          </button>
+
+          <!-- User Profile (Calls profile modal) -->
+          <div class="flex items-center gap-2 px-2.5 py-1 rounded-xl glass-card border cursor-pointer" onclick="openModal('profileModal', event)">
+            <div class="w-6 h-6 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-[9px] text-white">
+              PRO
+            </div>
+            <span class="text-xs font-bold text-fix-heading hidden sm:inline" id="userEmailNav">Profile</span>
+          </div>
+
+          <!-- Exit / Logout -->
+          <button id="logoutBtnNav" class="p-2 sm:px-3 sm:py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5">
+            <i data-lucide="power" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Exit</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ================= 2. DESKTOP HERO SECTION ================= -->
+    <header class="hidden md:block px-4 pt-8 pb-4 text-center max-w-4xl mx-auto">
+      <div class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-indigo-600 dark:text-cyan-400 px-4 py-1.5 glass-card rounded-full border border-indigo-500/30 mb-3">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Multi-Tool Studio Workspace
+      </div>
+      <h1 class="text-5xl font-black tracking-tight leading-none mb-3 text-fix-heading">
+        AI POWERED <span class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 dark:from-cyan-400 dark:via-purple-400 dark:to-pink-500 bg-clip-text text-transparent">CINEMATIC DASHBOARD</span>
+      </h1>
+      <p class="text-fix-sub text-sm max-w-2xl mx-auto">Full control over Video Editing, Subtitle Generation, Audio Noise Cleaning, and Social Media Downloads.</p>
+    </header>
+
+    <!-- ================= 3. MOBILE SPECIAL APP UI ================= -->
+    <div class="block md:hidden px-4 pt-4 pb-2">
+      <!-- Quick Status Header -->
+      <div class="glass-card p-4 rounded-2xl mb-4 flex items-center justify-between border-indigo-500/30">
+        <div>
+          <span class="text-[10px] font-mono text-indigo-500 dark:text-cyan-400 font-bold uppercase tracking-wider">Mobile Studio Mode</span>
+          <h2 class="text-base font-black text-fix-heading">Select AI Studio Tool</h2>
+        </div>
+        <i data-lucide="sparkles" class="w-5 h-5 text-indigo-500 animate-pulse"></i>
+      </div>
+
+      <!-- Horizontal Swipe Tool Selector for Mobile -->
+      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2">
+        <button onclick="mobileSwitchTab('m-editor')" id="m-btn-m-editor" class="mobile-tab-btn shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
+          <i data-lucide="film" class="w-3.5 h-3.5"></i> Editor
+        </button>
+        <button onclick="mobileSwitchTab('m-srt')" id="m-btn-m-srt" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <i data-lucide="captions" class="w-3.5 h-3.5"></i> SRT Subtitle
+        </button>
+        <button onclick="mobileSwitchTab('m-audio')" id="m-btn-m-audio" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <i data-lucide="mic-off" class="w-3.5 h-3.5"></i> Audio Clean
+        </button>
+        <button onclick="mobileSwitchTab('m-downloader')" id="m-btn-m-downloader" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> Downloader
+        </button>
+        <button onclick="mobileSwitchTab('m-projects')" id="m-btn-m-projects" class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
+          <i data-lucide="facebook" class="w-3.5 h-3.5"></i> Facebook
+        </button>
+      </div>
+
+      <!-- Mobile Active Tool Container -->
+      <div class="glass-card rounded-2xl p-4 min-h-[380px] flex flex-col justify-between">
+        
+        <!-- Mobile Tool 1: Video Editor -->
+        <div id="m-editor" class="mobile-tab-content space-y-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="film" class="text-indigo-500 w-5 h-5"></i>
+            <h3 class="font-bold text-sm text-fix-heading">4K Mobile Timeline Editor</h3>
+          </div>
+          <div class="relative h-44 rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
+            <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-80" />
+            <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-3 text-center">
+              <p class="text-white text-xs font-bold mb-2">Launch Studio Editor</p>
+              <button onclick="window.location.href='editor.html'" class="px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-lg shadow-lg">Open Editor</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile Tool 2: SRT Generator -->
+        <div id="m-srt" class="mobile-tab-content hidden space-y-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="captions" class="text-purple-500 w-5 h-5"></i>
+            <h3 class="font-bold text-sm text-fix-heading">AI Subtitle Generator</h3>
+          </div>
+          <p class="text-xs text-fix-sub">Extract captions from videos. Supports Sinhala fonts & Word Limits.</p>
+          <button onclick="openModal('srtModal', event)" class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
+        </div>
+
+        <!-- Mobile Tool 3: Audio Denoiser -->
+        <div id="m-audio" class="mobile-tab-content hidden space-y-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="mic-off" class="text-pink-500 w-5 h-5"></i>
+            <h3 class="font-bold text-sm text-fix-heading">Noise Cleaner</h3>
+          </div>
+          <p class="text-xs text-fix-sub mb-3">Isolate background noise & hiss from audio clips with extreme 100% voice boost.</p>
+          <button onclick="openModal('audioModal', event)" class="w-full py-3 bg-pink-600 text-white font-bold text-xs rounded-xl">Open Audio Cleaner</button>
+        </div>
+
+        <!-- Mobile Tool 4: TikTok Downloader -->
+        <div id="m-downloader" class="mobile-tab-content hidden space-y-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="download-cloud" class="text-cyan-500 w-5 h-5"></i>
+            <h3 class="font-bold text-sm text-fix-heading">TikTok HD Downloader</h3>
+          </div>
+          <p class="text-xs text-fix-sub mb-3">Download watermark-free HD TikToks directly.</p>
+          <button onclick="openModal('tiktokModal', event)" class="w-full py-3 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-md">Open TikTok Tool</button>
+        </div>
+
+        <!-- Mobile Tool 5: Facebook Downloader -->
+        <div id="m-projects" class="mobile-tab-content hidden space-y-3">
+          <div class="flex items-center gap-2 mb-2">
+            <i data-lucide="facebook" class="text-amber-500 w-5 h-5"></i>
+            <h3 class="font-bold text-sm text-fix-heading">Facebook Downloader</h3>
+          </div>
+          <p class="text-xs text-fix-sub mb-3">Download Facebook videos in SD/HD quality.</p>
+          <button onclick="openModal('fbModal', event)" class="w-full py-3 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">Open Facebook Tool</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ================= 4. DESKTOP BENTO GRID ================= -->
+    <main class="hidden md:grid max-w-7xl mx-auto px-6 pb-16 grid-cols-3 gap-6">
+      
+      <!-- CARD 1: VIDEO EDITOR -->
+      <div class="col-span-2 glass-card rounded-3xl p-6 relative overflow-hidden transition-all duration-300">
+        <div class="flex justify-between items-start mb-4">
+          <div class="flex items-center gap-3">
+            <div class="p-3 bg-indigo-500/10 text-indigo-500 rounded-2xl border border-indigo-500/20">
+              <i data-lucide="film" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-fix-heading">Cloud Video Editor Pro</h3>
+              <p class="text-xs text-fix-sub">4K Multi-Track Editing Engine</p>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono px-2.5 py-1 bg-indigo-500/20 text-indigo-500 font-bold rounded-lg border border-indigo-500/30">GPU ACCELERATED</span>
+        </div>
+
+        <div class="relative h-56 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group">
+          <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" />
+          <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-6 text-center">
+            <p class="text-white font-bold text-base mb-1">Full Studio Workspace</p>
+            <p class="text-slate-300 text-xs mb-4">Add transitions, effects, text, and export in 4K quality</p>
+            <button onclick="window.location.href='editor.html'" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg">Launch 4K Editor</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: AUTO SRT GENERATOR -->
+      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
+              <i data-lucide="captions" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-fix-heading">AI Subtitles</h3>
+              <p class="text-xs text-fix-sub">Auto SRT Generator</p>
+            </div>
+          </div>
+
+          <div class="h-28 rounded-xl overflow-hidden mb-4 relative border border-black/10 dark:border-white/10">
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-70" />
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span class="bg-black/80 text-purple-300 text-[11px] font-mono px-3 py-1 rounded-lg border border-purple-500/30">Auto-Cap Synced ✨</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="openModal('srtModal', event)" class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Studio</button>
+      </div>
+
+      <!-- CARD 3: AUDIO DENOISER -->
+      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="p-3 bg-pink-500/10 text-pink-500 rounded-2xl border border-pink-500/20">
+              <i data-lucide="mic-off" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-fix-heading">Audio Denoiser</h3>
+              <p class="text-xs text-fix-sub">AI Noise Cleaner</p>
+            </div>
+          </div>
+          <div class="h-24 rounded-xl overflow-hidden my-3 relative border border-black/10 dark:border-white/10">
+            <img src="https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-80" />
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span class="text-xs font-bold text-pink-300 bg-black/60 px-3 py-1 rounded-full">Noise Suppressed</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="openModal('audioModal', event)" class="w-full py-3 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md">Clean Audio Track</button>
+      </div>
+
+      <!-- CARD 4: TIKTOK DOWNLOADER -->
+      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-3">
+            <div class="p-3 bg-cyan-500/10 text-cyan-500 rounded-2xl border border-cyan-500/20">
+              <i data-lucide="download-cloud" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-fix-heading">TikTok Grabber</h3>
+              <p class="text-xs text-fix-sub">TikTok HD Rip</p>
+            </div>
+          </div>
+          <div class="h-24 rounded-xl overflow-hidden my-3 relative border border-black/10 dark:border-white/10">
+            <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=600&q=80" class="w-full h-full object-cover opacity-80" />
+            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <span class="text-xs font-bold text-cyan-300 bg-black/60 px-3 py-1 rounded-lg">No Watermark HD</span>
+            </div>
+          </div>
+        </div>
+        <button onclick="openModal('tiktokModal', event)" class="w-full py-3 bg-cyan-600 text-white font-bold text-xs rounded-xl shadow-md">Open TikTok Downloader</button>
+      </div>
+
+      <!-- CARD 5: FB DOWNLOADER -->
+      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
+        <div>
+          <div class="flex items-center gap-3 mb-4">
+            <div class="p-3 bg-amber-500/10 text-amber-500 rounded-2xl border border-amber-500/20">
+              <i data-lucide="facebook" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="text-lg font-bold text-fix-heading">FB Downloader</h3>
+              <p class="text-xs text-fix-sub">Social Downloader</p>
+            </div>
+          </div>
+          <div class="space-y-2 text-center text-xs text-fix-sub pt-4">
+             Fast Facebook Video downloads in HD & SD.
+          </div>
+        </div>
+        <button onclick="openModal('fbModal', event)" class="w-full mt-4 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">Open Facebook Downloader</button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ================= 5. MOBILE BOTTOM NATIVE APP NAVIGATION ================= -->
+  <div class="fixed bottom-0 left-0 right-0 glass-card border-t border-black/10 dark:border-white/10 py-2.5 px-2 sm:hidden z-40 flex justify-around items-center">
+    <button onclick="mobileSwitchTab('m-editor')" class="flex flex-col items-center gap-1 text-indigo-500">
+      <i data-lucide="film" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Editor</span>
+    </button>
+    <button onclick="mobileSwitchTab('m-srt')" class="flex flex-col items-center gap-1 text-fix-sub">
+      <i data-lucide="captions" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">SRT</span>
+    </button>
+    <button onclick="mobileSwitchTab('m-audio')" class="flex flex-col items-center gap-1 text-fix-sub">
+      <i data-lucide="mic-off" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Audio</span>
+    </button>
+    <button onclick="mobileSwitchTab('m-downloader')" class="flex flex-col items-center gap-1 text-fix-sub">
+      <i data-lucide="download-cloud" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">TikTok</span>
+    </button>
+    <button onclick="mobileSwitchTab('m-projects')" class="flex flex-col items-center gap-1 text-fix-sub">
+      <i data-lucide="facebook" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">FB</span>
+    </button>
+  </div>
+
+  <!-- ================= 6. FOOTER ================= -->
+  <footer class="border-t border-black/10 dark:border-white/10 glass-card py-5 px-4 mb-14 sm:mb-0">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-fix-sub">
+      <div class="flex items-center gap-2">
+        <i data-lucide="clapperboard" class="w-4 h-4 text-indigo-500"></i>
+        <span class="font-bold text-fix-heading">CapZone STUDIO</span>
+        <span>© 2026 Production Engine</span>
+      </div>
+      <div class="flex gap-4 text-[10px] sm:text-xs">
+        <a href="#" class="hover:underline">Privacy Policy</a>
+        <a href="#" class="hover:underline">API Access</a>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- OLD MODALS PLACEHOLDER -->
+  
+
+  <!-- Scripts -->
+  <script type="module">
         import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
         
         onAuthStateChanged(auth, (user) => {
@@ -1934,4 +3219,37 @@
     </script>
 </body>
 
+
+  <script>
+    lucide.createIcons();
+    
+    // Default Tailwind dark logic override, integrating with CapZone theme logic
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        themeIcon.setAttribute('data-lucide', 'moon');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        themeIcon.setAttribute('data-lucide', 'sun');
+      }
+      lucide.createIcons();
+    }
+
+    function mobileSwitchTab(tabId) {
+      document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
+        btn.className = "mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5";
+      });
+      const contentEl = document.getElementById(tabId);
+      if(contentEl) contentEl.classList.remove('hidden');
+      const activeBtn = document.getElementById('m-btn-' + tabId);
+      if(activeBtn) activeBtn.className = "mobile-tab-btn shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md";
+    }
+  </script>
+</body>
 </html>
