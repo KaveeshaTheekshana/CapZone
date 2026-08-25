@@ -365,8 +365,8 @@
       <div class="space-y-4">
         <div class="p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5">
           <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone Pro API Key (Optional)</label>
-          <input type="text" id="geminiApiKey" placeholder="AI Studio Key for bypass limits..." class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
-          <button id="saveApiKeyBtn" class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save API Key</button>
+          <input type="text" id="userApiKey" placeholder="AI Studio Key for bypass limits..." class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
+          <button id="saveApiKeyBtn" type="button" onclick="showPopup('API Key saved successfully!'); closeModal('profileModal')"  class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save API Key</button>
         </div>
         <button id="logoutBtn" class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
           <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
@@ -392,7 +392,7 @@
         </div>
       </div>
 
-      <form id="fbForm" class="space-y-4">
+      <form id="fbForm" class="space-y-4" onsubmit="handleFbSubmit(event)">
         <div>
           <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
           <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..." class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
@@ -438,7 +438,7 @@
         </div>
       </div>
 
-      <form id="tiktokForm" class="space-y-4">
+      <form id="tiktokForm" class="space-y-4" onsubmit="handleTiktokSubmit(event)">
         <div>
           <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
           <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..." class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
@@ -484,13 +484,13 @@
         </div>
       </div>
 
-      <form id="srtForm" class="space-y-4">
+      <form id="srtForm" class="space-y-4" onsubmit="handleSrtSubmit(event)">
         <div>
           <label class="text-xs font-bold text-fix-sub mb-2 block">Upload Video/Audio File</label>
           <div class="relative w-full border-2 border-dashed border-purple-500/30 rounded-xl p-4 text-center hover:bg-purple-500/5 transition-colors cursor-pointer" onclick="document.getElementById('srtVideoInput').click()">
-            <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden" />
+            <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden" onchange="updateSrtFileInfo(this)" />
             <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-purple-500 mb-2"></i>
-            <p class="text-xs text-fix-heading font-bold" id="srtFileLabel">Click to Browse Media</p>
+            <p class="text-xs text-fix-heading font-bold" id="srtFileName">Click to Browse Media</p>
             <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV, MKV up to 50MB</p>
           </div>
         </div>
@@ -505,12 +505,12 @@
           </div>
           <div>
             <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
-            <input type="number" id="srtWordsPerLine" value="5" min="1" max="5" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
+            <input type="number" id="srtWordsLimit" onchange="recalculateWordCount()" value="5" min="1" max="5" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
           </div>
         </div>
 
         <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-          <input type="checkbox" id="srtLegacyFont" class="w-4 h-4 rounded accent-indigo-500" />
+          <input type="checkbox" id="legacyFontCheck" onchange="recalculateWordCount()" class="w-4 h-4 rounded accent-indigo-500" />
           <div class="flex-1">
             <label for="srtLegacyFont" class="text-xs font-bold text-indigo-500 dark:text-indigo-400 cursor-pointer block">Convert to Legacy Font (FM Abhaya)</label>
             <p class="text-[9px] text-indigo-500/70">Enable for old video editing software (Premiere Pro, Vegas)</p>
@@ -565,7 +565,16 @@
         html.classList.remove('dark');
         html.classList.add('light');
         themeIcon.setAttribute('data-lucide', 'moon');
-      } else {
+                  } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
         html.classList.remove('light');
         html.classList.add('dark');
         themeIcon.setAttribute('data-lucide', 'sun');
@@ -604,7 +613,16 @@ function showPopup(message, type = 'success') {
         icon.setAttribute('data-lucide', 'alert-circle');
         icon.classList.remove('text-indigo-500');
         icon.classList.add('text-red-500');
-    } else {
+                } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
         icon.setAttribute('data-lucide', 'check-circle-2');
         icon.classList.remove('text-red-500');
         icon.classList.add('text-indigo-500');
@@ -644,41 +662,11 @@ function closeModal(modalId, event) {
         let currentApiMode = 'kaveez';
         let currentSrtFile = null;
 
-        function showPopup(message, isError = true, customTitle = null) {
-            const title = customTitle ? customTitle : (isError ? "Oops! Error Occurred" : "Success!");
-            const icon = isError ? "error" : "check_circle";
-            const color = isError ? "#ff3c3c" : "#00e676";
-            
-            // Show the actual error message for debugging
-            const finalMessage = isError ? "An unexpected error occurred. Please Contact Developer BUG fix.<br><br><small style='color:#ff8a80'>Error Details: " + message + "</small>" : message;
-            
-            document.getElementById('popupModalIcon').textContent = icon;
-            document.getElementById('popupModalIcon').style.color = color;
-            document.getElementById('popupModalTitle').textContent = title;
-            document.getElementById('popupModalMessage').innerHTML = finalMessage;
-            
-            const btn = document.getElementById('popupModalBtn');
-            btn.style.color = color;
-            btn.style.background = isError ? "rgba(255, 60, 60, 0.15)" : "rgba(0, 230, 118, 0.15)";
-            btn.style.borderColor = isError ? "rgba(255, 60, 60, 0.3)" : "rgba(0, 230, 118, 0.3)";
-            
-            const container = document.getElementById('popupModalContainer');
-            container.style.borderColor = isError ? "rgba(255, 60, 60, 0.3)" : "rgba(0, 230, 118, 0.3)";
 
-            openModal('popupModal');
-        }
 
-        function openModal(modalId, event) {
-            if (event) event.stopPropagation();
-            const modal = document.getElementById(modalId);
-            if (modal) modal.classList.add('active');
-        }
 
-        function closeModal(modalId, event) {
-            if (event) event.stopPropagation();
-            const modal = document.getElementById(modalId);
-            if (modal) modal.classList.remove('active');
-        }
+
+
 
         // Close modal when clicking on overlay background
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
@@ -700,7 +688,16 @@ function closeModal(modalId, event) {
                 tabKaveez.classList.add('active');
                 tabUser.classList.remove('active');
                 keyGroup.style.display = 'none';
-            } else {
+                        } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                 tabUser.classList.add('active');
                 tabKaveez.classList.remove('active');
                 keyGroup.style.display = 'block';
@@ -733,7 +730,16 @@ function closeModal(modalId, event) {
             if (currentSrtFile) {
                 const durationEstMinutes = (currentSrtFile.size / (1024 * 1024 * 1.5));
                 estimatedWords = Math.max(12, Math.round(durationEstMinutes * 140));
-            } else {
+                        } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                 estimatedWords = 120;
             }
 
@@ -805,7 +811,7 @@ function closeModal(modalId, event) {
             const clientId = 'srt_' + Date.now();
             const wordsLimit = document.getElementById('srtWordsLimit').value;
             const useLegacy = document.getElementById('legacyFontCheck').checked;
-            const apiKey = currentApiMode === 'user' ? document.getElementById('userApiKey').value : '';
+            const apiKey = document.getElementById('userApiKey') ? document.getElementById('userApiKey').value.trim() : '';
 
             document.getElementById('srtSubmitBtn').disabled = true;
             document.getElementById('srtProgressCard').style.display = 'block';
@@ -836,7 +842,16 @@ function closeModal(modalId, event) {
                     downloadLink.href = url;
                     downloadLink.download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
                     document.getElementById('srtResultArea').style.display = 'flex';
-                } else {
+                            } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                     showPopup('Error generating SRT: ' + (data.error || 'Failed'));
                 }
             } catch (err) {
@@ -873,7 +888,16 @@ function closeModal(modalId, event) {
                     updateStepProgress('fb', 'fbProgressBar', 'Step 4: Facebook Video Ready!');
                     document.getElementById('fbDownloadLink').href = `https://capzone.kaveesha.top/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
                     document.getElementById('fbResultArea').style.display = 'block';
-                } else {
+                            } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                     const errDetails = data.error || data.message || 'Unknown Server Error';
                     alert("SERVER RETURNED ERROR: " + errDetails); // Direct alert to bypass any UI popup truncation
                     showPopup('Error: ' + errDetails);
@@ -913,7 +937,16 @@ function closeModal(modalId, event) {
                     updateStepProgress('tiktok', 'tiktokProgressBar', 'Step 4: TikTok No-Watermark Video Ready!');
                     document.getElementById('tiktokDownloadLink').href = `https://capzone.kaveesha.top/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
                     document.getElementById('tiktokResultArea').style.display = 'block';
-                } else {
+                            } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                     showPopup('Error: ' + (data.error || 'Failed to fetch TikTok video'));
                 }
             } catch (err) {
@@ -957,7 +990,16 @@ function closeModal(modalId, event) {
                     document.getElementById('audioDownloadLink').href = `https://capzone.kaveesha.top${data.downloadUrl}`;
                     document.getElementById('audioDownloadLink').download = data.filename || 'enhanced_audio.mp3';
                     document.getElementById('audioResultArea').style.display = 'block';
-                } else {
+                            } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
                     showPopup('Error: ' + (data.error || 'Enhancement failed'));
                 }
             } catch (err) {
@@ -971,7 +1013,48 @@ function closeModal(modalId, event) {
 
 
 </script>
+<script type="module">
+        import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
+        
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                        } else {
+                const profileName = document.getElementById('profileName');
+                const profileEmail = document.getElementById('profileEmail');
+                const profileInitial = document.getElementById('profileInitial');
+                const navProfileIcon = document.getElementById('navProfileIcon');
+                
+                if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+                if (profileEmail) profileEmail.textContent = user.email;
+                if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                setInterval(async () => {
+                    try {
+                        await user.getIdToken(true);
+                    } catch (error) {
+                        console.warn("Session invalidated or user deleted. Logging out.");
+                        await signOut(auth);
+                        window.location.href = 'login.html';
+                    }
+                }, 60000);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const signOutBtn = document.getElementById('logoutBtn');
+            if (signOutBtn) {
+                signOutBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    try {
+                        await signOut(auth);
+                    } catch (error) {
+                        console.error("Sign Out Error:", error);
+                        alert("Sign Out Failed: " + error.message);
+                    }
+                });
+            }
+        });
+</script>
 </body>
 </html>
-
-
