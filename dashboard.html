@@ -845,12 +845,18 @@
         }
 
         const fontNote = isLegacy ? " (Legacy FM Abhaya font auto-converted)" : "";
-        document.getElementById('srtWordCountText').textContent = `Estimated Word Count: ~${estimatedWords} words (${limit} words/line)${fontNote}`;
+        const countEl = document.getElementById('srtWordCountText');
+        if (countEl) {
+          countEl.textContent = `Estimated Word Count: ~${estimatedWords} words (${limit} words/line)${fontNote}`;
+        }
       }
+
+      // Backend API Server base URL
+      const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://capzone.kaveesha.top';
 
       // SSE Real-time Progress helper
       function setupProgressTracker(clientId, stepsPrefix, barId) {
-        const eventSource = new EventSource(`/api/progress?clientId=${clientId}`);
+        const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
 
         eventSource.onmessage = (event) => {
           try {
@@ -933,7 +939,7 @@
         }
 
         try {
-          const res = await fetch(`/api/generate-srt?clientId=${clientId}`, {
+          const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, {
             method: 'POST',
             body: formData
           });
@@ -973,7 +979,7 @@
         const es = setupProgressTracker(clientId, 'fb', 'fbProgressBar');
 
         try {
-          const res = await fetch('/api/facebook-download', {
+          const res = await fetch(`${API_BASE_URL}/api/facebook-download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url, clientId })
@@ -984,7 +990,7 @@
 
           if (data.downloadUrl) {
             updateStepProgress('fb', 'fbProgressBar', 'Step 4: Facebook Video Ready!');
-            document.getElementById('fbDownloadLink').href = `/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+            document.getElementById('fbDownloadLink').href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
             document.getElementById('fbResultArea').style.display = 'block';
           } else {
             const errDetails = data.error || data.message || 'Unknown Server Error';
@@ -1011,7 +1017,7 @@
         const es = setupProgressTracker(clientId, 'tiktok', 'tiktokProgressBar');
 
         try {
-          const res = await fetch('/api/tiktok-download', {
+          const res = await fetch(`${API_BASE_URL}/api/tiktok-download`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ url, clientId })
@@ -1022,7 +1028,7 @@
 
           if (data.downloadUrl) {
             updateStepProgress('tiktok', 'tiktokProgressBar', 'Step 4: TikTok No-Watermark Video Ready!');
-            document.getElementById('tiktokDownloadLink').href = `/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+            document.getElementById('tiktokDownloadLink').href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
             document.getElementById('tiktokResultArea').style.display = 'block';
           } else {
             showPopup('Error: ' + (data.error || 'Failed to fetch TikTok video'), 'Downloader Notice', 'error');
@@ -1055,7 +1061,7 @@
         formData.append('media', fileInput.files[0]);
 
         try {
-          const res = await fetch(`/api/enhance-audio?clientId=${clientId}`, {
+          const res = await fetch(`${API_BASE_URL}/api/enhance-audio?clientId=${clientId}`, {
             method: 'POST',
             body: formData
           });
