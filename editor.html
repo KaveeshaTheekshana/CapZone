@@ -1984,6 +1984,11 @@
     function openKaveezSubtitleModal() {
         if (!selectedVideoFile) return showToast("Please load a video file first!", 'warning');
         const modal = document.getElementById('kaveez-subtitle-modal');
+        const savedKey = localStorage.getItem('gemini_api_key') || '';
+        const keyInput = document.getElementById('modal-api-key');
+        if (keyInput && !keyInput.value && savedKey) {
+            keyInput.value = savedKey;
+        }
         modal.classList.remove('hidden');
         setTimeout(() => modal.classList.remove('opacity-0'), 10);
     }
@@ -2012,11 +2017,15 @@
         const apiKey = document.getElementById('modal-api-key').value.trim();
         isLegacyFontActive = (fontMode === 'legacy');
 
+        if (apiKey) {
+            localStorage.setItem('gemini_api_key', apiKey);
+        }
+
         generateKaveezSubtitlesWithParams({
             wordsLimit,
             language,
             legacyFont: isLegacyFontActive,
-            apiKey
+            apiKey: apiKey || localStorage.getItem('gemini_api_key') || ''
         });
     }
 
@@ -2026,9 +2035,7 @@
         const clientId = 'client_' + Math.random().toString(36).substring(7);
         showProgress("KaveezCloud Subtitle Engine", "Processing speech stream & synchronizing timeline...", "cloud_done");
 
-        const API_BASE = (window.location.origin.includes('localhost') || window.location.origin.includes('capzone')) ? '' : 'https://capzone.kaveesha.top';
-
-        const eventSource = new EventSource(API_BASE + '/api/progress?clientId=' + clientId);
+        const eventSource = new EventSource('/api/progress?clientId=' + clientId);
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
@@ -2048,29 +2055,20 @@
         formData.append('language', params.language || 'Sinhala');
         formData.append('wordsLimit', params.wordsLimit || 5);
         formData.append('legacyFont', params.legacyFont || false);
-        if (params.apiKey) formData.append('apiKey', params.apiKey);
+        const activeKey = params.apiKey || localStorage.getItem('gemini_api_key') || '';
+        if (activeKey) formData.append('apiKey', activeKey);
 
         try {
-            let response = await fetch(API_BASE + '/api/generate-srt?clientId=' + clientId, {
+            const response = await fetch('/api/generate-srt?clientId=' + clientId, {
                 method: 'POST',
                 body: formData
-            }).catch(() => null);
-
-            // Resilient fallback to production domain if relative failed
-            if (!response || !response.ok) {
-                if (API_BASE === '') {
-                    response = await fetch('https://capzone.kaveesha.top/api/generate-srt?clientId=' + clientId, {
-                        method: 'POST',
-                        body: formData
-                    });
-                }
-            }
+            });
 
             eventSource.close();
 
-            if (!response || !response.ok) {
-                const errJson = await response?.json().catch(() => ({}));
-                throw new Error(errJson?.error || errJson?.details || 'Subtitle generation request failed. Check server status.');
+            if (!response.ok) {
+                const errJson = await response.json().catch(() => ({}));
+                throw new Error(errJson.error || errJson.details || 'Subtitle generation request failed. Check server status or API key.');
             }
 
             const data = await response.json();
@@ -2238,9 +2236,7 @@
         const clientId = 'export_' + Math.random().toString(36).substring(7);
         showProgress("Rendering Video", "Hardcoding styled Sinhala subtitles with FFmpeg...", "movie_creation");
 
-        const API_BASE = (window.location.origin.includes('localhost') || window.location.origin.includes('capzone')) ? '' : 'https://capzone.kaveesha.top';
-
-        const eventSource = new EventSource(API_BASE + '/api/progress?clientId=' + clientId);
+        const eventSource = new EventSource('/api/progress?clientId=' + clientId);
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
             document.getElementById('progress-text').textContent = data.message;
@@ -2262,7 +2258,7 @@
         formData.append('posY', overlayPos.y);
 
         try {
-            const res = await fetch(API_BASE + '/api/export-video?clientId=' + clientId, { method: 'POST', body: formData });
+            const res = await fetch('/api/export-video?clientId=' + clientId, { method: 'POST', body: formData });
             if (!res.ok) throw new Error(await res.text());
 
             const blob = await res.blob();
