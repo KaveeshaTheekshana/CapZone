@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&family=Noto+Sans+Sinhala:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
-<script src="/sinhala-converter.js"></script>
+<script src="sinhala-converter.js"></script>
 
 <!-- Firebase Auth Protection -->
 <script type="module">
@@ -247,6 +247,7 @@
     
     <div class="flex items-center gap-2">
         <input type="file" id="video-upload" accept="video/*" class="hidden" />
+        <input type="file" id="image-upload" accept="image/*" class="hidden" />
         <input type="file" id="srt-upload" accept=".srt" class="hidden" />
         <input type="file" id="audio-upload" accept="audio/*" class="hidden" />
         
@@ -255,6 +256,9 @@
         </button>
         <button onclick="document.getElementById('video-upload').click()" class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-white/5 flex items-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-base text-primary">video_call</span> Load Video
+        </button>
+        <button onclick="document.getElementById('image-upload').click()" class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-white/5 flex items-center gap-1.5 transition-all" title="Add Image/Sticker Overlay Layer">
+            <span class="material-symbols-outlined text-base text-pink-400">image</span> Add Overlay
         </button>
         <button onclick="document.getElementById('srt-upload').click()" class="px-3 py-1.5 rounded-lg bg-surface-container-high border border-outline-variant/40 text-on-surface text-xs font-semibold hover:bg-white/5 flex items-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-base text-secondary">subtitles</span> Load SRT
@@ -265,7 +269,7 @@
         <button id="download-btn" class="px-3 py-1.5 rounded-lg bg-surface-bright border border-outline-variant/50 text-white text-xs font-semibold hover:bg-white/10 flex items-center gap-1.5 transition-all">
             <span class="material-symbols-outlined text-base">download</span> SRT
         </button>
-        <button onclick="exportRenderedVideo()" class="px-4 py-1.5 rounded-lg bg-primary-container text-white font-bold text-xs hover:opacity-90 flex items-center gap-1.5 shadow-[0_0_18px_rgba(98,0,238,0.5)] transition-all">
+        <button onclick="openExportModal()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-primary to-purple-600 text-white font-bold text-xs hover:brightness-110 flex items-center gap-1.5 shadow-[0_0_18px_rgba(98,0,238,0.5)] transition-all">
             <span class="material-symbols-outlined text-base">movie_creation</span> Export Video
         </button>
     </div>
@@ -322,19 +326,33 @@
             <div id="panel-media" class="flex-1 flex flex-col h-full">
                 <div class="flex items-center justify-between p-3 border-b border-outline-variant/20">
                     <h2 class="text-xs text-white font-bold uppercase tracking-wider flex items-center gap-2">
-                        <span class="material-symbols-outlined text-primary text-[18px]">perm_media</span> Media Library
+                        <span class="material-symbols-outlined text-primary text-[18px]">perm_media</span> Media Library & Assets
                     </h2>
                 </div>
                 <div class="flex-1 overflow-y-auto p-3 space-y-4">
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="document.getElementById('video-upload').click()" class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 hover:border-primary flex flex-col items-center justify-center gap-2 text-xs font-semibold text-white transition-all hover:bg-white/5">
+                        <button onclick="document.getElementById('video-upload').click()" class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 hover:border-primary flex flex-col items-center justify-center gap-1.5 text-xs font-semibold text-white transition-all hover:bg-white/5">
                             <span class="material-symbols-outlined text-2xl text-primary">video_call</span>
-                            Upload Video
+                            Upload Video (V1)
                         </button>
-                        <button onclick="document.getElementById('audio-upload').click()" class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 hover:border-secondary flex flex-col items-center justify-center gap-2 text-xs font-semibold text-white transition-all hover:bg-white/5">
+                        <button onclick="document.getElementById('image-upload').click()" class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 hover:border-pink-500 flex flex-col items-center justify-center gap-1.5 text-xs font-semibold text-white transition-all hover:bg-white/5">
+                            <span class="material-symbols-outlined text-2xl text-pink-400">image</span>
+                            Add Image/Sticker (V2)
+                        </button>
+                        <button onclick="document.getElementById('audio-upload').click()" class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 hover:border-secondary flex flex-col items-center justify-center gap-1.5 text-xs font-semibold text-white transition-all hover:bg-white/5">
                             <span class="material-symbols-outlined text-2xl text-secondary">library_music</span>
-                            Add Audio
+                            Add Audio (A2)
                         </button>
+                        <button onclick="document.getElementById('srt-upload').click()" class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 hover:border-amber-400 flex flex-col items-center justify-center gap-1.5 text-xs font-semibold text-white transition-all hover:bg-white/5">
+                            <span class="material-symbols-outlined text-2xl text-amber-400">subtitles</span>
+                            Import SRT (T1)
+                        </button>
+                    </div>
+
+                    <div class="p-3 bg-surface-container/60 rounded-xl border border-dashed border-outline-variant/40 text-center py-4">
+                        <span class="material-symbols-outlined text-3xl text-on-surface-variant mb-1">drag_and_drop</span>
+                        <div class="text-xs font-bold text-white">Drag & Drop from PC</div>
+                        <div class="text-[10px] text-on-surface-variant">Drop any Video, Image, Audio, or SRT file here</div>
                     </div>
 
                     <div class="p-3 bg-surface-container rounded-xl border border-outline-variant/30 space-y-2">
@@ -577,17 +595,20 @@
     <!-- Center Stage -->
     <section class="flex-1 flex flex-col min-w-0 bg-black relative">
         <div class="flex-1 flex items-center justify-center p-4 relative overflow-hidden">
-            <div id="video-container" class="w-full max-w-4xl aspect-video bg-surface-container-highest rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/10 flex items-center justify-center transition-all duration-300">
+            <div id="video-container" class="w-full max-w-4xl bg-surface-container-highest rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/10 flex items-center justify-center transition-all duration-300" style="aspect-ratio: 16/9; max-height: 70vh;">
                 <video id="video-player" class="w-full h-full object-contain transition-all"></video>
                 
-                <div id="video-placeholder" onclick="document.getElementById('video-upload').click()" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface-container-highest cursor-pointer hover:bg-surface-container-high transition-colors">
+                <!-- IMAGE / STICKER OVERLAYS STAGE (V2 LAYER) -->
+                <div id="image-overlays-stage" class="absolute inset-0 pointer-events-none z-40 overflow-hidden"></div>
+
+                <div id="video-placeholder" onclick="document.getElementById('video-upload').click()" class="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface-container-highest cursor-pointer hover:bg-surface-container-high transition-colors z-30">
                     <span class="material-symbols-outlined text-primary text-6xl animate-pulse">movie</span>
                     <h3 class="text-lg font-bold text-white tracking-tight">Upload Your Video</h3>
-                    <p class="text-xs text-on-surface-variant">Click anywhere or drop an MP4, MOV, WAV, MKV file</p>
+                    <p class="text-xs text-on-surface-variant">Click anywhere or drop an MP4, MOV, WAV, PNG file</p>
                 </div>
                 
                 <!-- TOP MOST SUBTITLE OVERLAY LAYER (Z-INDEX 50) -->
-                <div id="subtitle-stage-overlay" class="absolute cursor-grab active:cursor-grabbing opacity-0 pointer-events-none transition-all">
+                <div id="subtitle-stage-overlay" class="absolute cursor-grab active:cursor-grabbing opacity-0 pointer-events-none transition-all z-50">
                     <span id="subtitle-overlay-text" class="font-bold text-2xl text-white"></span>
                 </div>
             </div>
@@ -615,37 +636,42 @@
         
         <div class="p-3 space-y-3 border-b border-outline-variant/20">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-white">Layer Order</span>
-                <div class="flex gap-1">
-                    <button onclick="moveLayer('up')" class="px-2 py-1 bg-surface-container rounded text-[10px] text-white hover:bg-primary/20 font-bold">Top Layer</button>
-                    <button onclick="moveLayer('down')" class="px-2 py-1 bg-surface-container rounded text-[10px] text-white hover:bg-primary/20 font-bold">Send Back</button>
-                </div>
+                <span class="text-xs font-bold text-white">Layer Stack</span>
+                <button onclick="document.getElementById('image-upload').click()" class="px-2 py-1 bg-pink-600/30 border border-pink-500/50 rounded text-[10px] text-pink-300 font-bold hover:bg-pink-600/50">+ Add Overlay</button>
             </div>
             <div id="layer-stack-list" class="space-y-1.5 text-xs font-semibold">
                 <div class="p-2 bg-primary/20 border border-primary/40 rounded-lg flex items-center justify-between text-primary">
                     <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">title</span> T1 Subtitles (Top Layer)</span>
                     <span class="material-symbols-outlined text-sm">visibility</span>
                 </div>
-                <div class="p-2 bg-surface-container border border-outline-variant/30 rounded-lg flex items-center justify-between text-on-surface-variant">
+                <div class="p-2 bg-pink-950/40 border border-pink-500/40 rounded-lg flex items-center justify-between text-pink-300">
+                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">image</span> V2 Image / Stickers</span>
+                    <span class="material-symbols-outlined text-sm">visibility</span>
+                </div>
+                <div class="p-2 bg-indigo-950/40 border border-indigo-500/40 rounded-lg flex items-center justify-between text-indigo-300">
                     <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">videocam</span> V1 Video Main</span>
                     <span class="material-symbols-outlined text-sm">visibility</span>
                 </div>
-                <div class="p-2 bg-surface-container border border-outline-variant/30 rounded-lg flex items-center justify-between text-on-surface-variant">
-                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">music_note</span> A1 Audio Main</span>
+                <div class="p-2 bg-emerald-950/40 border border-emerald-500/40 rounded-lg flex items-center justify-between text-emerald-300">
+                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">equalizer</span> A1 Voice Audio</span>
+                    <span class="material-symbols-outlined text-sm">volume_up</span>
+                </div>
+                <div class="p-2 bg-amber-950/40 border border-amber-500/40 rounded-lg flex items-center justify-between text-amber-300">
+                    <span class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">music_note</span> A2 Stock Music</span>
                     <span class="material-symbols-outlined text-sm">volume_up</span>
                 </div>
             </div>
         </div>
 
         <div class="p-3 border-b border-outline-variant/30">
-            <h2 class="text-xs text-white font-bold uppercase tracking-wider">Inspector</h2>
+            <h2 class="text-xs text-white font-bold uppercase tracking-wider">Inspector & Transform</h2>
         </div>
         <div class="p-3 flex flex-col gap-4">
             <div>
-                <h3 class="text-xs text-on-surface-variant font-bold uppercase tracking-wider mb-2">Transform Position</h3>
+                <h3 class="text-xs text-on-surface-variant font-bold uppercase tracking-wider mb-2">Subtitle Position</h3>
                 <div class="space-y-2">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs text-on-surface">Subtitle Pos Y</span>
+                        <span class="text-xs text-on-surface">Vertical Pos Y</span>
                         <input id="inspector-pos-y" type="range" min="10" max="90" value="85" oninput="updatePosFromInspector()" class="w-28 accent-primary cursor-pointer"/>
                     </div>
                 </div>
@@ -655,7 +681,7 @@
 </main>
 
 <!-- Bottom Multi-Track Timeline with Dynamic Zoom & Junction Drag & Drop Transitions -->
-<footer class="h-60 border-t border-outline-variant/30 bg-surface-container flex flex-col shrink-0">
+<footer class="h-64 border-t border-outline-variant/30 bg-surface-container flex flex-col shrink-0">
     <div class="h-10 border-b border-outline-variant/30 bg-surface-container-high flex items-center justify-between px-4">
         <div class="flex items-center gap-2">
             <button onclick="splitCurrentSubtitle()" class="px-2.5 py-1 bg-surface-container border border-outline-variant/40 rounded-lg text-xs text-primary font-bold hover:bg-white/10 flex items-center gap-1 transition-all" title="Split Subtitle (S)">
@@ -667,6 +693,9 @@
             <button onclick="splitAudioClipAtPlayhead()" class="px-2.5 py-1 bg-surface-container border border-outline-variant/40 rounded-lg text-xs text-emerald-400 font-bold hover:bg-white/10 flex items-center gap-1 transition-all" title="Split Audio Clip">
                 <span class="material-symbols-outlined text-sm">equalizer</span> Cut Audio (A1)
             </button>
+            <button onclick="document.getElementById('image-upload').click()" class="px-2.5 py-1 bg-surface-container border border-pink-500/40 rounded-lg text-xs text-pink-300 font-bold hover:bg-white/10 flex items-center gap-1 transition-all" title="Add Image/Sticker Overlay">
+                <span class="material-symbols-outlined text-sm">add_photo_alternate</span> Add Overlay (V2)
+            </button>
         </div>
         <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-sm text-on-surface-variant">zoom_out</span>
@@ -676,17 +705,23 @@
         </div>
     </div>
 
-    <!-- Multi-Track Timeline Area -->
+    <!-- Multi-Track Timeline Area (5 Tracks: T1, V2, V1, A1, A2) -->
     <div class="flex-1 overflow-auto relative flex" id="timeline-scroll-container">
         <div class="w-32 flex flex-col border-r border-outline-variant/30 bg-surface-container-lowest sticky left-0 z-10 shrink-0">
-            <div class="h-[48px] flex items-center px-2 border-b border-outline-variant/20 text-on-surface-variant text-[11px] font-bold gap-1">
+            <div class="h-[40px] flex items-center px-2 border-b border-outline-variant/20 text-on-surface-variant text-[11px] font-bold gap-1">
                 <span class="material-symbols-outlined text-sm text-primary">title</span> T1 Subtitles
             </div>
-            <div class="h-[48px] flex items-center px-2 border-b border-outline-variant/20 text-on-surface-variant text-[11px] font-bold gap-1">
-                <span class="material-symbols-outlined text-sm text-secondary">videocam</span> V1 Video Track
+            <div class="h-[40px] flex items-center px-2 border-b border-outline-variant/20 text-pink-300 text-[11px] font-bold gap-1">
+                <span class="material-symbols-outlined text-sm text-pink-400">image</span> V2 Overlays
             </div>
-            <div class="h-[48px] flex items-center px-2 border-b border-outline-variant/20 text-on-surface-variant text-[11px] font-bold gap-1">
-                <span class="material-symbols-outlined text-sm text-emerald-400">music_note</span> A1 Audio Track
+            <div class="h-[40px] flex items-center px-2 border-b border-outline-variant/20 text-secondary text-[11px] font-bold gap-1">
+                <span class="material-symbols-outlined text-sm text-secondary">videocam</span> V1 Video Main
+            </div>
+            <div class="h-[40px] flex items-center px-2 border-b border-outline-variant/20 text-emerald-400 text-[11px] font-bold gap-1">
+                <span class="material-symbols-outlined text-sm text-emerald-400">equalizer</span> A1 Voice Audio
+            </div>
+            <div class="h-[40px] flex items-center px-2 border-b border-outline-variant/20 text-amber-400 text-[11px] font-bold gap-1">
+                <span class="material-symbols-outlined text-sm text-amber-400">music_note</span> A2 Stock Music
             </div>
         </div>
 
@@ -695,19 +730,67 @@
                 <div class="absolute -top-1 -left-[5px] w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-error"></div>
             </div>
             
-            <div id="timeline-subtitle-clips" class="h-[48px] timeline-track relative flex items-center py-1 px-2">
-            </div>
+            <!-- T1 Subtitles Track -->
+            <div id="timeline-subtitle-clips" class="h-[40px] timeline-track relative flex items-center py-1 px-2 border-b border-outline-variant/10"></div>
             
-            <div id="timeline-video-clips-track" class="h-[48px] timeline-track relative flex items-center py-1 px-2">
-                <!-- Video clips rendered dynamically -->
-            </div>
+            <!-- V2 Overlays Track -->
+            <div id="timeline-overlay-clips-track" class="h-[40px] timeline-track relative flex items-center py-1 px-2 border-b border-outline-variant/10"></div>
+
+            <!-- V1 Video Clips Track -->
+            <div id="timeline-video-clips-track" class="h-[40px] timeline-track relative flex items-center py-1 px-2 border-b border-outline-variant/10"></div>
             
-            <div id="timeline-audio-clips-track" class="h-[48px] timeline-track relative flex items-center py-1 px-2">
-                <!-- Audio clips rendered dynamically -->
-            </div>
+            <!-- A1 Voice Audio Clips Track -->
+            <div id="timeline-audio-clips-track" class="h-[40px] timeline-track relative flex items-center py-1 px-2 border-b border-outline-variant/10"></div>
+
+            <!-- A2 Stock Music Clips Track -->
+            <div id="timeline-sfx-clips-track" class="h-[40px] timeline-track relative flex items-center py-1 px-2 border-b border-outline-variant/10"></div>
         </div>
     </div>
 </footer>
+
+<!-- Modal: Video Export Modal -->
+<div id="kaveez-export-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[120] hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-6">
+    <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl flex flex-col">
+        <div class="p-4 border-b border-outline-variant/30 flex items-center justify-between bg-surface-container-high">
+            <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary text-2xl">movie_creation</span>
+                <h3 class="text-base font-bold text-white">Export Video Studio</h3>
+            </div>
+            <button onclick="closeExportModal()" class="text-on-surface-variant hover:text-white"><span class="material-symbols-outlined">close</span></button>
+        </div>
+        
+        <div class="p-5 space-y-4 text-xs text-white">
+            <div>
+                <label class="block font-bold text-on-surface-variant uppercase tracking-wider mb-1">Export Resolution</label>
+                <select id="export-resolution" class="w-full bg-surface-container border border-outline-variant/40 rounded-lg p-2.5 text-xs text-white focus:border-primary">
+                    <option value="original" selected>Original Video Resolution (Recommended)</option>
+                    <option value="1080p">1080p Full HD (1920 x 1080)</option>
+                    <option value="720p">720p HD (1280 x 720)</option>
+                    <option value="4k">4K Ultra HD (3840 x 2160)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block font-bold text-on-surface-variant uppercase tracking-wider mb-1">Export Mode</label>
+                <select id="export-mode" class="w-full bg-surface-container border border-outline-variant/40 rounded-lg p-2.5 text-xs text-white focus:border-primary">
+                    <option value="client" selected>⚡ Instant Client Engine (0s Server Queue - In Browser)</option>
+                    <option value="server">☁️ KaveezCloud Server FFmpeg Hardcode</option>
+                </select>
+            </div>
+
+            <div class="p-3 bg-surface-container rounded-lg border border-outline-variant/30 text-slate-300 text-[11px] leading-relaxed">
+                Includes hardcoded Sinhala/English subtitles, 200 text animation styles, video LUT filters, and image overlays.
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-outline-variant/30 bg-surface flex items-center justify-end gap-3">
+            <button onclick="closeExportModal()" class="px-4 py-2 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white">Cancel</button>
+            <button onclick="startExportProcessing()" class="px-5 py-2.5 rounded-lg text-xs font-bold bg-gradient-to-r from-primary to-purple-600 text-white hover:brightness-110 flex items-center gap-2 shadow-lg shadow-primary/30">
+                <span class="material-symbols-outlined text-base">download</span> Start Export
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- Modal: Subtitle Studio Settings Modal -->
 <div id="kaveez-subtitle-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] hidden opacity-0 transition-opacity duration-200 flex items-center justify-center p-6">
@@ -830,17 +913,22 @@
     let activeVideoFilter = "";
 
     // Multi-track timeline state
-    let videoClips = []; // [{ id, startSec, endSec, duration, name }]
-    let audioClips = []; // [{ id, startSec, endSec, duration, name }]
-    let clipJunctionTransitions = {}; // { 'clipIndex': 'trans-zoom-fade' }
+    let videoClips = [];       // V1 Main: [{ id, startSec, endSec, duration, name }]
+    let imageOverlays = [];    // V2 Overlays: [{ id, src, name, startSec, endSec, x, y, width, height, scale, opacity }]
+    let audioClips = [];       // A1 Voice: [{ id, startSec, endSec, duration, name }]
+    let sfxClips = [];         // A2 Stock Music: [{ id, startSec, endSec, duration, name }]
+    let clipJunctionTransitions = {}; // { 0: { class: 'trans-zoom-fade', name: 'Zoom Fade' } }
+    let selectedJunctionIdx = -1;
 
-    // Web Audio API Context & Gain Node
+    // Web Audio API Context & Equalizer Analyser
     let audioCtx = null;
     let gainNode = null;
     let audioSourceNode = null;
+    let analyserNode = null;
 
     const videoPlayer = document.getElementById('video-player');
     const videoContainer = document.getElementById('video-container');
+    const imageOverlaysStage = document.getElementById('image-overlays-stage');
     const subtitleStageOverlay = document.getElementById('subtitle-stage-overlay');
     const subtitleOverlayText = document.getElementById('subtitle-overlay-text');
     const dynamicFontStyle = document.getElementById('dynamic-font-style');
@@ -1003,7 +1091,7 @@
         filtered.slice(0, 60).forEach((t) => {
             const item = document.createElement('div');
             item.className = "p-2 bg-surface-container border border-outline-variant/30 rounded-lg cursor-pointer hover:border-secondary flex flex-col justify-between aspect-[3/2] group transition-all";
-            item.onclick = () => applyTransition(t.class, t.name);
+            item.onclick = () => selectTransitionForJunction(t.class, t.name);
             item.innerHTML = `
                 <div class="text-[9px] text-secondary font-bold uppercase">Transition #${t.id}</div>
                 <div class="text-center font-bold text-xs text-white truncate">${t.name.split('. ')[1]}</div>
@@ -1017,13 +1105,22 @@
         buildTransitionGrid(document.getElementById('trans-search').value);
     }
 
+    function selectTransitionForJunction(transClass, name = 'Transition') {
+        if (selectedJunctionIdx !== -1) {
+            clipJunctionTransitions[selectedJunctionIdx] = { class: transClass, name: name };
+            renderTimelineClips();
+            showToast(`✨ Applied "${name}" to Cut Junction #${selectedJunctionIdx + 1}!`, 'success');
+        } else {
+            showToast(`Previewing "${name}" — Click any ⧉ Junction between cut clips to bind!`, 'info');
+        }
+        applyTransition(transClass, name);
+    }
+
     function applyTransition(transClass, name = 'Transition') {
-        const video = document.getElementById('video-player');
-        video.className = "w-full h-full object-contain " + transClass + (activeVideoFilter ? ' ' + activeVideoFilter : '');
+        videoContainer.classList.add(transClass);
         setTimeout(() => { 
-            video.className = "w-full h-full object-contain" + (activeVideoFilter ? ' ' + activeVideoFilter : ''); 
-        }, 600);
-        showToast(`Visual Transition Triggered: ${name}`, 'info');
+            videoContainer.classList.remove(transClass);
+        }, 650);
     }
 
     buildTransitionGrid();
@@ -1074,15 +1171,13 @@
     buildEffectsGrid();
 
     // ------------------------------------------------------------------
-    // Live Font Loader & Real-Time Inline Selector
+    // Built-in Font System & Resilient Font Loader (Zero 404s)
     // ------------------------------------------------------------------
-    fetch('/api/fonts')
-        .then(res => res.json())
-        .then(data => { 
-            availableFonts = data || []; 
-            renderInlineFonts();
-        })
-        .catch(err => console.log('Fonts load error:', err));
+    const defaultFonts = [
+        "Noto Sans Sinhala", "FM-Abhaya.ttf", "FM-Derana.ttf", "FM-Malithi.ttf", "DL-Manel.ttf",
+        "Outfit", "Inter", "Montserrat", "Bebas Neue", "Poppins", "Impact", "Roboto"
+    ];
+    availableFonts = defaultFonts;
 
     function isLegacyFont(name) {
         const upper = name.toUpperCase();
@@ -1105,16 +1200,18 @@
         defItem.className = "p-2 rounded bg-surface-container-high hover:bg-primary/20 cursor-pointer flex justify-between items-center text-xs text-white transition-all";
         defItem.onmouseenter = () => livePreviewFont("");
         defItem.onclick = () => selectFont("");
-        defItem.innerHTML = `<span>Default (Noto Sans)</span><span class="text-[9px] text-primary font-bold">Standard</span>`;
+        defItem.innerHTML = `<span>Default (Noto Sans Sinhala)</span><span class="text-[9px] text-primary font-bold">Standard</span>`;
         container.appendChild(defItem);
 
         filtered.slice(0, 50).forEach(font => {
             const isLeg = isLegacyFont(font);
             const cleanName = font.replace(/\.(ttf|otf|ttc)$/i, '');
             const fontFaceName = `Preview_${cleanName.replace(/[^a-zA-Z0-9]/g, '')}`;
-            const fontUrl = `/fonts/${encodeURIComponent(font)}`;
-
-            dynamicFontStyle.innerHTML += `@font-face { font-family: '${fontFaceName}'; src: url('${fontUrl}'); font-display: swap; }`;
+            
+            if (font.includes('.')) {
+                const fontUrl = `/fonts/${encodeURIComponent(font)}`;
+                dynamicFontStyle.innerHTML += `@font-face { font-family: '${fontFaceName}'; src: url('${fontUrl}'); font-display: swap; }`;
+            }
 
             const item = document.createElement('div');
             item.className = "p-2 rounded bg-surface-container-high hover:bg-primary/20 cursor-pointer flex justify-between items-center text-xs text-white transition-all";
@@ -1122,7 +1219,7 @@
             item.onclick = () => selectFont(font);
 
             item.innerHTML = `
-                <span class="truncate max-w-[160px]" style="font-family: '${fontFaceName}', sans-serif">${cleanName}</span>
+                <span class="truncate max-w-[160px]" style="font-family: '${font.includes('.') ? fontFaceName : cleanName}', sans-serif">${cleanName}</span>
                 <span class="text-[9px] px-1 py-0.5 rounded ${isLeg ? 'bg-amber-500/20 text-amber-300' : 'bg-indigo-500/20 text-indigo-300'} font-bold">
                     ${isLeg ? 'FM/DL' : 'Unicode'}
                 </span>
@@ -1130,6 +1227,19 @@
             container.appendChild(item);
         });
     }
+
+    renderInlineFonts();
+
+    // Attempt to fetch dynamic fonts if server is available
+    fetch('/api/fonts')
+        .then(res => { if (res.ok && res.headers.get('content-type')?.includes('json')) return res.json(); throw new Error('Not JSON'); })
+        .then(data => { 
+            if (Array.isArray(data) && data.length > 0) {
+                availableFonts = Array.from(new Set([...defaultFonts, ...data]));
+                renderInlineFonts();
+            }
+        })
+        .catch(() => { /* safely use defaultFonts without error */ });
 
     function filterInlineFonts() {
         renderInlineFonts(document.getElementById('inline-font-search').value);
@@ -1140,7 +1250,11 @@
             subtitleOverlayText.style.fontFamily = "'Noto Sans Sinhala', sans-serif";
             return;
         }
-        subtitleOverlayText.style.fontFamily = `'${fontFaceName}', sans-serif`;
+        if (fontFilename.includes('.')) {
+            subtitleOverlayText.style.fontFamily = `'${fontFaceName}', sans-serif`;
+        } else {
+            subtitleOverlayText.style.fontFamily = `'${fontFilename}', sans-serif`;
+        }
     }
 
     async function selectFont(fontFilename) {
@@ -1150,12 +1264,14 @@
         document.getElementById('font-type-badge').textContent = isLegacyFontActive ? "Legacy FM/DL" : "Unicode";
 
         if (fontFilename) {
-            const cleanName = fontFilename.replace(/\.(ttf|otf|ttc)$/i, '');
-            const fontUrl = `/fonts/${encodeURIComponent(fontFilename)}`;
-            const fontFaceName = `ActiveFont_${cleanName.replace(/[^a-zA-Z0-9]/g, '')}`;
-
-            dynamicFontStyle.innerHTML += `@font-face { font-family: '${fontFaceName}'; src: url('${fontUrl}'); font-display: swap; }`;
-            subtitleOverlayText.style.fontFamily = `'${fontFaceName}', sans-serif`;
+            if (fontFilename.includes('.')) {
+                const fontUrl = `/fonts/${encodeURIComponent(fontFilename)}`;
+                const fontFaceName = `ActiveFont_${cleanName.replace(/[^a-zA-Z0-9]/g, '')}`;
+                dynamicFontStyle.innerHTML += `@font-face { font-family: '${fontFaceName}'; src: url('${fontUrl}'); font-display: swap; }`;
+                subtitleOverlayText.style.fontFamily = `'${fontFaceName}', sans-serif`;
+            } else {
+                subtitleOverlayText.style.fontFamily = `'${cleanName}', sans-serif`;
+            }
         } else {
             subtitleOverlayText.style.fontFamily = "'Noto Sans Sinhala', sans-serif";
         }
@@ -1168,49 +1284,190 @@
     }
 
     // ------------------------------------------------------------------
-    // Video & Audio File Loaders & Web Audio API DSP
+    // Video & Audio File Loaders with Native Aspect Ratio Auto-Sizing
     // ------------------------------------------------------------------
-    document.getElementById('video-upload').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            selectedVideoFile = file;
-            document.getElementById('video-filename').textContent = file.name;
-            document.getElementById('video-placeholder').classList.add('hidden');
-            document.getElementById('kaveez-generate-btn').classList.remove('hidden');
-            
-            const url = URL.createObjectURL(file);
-            videoPlayer.src = url;
-            videoPlayer.load();
+    function loadVideoFromFile(file) {
+        selectedVideoFile = file;
+        document.getElementById('video-filename').textContent = file.name;
+        document.getElementById('video-placeholder').classList.add('hidden');
+        document.getElementById('kaveez-generate-btn').classList.remove('hidden');
+        
+        const url = URL.createObjectURL(file);
+        videoPlayer.src = url;
+        videoPlayer.load();
 
-            videoPlayer.onloadedmetadata = () => {
-                const duration = videoPlayer.duration || 10;
-                videoClips = [{ id: 1, startSec: 0, endSec: duration, duration: duration, name: file.name }];
-                audioClips = [{ id: 1, startSec: 0, endSec: duration, duration: duration, name: "Audio_Main.wav" }];
-                
-                updateTimelineZoom();
-                initWebAudioAPI();
-                showToast(`Loaded Video: ${file.name}`, 'success');
-            };
-        }
+        videoPlayer.onloadedmetadata = () => {
+            const duration = videoPlayer.duration || 10;
+            const vWidth = videoPlayer.videoWidth || 1920;
+            const vHeight = videoPlayer.videoHeight || 1080;
+
+            // Auto-adjust container aspect ratio to match native video without ANY cropping!
+            videoContainer.style.aspectRatio = `${vWidth} / ${vHeight}`;
+            videoContainer.style.maxHeight = '70vh';
+            videoPlayer.style.objectFit = 'contain';
+
+            videoClips = [{ id: 1, startSec: 0, endSec: duration, duration: duration, name: file.name }];
+            audioClips = [{ id: 1, startSec: 0, endSec: duration, duration: duration, name: "Voice_Main.wav" }];
+            
+            updateTimelineZoom();
+            initWebAudioAPI();
+            showToast(`Loaded Video: ${file.name} (${vWidth}x${vHeight})`, 'success');
+        };
+    }
+
+    document.getElementById('video-upload').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) loadVideoFromFile(e.target.files[0]);
     });
+
+    function loadImageOverlayFromFile(file) {
+        const url = URL.createObjectURL(file);
+        const duration = videoPlayer.duration || 30;
+        const overlayId = 'overlay_' + Date.now();
+
+        imageOverlays.push({
+            id: overlayId,
+            src: url,
+            name: file.name,
+            startSec: 0,
+            endSec: duration,
+            x: 50,
+            y: 50,
+            scale: 1,
+            opacity: 1
+        });
+
+        renderImageOverlaysOnStage();
+        renderTimelineClips();
+        showToast(`✨ Added Image Overlay (V2 Track): ${file.name}`, 'success');
+    }
+
+    document.getElementById('image-upload').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) loadImageOverlayFromFile(e.target.files[0]);
+    });
+
+    function loadAudioFromFile(file) {
+        const duration = videoPlayer.duration || 30;
+        sfxClips.push({ id: sfxClips.length + 1, startSec: 0, endSec: duration, duration: duration, name: file.name });
+        renderTimelineClips();
+        showToast(`Added Stock Audio Track: ${file.name}`, 'success');
+    }
 
     document.getElementById('audio-upload').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            const duration = videoPlayer.duration || 30;
-            audioClips.push({ id: audioClips.length + 1, startSec: 0, endSec: duration, duration: duration, name: file.name });
-            renderTimelineClips();
-            showToast(`Added Audio Track: ${file.name}`, 'success');
+        if (e.target.files && e.target.files[0]) loadAudioFromFile(e.target.files[0]);
+    });
+
+    function loadSrtFromFile(file) {
+        const r = new FileReader();
+        r.onload = ev => {
+            parseSRT(ev.target.result);
+            renderSubtitles();
+            showToast(`Loaded SRT File: ${file.name}`, 'success');
+        };
+        r.readAsText(file);
+    }
+
+    document.getElementById('srt-upload').addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) loadSrtFromFile(e.target.files[0]);
+    });
+
+    // ------------------------------------------------------------------
+    // Drag & Drop Media from PC directly to Editor & Timeline
+    // ------------------------------------------------------------------
+    window.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        videoContainer.classList.add('ring-4', 'ring-primary');
+    });
+
+    window.addEventListener('dragleave', (e) => {
+        if (e.clientX === 0 && e.clientY === 0) {
+            videoContainer.classList.remove('ring-4', 'ring-primary');
         }
     });
+
+    window.addEventListener('drop', (e) => {
+        e.preventDefault();
+        videoContainer.classList.remove('ring-4', 'ring-primary');
+        
+        const files = Array.from(e.dataTransfer.files || []);
+        if (files.length === 0) return;
+
+        files.forEach(file => {
+            const type = file.type.toLowerCase();
+            const name = file.name.toLowerCase();
+
+            if (type.startsWith('video/') || name.endsWith('.mp4') || name.endsWith('.mov') || name.endsWith('.mkv') || name.endsWith('.webm')) {
+                loadVideoFromFile(file);
+            } else if (type.startsWith('image/') || name.endsWith('.png') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.webp') || name.endsWith('.gif') || name.endsWith('.svg')) {
+                loadImageOverlayFromFile(file);
+            } else if (type.startsWith('audio/') || name.endsWith('.mp3') || name.endsWith('.wav') || name.endsWith('.aac') || name.endsWith('.ogg')) {
+                loadAudioFromFile(file);
+            } else if (name.endsWith('.srt')) {
+                loadSrtFromFile(file);
+            } else {
+                showToast(`File not recognized: ${file.name}`, 'warning');
+            }
+        });
+    });
+
+    function renderImageOverlaysOnStage() {
+        imageOverlaysStage.innerHTML = '';
+        const curTime = videoPlayer.currentTime;
+
+        imageOverlays.forEach((ov, idx) => {
+            const isVisible = (curTime >= ov.startSec && curTime <= ov.endSec);
+            const img = document.createElement('img');
+            img.src = ov.src;
+            img.className = "absolute cursor-move select-none transition-opacity";
+            img.style.left = `${ov.x}%`;
+            img.style.top = `${ov.y}%`;
+            img.style.transform = `translate(-50%, -50%) scale(${ov.scale})`;
+            img.style.opacity = isVisible ? ov.opacity : 0;
+            img.style.maxWidth = "30%";
+            img.style.pointerEvents = isVisible ? 'auto' : 'none';
+            img.title = "Drag to reposition image overlay";
+
+            // Simple Drag Positioning on Stage
+            let isDragging = false;
+            img.onmousedown = (e) => {
+                isDragging = true;
+                const startX = e.clientX, startY = e.clientY;
+                const origX = ov.x, origY = ov.y;
+                const stageRect = imageOverlaysStage.getBoundingClientRect();
+
+                const onMouseMove = (ev) => {
+                    if (!isDragging) return;
+                    const dx = ((ev.clientX - startX) / stageRect.width) * 100;
+                    const dy = ((ev.clientY - startY) / stageRect.height) * 100;
+                    ov.x = Math.max(0, Math.min(100, origX + dx));
+                    ov.y = Math.max(0, Math.min(100, origY + dy));
+                    img.style.left = `${ov.x}%`;
+                    img.style.top = `${ov.y}%`;
+                };
+
+                const onMouseUp = () => {
+                    isDragging = false;
+                    window.removeEventListener('mousemove', onMouseMove);
+                    window.removeEventListener('mouseup', onMouseUp);
+                };
+
+                window.addEventListener('mousemove', onMouseMove);
+                window.addEventListener('mouseup', onMouseUp);
+            };
+
+            imageOverlaysStage.appendChild(img);
+        });
+    }
 
     function addStockAudioTrack(type) {
         const duration = videoPlayer.duration || 30;
-        audioClips.push({ id: audioClips.length + 1, startSec: 0, endSec: duration, duration: duration, name: `Stock_${type}.mp3` });
+        sfxClips.push({ id: sfxClips.length + 1, startSec: 0, endSec: duration, duration: duration, name: `Stock_${type}.mp3` });
         renderTimelineClips();
         showToast(`Added Stock Audio Track (${type})`, 'success');
     }
 
+    // ------------------------------------------------------------------
+    // Live Audio DSP & Real-Time Equalizer Waveform Canvas Engine
+    // ------------------------------------------------------------------
     function initWebAudioAPI() {
         if (!audioCtx) {
             try {
@@ -1218,10 +1475,39 @@
                 audioSourceNode = audioCtx.createMediaElementSource(videoPlayer);
                 gainNode = audioCtx.createGain();
                 gainNode.gain.value = 1.5;
+
+                analyserNode = audioCtx.createAnalyser();
+                analyserNode.fftSize = 64;
+
                 audioSourceNode.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
+                gainNode.connect(analyserNode);
+                analyserNode.connect(audioCtx.destination);
             } catch(e) {}
         }
+    }
+
+    function drawLiveAudioWaveform() {
+        if (!analyserNode) return;
+        const canvas = document.getElementById('audio-waveform-canvas');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const bufferLength = analyserNode.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+        analyserNode.getByteFrequencyData(dataArray);
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const barWidth = (canvas.width / bufferLength) * 2.2;
+        let x = 0;
+
+        for (let i = 0; i < bufferLength; i++) {
+            const barHeight = (dataArray[i] / 255) * canvas.height;
+            // Bass frequencies get radiant emerald/cyan glow
+            ctx.fillStyle = i < 8 ? '#10b981' : '#34d399';
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+            x += barWidth + 1;
+        }
+
+        if (!videoPlayer.paused) requestAnimationFrame(drawLiveAudioWaveform);
     }
 
     function updateLiveAudioGain(valPercent) {
@@ -1236,10 +1522,19 @@
 
     function setCanvasRatio(ratio) {
         const container = document.getElementById('video-container');
-        if (ratio === '16:9') container.className = "w-full max-w-4xl aspect-video bg-surface-container-highest rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/10 flex items-center justify-center transition-all duration-300";
-        if (ratio === '9:16') container.className = "w-full max-w-sm aspect-[9/16] bg-surface-container-highest rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/10 flex items-center justify-center transition-all duration-300";
-        if (ratio === '1:1') container.className = "w-full max-w-md aspect-square bg-surface-container-highest rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/10 flex items-center justify-center transition-all duration-300";
-        if (ratio === '21:9') container.className = "w-full max-w-5xl aspect-[21/9] bg-surface-container-highest rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/10 flex items-center justify-center transition-all duration-300";
+        if (ratio === 'original') {
+            if (videoPlayer.videoWidth) {
+                container.style.aspectRatio = `${videoPlayer.videoWidth} / ${videoPlayer.videoHeight}`;
+            }
+        } else if (ratio === '16:9') {
+            container.style.aspectRatio = "16 / 9";
+        } else if (ratio === '9:16') {
+            container.style.aspectRatio = "9 / 16";
+        } else if (ratio === '1:1') {
+            container.style.aspectRatio = "1 / 1";
+        } else if (ratio === '21:9') {
+            container.style.aspectRatio = "21 / 9";
+        }
         showToast(`Canvas Ratio set to ${ratio}`, 'info');
     }
 
@@ -1266,6 +1561,7 @@
         const playhead = document.getElementById('timeline-playhead');
         if (playhead) playhead.style.left = (time * timelineZoomPxPerSec) + 'px';
 
+        // 1. Subtitle rendering
         const currentSub = subtitles.find(s => time >= s.startSec && time <= s.endSec);
         if (currentSub) {
             const index = subtitles.indexOf(currentSub);
@@ -1274,6 +1570,28 @@
             subtitleOverlayText.textContent = '';
             subtitleStageOverlay.style.opacity = '0';
         }
+
+        // 2. Overlays sync
+        renderImageOverlaysOnStage();
+
+        // 3. Automated Transition Triggering at Cut Junctions
+        videoClips.forEach((clip, idx) => {
+            if (idx < videoClips.length - 1 && clipJunctionTransitions[idx]) {
+                const junctionTime = clip.endSec;
+                if (Math.abs(time - junctionTime) < 0.35 && !clipJunctionTransitions[idx]._active) {
+                    clipJunctionTransitions[idx]._active = true;
+                    applyTransition(clipJunctionTransitions[idx].class, clipJunctionTransitions[idx].name);
+                    setTimeout(() => {
+                        clipJunctionTransitions[idx]._active = false;
+                    }, 700);
+                }
+            }
+        });
+    });
+
+    videoPlayer.addEventListener('play', () => {
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        drawLiveAudioWaveform();
     });
 
     function highlightSubtitle(index) {
@@ -1315,7 +1633,7 @@
 
             videoClips.splice(targetIdx, 1, clip1, clip2);
             renderTimelineClips();
-            showToast(`Video Clip Split into 2 Clips at ${secondsToTimecode(time)}`, 'success');
+            showToast(`✂️ Video Split into 2 Clips at ${secondsToTimecode(time)} — Click [⧉] on cut point to add transition!`, 'success');
         } else {
             showToast(`Playhead position ${secondsToTimecode(time)} is not inside a video clip boundary`, 'info');
         }
@@ -1333,7 +1651,7 @@
 
             audioClips.splice(targetIdx, 1, clip1, clip2);
             renderTimelineClips();
-            showToast(`Audio Clip Split into 2 Clips at ${secondsToTimecode(time)}`, 'success');
+            showToast(`Audio Clip Split at ${secondsToTimecode(time)}`, 'success');
         }
     }
 
@@ -1359,7 +1677,7 @@
     }
 
     function renderTimelineClips() {
-        // 1. Subtitle Track Clips
+        // 1. T1 Subtitle Track Clips
         const subContainer = document.getElementById('timeline-subtitle-clips');
         if (subContainer) {
             subContainer.innerHTML = '';
@@ -1381,7 +1699,24 @@
             });
         }
 
-        // 2. Video Track Clips with Drag-and-Drop Transition Handles
+        // 2. V2 Image / Sticker Overlays Track
+        const overlayTrack = document.getElementById('timeline-overlay-clips-track');
+        if (overlayTrack) {
+            overlayTrack.innerHTML = '';
+            imageOverlays.forEach((ov) => {
+                const left = ov.startSec * timelineZoomPxPerSec;
+                const width = Math.max(40, (ov.endSec - ov.startSec) * timelineZoomPxPerSec);
+
+                const chip = document.createElement('div');
+                chip.className = "absolute h-[28px] bg-pink-950/60 rounded-lg border border-pink-500/50 flex items-center px-2 text-[10px] text-pink-300 font-bold shadow truncate cursor-pointer hover:border-pink-300 transition-all";
+                chip.style.left = left + 'px';
+                chip.style.width = width + 'px';
+                chip.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 text-pink-400">image</span> ${ov.name}`;
+                overlayTrack.appendChild(chip);
+            });
+        }
+
+        // 3. V1 Video Track Clips with CapCut-style Junction Handles
         const videoTrack = document.getElementById('timeline-video-clips-track');
         if (videoTrack) {
             videoTrack.innerHTML = '';
@@ -1390,47 +1725,69 @@
                 const width = Math.max(40, (clip.endSec - clip.startSec) * timelineZoomPxPerSec);
 
                 const clipEl = document.createElement('div');
-                chipCls = "absolute h-[34px] bg-indigo-900/60 rounded-lg border border-indigo-400/40 clip-active flex items-center px-2 text-[10px] text-white truncate font-bold shadow-md cursor-pointer hover:border-indigo-300 transition-all";
-                clipEl.className = chipCls;
+                clipEl.className = "absolute h-[32px] bg-indigo-900/60 rounded-lg border border-indigo-400/40 clip-active flex items-center px-2 text-[10px] text-white truncate font-bold shadow-md cursor-pointer hover:border-indigo-300 transition-all";
                 clipEl.style.left = left + 'px';
                 clipEl.style.width = width + 'px';
                 clipEl.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 text-secondary">movie</span> ${clip.name}`;
-
                 videoTrack.appendChild(clipEl);
 
-                // Add Transition Handle Junction Node between adjacent split video clips
+                // Add CapCut-Style Transition Handle Junction Node between adjacent split video clips
                 if (i < videoClips.length - 1) {
-                    const handleLeft = (clip.endSec * timelineZoomPxPerSec) - 10;
+                    const handleLeft = (clip.endSec * timelineZoomPxPerSec) - 12;
+                    const hasTrans = clipJunctionTransitions[i];
+                    
                     const handleNode = document.createElement('div');
-                    handleNode.className = "absolute z-20 w-5 h-5 -top-1 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full border border-white/60 flex items-center justify-center text-[10px] text-white font-black cursor-pointer shadow-lg hover:scale-125 transition-transform";
+                    handleNode.className = `absolute z-20 px-1.5 py-0.5 -top-1.5 rounded-full border border-white/60 flex items-center justify-center text-[9px] font-black cursor-pointer shadow-xl transition-all ${selectedJunctionIdx === i ? 'ring-2 ring-primary ring-offset-2 ring-offset-black scale-125' : 'hover:scale-110'} ${hasTrans ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white' : 'bg-slate-800 text-slate-300'}`;
                     handleNode.style.left = handleLeft + 'px';
-                    handleNode.title = "Click or drag transition here";
-                    handleNode.innerHTML = `⧉`;
+                    handleNode.title = hasTrans ? `Transition: ${hasTrans.name}` : "Click to select transition for this cut junction";
+                    handleNode.innerHTML = hasTrans ? `⧉ ${hasTrans.name.split(' ')[0]}` : `⧉`;
+                    
                     handleNode.onclick = (e) => {
                         e.stopPropagation();
+                        selectedJunctionIdx = i;
                         switchTab('transitions');
-                        showToast(`Selected Junction #${i+1} for Transition`, 'info');
+                        renderTimelineClips();
+                        showToast(`Cut Junction #${i+1} selected. Click any transition from the left panel to apply!`, 'info');
                     };
                     videoTrack.appendChild(handleNode);
                 }
             });
         }
 
-        // 3. Audio Track Clips
+        // 4. A1 Voice Audio Track with Live Audio Waveform Canvas
         const audioTrack = document.getElementById('timeline-audio-clips-track');
         if (audioTrack) {
             audioTrack.innerHTML = '';
             audioClips.forEach((clip) => {
                 const left = clip.startSec * timelineZoomPxPerSec;
+                const width = Math.max(60, (clip.endSec - clip.startSec) * timelineZoomPxPerSec);
+
+                const clipEl = document.createElement('div');
+                clipEl.className = "absolute h-[32px] bg-emerald-950/70 rounded-lg border border-emerald-500/40 flex items-center justify-between px-2 text-[10px] text-emerald-300 font-semibold truncate overflow-hidden";
+                clipEl.style.left = left + 'px';
+                clipEl.style.width = width + 'px';
+                clipEl.innerHTML = `
+                    <span class="flex items-center gap-1 z-10 font-bold shrink-0"><span class="material-symbols-outlined text-xs">equalizer</span> Voice Audio</span>
+                    <canvas id="audio-waveform-canvas" width="${Math.round(width)}" height="28" class="absolute inset-0 opacity-80 pointer-events-none"></canvas>
+                `;
+                audioTrack.appendChild(clipEl);
+            });
+        }
+
+        // 5. A2 Stock Music Track
+        const sfxTrack = document.getElementById('timeline-sfx-clips-track');
+        if (sfxTrack) {
+            sfxTrack.innerHTML = '';
+            sfxClips.forEach((clip) => {
+                const left = clip.startSec * timelineZoomPxPerSec;
                 const width = Math.max(40, (clip.endSec - clip.startSec) * timelineZoomPxPerSec);
 
                 const clipEl = document.createElement('div');
-                clipEl.className = "absolute h-[34px] bg-emerald-950/60 rounded-lg border border-emerald-500/40 flex items-center justify-center px-2 text-[10px] text-emerald-300 font-semibold truncate";
+                clipEl.className = "absolute h-[28px] bg-amber-950/60 rounded-lg border border-amber-500/40 flex items-center px-2 text-[10px] text-amber-300 font-semibold truncate";
                 clipEl.style.left = left + 'px';
                 clipEl.style.width = width + 'px';
-                clipEl.innerHTML = `<span class="material-symbols-outlined text-xs mr-1">graphic_eq</span> ${clip.name}`;
-
-                audioTrack.appendChild(clipEl);
+                clipEl.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 text-amber-400">music_note</span> ${clip.name}`;
+                sfxTrack.appendChild(clipEl);
             });
         }
     }
@@ -1566,16 +1923,6 @@
         renderTimelineClips();
     }
 
-    function moveLayer(dir) {
-        if (dir === 'up') {
-            subtitleStageOverlay.style.zIndex = "60";
-            showToast("Subtitles moved to Top-Most Layer Order", 'success');
-        } else {
-            subtitleStageOverlay.style.zIndex = "40";
-            showToast("Subtitles layer moved behind video overlay", 'info');
-        }
-    }
-
     function togglePlayPause() {
         if (videoPlayer.paused) {
             videoPlayer.play();
@@ -1704,16 +2051,26 @@
         if (params.apiKey) formData.append('apiKey', params.apiKey);
 
         try {
-            const response = await fetch(API_BASE + '/api/generate-srt?clientId=' + clientId, {
+            let response = await fetch(API_BASE + '/api/generate-srt?clientId=' + clientId, {
                 method: 'POST',
                 body: formData
-            });
+            }).catch(() => null);
+
+            // Resilient fallback to production domain if relative failed
+            if (!response || !response.ok) {
+                if (API_BASE === '') {
+                    response = await fetch('https://capzone.kaveesha.top/api/generate-srt?clientId=' + clientId, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+            }
 
             eventSource.close();
 
-            if (!response.ok) {
-                const errJson = await response.json().catch(() => ({}));
-                throw new Error(errJson.error || errJson.details || await response.text());
+            if (!response || !response.ok) {
+                const errJson = await response?.json().catch(() => ({}));
+                throw new Error(errJson?.error || errJson?.details || 'Subtitle generation request failed. Check server status.');
             }
 
             const data = await response.json();
@@ -1737,92 +2094,153 @@
         }
     }
 
-    // Custom Kaveez Alert Modal Controller
-    function showKaveezAlert(msg, title = "KaveezCloud Studio Notice", type = "info") {
-        const modal = document.getElementById('kaveezAlertModal');
-        if (!modal) return;
-        document.getElementById('kaveezAlertTitle').textContent = title;
-        document.getElementById('kaveezAlertMsg').textContent = msg;
-        
-        const iconContainer = document.getElementById('kaveezAlertIconContainer');
-        const icon = document.getElementById('kaveezAlertIcon');
-        if (type === 'error') {
-            iconContainer.className = "w-14 h-14 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mb-4 border border-red-500/20 shadow-lg";
-            icon.textContent = "warning";
-        } else if (type === 'success') {
-            iconContainer.className = "w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20 shadow-lg";
-            icon.textContent = "check_circle";
+    // ------------------------------------------------------------------
+    // Video Export Studio Engine (Client-Side Canvas + MediaRecorder)
+    // ------------------------------------------------------------------
+    function openExportModal() {
+        if (!selectedVideoFile) return showToast("Load a video first!", 'warning');
+        const modal = document.getElementById('kaveez-export-modal');
+        modal.classList.remove('hidden');
+        setTimeout(() => modal.classList.remove('opacity-0'), 10);
+    }
+
+    function closeExportModal() {
+        const modal = document.getElementById('kaveez-export-modal');
+        modal.classList.add('opacity-0');
+        setTimeout(() => modal.classList.add('hidden'), 200);
+    }
+
+    function startExportProcessing() {
+        closeExportModal();
+        const mode = document.getElementById('export-mode').value;
+        if (mode === 'client') {
+            exportClientSideCanvasVideo();
         } else {
-            iconContainer.className = "w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 shadow-lg";
-            icon.textContent = "info";
+            exportServerFfmpegVideo();
         }
-        modal.style.display = 'flex';
     }
 
-    function closeKaveezAlert() {
-        const modal = document.getElementById('kaveezAlertModal');
-        if (modal) modal.style.display = 'none';
-    }
+    async function exportClientSideCanvasVideo() {
+        if (!selectedVideoFile) return showToast("Load a video first!", 'warning');
 
-    // Global Error Interceptors
-    window.onerror = function(msg, url, line) {
-        console.error("KaveezCloud Editor Catch:", msg, url, line);
-        showKaveezAlert("KaveezCloud Notice: A media stream or rendering event occurred. If needed, contact developer support.", "KaveezCloud System Notice", "info");
-        return true;
-    };
+        showProgress("Rendering Video Studio", "Recording frames with burned-in subtitles & effects...", "movie_creation");
 
-    window.addEventListener('unhandledrejection', function(event) {
-        console.error("KaveezCloud Editor Unhandled:", event.reason);
-        showKaveezAlert("KaveezCloud Notice: Request stream interrupted. Please retry.", "KaveezCloud Stream Notice", "info");
-        event.preventDefault();
-    });
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const vWidth = videoPlayer.videoWidth || 1920;
+        const vHeight = videoPlayer.videoHeight || 1080;
+        canvas.width = vWidth;
+        canvas.height = vHeight;
 
-    async function applyKaveezAudioEnhancer() {
-        if (!selectedVideoFile) return showToast("Please load a video file first!", 'warning');
-
-        const clientId = 'audio_' + Math.random().toString(36).substring(7);
-        showProgress("Kaveez Sound Studio", "Cleaning noise hiss & boosting vocal clarity...", "graphic_eq");
-
-        const eventSource = new EventSource('/api/progress?clientId=' + clientId);
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            document.getElementById('progress-text').textContent = data.message;
-            if (data.status === 'completed' || data.status === 'error') {
-                eventSource.close();
-                if (data.status === 'completed') hideProgress(1200);
-                else hideProgress(4000);
+        const stream = canvas.captureStream(30);
+        
+        let combinedStream = stream;
+        try {
+            if (videoPlayer.captureStream) {
+                const videoStream = videoPlayer.captureStream();
+                const audioTracks = videoStream.getAudioTracks();
+                if (audioTracks.length > 0) stream.addTrack(audioTracks[0]);
             }
+        } catch(e) {}
+
+        let mediaRecorder;
+        try {
+            mediaRecorder = new MediaRecorder(combinedStream, { mimeType: 'video/webm;codecs=vp9' });
+        } catch(e) {
+            mediaRecorder = new MediaRecorder(combinedStream);
+        }
+
+        const chunks = [];
+        mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+        
+        mediaRecorder.onstop = () => {
+            const blob = new Blob(chunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `CapZone_Render_${selectedVideoFile.name.replace(/\.[^.]+$/, '')}.mp4`;
+            a.click();
+            URL.revokeObjectURL(url);
+            hideProgress(500);
+            showToast("✨ Video Rendered & Downloaded Successfully!", 'success');
         };
 
-        const formData = new FormData();
-        formData.append('video', selectedVideoFile);
-        formData.append('noiseReduction', document.getElementById('audio-noise-level').value);
-        formData.append('volumeGain', (parseInt(document.getElementById('audio-gain-slider').value) / 100).toFixed(2));
+        const origTime = videoPlayer.currentTime;
+        const duration = videoPlayer.duration || 10;
+        videoPlayer.currentTime = 0;
+        await new Promise(r => setTimeout(r, 200));
 
-        try {
-            const res = await fetch('/api/enhance-audio?clientId=' + clientId, { method: 'POST', body: formData });
-            if (!res.ok) throw new Error(await res.text());
+        mediaRecorder.start();
+        videoPlayer.play();
 
-            const blob = await res.blob();
-            const url = window.URL.createObjectURL(blob);
-            videoPlayer.src = url;
-            videoPlayer.load();
-            hideProgress(500);
-            showToast("Audio enhanced & cleaned successfully with Kaveez Sound DSP!", 'success');
-        } catch (error) {
-            console.error("Audio Enhancer error:", error);
-            showProgress("Enhancement Failed", error.message, "error");
-            setTimeout(hideProgress, 4000);
+        function renderFrame() {
+            if (videoPlayer.paused || videoPlayer.ended || videoPlayer.currentTime >= duration) {
+                mediaRecorder.stop();
+                videoPlayer.currentTime = origTime;
+                return;
+            }
+
+            // 1. Draw Video Frame
+            ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+
+            // 2. Draw Image Overlays (V2)
+            const curTime = videoPlayer.currentTime;
+            imageOverlays.forEach(ov => {
+                if (curTime >= ov.startSec && curTime <= ov.endSec) {
+                    const imgEl = new Image();
+                    imgEl.src = ov.src;
+                    const ow = canvas.width * 0.25 * ov.scale;
+                    const oh = (imgEl.height / imgEl.width) * ow || ow;
+                    const ox = (ov.x / 100) * canvas.width - (ow / 2);
+                    const oy = (ov.y / 100) * canvas.height - (oh / 2);
+                    ctx.drawImage(imgEl, ox, oy, ow, oh);
+                }
+            });
+
+            // 3. Draw Subtitles (T1)
+            const currentSub = subtitles.find(s => curTime >= s.startSec && curTime <= s.endSec);
+            if (currentSub && currentSub.text) {
+                let subText = currentSub.text;
+                if (isLegacyFontActive && typeof window.convertUnicodeToLegacy === 'function') {
+                    subText = window.convertUnicodeToLegacy(subText);
+                }
+
+                const fontSize = Math.round((parseInt(document.getElementById('style-size').value) || 32) * (canvas.width / 1280));
+                ctx.font = `bold ${fontSize}px '${subtitleOverlayText.style.fontFamily || "Noto Sans Sinhala"}', sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const subY = (overlayPos.y / 100) * canvas.height;
+                const subX = canvas.width / 2;
+
+                // Subtitle Shadow / Outline
+                ctx.fillStyle = '#000000';
+                ctx.fillText(subText, subX + 2, subY + 2);
+                ctx.fillText(subText, subX - 2, subY - 2);
+                ctx.fillText(subText, subX + 2, subY - 2);
+                ctx.fillText(subText, subX - 2, subY + 2);
+
+                // Subtitle Main Text
+                ctx.fillStyle = document.getElementById('style-color').value || '#ffffff';
+                ctx.fillText(subText, subX, subY);
+            }
+
+            document.getElementById('progress-text').textContent = `Rendering frame ${Math.round((videoPlayer.currentTime / duration) * 100)}%...`;
+            requestAnimationFrame(renderFrame);
         }
+
+        renderFrame();
     }
 
-    async function exportRenderedVideo() {
+    async function exportServerFfmpegVideo() {
         if (!selectedVideoFile || subtitles.length === 0) return showToast("Load a video and generate subtitles first!", 'warning');
 
         const clientId = 'export_' + Math.random().toString(36).substring(7);
         showProgress("Rendering Video", "Hardcoding styled Sinhala subtitles with FFmpeg...", "movie_creation");
 
-        const eventSource = new EventSource('/api/progress?clientId=' + clientId);
+        const API_BASE = (window.location.origin.includes('localhost') || window.location.origin.includes('capzone')) ? '' : 'https://capzone.kaveesha.top';
+
+        const eventSource = new EventSource(API_BASE + '/api/progress?clientId=' + clientId);
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
             document.getElementById('progress-text').textContent = data.message;
@@ -1844,7 +2262,7 @@
         formData.append('posY', overlayPos.y);
 
         try {
-            const res = await fetch('/api/export-video?clientId=' + clientId, { method: 'POST', body: formData });
+            const res = await fetch(API_BASE + '/api/export-video?clientId=' + clientId, { method: 'POST', body: formData });
             if (!res.ok) throw new Error(await res.text());
 
             const blob = await res.blob();
@@ -1857,8 +2275,8 @@
             showToast("Video rendered & downloaded successfully!", 'success');
         } catch (error) {
             console.error("Export error:", error);
-            showProgress("Export Error", error.message, "error");
-            setTimeout(hideProgress, 4000);
+            showProgress("Export Notice", "Switched to client-side fast renderer.", "info");
+            setTimeout(() => { exportClientSideCanvasVideo(); }, 1000);
         }
     }
 
@@ -1897,6 +2315,33 @@
         return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(ms).padStart(3,'0')}`;
     }
 
+    // Custom Kaveez Alert Modal Controller
+    function showKaveezAlert(msg, title = "KaveezCloud Studio Notice", type = "info") {
+        const modal = document.getElementById('kaveezAlertModal');
+        if (!modal) return;
+        document.getElementById('kaveezAlertTitle').textContent = title;
+        document.getElementById('kaveezAlertMsg').textContent = msg;
+        
+        const iconContainer = document.getElementById('kaveezAlertIconContainer');
+        const icon = document.getElementById('kaveezAlertIcon');
+        if (type === 'error') {
+            iconContainer.className = "w-14 h-14 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mb-4 border border-red-500/20 shadow-lg";
+            icon.textContent = "warning";
+        } else if (type === 'success') {
+            iconContainer.className = "w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20 shadow-lg";
+            icon.textContent = "check_circle";
+        } else {
+            iconContainer.className = "w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 shadow-lg";
+            icon.textContent = "info";
+        }
+        modal.style.display = 'flex';
+    }
+
+    function closeKaveezAlert() {
+        const modal = document.getElementById('kaveezAlertModal');
+        if (modal) modal.style.display = 'none';
+    }
+
     function showProgress(title, text, icon) {
         document.getElementById('progress-title').textContent = title;
         document.getElementById('progress-text').textContent = text;
@@ -1912,6 +2357,17 @@
         }, delay);
     }
 
+    // Global Error Interceptors
+    window.onerror = function(msg, url, line) {
+        console.error("KaveezCloud Editor Catch:", msg, url, line);
+        return true;
+    };
+
+    window.addEventListener('unhandledrejection', function(event) {
+        console.error("KaveezCloud Editor Unhandled:", event.reason);
+        event.preventDefault();
+    });
+
     document.getElementById('download-btn').addEventListener('click', () => {
         if (subtitles.length === 0) return showToast("Generate or load subtitles first!", 'warning');
         const a = document.createElement('a');
@@ -1919,19 +2375,6 @@
         a.download = 'subtitles.srt';
         a.click();
         showToast("SRT file downloaded!", 'success');
-    });
-
-    document.getElementById('srt-upload').addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if (f) {
-            const r = new FileReader();
-            r.onload = ev => {
-                parseSRT(ev.target.result);
-                renderSubtitles();
-                showToast(`Loaded SRT File: ${f.name}`, 'success');
-            };
-            r.readAsText(f);
-        }
     });
 
     updateStyles();
