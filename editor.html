@@ -2337,7 +2337,7 @@
             wordsLimit,
             language,
             legacyFont: isLegacyFontActive,
-            apiKey: apiKey || localStorage.getItem('gemini_api_key') || ''
+            apiKey: apiKey
         });
     }
 
@@ -2367,7 +2367,7 @@
         formData.append('language', params.language || 'Sinhala');
         formData.append('wordsLimit', params.wordsLimit || 5);
         formData.append('legacyFont', params.legacyFont || false);
-        const activeKey = params.apiKey || localStorage.getItem('gemini_api_key') || '';
+        const activeKey = params.apiKey !== undefined ? params.apiKey : (localStorage.getItem('gemini_api_key') || '');
         if (activeKey) formData.append('apiKey', activeKey);
 
         try {
