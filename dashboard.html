@@ -174,8 +174,7 @@
             <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-3 text-center">
               <p class="text-white text-xs font-bold mb-2">Tap to Add Video Footage</p>
               <div class="flex flex-col gap-2 w-full max-w-[200px]">
-                <button onclick="window.location.href='editor.html'" class="px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-lg shadow-lg">Classic Editor</button>
-                <button onclick="window.location.href='https://capzone.kaveesha.top/freecut-editor/projects'" class="px-4 py-2 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold text-xs rounded-lg shadow-lg">Pro Mode (FreeCut)</button>
+                <button onclick="window.location.href='editor.html'" class="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all">Launch 4K Studio Editor</button>
               </div>
             </div>
           </div>
@@ -185,10 +184,10 @@
         <div id="m-srt" class="mobile-tab-content hidden space-y-3">
           <div class="flex items-center gap-2">
             <i data-lucide="captions" class="text-purple-500 w-5 h-5"></i>
-            <h3 class="font-bold text-sm text-fix-heading">AI Subtitle Generator</h3>
+            <h3 class="font-bold text-sm text-fix-heading">KaveezCloud Subtitle Studio</h3>
           </div>
-          <p class="text-xs text-fix-sub">Automatically extract captions from videos and download `.srt` files directly on mobile.</p>
-          <button onclick="openModal('srtModal', event)" class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
+          <p class="text-xs text-fix-sub">Automatically extract & translate captions from any language into Sinhala or English.</p>
+          <button onclick="openModal('srtModal', event)" class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open Subtitle Tool</button>
         </div>
 
         <!-- Mobile Tool 3: Social Downloader -->
@@ -231,21 +230,20 @@
               <i data-lucide="film" class="w-6 h-6"></i>
             </div>
             <div>
-              <h3 class="text-lg font-bold text-fix-heading">Cloud Video Editor Pro</h3>
-              <p class="text-xs text-fix-sub">4K Multi-Track Editing Engine</p>
+              <h3 class="text-lg font-bold text-fix-heading">CapZone Studio Pro - Powered by KaveezCloud</h3>
+              <p class="text-xs text-fix-sub">4K Multi-Track Video & Subtitle Suite</p>
             </div>
           </div>
-          <span class="text-[10px] font-mono px-2.5 py-1 bg-indigo-500/20 text-indigo-500 font-bold rounded-lg border border-indigo-500/30">GPU ACCELERATED</span>
+          <span class="text-[10px] font-mono px-2.5 py-1 bg-indigo-500/20 text-indigo-500 font-bold rounded-lg border border-indigo-500/30">KAVEEZ ENGINE</span>
         </div>
 
         <div class="relative h-56 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group">
           <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" />
           <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-6 text-center">
-            <p class="text-white font-bold text-base mb-1">Drag and Drop Video Files Here</p>
-            <p class="text-slate-300 text-xs mb-4">Supports ProRes, MP4, RED RAW up to 10GB</p>
+            <p class="text-white font-bold text-base mb-1">CapZone 4K Video Editing Suite</p>
+            <p class="text-slate-300 text-xs mb-4">Transitions, Multi-Track Layers, Text FX, Audio DSP & Subtitle Sync</p>
             <div class="flex gap-2 justify-center">
-              <button onclick="window.location.href='editor.html'" class="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all">Launch 4K Editor</button>
-              <button onclick="window.location.href='https://capzone.kaveesha.top/freecut-editor/projects'" class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-orange-400 text-white font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all">Pro Mode (FreeCut)</button>
+              <button onclick="window.location.href='editor.html'" class="px-8 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold text-xs rounded-xl shadow-xl hover:scale-105 transition-all">Launch 4K Studio Editor</button>
             </div>
           </div>
         </div>
@@ -502,8 +500,8 @@
           <i data-lucide="captions" class="w-6 h-6"></i>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-fix-heading">AI Subtitles Studio</h2>
-          <p class="text-xs text-fix-sub">Generate perfectly synced SRT files in seconds.</p>
+          <h2 class="text-xl font-bold text-fix-heading">KaveezCloud Subtitle Studio</h2>
+          <p class="text-xs text-fix-sub">Generate perfectly synced Sinhala & English subtitles from any audio.</p>
         </div>
       </div>
 
@@ -520,23 +518,23 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Language</label>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Target Subtitle Language</label>
             <select id="srtLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
-              <option value="si">Sinhala (Ã Â·Æ’Ã Â·â€™Ã Â¶â€šÃ Â·â€žÃ Â¶Â½)</option>
-              <option value="en">English</option>
+              <option value="si" selected>Sinhala (සිංහල Unicode)</option>
+              <option value="en">English (All Accents)</option>
             </select>
           </div>
           <div>
             <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
-            <input type="number" id="srtWordsLimit" onchange="recalculateWordCount()" value="5" min="1" max="5" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
+            <input type="number" id="srtWordsLimit" onchange="recalculateWordCount()" value="5" min="1" max="8" class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
           </div>
         </div>
 
         <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
           <input type="checkbox" id="legacyFontCheck" onchange="recalculateWordCount()" class="w-4 h-4 rounded accent-indigo-500" />
           <div class="flex-1">
-            <label for="srtLegacyFont" class="text-xs font-bold text-indigo-500 dark:text-indigo-400 cursor-pointer block">Convert to Legacy Font (FM Abhaya)</label>
-            <p class="text-[9px] text-indigo-500/70">Enable for old video editing software (Premiere Pro, Vegas)</p>
+            <label for="legacyFontCheck" class="text-xs font-bold text-indigo-500 dark:text-indigo-400 cursor-pointer block">Convert to Legacy Font (FM Abhaya)</label>
+            <p class="text-[9px] text-indigo-500/70">Enable for legacy desktop editors (Premiere Pro, Vegas)</p>
           </div>
         </div>
 
@@ -957,12 +955,78 @@ function closeModal(modalId, event) {
                 }
             } catch (err) {
                 es.close();
-                showPopup('Enhance failed: ' + err.message);
+                showPopup('Enhance failed: ' + err.message, 'Audio Enhancement Error', 'error');
             } finally {
                 document.getElementById('audioSubmitBtn').disabled = false;
             }
         }
+
+        // ======================================================================
+        // KAVEEZ CUSTOM ALERT & ERROR INTERCEPTOR SYSTEM (NO BROWSER POPUPS)
+        // ======================================================================
+        function showPopup(msg, title = "KaveezCloud Notice", type = "info") {
+            showKaveezAlert(msg, title, type);
+        }
+
+        function showKaveezAlert(msg, title = "KaveezCloud Notice", type = "info") {
+            const modal = document.getElementById('kaveezAlertModal');
+            if (!modal) return;
+            document.getElementById('kaveezAlertTitle').textContent = title;
+            document.getElementById('kaveezAlertMsg').textContent = msg;
+            
+            const iconContainer = document.getElementById('kaveezAlertIconContainer');
+            const icon = document.getElementById('kaveezAlertIcon');
+            if (type === 'error') {
+                iconContainer.className = "w-14 h-14 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mb-4 border border-red-500/20 shadow-lg";
+                icon.setAttribute('data-lucide', 'alert-triangle');
+            } else if (type === 'success') {
+                iconContainer.className = "w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20 shadow-lg";
+                icon.setAttribute('data-lucide', 'check-circle-2');
+            } else {
+                iconContainer.className = "w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 shadow-lg";
+                icon.setAttribute('data-lucide', 'info');
+            }
+            if (window.lucide) lucide.createIcons();
+            modal.style.display = 'flex';
+        }
+
+        function closeKaveezAlert() {
+            const modal = document.getElementById('kaveezAlertModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        // Global Error Interceptors
+        window.onerror = function(msg, url, line) {
+            console.error("KaveezCloud Catch:", msg, url, line);
+            showKaveezAlert("KaveezCloud Notice: A temporary stream or network event occurred. If you need assistance, contact our developer support.", "KaveezCloud Service Notice", "info");
+            return true;
+        };
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error("KaveezCloud Unhandled Rejection:", event.reason);
+            showKaveezAlert("KaveezCloud Notice: Processing stream paused. Please try your action again.", "KaveezCloud Stream Notice", "info");
+            event.preventDefault();
+        });
 </script>
+
+<!-- CUSTOM KAVEEZ ALERT MODAL (NO RAW BROWSER POPUPS) -->
+<div id="kaveezAlertModal" class="fixed inset-0 z-[999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4" style="display: none;">
+  <div class="glass-card w-full max-w-md rounded-3xl p-6 md:p-8 relative border border-white/10 shadow-2xl text-center flex flex-col items-center">
+    <div id="kaveezAlertIconContainer" class="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 shadow-lg">
+      <i id="kaveezAlertIcon" data-lucide="info" class="w-7 h-7"></i>
+    </div>
+    <h3 id="kaveezAlertTitle" class="text-lg font-bold text-white mb-2 tracking-tight">KaveezCloud Notice</h3>
+    <p id="kaveezAlertMsg" class="text-xs text-slate-300 mb-6 leading-relaxed">Service notification details.</p>
+    
+    <div class="flex flex-col sm:flex-row gap-3 w-full">
+      <button onclick="closeKaveezAlert()" class="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl transition-all">Dismiss</button>
+      <a id="kaveezAlertContactBtn" href="https://t.me/Kaveesha_Theekshana" target="_blank" class="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg">
+        <i data-lucide="help-circle" class="w-4 h-4"></i> Contact Developer
+      </a>
+    </div>
+  </div>
+</div>
+
 <script type="module">
         import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
         
@@ -1001,7 +1065,7 @@ function closeModal(modalId, event) {
                         await signOut(auth);
                     } catch (error) {
                         console.error("Sign Out Error:", error);
-                        alert("Sign Out Failed: " + error.message);
+                        showKaveezAlert("Sign Out Failed: " + error.message, "Authentication Notice", "error");
                     }
                 });
             }
