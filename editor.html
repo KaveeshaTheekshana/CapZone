@@ -185,16 +185,74 @@
     .anim-pulse { animation: anim-pulse 1s infinite; }
     .anim-float { animation: anim-float 2s ease-in-out infinite; }
 
-    /* Transitions CSS Classes */
-    .trans-zoom-fade { transition: all 0.5s ease; transform: scale(1.15); opacity: 0.8; }
-    .trans-dissolve { transition: opacity 0.5s ease; opacity: 0.3; }
-    .trans-slide-left { transition: transform 0.5s ease; transform: translateX(-20%); }
-    .trans-wipe-right { transition: transform 0.5s ease; transform: translateX(20%); }
-    .trans-spin-blur { transition: all 0.5s ease; transform: rotate(12deg) scale(0.9); filter: blur(6px); }
-    .trans-bounce-in { transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform: scale(1.08); }
-    .trans-flash-cut { transition: filter 0.3s ease; filter: brightness(2.2) contrast(1.6); }
-    .trans-prism-blur { transition: filter 0.5s ease; filter: blur(10px) saturate(2.5); }
-    .trans-glitch-split { transition: filter 0.4s ease; filter: hue-rotate(180deg) invert(0.8); }
+    /* CapCut-Style Cinematic Video Transition Keyframes */
+    @keyframes capcut-zoom-fade {
+        0% { transform: scale(1); filter: blur(0px); opacity: 1; }
+        50% { transform: scale(1.35); filter: blur(8px); opacity: 0.7; }
+        100% { transform: scale(1); filter: blur(0px); opacity: 1; }
+    }
+    @keyframes capcut-push-left {
+        0% { transform: translateX(0); filter: blur(0px); }
+        45% { transform: translateX(-40%) scale(0.92); filter: blur(6px); }
+        55% { transform: translateX(40%) scale(0.92); filter: blur(6px); }
+        100% { transform: translateX(0) scale(1); filter: blur(0px); }
+    }
+    @keyframes capcut-push-right {
+        0% { transform: translateX(0); filter: blur(0px); }
+        45% { transform: translateX(40%) scale(0.92); filter: blur(6px); }
+        55% { transform: translateX(-40%) scale(0.92); filter: blur(6px); }
+        100% { transform: translateX(0) scale(1); filter: blur(0px); }
+    }
+    @keyframes capcut-spin-blur {
+        0% { transform: rotate(0deg) scale(1); filter: blur(0px); }
+        50% { transform: rotate(18deg) scale(0.85); filter: blur(10px) brightness(1.2); }
+        100% { transform: rotate(0deg) scale(1); filter: blur(0px); }
+    }
+    @keyframes capcut-flash-cut {
+        0% { filter: brightness(1) contrast(1); }
+        40% { filter: brightness(3.5) contrast(1.8) drop-shadow(0 0 30px white); }
+        100% { filter: brightness(1) contrast(1); }
+    }
+    @keyframes capcut-glitch-split {
+        0% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+        20% { transform: translate(-10px, 5px) skewX(6deg); filter: hue-rotate(180deg) invert(0.6); }
+        40% { transform: translate(10px, -5px) skewX(-6deg); filter: hue-rotate(270deg) contrast(2); }
+        60% { transform: translate(-5px, 2px); filter: hue-rotate(90deg); }
+        100% { transform: translate(0, 0); filter: hue-rotate(0deg); }
+    }
+    @keyframes capcut-3d-flip {
+        0% { transform: perspective(800px) rotateY(0deg) scale(1); }
+        50% { transform: perspective(800px) rotateY(90deg) scale(0.85); opacity: 0.6; }
+        100% { transform: perspective(800px) rotateY(0deg) scale(1); opacity: 1; }
+    }
+    @keyframes capcut-dissolve {
+        0% { opacity: 1; filter: blur(0px); }
+        50% { opacity: 0.25; filter: blur(6px); }
+        100% { opacity: 1; filter: blur(0px); }
+    }
+    @keyframes capcut-bounce-in {
+        0% { transform: scale(1); }
+        30% { transform: scale(0.88); }
+        60% { transform: scale(1.12); }
+        80% { transform: scale(0.96); }
+        100% { transform: scale(1); }
+    }
+    @keyframes capcut-prism-blur {
+        0% { filter: blur(0px) saturate(1); }
+        50% { filter: blur(12px) saturate(3) hue-rotate(45deg); transform: scale(1.08); }
+        100% { filter: blur(0px) saturate(1); transform: scale(1); }
+    }
+
+    .trans-zoom-fade { animation: capcut-zoom-fade 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .trans-slide-left { animation: capcut-push-left 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .trans-wipe-right { animation: capcut-push-right 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .trans-spin-blur { animation: capcut-spin-blur 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .trans-flash-cut { animation: capcut-flash-cut 0.5s ease-out forwards; }
+    .trans-glitch-split { animation: capcut-glitch-split 0.55s steps(2, jump-none) forwards; }
+    .trans-3d-flip { animation: capcut-3d-flip 0.65s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+    .trans-dissolve { animation: capcut-dissolve 0.6s ease-in-out forwards; }
+    .trans-bounce-in { animation: capcut-bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards; }
+    .trans-prism-blur { animation: capcut-prism-blur 0.65s ease-out forwards; }
 
     /* Video Effects CSS Overlay Classes */
     .fx-cyberpunk { filter: saturate(2) hue-rotate(-20deg) contrast(1.2); }
@@ -696,6 +754,9 @@
             <button onclick="document.getElementById('image-upload').click()" class="px-2.5 py-1 bg-surface-container border border-pink-500/40 rounded-lg text-xs text-pink-300 font-bold hover:bg-white/10 flex items-center gap-1 transition-all" title="Add Image/Sticker Overlay">
                 <span class="material-symbols-outlined text-sm">add_photo_alternate</span> Add Overlay (V2)
             </button>
+            <button onclick="deleteSelectedTrackElement()" id="btn-delete-selected" class="px-2.5 py-1 bg-red-950/40 border border-red-500/40 rounded-lg text-xs text-red-300 font-bold hover:bg-red-900/50 flex items-center gap-1 transition-all" title="Delete Selected Clip (Del / Backspace)">
+                <span class="material-symbols-outlined text-sm text-red-400">delete</span> Delete
+            </button>
         </div>
         <div class="flex items-center gap-2">
             <span class="material-symbols-outlined text-sm text-on-surface-variant">zoom_out</span>
@@ -899,6 +960,8 @@
 </div>
 
 <script>
+    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://capzone.kaveesha.top';
+
     let subtitles = [];
     let activeIndex = -1;
     let selectedVideoFile = null;
@@ -1069,10 +1132,10 @@
     buildAnimationGrid();
 
     // ------------------------------------------------------------------
-    // 200 Video Transitions Generator Engine
+    // 200 CapCut Video Transitions Generator Engine
     // ------------------------------------------------------------------
-    const transTypes = ["Zoom Fade", "Dissolve", "Push Left", "Wipe Right", "Spin Blur", "Bounce In", "Flash Cut", "Prism Blur", "Glitch Split"];
-    const transClasses = ["trans-zoom-fade", "trans-dissolve", "trans-slide-left", "trans-wipe-right", "trans-spin-blur", "trans-bounce-in", "trans-flash-cut", "trans-prism-blur", "trans-glitch-split"];
+    const transTypes = ["Zoom Punch In", "Camera Push Left", "Camera Push Right", "Whip Spin & Blur", "Flash White Strobe", "Digital Glitch RGB", "3D Cube Flip", "Gaussian Dissolve", "Bounce Pop In", "Prism Rainbow Flare"];
+    const transClasses = ["trans-zoom-fade", "trans-slide-left", "trans-wipe-right", "trans-spin-blur", "trans-flash-cut", "trans-glitch-split", "trans-3d-flip", "trans-dissolve", "trans-bounce-in", "trans-prism-blur"];
     let allTransitions = [];
 
     for (let i = 1; i <= 200; i++) {
@@ -1117,10 +1180,18 @@
     }
 
     function applyTransition(transClass, name = 'Transition') {
-        videoContainer.classList.add(transClass);
+        const target = videoPlayer;
+        if (!target) return;
+        const allTrans = ["trans-zoom-fade", "trans-slide-left", "trans-wipe-right", "trans-spin-blur", "trans-flash-cut", "trans-glitch-split", "trans-3d-flip", "trans-dissolve", "trans-bounce-in", "trans-prism-blur"];
+        allTrans.forEach(c => target.classList.remove(c));
+        
+        // Force DOM reflow to immediately replay animation
+        void target.offsetWidth;
+        
+        target.classList.add(transClass);
         setTimeout(() => { 
-            videoContainer.classList.remove(transClass);
-        }, 650);
+            target.classList.remove(transClass);
+        }, 700);
     }
 
     buildTransitionGrid();
@@ -1231,7 +1302,7 @@
     renderInlineFonts();
 
     // Attempt to fetch dynamic fonts if server is available
-    fetch('/api/fonts')
+    fetch(`${API_BASE_URL}/api/fonts`)
         .then(res => { if (res.ok && res.headers.get('content-type')?.includes('json')) return res.json(); throw new Error('Not JSON'); })
         .then(data => { 
             if (Array.isArray(data) && data.length > 0) {
@@ -1265,7 +1336,7 @@
 
         if (fontFilename) {
             if (fontFilename.includes('.')) {
-                const fontUrl = `/fonts/${encodeURIComponent(fontFilename)}`;
+                const fontUrl = `${API_BASE_URL}/fonts/${encodeURIComponent(fontFilename)}`;
                 const fontFaceName = `ActiveFont_${cleanName.replace(/[^a-zA-Z0-9]/g, '')}`;
                 dynamicFontStyle.innerHTML += `@font-face { font-family: '${fontFaceName}'; src: url('${fontUrl}'); font-display: swap; }`;
                 subtitleOverlayText.style.fontFamily = `'${fontFaceName}', sans-serif`;
@@ -1300,17 +1371,31 @@
             const duration = videoPlayer.duration || 10;
             const vWidth = videoPlayer.videoWidth || 1920;
             const vHeight = videoPlayer.videoHeight || 1080;
+            const isPortrait = vHeight > vWidth;
 
             // Auto-adjust container aspect ratio to match native video without ANY cropping!
             videoContainer.style.aspectRatio = `${vWidth} / ${vHeight}`;
-            videoContainer.style.maxHeight = '70vh';
+            if (isPortrait) {
+                videoContainer.style.width = 'auto';
+                videoContainer.style.height = '65vh';
+                videoContainer.style.maxWidth = '100%';
+                videoContainer.style.maxHeight = '65vh';
+            } else {
+                videoContainer.style.width = '100%';
+                videoContainer.style.maxWidth = '850px';
+                videoContainer.style.height = 'auto';
+                videoContainer.style.maxHeight = '65vh';
+            }
             videoPlayer.style.objectFit = 'contain';
+            videoPlayer.style.width = '100%';
+            videoPlayer.style.height = '100%';
 
             videoClips = [{ id: 1, startSec: 0, endSec: duration, duration: duration, name: file.name }];
             audioClips = [{ id: 1, startSec: 0, endSec: duration, duration: duration, name: "Voice_Main.wav" }];
             
             updateTimelineZoom();
             initWebAudioAPI();
+            renderLayerStackList();
             showToast(`Loaded Video: ${file.name} (${vWidth}x${vHeight})`, 'success');
         };
     }
@@ -1522,19 +1607,43 @@
 
     function setCanvasRatio(ratio) {
         const container = document.getElementById('video-container');
-        if (ratio === 'original') {
-            if (videoPlayer.videoWidth) {
-                container.style.aspectRatio = `${videoPlayer.videoWidth} / ${videoPlayer.videoHeight}`;
-            }
-        } else if (ratio === '16:9') {
-            container.style.aspectRatio = "16 / 9";
+        if (!container) return;
+        
+        let targetRatio = "16 / 9";
+        let isPortrait = false;
+
+        if (ratio === 'original' && videoPlayer.videoWidth) {
+            targetRatio = `${videoPlayer.videoWidth} / ${videoPlayer.videoHeight}`;
+            isPortrait = videoPlayer.videoHeight > videoPlayer.videoWidth;
         } else if (ratio === '9:16') {
-            container.style.aspectRatio = "9 / 16";
+            targetRatio = "9 / 16";
+            isPortrait = true;
         } else if (ratio === '1:1') {
-            container.style.aspectRatio = "1 / 1";
+            targetRatio = "1 / 1";
+            isPortrait = false;
         } else if (ratio === '21:9') {
-            container.style.aspectRatio = "21 / 9";
+            targetRatio = "21 / 9";
+            isPortrait = false;
+        } else {
+            targetRatio = "16 / 9";
+            isPortrait = false;
         }
+
+        container.style.aspectRatio = targetRatio;
+        if (isPortrait) {
+            container.style.width = 'auto';
+            container.style.height = '65vh';
+            container.style.maxWidth = '100%';
+            container.style.maxHeight = '65vh';
+        } else {
+            container.style.width = '100%';
+            container.style.maxWidth = '850px';
+            container.style.height = 'auto';
+            container.style.maxHeight = '65vh';
+        }
+        videoPlayer.style.objectFit = 'contain';
+        videoPlayer.style.width = '100%';
+        videoPlayer.style.height = '100%';
         showToast(`Canvas Ratio set to ${ratio}`, 'info');
     }
 
@@ -1655,12 +1764,186 @@
         }
     }
 
-    // Keyboard shortcut 'S' for Cut/Split
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 's' || e.key === 'S') {
-            if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-                splitVideoClipAtPlayhead();
+    // Track Item Selection & Deletion System
+    let selectedTrackItem = null; // { type: 'subtitle'|'overlay'|'video'|'audio'|'sfx', id: null, index: -1 }
+
+    function selectTrackItem(type, idOrIdx) {
+        selectedTrackItem = { type, id: (typeof idOrIdx === 'string' ? idOrIdx : null), index: (typeof idOrIdx === 'number' ? idOrIdx : -1) };
+        renderTimelineClips();
+    }
+
+    function deleteSubtitle(index) {
+        if (index >= 0 && index < subtitles.length) {
+            subtitles.splice(index, 1);
+            if (activeIndex === index) {
+                activeIndex = -1;
+                subtitleOverlayText.textContent = '';
+                subtitleStageOverlay.style.opacity = '0';
+            } else if (activeIndex > index) {
+                activeIndex--;
             }
+            if (selectedTrackItem && selectedTrackItem.type === 'subtitle') selectedTrackItem = null;
+            renderSubtitles();
+            renderTimelineClips();
+            renderLayerStackList();
+            showToast("Subtitle block deleted", 'info');
+        }
+    }
+
+    function deleteImageOverlay(id) {
+        const idx = imageOverlays.findIndex(o => o.id === id);
+        if (idx !== -1) {
+            const removed = imageOverlays.splice(idx, 1)[0];
+            if (selectedTrackItem && selectedTrackItem.type === 'overlay' && selectedTrackItem.id === id) selectedTrackItem = null;
+            renderImageOverlaysOnStage();
+            renderTimelineClips();
+            renderLayerStackList();
+            showToast(`Deleted overlay: ${removed.name}`, 'info');
+        }
+    }
+
+    function deleteVideoClip(idx) {
+        if (videoClips.length <= 1) {
+            showToast("Cannot delete the only video track!", 'warning');
+            return;
+        }
+        videoClips.splice(idx, 1);
+        delete clipJunctionTransitions[idx];
+        if (selectedTrackItem && selectedTrackItem.type === 'video') selectedTrackItem = null;
+        renderTimelineClips();
+        renderLayerStackList();
+        showToast(`Deleted split video clip #${idx + 1}`, 'info');
+    }
+
+    function deleteAudioClip(idx) {
+        if (idx >= 0 && idx < audioClips.length) {
+            audioClips.splice(idx, 1);
+            if (selectedTrackItem && selectedTrackItem.type === 'audio') selectedTrackItem = null;
+            renderTimelineClips();
+            renderLayerStackList();
+            showToast("Deleted Voice Audio track", 'info');
+        }
+    }
+
+    function deleteSfxClip(idx) {
+        if (idx >= 0 && idx < sfxClips.length) {
+            const removed = sfxClips.splice(idx, 1)[0];
+            if (selectedTrackItem && selectedTrackItem.type === 'sfx') selectedTrackItem = null;
+            renderTimelineClips();
+            renderLayerStackList();
+            showToast(`Deleted audio track: ${removed.name}`, 'info');
+        }
+    }
+
+    function deleteSelectedTrackElement() {
+        if (!selectedTrackItem) {
+            showToast("Click a clip on the timeline or layer stack first to select it!", 'warning');
+            return;
+        }
+        if (selectedTrackItem.type === 'subtitle') {
+            deleteSubtitle(selectedTrackItem.index);
+        } else if (selectedTrackItem.type === 'overlay') {
+            deleteImageOverlay(selectedTrackItem.id);
+        } else if (selectedTrackItem.type === 'video') {
+            deleteVideoClip(selectedTrackItem.index);
+        } else if (selectedTrackItem.type === 'audio') {
+            deleteAudioClip(selectedTrackItem.index);
+        } else if (selectedTrackItem.type === 'sfx') {
+            deleteSfxClip(selectedTrackItem.index);
+        }
+    }
+
+    function renderLayerStackList() {
+        const list = document.getElementById('layer-stack-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        // 1. T1 Subtitles
+        const subItem = document.createElement('div');
+        subItem.className = "p-2 bg-primary/20 border border-primary/40 rounded-lg flex items-center justify-between text-primary";
+        subItem.innerHTML = `
+            <span class="flex items-center gap-2 font-bold truncate"><span class="material-symbols-outlined text-sm">title</span> T1 Subtitles (${subtitles.length})</span>
+            <div class="flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-sm text-red-400 cursor-pointer hover:text-red-300" onclick="clearAllSubtitles()" title="Clear All Subtitles">delete</span>
+            </div>
+        `;
+        list.appendChild(subItem);
+
+        // 2. V2 Overlays
+        imageOverlays.forEach((ov) => {
+            const item = document.createElement('div');
+            item.className = "p-2 bg-pink-950/40 border border-pink-500/40 rounded-lg flex items-center justify-between text-pink-300";
+            item.innerHTML = `
+                <span class="flex items-center gap-2 truncate max-w-[140px] font-semibold"><span class="material-symbols-outlined text-sm text-pink-400">image</span> ${ov.name}</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm text-red-400 cursor-pointer hover:text-red-300" onclick="deleteImageOverlay('${ov.id}')" title="Delete Overlay">delete</span>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+
+        // 3. V1 Video Clips
+        videoClips.forEach((vc, idx) => {
+            const item = document.createElement('div');
+            item.className = "p-2 bg-indigo-950/40 border border-indigo-500/40 rounded-lg flex items-center justify-between text-indigo-300";
+            item.innerHTML = `
+                <span class="flex items-center gap-2 truncate max-w-[140px] font-semibold"><span class="material-symbols-outlined text-sm text-indigo-400">videocam</span> ${vc.name}</span>
+                <div class="flex items-center gap-1.5">
+                    ${videoClips.length > 1 ? `<span class="material-symbols-outlined text-sm text-red-400 cursor-pointer hover:text-red-300" onclick="deleteVideoClip(${idx})" title="Delete Clip">delete</span>` : ''}
+                </div>
+            `;
+            list.appendChild(item);
+        });
+
+        // 4. A1 Voice Audio
+        audioClips.forEach((ac, idx) => {
+            const item = document.createElement('div');
+            item.className = "p-2 bg-emerald-950/40 border border-emerald-500/40 rounded-lg flex items-center justify-between text-emerald-300";
+            item.innerHTML = `
+                <span class="flex items-center gap-2 truncate max-w-[140px] font-semibold"><span class="material-symbols-outlined text-sm text-emerald-400">equalizer</span> ${ac.name}</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm text-red-400 cursor-pointer hover:text-red-300" onclick="deleteAudioClip(${idx})" title="Delete Voice">delete</span>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+
+        // 5. A2 SFX / Stock Music
+        sfxClips.forEach((sfx, idx) => {
+            const item = document.createElement('div');
+            item.className = "p-2 bg-amber-950/40 border border-amber-500/40 rounded-lg flex items-center justify-between text-amber-300";
+            item.innerHTML = `
+                <span class="flex items-center gap-2 truncate max-w-[140px] font-semibold"><span class="material-symbols-outlined text-sm text-amber-400">music_note</span> ${sfx.name}</span>
+                <div class="flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm text-red-400 cursor-pointer hover:text-red-300" onclick="deleteSfxClip(${idx})" title="Delete Audio">delete</span>
+                </div>
+            `;
+            list.appendChild(item);
+        });
+    }
+
+    function clearAllSubtitles() {
+        if (subtitles.length === 0) return;
+        subtitles = [];
+        activeIndex = -1;
+        subtitleOverlayText.textContent = '';
+        subtitleStageOverlay.style.opacity = '0';
+        document.getElementById('word-count-display').textContent = '0 Words';
+        document.getElementById('subtitle-count').textContent = '0 Blocks';
+        renderSubtitles();
+        renderTimelineClips();
+        renderLayerStackList();
+        showToast("Cleared all subtitles", 'info');
+    }
+
+    // Keyboard shortcuts: 'S' for Cut/Split, 'Delete' / 'Backspace' for deleting selected clip
+    window.addEventListener('keydown', (e) => {
+        if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+        if (e.key === 's' || e.key === 'S') {
+            splitVideoClipAtPlayhead();
+        } else if (e.key === 'Delete' || e.key === 'Backspace') {
+            deleteSelectedTrackElement();
         }
     });
 
@@ -1674,6 +1957,7 @@
         document.getElementById('timeline-tracks-content').style.width = totalWidth + 'px';
 
         renderTimelineClips();
+        renderLayerStackList();
     }
 
     function renderTimelineClips() {
@@ -1684,16 +1968,21 @@
             subtitles.forEach((sub, i) => {
                 const left = sub.startSec * timelineZoomPxPerSec;
                 const width = Math.max(30, (sub.endSec - sub.startSec) * timelineZoomPxPerSec);
+                const isSelected = selectedTrackItem && selectedTrackItem.type === 'subtitle' && selectedTrackItem.index === i;
                 
                 const chip = document.createElement('div');
-                chip.className = "absolute h-[28px] bg-primary/20 rounded-lg border border-primary/50 flex items-center justify-center text-primary truncate px-2 text-[10px] font-bold cursor-pointer hover:border-primary transition-all";
+                chip.className = `absolute h-[28px] bg-primary/20 rounded-lg border flex items-center justify-between text-primary truncate px-2 text-[10px] font-bold cursor-pointer transition-all ${isSelected ? 'ring-2 ring-primary ring-offset-1 ring-offset-black border-primary' : 'border-primary/50 hover:border-primary'}`;
                 chip.style.left = left + 'px';
                 chip.style.width = width + 'px';
-                chip.textContent = sub.text.slice(0, 15);
+                chip.innerHTML = `
+                    <span class="truncate">${sub.text.slice(0, 15)}</span>
+                    <button onclick="event.stopPropagation(); deleteSubtitle(${i})" class="text-[10px] text-red-400 hover:text-white ml-1 font-black shrink-0" title="Delete subtitle">✕</button>
+                `;
                 chip.onclick = (e) => {
                     e.stopPropagation();
                     videoPlayer.currentTime = sub.startSec;
                     highlightSubtitle(i);
+                    selectTrackItem('subtitle', i);
                 };
                 subContainer.appendChild(chip);
             });
@@ -1706,12 +1995,20 @@
             imageOverlays.forEach((ov) => {
                 const left = ov.startSec * timelineZoomPxPerSec;
                 const width = Math.max(40, (ov.endSec - ov.startSec) * timelineZoomPxPerSec);
+                const isSelected = selectedTrackItem && selectedTrackItem.type === 'overlay' && selectedTrackItem.id === ov.id;
 
                 const chip = document.createElement('div');
-                chip.className = "absolute h-[28px] bg-pink-950/60 rounded-lg border border-pink-500/50 flex items-center px-2 text-[10px] text-pink-300 font-bold shadow truncate cursor-pointer hover:border-pink-300 transition-all";
+                chip.className = `absolute h-[28px] bg-pink-950/60 rounded-lg border flex items-center justify-between px-2 text-[10px] text-pink-300 font-bold shadow truncate cursor-pointer transition-all ${isSelected ? 'ring-2 ring-pink-400 ring-offset-1 ring-offset-black border-pink-300' : 'border-pink-500/50 hover:border-pink-300'}`;
                 chip.style.left = left + 'px';
                 chip.style.width = width + 'px';
-                chip.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 text-pink-400">image</span> ${ov.name}`;
+                chip.innerHTML = `
+                    <span class="flex items-center gap-1 truncate"><span class="material-symbols-outlined text-xs text-pink-400">image</span> ${ov.name}</span>
+                    <button onclick="event.stopPropagation(); deleteImageOverlay('${ov.id}')" class="text-[10px] text-red-400 hover:text-white ml-1 font-black shrink-0" title="Delete overlay">✕</button>
+                `;
+                chip.onclick = (e) => {
+                    e.stopPropagation();
+                    selectTrackItem('overlay', ov.id);
+                };
                 overlayTrack.appendChild(chip);
             });
         }
@@ -1723,12 +2020,20 @@
             videoClips.forEach((clip, i) => {
                 const left = clip.startSec * timelineZoomPxPerSec;
                 const width = Math.max(40, (clip.endSec - clip.startSec) * timelineZoomPxPerSec);
+                const isSelected = selectedTrackItem && selectedTrackItem.type === 'video' && selectedTrackItem.index === i;
 
                 const clipEl = document.createElement('div');
-                clipEl.className = "absolute h-[32px] bg-indigo-900/60 rounded-lg border border-indigo-400/40 clip-active flex items-center px-2 text-[10px] text-white truncate font-bold shadow-md cursor-pointer hover:border-indigo-300 transition-all";
+                clipEl.className = `absolute h-[32px] bg-indigo-900/60 rounded-lg border flex items-center justify-between px-2 text-[10px] text-white truncate font-bold shadow-md cursor-pointer transition-all ${isSelected ? 'ring-2 ring-indigo-400 ring-offset-1 ring-offset-black border-indigo-300' : 'border-indigo-400/40 hover:border-indigo-300'}`;
                 clipEl.style.left = left + 'px';
                 clipEl.style.width = width + 'px';
-                clipEl.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 text-secondary">movie</span> ${clip.name}`;
+                clipEl.innerHTML = `
+                    <span class="flex items-center gap-1 truncate"><span class="material-symbols-outlined text-xs text-secondary">movie</span> ${clip.name}</span>
+                    ${videoClips.length > 1 ? `<button onclick="event.stopPropagation(); deleteVideoClip(${i})" class="text-[10px] text-red-400 hover:text-white ml-1 font-black shrink-0" title="Delete split clip">✕</button>` : ''}
+                `;
+                clipEl.onclick = (e) => {
+                    e.stopPropagation();
+                    selectTrackItem('video', i);
+                };
                 videoTrack.appendChild(clipEl);
 
                 // Add CapCut-Style Transition Handle Junction Node between adjacent split video clips
@@ -1758,18 +2063,24 @@
         const audioTrack = document.getElementById('timeline-audio-clips-track');
         if (audioTrack) {
             audioTrack.innerHTML = '';
-            audioClips.forEach((clip) => {
+            audioClips.forEach((clip, i) => {
                 const left = clip.startSec * timelineZoomPxPerSec;
                 const width = Math.max(60, (clip.endSec - clip.startSec) * timelineZoomPxPerSec);
+                const isSelected = selectedTrackItem && selectedTrackItem.type === 'audio' && selectedTrackItem.index === i;
 
                 const clipEl = document.createElement('div');
-                clipEl.className = "absolute h-[32px] bg-emerald-950/70 rounded-lg border border-emerald-500/40 flex items-center justify-between px-2 text-[10px] text-emerald-300 font-semibold truncate overflow-hidden";
+                clipEl.className = `absolute h-[32px] bg-emerald-950/70 rounded-lg border flex items-center justify-between px-2 text-[10px] text-emerald-300 font-semibold truncate overflow-hidden cursor-pointer ${isSelected ? 'ring-2 ring-emerald-400 ring-offset-1 ring-offset-black border-emerald-300' : 'border-emerald-500/40'}`;
                 clipEl.style.left = left + 'px';
                 clipEl.style.width = width + 'px';
                 clipEl.innerHTML = `
                     <span class="flex items-center gap-1 z-10 font-bold shrink-0"><span class="material-symbols-outlined text-xs">equalizer</span> Voice Audio</span>
+                    <button onclick="event.stopPropagation(); deleteAudioClip(${i})" class="text-[10px] text-red-400 hover:text-white z-10 ml-1 font-black shrink-0" title="Delete voice audio">✕</button>
                     <canvas id="audio-waveform-canvas" width="${Math.round(width)}" height="28" class="absolute inset-0 opacity-80 pointer-events-none"></canvas>
                 `;
+                clipEl.onclick = (e) => {
+                    e.stopPropagation();
+                    selectTrackItem('audio', i);
+                };
                 audioTrack.appendChild(clipEl);
             });
         }
@@ -1778,15 +2089,23 @@
         const sfxTrack = document.getElementById('timeline-sfx-clips-track');
         if (sfxTrack) {
             sfxTrack.innerHTML = '';
-            sfxClips.forEach((clip) => {
+            sfxClips.forEach((clip, i) => {
                 const left = clip.startSec * timelineZoomPxPerSec;
                 const width = Math.max(40, (clip.endSec - clip.startSec) * timelineZoomPxPerSec);
+                const isSelected = selectedTrackItem && selectedTrackItem.type === 'sfx' && selectedTrackItem.index === i;
 
                 const clipEl = document.createElement('div');
-                clipEl.className = "absolute h-[28px] bg-amber-950/60 rounded-lg border border-amber-500/40 flex items-center px-2 text-[10px] text-amber-300 font-semibold truncate";
+                clipEl.className = `absolute h-[28px] bg-amber-950/60 rounded-lg border flex items-center justify-between px-2 text-[10px] text-amber-300 font-semibold truncate cursor-pointer ${isSelected ? 'ring-2 ring-amber-400 ring-offset-1 ring-offset-black border-amber-300' : 'border-amber-500/40'}`;
                 clipEl.style.left = left + 'px';
                 clipEl.style.width = width + 'px';
-                clipEl.innerHTML = `<span class="material-symbols-outlined text-xs mr-1 text-amber-400">music_note</span> ${clip.name}`;
+                clipEl.innerHTML = `
+                    <span class="flex items-center gap-1 truncate"><span class="material-symbols-outlined text-xs text-amber-400">music_note</span> ${clip.name}</span>
+                    <button onclick="event.stopPropagation(); deleteSfxClip(${i})" class="text-[10px] text-red-400 hover:text-white ml-1 font-black shrink-0" title="Delete music">✕</button>
+                `;
+                clipEl.onclick = (e) => {
+                    e.stopPropagation();
+                    selectTrackItem('sfx', i);
+                };
                 sfxTrack.appendChild(clipEl);
             });
         }
@@ -1868,13 +2187,6 @@
             subtitles[index].text = val;
             if (index === activeIndex) renderOverlayText(val);
         }
-    }
-
-    function deleteSubtitle(index) {
-        subtitles.splice(index, 1);
-        renderSubtitles();
-        renderTimelineClips();
-        showToast("Subtitle block deleted", 'info');
     }
 
     function splitSubtitleAt(index) {
@@ -2035,7 +2347,7 @@
         const clientId = 'client_' + Math.random().toString(36).substring(7);
         showProgress("KaveezCloud Subtitle Engine", "Processing speech stream & synchronizing timeline...", "cloud_done");
 
-        const eventSource = new EventSource('/api/progress?clientId=' + clientId);
+        const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
         eventSource.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data);
@@ -2059,7 +2371,7 @@
         if (activeKey) formData.append('apiKey', activeKey);
 
         try {
-            const response = await fetch('/api/generate-srt?clientId=' + clientId, {
+            const response = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, {
                 method: 'POST',
                 body: formData
             });
@@ -2236,7 +2548,7 @@
         const clientId = 'export_' + Math.random().toString(36).substring(7);
         showProgress("Rendering Video", "Hardcoding styled Sinhala subtitles with FFmpeg...", "movie_creation");
 
-        const eventSource = new EventSource('/api/progress?clientId=' + clientId);
+        const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
             document.getElementById('progress-text').textContent = data.message;
@@ -2258,7 +2570,7 @@
         formData.append('posY', overlayPos.y);
 
         try {
-            const res = await fetch('/api/export-video?clientId=' + clientId, { method: 'POST', body: formData });
+            const res = await fetch(`${API_BASE_URL}/api/export-video?clientId=${clientId}`, { method: 'POST', body: formData });
             if (!res.ok) throw new Error(await res.text());
 
             const blob = await res.blob();
