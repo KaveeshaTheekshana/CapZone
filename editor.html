@@ -1124,9 +1124,20 @@
     }
 
     function selectAnimation(cls, name) {
-        activeAnimationClass = cls;
-        subtitleOverlayText.className = `font-bold text-2xl text-white ${cls}`;
-        showToast(`Text Animation Applied: ${name}`, 'success');
+        if (selectedTrackItem && selectedTrackItem.type === 'subtitle' && selectedTrackItem.index >= 0) {
+            subtitles[selectedTrackItem.index].animation = cls;
+            showToast(`Animation applied to selected subtitle`, 'success');
+        } else {
+            subtitles.forEach(s => s.animation = cls);
+            activeAnimationClass = cls; // Fallback
+            showToast(`Animation applied to ALL subtitles`, 'success');
+        }
+        
+        if (activeIndex >= 0) {
+            highlightSubtitle(activeIndex);
+        } else {
+            subtitleOverlayText.className = `font-bold text-2xl text-white ${cls}`;
+        }
     }
 
     buildAnimationGrid();
@@ -1708,6 +1719,9 @@
         const sub = subtitles[index];
         if (!sub) return;
 
+        const animClass = sub.animation || activeAnimationClass || 'anim-pop';
+        subtitleOverlayText.className = `font-bold text-2xl text-white ${animClass}`;
+
         renderOverlayText(sub.text);
         subtitleStageOverlay.style.opacity = '1';
 
@@ -1725,6 +1739,9 @@
         let textToDisplay = rawText;
         if (isLegacyFontActive && typeof window.convertUnicodeToLegacy === 'function') {
             textToDisplay = window.convertUnicodeToLegacy(rawText);
+            if (!subtitleOverlayText.style.fontFamily || subtitleOverlayText.style.fontFamily.includes('Outfit')) {
+                subtitleOverlayText.style.fontFamily = "'FM-Abhaya', sans-serif"; // Default legacy font to prevent corruption
+            }
         }
         subtitleOverlayText.textContent = textToDisplay;
     }
@@ -2296,11 +2313,7 @@
     function openKaveezSubtitleModal() {
         if (!selectedVideoFile) return showToast("Please load a video file first!", 'warning');
         const modal = document.getElementById('kaveez-subtitle-modal');
-        const savedKey = localStorage.getItem('gemini_api_key') || '';
-        const keyInput = document.getElementById('modal-api-key');
-        if (keyInput && !keyInput.value && savedKey) {
-            keyInput.value = savedKey;
-        }
+        // API key input will remain empty by default so it uses backend key unless explicitly typed
         modal.classList.remove('hidden');
         setTimeout(() => modal.classList.remove('opacity-0'), 10);
     }
@@ -2437,10 +2450,28 @@
 
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        const vWidth = videoPlayer.videoWidth || 1920;
-        const vHeight = videoPlayer.videoHeight || 1080;
-        canvas.width = vWidth;
-        canvas.height = vHeight;
+        
+        // Use the container's aspect ratio
+        const container = document.getElementById('video-container');
+        const ratioStr = container.style.aspectRatio || "16 / 9";
+        const parts = ratioStr.split('/').map(p => parseFloat(p.trim()));
+        let ratio = parts[0] / parts[1];
+        if (isNaN(ratio) || ratioStr === 'original') {
+            ratio = (videoPlayer.videoWidth || 1920) / (videoPlayer.videoHeight || 1080);
+        }
+
+        // Determine canvas export dimensions (baseline 1080p)
+        let cWidth, cHeight;
+        if (ratio >= 1) { // Landscape or square
+            cHeight = 1080;
+            cWidth = Math.round(cHeight * ratio);
+        } else { // Portrait
+            cHeight = 1920;
+            cWidth = Math.round(cHeight * ratio);
+        }
+        
+        canvas.width = cWidth;
+        canvas.height = cHeight;
 
         const stream = canvas.captureStream(30);
         
@@ -2490,8 +2521,26 @@
                 return;
             }
 
-            // 1. Draw Video Frame
-            ctx.drawImage(videoPlayer, 0, 0, canvas.width, canvas.height);
+            // 1. Draw Video Frame with object-fit: contain (Letterbox/Pillarbox)
+            const vRatio = videoPlayer.videoWidth / videoPlayer.videoHeight;
+            const cRatio = canvas.width / canvas.height;
+            let dWidth, dHeight, dx, dy;
+            
+            if (vRatio > cRatio) {
+                dWidth = canvas.width;
+                dHeight = canvas.width / vRatio;
+                dx = 0;
+                dy = (canvas.height - dHeight) / 2;
+            } else {
+                dHeight = canvas.height;
+                dWidth = canvas.height * vRatio;
+                dx = (canvas.width - dWidth) / 2;
+                dy = 0;
+            }
+            
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(videoPlayer, dx, dy, dWidth, dHeight);
 
             // 2. Draw Image Overlays (V2)
             const curTime = videoPlayer.currentTime;
