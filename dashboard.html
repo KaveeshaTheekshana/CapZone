@@ -919,7 +919,7 @@
         const clientId = 'srt_' + Date.now();
         const wordsLimit = document.getElementById('srtWordsLimit')?.value || 5;
         const useLegacy = document.getElementById('legacyFontCheck')?.checked || false;
-        const apiKey = (currentApiMode === 'user' ? document.getElementById('userApiKey')?.value : '') || localStorage.getItem('gemini_api_key') || '';
+        const apiKey = (currentApiMode === 'user' ? document.getElementById('userApiKey')?.value : '') || '';
         const language = document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala';
 
         document.getElementById('srtSubmitBtn').disabled = true;
