@@ -236,6 +236,8 @@
           <button onclick="openModal('srtModal', event)"
             class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open Subtitle
             Tool</button>
+          <button onclick="openModal('dubModal', event)"
+            class="w-full py-2.5 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"><i data-lucide="mic" class="w-4 h-4"></i> AI Video Dubbing</button>
         </div>
 
         <!-- Mobile Tool 3: Social Downloader -->
@@ -334,6 +336,8 @@
         <div class="space-y-2">
           <button onclick="openModal('srtModal', event)"
             class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
+          <button onclick="openModal('dubModal', event)"
+            class="w-full py-3 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"><i data-lucide="mic" class="w-4 h-4"></i> AI Video Dubbing</button>
         </div>
       </div>
 
@@ -456,15 +460,23 @@
       </div>
 
       <div class="space-y-4">
-        <div class="p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5">
-          <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone Pro API Key
-            (Optional)</label>
-          <input type="text" id="userApiKey" placeholder="AI Studio Key for bypass limits..."
-            class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
+        <div class="p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5 space-y-3">
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone Pro API Key
+              (Optional)</label>
+            <input type="text" id="userApiKey" placeholder="AI Studio Key for bypass limits..."
+              class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">ElevenLabs API Key
+              (For Dubbing)</label>
+            <input type="text" id="elevenLabsApiKey" placeholder="sk_..."
+              class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
+          </div>
           <button id="saveApiKeyBtn" type="button"
-            onclick="showPopup('API Key saved successfully!'); closeModal('profileModal')"
+            onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
             class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
-            API Key</button>
+            API Keys</button>
         </div>
         <button id="logoutBtn"
           class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
@@ -679,6 +691,82 @@
           class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
           target="_blank">
           <i data-lucide="download" class="w-4 h-4"></i> Download .SRT File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: AI VIDEO DUBBING -->
+  <div id="dubModal"
+    class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto py-10"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative my-auto">
+      <button onclick="closeModal('dubModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-pink-500/10 text-pink-500 rounded-2xl border border-pink-500/20">
+          <i data-lucide="mic" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">AI Video Dubbing</h2>
+          <p class="text-xs text-fix-sub">Dub your video into English or Sinhala with Voice Cloning.</p>
+        </div>
+      </div>
+
+      <form id="dubForm" class="space-y-4" onsubmit="handleDubSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Upload Video File</label>
+          <div
+            class="relative w-full border-2 border-dashed border-pink-500/30 rounded-xl p-4 text-center hover:bg-pink-500/5 transition-colors cursor-pointer"
+            onclick="document.getElementById('dubVideoInput').click()">
+            <input type="file" id="dubVideoInput" accept="video/*" required class="hidden"
+              onchange="document.getElementById('dubFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Browse Media'" />
+            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-pink-500 mb-2"></i>
+            <p class="text-xs text-fix-heading font-bold" id="dubFileName">Click to Browse Media</p>
+            <p class="text-[10px] text-fix-sub mt-1">MP4, MKV up to 50MB</p>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Target Language</label>
+          <select id="dubLanguage"
+            class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
+            <option value="en" selected>English (Voice Cloning via ElevenLabs)</option>
+            <option value="si">Sinhala (Standard AI Voice)</option>
+          </select>
+        </div>
+
+        <button type="submit" id="dubSubmitBtn"
+          class="w-full py-3.5 bg-pink-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-pink-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="mic" class="w-4 h-4"></i> Start AI Dubbing
+        </button>
+      </form>
+
+      <!-- Progress Tracking -->
+      <div id="dubProgressCard"
+        class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5"
+        style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Dubbing in Progress...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="dubProgressBar" class="bg-pink-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+        <div id="dubProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-24 overflow-y-auto space-y-1"></div>
+      </div>
+
+      <!-- Result Area -->
+      <div id="dubResultArea"
+        class="mt-4 p-4 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="film" class="w-8 h-8 text-pink-500"></i>
+        <p class="text-xs font-bold text-fix-heading">Dubbing Complete!</p>
+        <a id="dubDownloadLink"
+          class="w-full py-2.5 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Dubbed Video
         </a>
       </div>
     </div>
@@ -1084,6 +1172,85 @@
           document.getElementById('audioSubmitBtn').disabled = false;
         }
       }
+
+      // 5. Handle AI Dubbing Submit
+      async function handleDubSubmit(e) {
+        e.preventDefault();
+        const fileInput = document.getElementById('dubVideoInput');
+        if (!fileInput.files || !fileInput.files[0]) {
+          showPopup('Please upload a video file!');
+          return;
+        }
+
+        const clientId = 'dub_' + Date.now();
+        const language = document.getElementById('dubLanguage').value;
+        const elevenLabsKey = localStorage.getItem('elevenlabs_api_key') || '';
+
+        if (language === 'en' && !elevenLabsKey) {
+            showPopup('ElevenLabs API Key is required for English Voice Cloning! Please add it in your Profile Settings.', 'API Key Missing', 'error');
+            return;
+        }
+
+        document.getElementById('dubSubmitBtn').disabled = true;
+        document.getElementById('dubProgressCard').style.display = 'block';
+        document.getElementById('dubResultArea').style.display = 'none';
+
+        const es = setupProgressTracker(clientId, 'dub', 'dubProgressBar');
+
+        const formData = new FormData();
+        formData.append('video', fileInput.files[0]);
+        formData.append('language', language);
+        if (elevenLabsKey) {
+            formData.append('elevenLabsKey', elevenLabsKey);
+        }
+        
+        // Add existing Gemini key if available
+        const geminiKey = document.getElementById('userApiKey')?.value || localStorage.getItem('gemini_api_key') || '';
+        if(geminiKey) formData.append('geminiKey', geminiKey);
+
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/dub-video?clientId=${clientId}`, {
+            method: 'POST',
+            body: formData
+          });
+
+          const data = await res.json();
+          es.close();
+
+          if (data.dubbedUrl) {
+            updateStepProgress('dub', 'dubProgressBar', 'AI Dubbing Complete!');
+            document.getElementById('dubDownloadLink').href = data.dubbedUrl;
+            document.getElementById('dubDownloadLink').download = data.filename || 'dubbed_video.mp4';
+            document.getElementById('dubResultArea').style.display = 'flex';
+          } else {
+            showPopup('Error: ' + (data.error || 'Dubbing failed'), 'AI Dubbing Notice', 'error');
+          }
+        } catch (err) {
+          es.close();
+          showPopup('Dubbing failed: ' + err.message, 'AI Dubbing Error', 'error');
+        } finally {
+          document.getElementById('dubSubmitBtn').disabled = false;
+        }
+      }
+
+      function saveApiKeys() {
+          const geminiKey = document.getElementById('userApiKey')?.value;
+          const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value;
+          if(geminiKey) localStorage.setItem('gemini_api_key', geminiKey);
+          if(elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
+      }
+
+      // Initialize API Keys on load
+      document.addEventListener('DOMContentLoaded', () => {
+          const storedGemini = localStorage.getItem('gemini_api_key');
+          const storedEleven = localStorage.getItem('elevenlabs_api_key');
+          if(storedGemini && document.getElementById('userApiKey')) {
+              document.getElementById('userApiKey').value = storedGemini;
+          }
+          if(storedEleven && document.getElementById('elevenLabsApiKey')) {
+              document.getElementById('elevenLabsApiKey').value = storedEleven;
+          }
+      });
 
       // ======================================================================
       // KAVEEZ CUSTOM ALERT & ERROR INTERCEPTOR SYSTEM (NO BROWSER POPUPS)
