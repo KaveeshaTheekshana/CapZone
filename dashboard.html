@@ -733,9 +733,19 @@
         <div>
           <label class="text-xs font-bold text-fix-sub mb-2 block">Target Language</label>
           <select id="dubLanguage"
-            class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
-            <option value="en" selected>English (Voice Cloning via ElevenLabs)</option>
+            class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none"
+            onchange="document.getElementById('dubGenderWrapper').style.display = this.value === 'en' ? 'block' : 'none'">
+            <option value="en" selected>English (AI Voice via ElevenLabs)</option>
             <option value="si">Sinhala (Standard AI Voice)</option>
+          </select>
+        </div>
+
+        <div id="dubGenderWrapper">
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Voice Gender (English Only)</label>
+          <select id="dubGender"
+            class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
+            <option value="female" selected>Female Voice (Rachel)</option>
+            <option value="male">Male Voice (Adam)</option>
           </select>
         </div>
 
@@ -1195,6 +1205,9 @@
         const formData = new FormData();
         formData.append('video', fileInput.files[0]);
         formData.append('language', language);
+        if (language === 'en') {
+            formData.append('voiceGender', document.getElementById('dubGender').value);
+        }
         if (elevenLabsKey) {
             formData.append('elevenLabsKey', elevenLabsKey);
         }
