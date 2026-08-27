@@ -8,17 +8,34 @@
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+          },
           colors: {
             brand: {
               primary: '#6366f1',
               purple: '#8b5cf6',
               cyan: '#06b6d4'
             }
+          },
+          keyframes: {
+            'slide-up': {
+              '0%': { transform: 'translateY(100%)' },
+              '100%': { transform: 'translateY(0)' },
+            }
+          },
+          animation: {
+            'slide-up': 'slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
           }
         }
       }
@@ -95,7 +112,7 @@
       scrollbar-width: none;
     }
   </style>
-</head>
+<link rel="icon" href="assets/logo.png" type="image/png" /></head>
 
 <body
   class="animated-bg text-slate-100 dark:text-slate-100 transition-colors duration-500 font-sans min-h-screen flex flex-col justify-between"
@@ -109,14 +126,11 @@
 
         <!-- Logo -->
         <div class="flex items-center gap-2.5">
-          <div
-            class="p-2 bg-gradient-to-tr from-indigo-600 to-pink-500 text-white rounded-xl shadow-lg shadow-purple-500/30">
-            <i data-lucide="clapperboard" class="w-5 h-5"></i>
-          </div>
+          <img src="assets/logo.png" class="w-10 h-10 object-contain drop-shadow-md" alt="CapZone Logo">
           <div>
             <span
               class="bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent font-black text-lg sm:text-2xl tracking-wider uppercase">
-              CineNexus
+              CapZone
             </span>
             <span
               class="block text-[8px] text-indigo-600 dark:text-purple-400 font-bold tracking-widest font-mono uppercase -mt-1 hidden sm:block">Pro
@@ -182,28 +196,12 @@
         <i data-lucide="sparkles" class="w-5 h-5 text-indigo-500 animate-pulse"></i>
       </div>
 
-      <!-- Horizontal Swipe Tool Selector for Mobile -->
-      <div class="flex gap-2 overflow-x-auto no-scrollbar pb-3 mb-2">
-        <button onclick="mobileSwitchTab('m-editor')" id="m-btn-m-editor"
-          class="mobile-tab-btn shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md">
-          <i data-lucide="film" class="w-3.5 h-3.5"></i> Editor
-        </button>
-        <button onclick="mobileSwitchTab('m-srt')" id="m-btn-m-srt"
-          class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
-          <i data-lucide="captions" class="w-3.5 h-3.5"></i> SRT Subtitle
-        </button>
-        <button onclick="mobileSwitchTab('m-downloader')" id="m-btn-m-downloader"
-          class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
-          <i data-lucide="download-cloud" class="w-3.5 h-3.5"></i> Downloader
-        </button>
-        <button onclick="mobileSwitchTab('m-projects')" id="m-btn-m-projects"
-          class="mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5">
-          <i data-lucide="folder" class="w-3.5 h-3.5"></i> Projects
-        </button>
-      </div>
-
       <!-- Mobile Active Tool Container -->
-      <div class="glass-card rounded-2xl p-4 min-h-[380px] flex flex-col justify-between">
+      <div class="glass-card rounded-3xl p-5 min-h-[450px] shadow-2xl flex flex-col justify-between border-t border-white/20 relative overflow-hidden">
+        <!-- Background Glow -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full"></div>
+        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-500/20 blur-3xl rounded-full"></div>
+        <div class="relative z-10">
 
         <!-- Mobile Tool 1: Video Editor -->
         <div id="m-editor" class="mobile-tab-content space-y-3">
@@ -255,170 +253,44 @@
         </div>
 
         <!-- Mobile Tool 4: Saved Projects -->
-        <div id="m-projects" class="mobile-tab-content hidden space-y-2">
-          <div class="flex items-center gap-2 mb-2">
-            <i data-lucide="folder" class="text-amber-500 w-5 h-5"></i>
-            <h3 class="font-bold text-sm text-fix-heading">Recent Projects</h3>
-          </div>
-          <div class="p-2.5 rounded-lg bg-black/20 text-xs flex justify-between items-center">
-            <span class="truncate font-semibold text-fix-heading">Nike_Commercial_v4.mp4</span>
-            <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
-          </div>
-          <div class="p-2.5 rounded-lg bg-black/20 text-xs flex justify-between items-center">
-            <span class="truncate font-semibold text-fix-heading">Podcast_Cleaned.mp3</span>
-            <i data-lucide="check-circle" class="w-4 h-4 text-cyan-500 shrink-0"></i>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ================= 4. DESKTOP BENTO GRID (VISIBLE ONLY ON DESKTOP/LAPTOP) ================= -->
-    <main class="hidden md:grid max-w-7xl mx-auto px-6 pb-16 grid-cols-3 gap-6">
-
-      <!-- CARD 1: VIDEO EDITOR -->
-      <div class="col-span-2 glass-card rounded-3xl p-6 relative overflow-hidden transition-all duration-300">
-        <div class="flex justify-between items-start mb-4">
-          <div class="flex items-center gap-3">
-            <div class="p-3 bg-indigo-500/10 text-indigo-500 rounded-2xl border border-indigo-500/20">
-              <i data-lucide="film" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-fix-heading">CapZone Studio Pro - Powered by KaveezCloud</h3>
-              <p class="text-xs text-fix-sub">4K Multi-Track Video & Subtitle Suite</p>
-            </div>
-          </div>
-          <span
-            class="text-[10px] font-mono px-2.5 py-1 bg-indigo-500/20 text-indigo-500 font-bold rounded-lg border border-indigo-500/30">KAVEEZ
-            ENGINE</span>
-        </div>
-
-        <div class="relative h-56 rounded-2xl overflow-hidden border border-black/10 dark:border-white/10 group">
-          <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1000&q=80"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-80" />
-          <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-6 text-center">
-            <p class="text-white font-bold text-base mb-1">CapZone 4K Video Editing Suite</p>
-            <p class="text-slate-300 text-xs mb-4">Transitions, Multi-Track Layers, Text FX, Audio DSP & Subtitle Sync
-            </p>
-            <div class="flex gap-2 justify-center">
-              <button onclick="window.location.href='editor.html'"
-                class="px-8 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 text-white font-bold text-xs rounded-xl shadow-xl hover:scale-105 transition-all">Launch
-                4K Studio Editor</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 2: AUTO SRT GENERATOR -->
-      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
-              <i data-lucide="captions" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-fix-heading">AI Subtitles</h3>
-              <p class="text-xs text-fix-sub">Auto SRT Generator</p>
-            </div>
-          </div>
-
-          <div class="h-28 rounded-xl overflow-hidden mb-4 relative border border-black/10 dark:border-white/10">
-            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=600&q=80"
-              class="w-full h-full object-cover opacity-70" />
-            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <span
-                class="bg-black/80 text-purple-300 text-[11px] font-mono px-3 py-1 rounded-lg border border-purple-500/30">Auto-Cap
-                Synced Ã¢Å“Â¨</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-2">
-          <button onclick="openModal('srtModal', event)"
-            class="w-full py-3 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open SRT Tool</button>
-          <button onclick="openModal('dubModal', event)"
-            class="w-full py-3 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"><i data-lucide="mic" class="w-4 h-4"></i> AI Video Dubbing</button>
-        </div>
-      </div>
-
-      <!-- CARD 3: SOCIAL DOWNLOADER -->
-      <div class="col-span-1 glass-card rounded-3xl p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-3 mb-3">
-            <div class="p-3 bg-cyan-500/10 text-cyan-500 rounded-2xl border border-cyan-500/20">
-              <i data-lucide="download-cloud" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-fix-heading">Social Grabber</h3>
-              <p class="text-xs text-fix-sub">FB & TikTok HD Rip</p>
-            </div>
-          </div>
-          <div class="h-24 rounded-xl overflow-hidden my-3 relative border border-black/10 dark:border-white/10">
-            <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=600&q=80"
-              class="w-full h-full object-cover opacity-80" />
-            <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-              <span class="text-xs font-bold text-cyan-300 bg-black/60 px-3 py-1 rounded-lg">No Watermark HD</span>
-            </div>
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="openModal('fbModal', event)"
-            class="w-full py-3 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md">Facebook</button>
-          <button onclick="openModal('tiktokModal', event)"
-            class="w-full py-3 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-xs rounded-xl shadow-md">TikTok</button>
-        </div>
-      </div>
-
-      <!-- CARD 4: PROJECTS -->
-      <div class="glass-card rounded-3xl p-6 flex flex-col justify-between">
-        <div>
-          <div class="flex items-center gap-3 mb-4">
-            <div class="p-3 bg-amber-500/10 text-amber-500 rounded-2xl border border-amber-500/20">
-              <i data-lucide="folder" class="w-6 h-6"></i>
-            </div>
-            <div>
-              <h3 class="text-lg font-bold text-fix-heading">Saved Projects</h3>
-              <p class="text-xs text-fix-sub">Cloud Dashboard</p>
-            </div>
-          </div>
-          <div class="space-y-2">
-            <div class="p-3 rounded-xl bg-black/10 dark:bg-black/30 flex justify-between items-center">
-              <span class="text-xs font-bold text-fix-heading truncate">Nike_Ad_4K.mp4</span>
-              <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500 shrink-0"></i>
-            </div>
-            <div class="p-3 rounded-xl bg-black/10 dark:bg-black/30 flex justify-between items-center">
-              <span class="text-xs font-bold text-fix-heading truncate">Podcast_Clean.mp3</span>
-              <i data-lucide="check-circle" class="w-4 h-4 text-cyan-500 shrink-0"></i>
-            </div>
-          </div>
-        </div>
-        <button
-          class="w-full mt-4 py-2.5 bg-slate-200 dark:bg-slate-800 text-fix-heading font-bold text-xs rounded-xl">View
-          All Projects</button>
       </div>
 
     </main>
   </div>
 
   <!-- ================= 5. MOBILE BOTTOM NATIVE APP NAVIGATION ================= -->
-  <div
-    class="fixed bottom-0 left-0 right-0 glass-card border-t border-black/10 dark:border-white/10 py-2.5 px-2 sm:hidden z-50 flex justify-around items-center">
-    <button onclick="mobileSwitchTab('m-editor')" class="flex flex-col items-center gap-1 text-indigo-500">
-      <i data-lucide="film" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">Editor</span>
-    </button>
-    <button onclick="mobileSwitchTab('m-srt')" class="flex flex-col items-center gap-1 text-fix-sub">
-      <i data-lucide="captions" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">SRT</span>
-    </button>
-    <button onclick="mobileSwitchTab('m-downloader')" class="flex flex-col items-center gap-1 text-fix-sub">
-      <i data-lucide="download-cloud" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">Tools</span>
-    </button>
-    <button onclick="mobileSwitchTab('m-projects')" class="flex flex-col items-center gap-1 text-fix-sub">
-      <i data-lucide="folder" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">Projects</span>
-    </button>
+  <div class="fixed bottom-4 left-4 right-4 sm:hidden z-50">
+    <div class="glass-card rounded-2xl py-3 px-4 shadow-2xl flex justify-between items-center border border-white/20 bg-white/10 dark:bg-black/40 backdrop-blur-xl">
+      
+      <button onclick="mobileSwitchTab('m-editor')" id="nav-btn-m-editor" class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-indigo-500 scale-110">
+        <div class="p-2 rounded-xl bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
+          <i data-lucide="film" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[9px] font-bold">Studio</span>
+      </button>
+
+      <button onclick="mobileSwitchTab('m-srt')" id="nav-btn-m-srt" class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-purple-500">
+        <div class="p-2 rounded-xl border border-transparent transition-all">
+          <i data-lucide="captions" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[9px] font-bold">Subs</span>
+      </button>
+
+      <button onclick="mobileSwitchTab('m-downloader')" id="nav-btn-m-downloader" class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-cyan-500">
+        <div class="p-2 rounded-xl border border-transparent transition-all">
+          <i data-lucide="download-cloud" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[9px] font-bold">Tools</span>
+      </button>
+
+      <button onclick="mobileSwitchTab('m-projects')" id="nav-btn-m-projects" class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-amber-500">
+        <div class="p-2 rounded-xl border border-transparent transition-all">
+          <i data-lucide="folder" class="w-5 h-5"></i>
+        </div>
+        <span class="text-[9px] font-bold">Files</span>
+      </button>
+
+    </div>
   </div>
 
   <!-- ================= 6. FOOTER ================= -->
@@ -427,7 +299,7 @@
       <div class="flex items-center gap-2">
         <i data-lucide="clapperboard" class="w-4 h-4 text-indigo-500"></i>
         <span class="font-bold text-fix-heading">CINE-NEXUS STUDIO</span>
-        <span>Ã‚Â© 2026 Production Engine</span>
+        <span>Ãƒâ€šÃ‚Â© 2026 Production Engine</span>
       </div>
       <div class="flex gap-4 text-[10px] sm:text-xs">
         <a href="#" class="hover:underline">Privacy Policy</a>
@@ -441,9 +313,11 @@
   <!-- ====================================================================== -->
 
   <!-- MODAL 0: PROFILE -->
-  <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+  <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative">
+    <div class="glass-card w-full max-w-sm rounded-t-3xl sm:rounded-3xl rounded-b-none sm:rounded-b-3xl p-6 pb-12 sm:pb-6 relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto w-full">
+      <!-- Mobile drag handle -->
+      <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
       <button onclick="closeModal('profileModal', event)"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
         <i data-lucide="x" class="w-4 h-4"></i>
@@ -478,7 +352,7 @@
             class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
             API Keys</button>
         </div>
-        <button id="logoutBtn"
+                <button id="logoutBtn"
           class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
           <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
         </button>
@@ -487,21 +361,29 @@
   </div>
 
   <!-- MODAL 1: FACEBOOK DOWNLOADER -->
-  <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+  <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative">
+    <div class="glass-card w-full max-w-md rounded-t-3xl sm:rounded-3xl rounded-b-none sm:rounded-b-3xl p-6 pb-12 sm:pb-6 relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto w-full">
+      <!-- Mobile drag handle -->
+      <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
       <button onclick="closeModal('fbModal', event)"
-        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <div class="flex items-center gap-3 mb-6">
-        <div class="p-3 bg-amber-500/10 text-amber-500 rounded-2xl border border-amber-500/20">
-          <i data-lucide="facebook" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-fix-heading">FB Downloader</h2>
-          <p class="text-xs text-fix-sub">Download high-quality videos instantly</p>
+      <div class="h-40 -mt-6 -mx-6 mb-6 relative overflow-hidden rounded-t-3xl sm:rounded-t-3xl border-b border-white/10 group">
+        <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80"
+          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-[#1877F2] text-white rounded-xl shadow-[0_0_15px_rgba(24,119,242,0.5)]">
+              <i data-lucide="facebook" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">FB Downloader</h2>
+              <p class="text-[10px] text-slate-300">HD Video & Audio Rip</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -511,17 +393,23 @@
           <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..."
             class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
         </div>
-        <button type="submit" id="fbSubmitBtn"
-          class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-          <i data-lucide="download" class="w-4 h-4"></i> Download Video
-        </button>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="fbSubmitBtn"
+            class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleFbAudioSubmit(event)" id="fbAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
       </form>
 
       <!-- Progress Tracking -->
       <div id="fbProgressCard"
         class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5"
         style="display: none;">
-        <p class="text-xs font-bold text-fix-heading mb-2">Processing Video...</p>
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing Media...</p>
         <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
           <div id="fbProgressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
           </div>
@@ -537,28 +425,36 @@
         <a id="fbDownloadLink"
           class="w-full py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
           target="_blank">
-          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save HD Video
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
         </a>
       </div>
     </div>
   </div>
 
   <!-- MODAL 2: TIKTOK DOWNLOADER -->
-  <div id="tiktokModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+  <div id="tiktokModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative">
+    <div class="glass-card w-full max-w-md rounded-t-3xl sm:rounded-3xl rounded-b-none sm:rounded-b-3xl p-6 pb-12 sm:pb-6 relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto w-full">
+      <!-- Mobile drag handle -->
+      <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
       <button onclick="closeModal('tiktokModal', event)"
-        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <div class="flex items-center gap-3 mb-6">
-        <div class="p-3 bg-cyan-500/10 text-cyan-500 rounded-2xl border border-cyan-500/20">
-          <i data-lucide="download-cloud" class="w-6 h-6"></i>
-        </div>
-        <div>
-          <h2 class="text-xl font-bold text-fix-heading">TikTok Grabber</h2>
-          <p class="text-xs text-fix-sub">No-Watermark Video Downloads</p>
+      <div class="h-40 -mt-6 -mx-6 mb-6 relative overflow-hidden rounded-t-3xl sm:rounded-t-3xl border-b border-white/10 group">
+        <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?auto=format&fit=crop&w=800&q=80"
+          class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 filter saturate-150" />
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-gradient-to-tr from-cyan-500 to-pink-500 text-white rounded-xl shadow-lg">
+              <i data-lucide="music" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-white">TikTok Downloader</h2>
+              <p class="text-[10px] text-slate-300">No Watermark Video & Audio</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -568,10 +464,16 @@
           <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..."
             class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
         </div>
-        <button type="submit" id="tiktokSubmitBtn"
-          class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-          <i data-lucide="download" class="w-4 h-4"></i> Get Video
-        </button>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="tiktokSubmitBtn"
+            class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleTiktokAudioSubmit(event)" id="tiktokAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-emerald-700 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
       </form>
 
       <!-- Progress Tracking -->
@@ -596,17 +498,16 @@
         <a id="tiktokDownloadLink"
           class="w-full py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
           target="_blank">
-          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save HD Video
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
         </a>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 3: SRT GENERATOR -->
-  <div id="srtModal"
-    class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto py-10"
-    style="display: none;">
+  <!-- MODAL 3: SRT GENERATOR -->style="display: none;">
     <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative my-auto">
+      <!-- Mobile drag handle -->
+      <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
       <button onclick="closeModal('srtModal', event)"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
         <i data-lucide="x" class="w-4 h-4"></i>
@@ -641,7 +542,7 @@
             <label class="text-xs font-bold text-fix-sub mb-2 block">Target Subtitle Language</label>
             <select id="srtLanguage"
               class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
-              <option value="si" selected>Sinhala (සිංහල Unicode)</option>
+              <option value="si" selected>Sinhala (à·ƒà·’à¶‚à·„à¶½ Unicode)</option>
               <option value="en">English (All Accents)</option>
             </select>
           </div>
@@ -701,6 +602,8 @@
     class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto py-10"
     style="display: none;">
     <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative my-auto">
+      <!-- Mobile drag handle -->
+      <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
       <button onclick="closeModal('dubModal', event)"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
         <i data-lucide="x" class="w-4 h-4"></i>
@@ -818,18 +721,28 @@
       // Hide all mobile tab contents
       document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.add('hidden'));
 
-      // Reset mobile top button styles
-      document.querySelectorAll('.mobile-tab-btn').forEach(btn => {
-        btn.className = "mobile-tab-btn shrink-0 px-4 py-2 glass-card text-fix-heading rounded-xl text-xs font-bold flex items-center gap-1.5";
-      });
-
       // Show selected mobile content
       const contentEl = document.getElementById(tabId);
       if (contentEl) contentEl.classList.remove('hidden');
 
-      // Highlight selected mobile button
-      const activeBtn = document.getElementById('m-btn-' + tabId);
-      if (activeBtn) activeBtn.className = "mobile-tab-btn shrink-0 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md";
+      // Reset bottom nav buttons
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-white";
+        const iconDiv = btn.querySelector('div');
+        if (iconDiv) {
+          iconDiv.className = "p-2 rounded-xl border border-transparent transition-all";
+        }
+      });
+
+      // Highlight selected bottom nav button
+      const activeBtn = document.getElementById('nav-btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.className = "nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-indigo-500 scale-110";
+        const activeIconDiv = activeBtn.querySelector('div');
+        if (activeIconDiv) {
+          activeIconDiv.className = "p-2 rounded-xl bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.5)]";
+        }
+      }
     }
   </script>
   <script>
@@ -950,7 +863,7 @@
       }
 
       // Backend API Server base URL
-      const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://capzone.kaveesha.top';
+      const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://srt.kaveesha.top';
 
       // SSE Real-time Progress helper
       function setupProgressTracker(clientId, stepsPrefix, barId) {
@@ -1356,7 +1269,7 @@
   </script>
   <!-- CUSTOM KAVEEZ ALERT MODAL (NO RAW BROWSER POPUPS) -->
   <div id="kaveezAlertModal"
-    class="fixed inset-0 z-[999] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+    class="fixed inset-0 z-[999] bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
     style="display: none;">
     <div
       class="glass-card w-full max-w-md rounded-3xl p-6 md:p-8 relative border border-white/10 shadow-2xl text-center flex flex-col items-center">
@@ -1380,3 +1293,9 @@
 </body>
 
 </html>
+
+
+
+
+
+
