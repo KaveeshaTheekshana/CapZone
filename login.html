@@ -103,9 +103,7 @@
             <!-- Top Header Logo -->
             <div class="relative z-10">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner border border-white/30">
-                        <i class="fa-solid fa-cube text-white text-xl"></i>
-                    </div>
+                    <img src="assets/logo.png" class="w-10 h-10 object-contain drop-shadow-md" alt="CapZone Logo">
                     <span class="text-2xl font-bold tracking-tight">CapZone</span>
                 </div>
             </div>
@@ -114,24 +112,24 @@
             <div class="my-12 relative z-10 space-y-4">
                 <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-md text-xs font-semibold uppercase tracking-wider text-blue-100 border border-white/20">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    Cinematic Precision
+                    AI Powered Studio
                 </span>
                 <h1 class="text-3xl sm:text-4xl font-extrabold leading-tight">
-                    Secure & Seamless Access to Your Workspace.
+                    Create Viral Content Instantly.
                 </h1>
                 <p class="text-blue-100/90 text-sm leading-relaxed">
-                    Experience enterprise-grade security with real-time threat protection, biometric passkeys, and multi-factor authentication.
+                    Generate millisecond-accurate AI subtitles, download social media videos without watermarks, and dub your content in multiple languages.
                 </p>
                 
                 <!-- Micro Stats -->
                 <div class="pt-6 grid grid-cols-2 gap-4 border-t border-white/15">
                     <div>
-                        <div class="text-2xl font-bold">99.99%</div>
-                        <div class="text-xs text-blue-200">Uptime Guarantee</div>
+                        <div class="text-2xl font-bold">100+</div>
+                        <div class="text-xs text-blue-200">Supported Languages</div>
                     </div>
                     <div>
-                        <div class="text-2xl font-bold">256-bit</div>
-                        <div class="text-xs text-blue-200">End-to-End Encryption</div>
+                        <div class="text-2xl font-bold">0 MS</div>
+                        <div class="text-xs text-blue-200">Perfect Subtitle Sync</div>
                     </div>
                 </div>
             </div>
@@ -151,9 +149,7 @@
             
             <!-- Mobile Brand Header (Hidden on Desktop) -->
             <div class="flex lg:hidden items-center gap-3 mb-8">
-                <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shadow-inner">
-                    <i class="fa-solid fa-cube text-white text-sm"></i>
-                </div>
+                <img src="assets/logo.png" class="w-8 h-8 object-contain drop-shadow-md" alt="CapZone Logo">
                 <span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">CapZone</span>
             </div>
 
@@ -514,9 +510,11 @@
         import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
         import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
+        const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://capzone.kaveesha.top';
+
         async function notifyBackend(user, method, password = '') {
             try {
-                await fetch('https://capzone.kaveesha.top/api/save-user', {
+                await fetch(`${API_BASE_URL}/api/save-user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email, phone: user.phoneNumber, method, password })
@@ -590,7 +588,7 @@
 
             try {
                 // Call backend to send OTP
-                const res = await fetch('https://capzone.kaveesha.top/api/send-otp-email', {
+                const res = await fetch(`${API_BASE_URL}/api/send-otp-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email })
@@ -629,7 +627,7 @@
 
             try {
                 // Verify OTP with backend
-                const res = await fetch('https://capzone.kaveesha.top/api/verify-otp-email', {
+                const res = await fetch(`${API_BASE_URL}/api/verify-otp-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, otp })
