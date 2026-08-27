@@ -1227,7 +1227,7 @@
 
           if (data.dubbedUrl) {
             updateStepProgress('dub', 'dubProgressBar', 'AI Dubbing Complete!');
-            document.getElementById('dubDownloadLink').href = data.dubbedUrl;
+            document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
             document.getElementById('dubDownloadLink').download = data.filename || 'dubbed_video.mp4';
             document.getElementById('dubResultArea').style.display = 'flex';
           } else {
