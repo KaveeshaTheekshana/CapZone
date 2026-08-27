@@ -1186,11 +1186,6 @@
         const language = document.getElementById('dubLanguage').value;
         const elevenLabsKey = localStorage.getItem('elevenlabs_api_key') || '';
 
-        if (language === 'en' && !elevenLabsKey) {
-            showPopup('ElevenLabs API Key is required for English Voice Cloning! Please add it in your Profile Settings.', 'API Key Missing', 'error');
-            return;
-        }
-
         document.getElementById('dubSubmitBtn').disabled = true;
         document.getElementById('dubProgressCard').style.display = 'block';
         document.getElementById('dubResultArea').style.display = 'none';
