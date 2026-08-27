@@ -1,18 +1,13 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html class="dark" lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CapZone</title>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>CapZone | Video Editor Dashboard</title>
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts: Outfit -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <script>
     tailwind.config = {
@@ -20,38 +15,45 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Outfit', 'sans-serif'],
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
           },
           colors: {
             brand: {
-              primary: '#6366f1',
-              purple: '#8b5cf6',
-              cyan: '#06b6d4'
+              purple: '#8B5CF6',
+              blue: '#3B82F6',
+              dark: '#0B0F19',
+              darker: '#05070D',
+              surface: 'rgba(255, 255, 255, 0.05)',
+              border: 'rgba(255, 255, 255, 0.1)',
             }
           },
-          keyframes: {
-            'slide-up': {
-              '0%': { transform: 'translateY(100%)' },
-              '100%': { transform: 'translateY(0)' },
-            }
-          },
-          animation: {
-            'slide-up': 'slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          backgroundImage: {
+            'cosmic': 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
+            'hero-gradient': 'linear-gradient(135deg, #1E3A8A 0%, #4C1D95 100%)',
           }
         }
       }
     }
   </script>
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
   <!-- Firebase Auth Protection -->
   <script type="module">
     import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
     onAuthStateChanged(auth, (user) => {
       if (!user) {
+        // [DEV MODE] Temporarily bypassing login redirect
         window.location.href = 'login.html';
+        console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
+      } else {
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileInitial = document.getElementById('profileInitial');
+        const navProfileName = document.getElementById('navProfileName');
+
+        if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+        if (profileEmail) profileEmail.textContent = user.email;
+        if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+        if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
       }
     });
     window.handleLogout = () => {
@@ -63,1374 +65,733 @@
     };
   </script>
 
-  <style>
-    /* Dark Mode Glass */
-    .dark .glass-card {
-      background: rgba(15, 23, 42, 0.85);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  <style data-purpose="custom-styles">
+    body {
+      background-color: #0B0F19;
+      background-image: url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2000&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: white;
     }
 
-    /* Perfected Light Mode Glass */
-    .light .glass-card {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(203, 213, 225, 0.8);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+    .glass-panel {
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-top: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     }
 
-    .dark .animated-bg {
-      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 60%, #020617 100%);
+    .glass-input {
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white !important;
     }
 
-    .light .animated-bg {
-      background: radial-gradient(circle at 50% 0%, #e0e7ff 0%, #f1f5f9 60%, #cbd5e1 100%);
+    .glass-input:focus {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
     }
 
-    /* Light Mode Text Fixes */
-    .light .text-fix-heading {
-      color: #0f172a !important;
-    }
-
-    .light .text-fix-sub {
-      color: #475569 !important;
-    }
-
-    .light .input-fix {
-      background-color: #f1f5f9 !important;
-      color: #0f172a !important;
-      border-color: #cbd5e1 !important;
-    }
-
-    /* Hide scrollbar for horizontal swipe on mobile */
-    .no-scrollbar::-webkit-scrollbar {
+    /* Hide scrollbar for nav but allow scrolling */
+    .scrollbar-hide::-webkit-scrollbar {
       display: none;
     }
 
-    .no-scrollbar {
+    .scrollbar-hide {
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .input-fix {
+      background-color: rgba(0, 0, 0, 0.3) !important;
+      color: #fff !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .input-fix:focus {
+      border: 1px solid rgba(255, 255, 255, 0.8) !important;
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .glass-card {
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-top: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 20px rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover {
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.3);
+    }
+
+    .text-fix-heading {
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    .text-fix-sub {
+      color: #f1f5f9;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
   </style>
-  <link rel="icon" href="assets/logo.jpg" type="image/png" />
 </head>
 
 <body
-  class="animated-bg text-slate-100 dark:text-slate-100 transition-colors duration-500 font-sans min-h-screen flex flex-col justify-between"
-  id="bodyElement">
+  class="min-h-screen text-gray-100 font-sans antialiased overflow-x-hidden selection:bg-brand-purple selection:text-white relative">
 
-  <div>
-    <!-- ================= 1. HEADER (DESKTOP & MOBILE RESPONSIVE) ================= -->
+
+  <header class="fixed top-0 inset-x-0 h-20 glass-panel z-40 flex items-center px-4 lg:px-10 gap-3 lg:gap-6">
+    <a class="flex-shrink-0 flex items-center justify-center w-10 h-10 lg:w-12 lg:h-12 rounded-xl lg:rounded-2xl bg-gradient-to-br from-brand-blue to-brand-purple shadow-lg shadow-brand-purple/20"
+      href="#">
+      <svg class="w-5 h-5 lg:w-6 lg:h-6 text-white ml-0.5 lg:ml-1" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"></path>
+      </svg>
+    </a>
     <nav
-      class="px-4 sm:px-8 py-3.5 border-b border-black/10 dark:border-white/10 glass-card sticky top-0 z-50 transition-colors">
-      <div class="max-w-7xl mx-auto flex justify-between items-center">
-
-        <!-- Logo -->
-        <div class="flex items-center gap-2.5">
-          <div
-            class="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1 shadow-[0_0_15px_rgba(255,255,255,0.2)]">
-            <img src="assets/logo.jpg" class="w-full h-full object-contain" alt="CapZone Logo">
-          </div>
-          <div>
-            <span
-              class="bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 bg-clip-text text-transparent font-black text-lg sm:text-2xl tracking-wider uppercase">
-              CapZone
-            </span>
-            <span
-              class="block text-[8px] text-indigo-600 dark:text-purple-400 font-bold tracking-widest font-mono uppercase -mt-1 hidden sm:block">Pro
-              Mobile Engine</span>
-          </div>
-        </div>
-
-        <!-- Right Header Actions -->
-        <div class="flex items-center gap-2">
-          <!-- Theme Toggle Button -->
-          <button id="themeToggleBtn" onclick="toggleTheme()"
-            class="p-2 rounded-xl glass-card text-amber-500 dark:text-amber-400 hover:scale-105 transition-all">
-            <i data-lucide="sun" id="themeIcon" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-          </button>
-
-          <!-- User Profile -->
-          <div
-            class="flex items-center gap-2 px-2.5 py-1 rounded-xl glass-card border cursor-pointer hover:bg-white/5 transition-colors"
-            onclick="openModal('profileModal', event)">
-            <div
-              class="w-6 h-6 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-[9px] text-white"
-              id="navProfileIcon">
-              D
-            </div>
-            <span class="text-xs font-bold text-fix-heading hidden sm:inline" id="navProfileName">Director</span>
-          </div>
-
-          <!-- Exit / Logout -->
-          <button id="navLogoutBtn" onclick="handleLogout()"
-            class="p-2 sm:px-3 sm:py-1.5 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl hover:bg-red-500 hover:text-white transition-all text-xs font-bold flex items-center gap-1.5">
-            <i data-lucide="power" class="w-4 h-4"></i>
-            <span class="hidden sm:inline">Logout</span>
-          </button>
-        </div>
-      </div>
+      class="flex items-center justify-start lg:justify-center gap-4 lg:gap-8 flex-1 overflow-x-auto whitespace-nowrap px-1 lg:px-4 scrollbar-hide w-full">
+      <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pl-2"
+        onclick="openModal('srtModal', event)">Subtitle Studio</a>
+      <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+        onclick="openModal('fbModal', event)">FB Downloader</a>
+      <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+        onclick="openModal('tiktokModal', event)">TikTok Downloader</a>
+      <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pr-2"
+        onclick="openModal('dubModal', event)">AI Dubbing</a>
     </nav>
-
-    <!-- ================= 2. DESKTOP HERO SECTION (HIDDEN ON MOBILE FOR BETTER UX) ================= -->
-    <header class="hidden md:block px-4 pt-8 pb-4 text-center max-w-4xl mx-auto">
-      <div
-        class="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-indigo-600 dark:text-cyan-400 px-4 py-1.5 glass-card rounded-full border border-indigo-500/30 mb-3">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Multi-Tool Studio Workspace
-      </div>
-      <h1 class="text-5xl font-black tracking-tight leading-none mb-3 text-fix-heading">
-        AI POWERED <span
-          class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 dark:from-cyan-400 dark:via-purple-400 dark:to-pink-500 bg-clip-text text-transparent">CINEMATIC
-          DASHBOARD</span>
-      </h1>
-      <p class="text-fix-sub text-sm max-w-2xl mx-auto">Full control over Video Editing, Subtitle Generation, Audio
-        Noise Cleaning, and Social Media Downloads.</p>
-    </header>
-
-    <!-- ================= 4. DESKTOP BENTO GRID (VISIBLE ONLY ON DESKTOP) ================= -->
-    <div class="hidden md:block max-w-7xl mx-auto px-4 pb-12">
-      <div class="grid grid-cols-12 gap-6">
-
-        <!-- Left Column (Main Editor & Projects) -->
-        <div class="col-span-8 flex flex-col gap-6">
-
-          <!-- Hero Card: 4K Editor -->
-          <div
-            class="glass-card rounded-3xl p-8 relative overflow-hidden group border-t border-white/20 shadow-2xl hover:shadow-indigo-500/20 transition-all duration-500 min-h-[320px] flex flex-col justify-end cursor-pointer"
-            onclick="window.location.href='editor.html'">
-            <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=1200&q=80"
-              class="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:scale-105 group-hover:opacity-70 transition-all duration-700"
-              alt="Editor Background" />
-            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
-
-            <div class="relative z-10">
-              <div
-                class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-white mb-4">
-                <i data-lucide="sparkles" class="w-3 h-3 text-cyan-400"></i> PRO FEATURE
-              </div>
-              <h2 class="text-4xl font-black text-white mb-2">4K Cinematic Editor</h2>
-              <p class="text-slate-300 text-sm max-w-md mb-6">Experience our hardware-accelerated video editing suite.
-                Multi-track timeline, keyframe animations, and professional color grading in your browser.</p>
-
-              <button
-                class="px-8 py-3.5 bg-white text-black font-bold rounded-xl hover:bg-slate-200 transition-colors inline-flex items-center gap-2 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                Launch Workspace <i data-lucide="arrow-right" class="w-4 h-4"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Recent Projects (Empty State) -->
-          <div class="glass-card rounded-3xl p-6 border border-white/10 flex-1">
-            <div class="flex items-center justify-between mb-6">
-              <h3 class="text-lg font-bold text-fix-heading flex items-center gap-2">
-                <i data-lucide="folder-open" class="text-indigo-400"></i> Recent Projects
-              </h3>
-              <button class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold">View All</button>
-            </div>
-
-            <!-- Empty State Design -->
-            <div class="flex flex-col items-center justify-center py-10 opacity-70">
-              <div
-                class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
-                <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
-              </div>
-              <p class="text-slate-300 font-semibold">No active projects</p>
-              <p class="text-xs text-slate-500 mt-1">Start by launching the editor or a tool above.</p>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Right Column (AI Tools & Downloaders) -->
-        <div class="col-span-4 flex flex-col gap-6">
-
-          <!-- Tool 1: Subtitles -->
-          <div
-            class="glass-card rounded-3xl p-6 relative overflow-hidden group cursor-pointer hover:-translate-y-1 transition-all duration-300 border-t border-white/10"
-            onclick="showModal('srtModal')">
-            <div
-              class="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all">
-            </div>
-            <div
-              class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 mb-4">
-              <i data-lucide="subtitles" class="w-6 h-6 text-white"></i>
-            </div>
-            <h3 class="text-xl font-bold text-fix-heading mb-2">AI Auto Subtitles</h3>
-            <p class="text-xs text-fix-sub leading-relaxed">Generate 100% accurate subtitles for any video in seconds.
-              Powered by advanced Speech-to-Text models.</p>
-          </div>
-
-          <!-- Tool 2: Social Media Downloader -->
-          <div
-            class="glass-card rounded-3xl p-0 relative overflow-hidden group h-full border-t border-white/10 flex flex-col">
-            <div class="p-6 flex-1">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 bg-[#1877F2]/20 rounded-xl flex items-center justify-center">
-                  <i data-lucide="facebook" class="text-[#1877F2] w-5 h-5"></i>
-                </div>
-                <div class="w-10 h-10 bg-[#00f2fe]/20 rounded-xl flex items-center justify-center">
-                  <!-- TikTok Custom Icon -->
-                  <svg class="w-5 h-5 text-[#00f2fe]" viewBox="0 0 24 24" fill="currentColor">
-                    <path
-                      d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 15.68l.01.2a6.29 6.29 0 0 0 4 5.96 6.4 6.4 0 0 0 7.36-1.56 6.36 6.36 0 0 0 1.91-4.6V7.98a8.21 8.21 0 0 0 4.77 1.52v-3.4a4.92 4.92 0 0 1-3.46-1.41z" />
-                  </svg>
-                </div>
-              </div>
-              <h3 class="text-xl font-bold text-fix-heading mb-2">Social Downloader</h3>
-              <p class="text-xs text-fix-sub leading-relaxed mb-6">Download any video from Facebook or TikTok without
-                watermarks in pristine 4K / HD quality. Also supports direct MP3 audio extraction.</p>
-            </div>
-
-            <div class="grid grid-cols-2 gap-px bg-white/5 border-t border-white/5">
-              <button onclick="showModal('fbModal')"
-                class="py-4 text-xs font-bold text-white hover:bg-white/5 transition-colors flex flex-col items-center gap-1">
-                <i data-lucide="facebook" class="w-4 h-4 text-[#1877F2]"></i> Facebook
-              </button>
-              <button onclick="showModal('tiktokModal')"
-                class="py-4 text-xs font-bold text-white hover:bg-white/5 transition-colors flex flex-col items-center gap-1">
-                <svg class="w-4 h-4 text-[#00f2fe]" viewBox="0 0 24 24" fill="currentColor">
-                  <path
-                    d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 15.68l.01.2a6.29 6.29 0 0 0 4 5.96 6.4 6.4 0 0 0 7.36-1.56 6.36 6.36 0 0 0 1.91-4.6V7.98a8.21 8.21 0 0 0 4.77 1.52v-3.4a4.92 4.92 0 0 1-3.46-1.41z" />
-                </svg> TikTok
-              </button>
-            </div>
-          </div>
-
-        </div>
-      </div>
-    </div><!-- ================= 3. MOBILE SPECIAL APP UI (VISIBLE ONLY ON MOBILE) ================= -->
-    <div class="block md:hidden px-4 pt-4 pb-2">
-      <!-- Quick Status Header -->
-      <div class="glass-card p-4 rounded-2xl mb-4 flex items-center justify-between border-indigo-500/30">
-        <div>
-          <span
-            class="text-[10px] font-mono text-indigo-500 dark:text-cyan-400 font-bold uppercase tracking-wider">Mobile
-            Studio Mode</span>
-          <h2 class="text-base font-black text-fix-heading">Select AI Studio Tool</h2>
-        </div>
-        <i data-lucide="sparkles" class="w-5 h-5 text-indigo-500 animate-pulse"></i>
-      </div>
-
-      <!-- Mobile Active Tool Container -->
-      <div
-        class="glass-card rounded-3xl p-5 min-h-[450px] shadow-2xl flex flex-col justify-between border-t border-white/20 relative overflow-hidden">
-        <!-- Background Glow -->
-        <div class="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/20 blur-3xl rounded-full"></div>
-        <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-pink-500/20 blur-3xl rounded-full"></div>
-        <div class="relative z-10">
-
-          <!-- Mobile Tool 1: Video Editor -->
-          <div id="m-editor" class="mobile-tab-content space-y-3">
-            <div class="flex items-center gap-2">
-              <i data-lucide="film" class="text-indigo-500 w-5 h-5"></i>
-              <h3 class="font-bold text-sm text-fix-heading">4K Mobile Timeline Editor</h3>
-            </div>
-            <div class="relative h-44 rounded-xl overflow-hidden border border-black/10 dark:border-white/10">
-              <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&w=600&q=80"
-                class="w-full h-full object-cover opacity-80" />
-              <div class="absolute inset-0 bg-black/50 flex flex-col items-center justify-center p-3 text-center">
-                <p class="text-white text-xs font-bold mb-2">Tap to Add Video Footage</p>
-                <div class="flex flex-col gap-2 w-full max-w-[200px]">
-                  <button onclick="window.location.href='editor.html'"
-                    class="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-bold text-xs rounded-xl shadow-lg hover:scale-105 transition-all">Launch
-                    4K Studio Editor</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mobile Tool 2: SRT Generator -->
-          <div id="m-srt" class="mobile-tab-content hidden space-y-3">
-            <div class="flex items-center gap-2">
-              <i data-lucide="captions" class="text-purple-500 w-5 h-5"></i>
-              <h3 class="font-bold text-sm text-fix-heading">KaveezCloud Subtitle Studio</h3>
-            </div>
-            <p class="text-xs text-fix-sub">Automatically extract & translate captions from any language into Sinhala or
-              English.</p>
-            <button onclick="openModal('srtModal', event)"
-              class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md">Open Subtitle
-              Tool</button>
-            <button onclick="openModal('dubModal', event)"
-              class="w-full py-2.5 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2"><i
-                data-lucide="mic" class="w-4 h-4"></i> AI Video Dubbing</button>
-          </div>
-
-          <!-- Mobile Tool 3: Social Downloader -->
-          <div id="m-downloader" class="mobile-tab-content hidden space-y-3">
-            <div class="flex items-center gap-2">
-              <i data-lucide="download-cloud" class="text-cyan-500 w-5 h-5"></i>
-              <h3 class="font-bold text-sm text-fix-heading">FB & TikTok Downloader</h3>
-            </div>
-            <button onclick="openModal('fbModal', event)"
-              class="w-full py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl shadow-md mb-2">Download Facebook
-              HD</button>
-            <button onclick="openModal('tiktokModal', event)"
-              class="w-full py-2.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-xs rounded-xl shadow-md">Download
-              TikTok HD</button>
-          </div>
-
-          <!-- Mobile Tool 4: Saved Projects -->
-        </div>
-
-        </div>
-      </div>
-
-      <!-- ================= 5. MOBILE BOTTOM NATIVE APP NAVIGATION ================= -->
-      <div class="fixed bottom-4 left-4 right-4 sm:hidden z-50">
+    <div class="flex items-center gap-4 ml-auto">
+      <button onclick="openModal('profileModal', event)"
+        class="flex items-center gap-2 lg:gap-3 pl-1.5 lg:pl-2 pr-1.5 lg:pr-4 py-1.5 rounded-full glass-input hover:bg-white/10 transition-colors">
         <div
-          class="glass-card rounded-2xl py-3 px-4 shadow-2xl flex justify-between items-center border border-white/20 bg-white/10 dark:bg-black/40 backdrop-blur-xl">
-
-          <button onclick="mobileSwitchTab('m-editor')" id="nav-btn-m-editor"
-            class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-indigo-500 scale-110">
-            <div class="p-2 rounded-xl bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.5)]">
-              <i data-lucide="film" class="w-5 h-5"></i>
-            </div>
-            <span class="text-[9px] font-bold">Studio</span>
-          </button>
-
-          <button onclick="mobileSwitchTab('m-srt')" id="nav-btn-m-srt"
-            class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-purple-500">
-            <div class="p-2 rounded-xl border border-transparent transition-all">
-              <i data-lucide="captions" class="w-5 h-5"></i>
-            </div>
-            <span class="text-[9px] font-bold">Subs</span>
-          </button>
-
-          <button onclick="mobileSwitchTab('m-downloader')" id="nav-btn-m-downloader"
-            class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-cyan-500">
-            <div class="p-2 rounded-xl border border-transparent transition-all">
-              <i data-lucide="download-cloud" class="w-5 h-5"></i>
-            </div>
-            <span class="text-[9px] font-bold">Tools</span>
-          </button>
-
-          <button onclick="mobileSwitchTab('m-projects')" id="nav-btn-m-projects"
-            class="nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-amber-500">
-            <div class="p-2 rounded-xl border border-transparent transition-all">
-              <i data-lucide="folder" class="w-5 h-5"></i>
-            </div>
-            <span class="text-[9px] font-bold">Files</span>
-          </button>
-
-        </div>
-      </div>
+          class="w-8 h-8 rounded-full bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xs border border-white/20"
+          id="navProfileIcon">U</div>
+        <span class="text-sm font-medium text-gray-200 hidden sm:block" id="navProfileName">User</span>
+        <svg class="w-4 h-4 text-gray-400 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+        </svg>
+      </button>
     </div>
+  </header>
 
-      <!-- ================= 6. FOOTER ================= -->
-      <footer class="border-t border-black/10 dark:border-white/10 glass-card py-5 px-4 mb-12 sm:mb-0">
-        <div
-          class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 text-xs text-fix-sub">
-          <div class="flex items-center gap-2">
-            <i data-lucide="clapperboard" class="w-4 h-4 text-indigo-500"></i>
-            <span class="font-bold text-fix-heading">CapZone - Studio</span>
-            <span>© 2026 Production</span>
-          </div>
-          <div class="flex gap-4 text-[10px] sm:text-xs">
-            <a href="#" class="hover:underline">Privacy Policy</a>
-            <a href="#" class="hover:underline">API Access</a>
+  <main class="pt-28 pb-12 px-4 lg:px-10 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8 min-h-screen">
+
+    <aside class="w-full lg:w-80 flex-shrink-0 order-2 lg:order-1">
+      <div class="glass-panel rounded-3xl h-full min-h-[300px] lg:min-h-[calc(100vh-10rem)] p-6 lg:p-8">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-lg font-semibold text-white tracking-wide">Recent Projects</h2>
+        </div>
+        <div class="space-y-4">
+          <div class="flex flex-col items-center justify-center py-10 opacity-70">
+            <div
+              class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
+              <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
+            </div>
+            <p class="text-slate-300 font-semibold">No active projects</p>
+            <p class="text-xs text-slate-500 mt-1">Start by launching a tool.</p>
           </div>
         </div>
-      </footer>
+      </div>
+    </aside>
 
-      <!-- ====================================================================== -->
-      <!-- TAILWIND MODALS SECTION -->
-      <!-- ====================================================================== -->
-
-      <!-- MODAL 0: PROFILE -->
-      <div id="profileModal"
-        class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
-        style="display: none;">
-        <div
-          class="glass-card w-full max-w-sm rounded-t-3xl sm:rounded-3xl rounded-b-none sm:rounded-b-3xl p-6 pb-12 sm:pb-6 relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto w-full">
-          <!-- Mobile drag handle -->
-          <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
-          <button onclick="closeModal('profileModal', event)"
-            class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-
-          <div class="text-center mb-6">
-            <div
-              class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg shadow-cyan-500/30 mb-3"
-              id="profileInitial">
-              P
-            </div>
-            <h2 class="text-xl font-bold text-fix-heading" id="profileName">Loading...</h2>
-            <p class="text-xs text-fix-sub mt-1" id="profileEmail">user@example.com</p>
+    <div class="flex-1 flex flex-col gap-8 min-w-0 order-1 lg:order-2">
+      <section
+        class="rounded-3xl bg-hero-gradient p-1 relative overflow-hidden shadow-2xl shadow-brand-purple/20 group">
+        <div class="absolute inset-1 rounded-[22px] glass-panel bg-opacity-20 z-0 pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row h-full min-h-[300px] rounded-[22px] overflow-hidden">
+          <div
+            class="flex-1 flex items-center justify-center p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/10">
+            <button onclick="window.location.href='editor.html'"
+              class="px-6 py-4 lg:px-8 lg:py-5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-xl lg:rounded-2xl text-white transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 text-xl lg:text-2xl font-bold whitespace-nowrap">
+              Launch 4K Editor
+            </button>
           </div>
-
-          <div class="space-y-4">
-            <div
-              class="p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5 space-y-3">
-              <div>
-                <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone Pro API
-                  Key
-                  (Optional)</label>
-                <input type="text" id="userApiKey" placeholder="AI Studio Key for bypass limits..."
-                  class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
-              </div>
-              <div>
-                <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">ElevenLabs API Key
-                  (For Dubbing)</label>
-                <input type="text" id="elevenLabsApiKey" placeholder="sk_..."
-                  class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/20 border border-white/10 text-xs outline-none" />
-              </div>
-              <button id="saveApiKeyBtn" type="button"
-                onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
-                class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
-                API Keys</button>
-            </div>
-            <button id="logoutBtn"
-              class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
-              <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+          <div class="flex-1 p-8 lg:p-10 flex flex-col justify-center bg-black/20 backdrop-blur-sm">
+            <span class="text-xs font-semibold uppercase tracking-wider text-purple-300 mb-2">Featured Tool</span>
+            <h2 class="text-2xl lg:text-3xl font-bold text-white mb-4">Subtitle Generator</h2>
+            <p class="text-gray-300 text-sm leading-relaxed mb-8 max-w-md">
+              Generate perfectly synced Sinhala & English subtitles from any audio using AI.
+            </p>
+            <button onclick="openModal('srtModal', event)"
+              class="self-start px-6 py-2.5 bg-blue-500/20 hover:bg-blue-500/40 border border-blue-400/30 rounded-xl text-blue-100 font-medium transition-colors text-2xl font-bold">
+              Generate Subtitles
             </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- MODAL 1: FACEBOOK DOWNLOADER -->
-      <div id="fbModal"
-        class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
-        style="display: none;">
-        <div
-          class="glass-card w-full max-w-md rounded-t-3xl sm:rounded-3xl rounded-b-none sm:rounded-b-3xl p-6 pb-12 sm:pb-6 relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto w-full">
-          <!-- Mobile drag handle -->
-          <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
-          <button onclick="closeModal('fbModal', event)"
-            class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
-            <i data-lucide="x" class="w-4 h-4"></i>
-          </button>
-
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <article
+          class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
+          onclick="openModal('fbModal', event)">
           <div
-            class="h-40 -mt-6 -mx-6 mb-6 relative overflow-hidden rounded-t-3xl sm:rounded-t-3xl border-b border-white/10 group">
-            <img src="https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80"
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80" />
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-              <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-[#1877F2] text-white rounded-xl shadow-[0_0_15px_rgba(24,119,242,0.5)]">
-                  <i data-lucide="facebook" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-xl font-bold text-white">FB Downloader</h2>
-                  <p class="text-[10px] text-slate-300">HD Video & Audio Rip</p>
-                </div>
-              </div>
-            </div>
+            class="w-12 h-12 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 text-blue-400 group-hover:scale-110 transition-transform">
+            <i data-lucide="facebook" class="w-6 h-6"></i>
           </div>
-
-          <form id="fbForm" class="space-y-4" onsubmit="handleFbSubmit(event)">
-            <div>
-              <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
-              <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..."
-                class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <button type="submit" id="fbSubmitBtn"
-                class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="video" class="w-4 h-4"></i> Get Video
-              </button>
-              <button type="button" onclick="handleFbAudioSubmit(event)" id="fbAudioBtn"
-                class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2">
-                <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
-              </button>
-            </div>
-          </form>
-
-          <!-- Progress Tracking -->
-          <div id="fbProgressCard"
-            class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5"
-            style="display: none;">
-            <p class="text-xs font-bold text-fix-heading mb-2">Processing Media...</p>
-            <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-              <div id="fbProgressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                style="width: 0%">
-              </div>
-            </div>
-            <div id="fbProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1">
-            </div>
-          </div>
-
-          <!-- Result Area -->
-          <div id="fbResultArea"
-            class="mt-4 p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex flex-col items-center gap-3"
-            style="display: none;">
-            <i data-lucide="check-circle-2" class="w-8 h-8 text-green-500"></i>
-            <a id="fbDownloadLink"
-              class="w-full py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
-              target="_blank">
-              <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- MODAL 2: TIKTOK DOWNLOADER -->
-      <div id="tiktokModal"
-        class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4"
-        style="display: none;">
-        <div
-          class="glass-card w-full max-w-md rounded-t-3xl sm:rounded-3xl rounded-b-none sm:rounded-b-3xl p-6 pb-12 sm:pb-6 relative animate-slide-up sm:animate-none max-h-[90vh] overflow-y-auto w-full">
-          <!-- Mobile drag handle -->
-          <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
-          <button onclick="closeModal('tiktokModal', event)"
-            class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
-            <i data-lucide="x" class="w-4 h-4"></i>
+          <h3 class="text-lg font-bold text-white mb-3">Facebook Video<br />Downloader</h3>
+          <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
+            Download HD videos and extract MP3 audio directly from Facebook.
+          </p>
+          <button
+            class="w-full py-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 font-medium transition-colors">
+            Open Downloader
           </button>
+        </article>
 
+        <article
+          class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
+          onclick="openModal('tiktokModal', event)">
           <div
-            class="h-40 -mt-6 -mx-6 mb-6 relative overflow-hidden rounded-t-3xl sm:rounded-t-3xl border-b border-white/10 group">
-            <img src="https://images.unsplash.com/photo-1611605698335-8b1569810432?auto=format&fit=crop&w=800&q=80"
-              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 opacity-80 filter saturate-150" />
-            <div
-              class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end p-6">
-              <div class="flex items-center gap-3">
-                <div class="p-2.5 bg-gradient-to-tr from-cyan-500 to-pink-500 text-white rounded-xl shadow-lg">
-                  <i data-lucide="music" class="w-5 h-5"></i>
-                </div>
-                <div>
-                  <h2 class="text-xl font-bold text-white">TikTok Downloader</h2>
-                  <p class="text-[10px] text-slate-300">No Watermark Video & Audio</p>
-                </div>
-              </div>
-            </div>
+            class="w-12 h-12 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center mb-6 text-purple-400 group-hover:scale-110 transition-transform">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path
+                d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 15.68l.01.2a6.29 6.29 0 0 0 4 5.96 6.4 6.4 0 0 0 7.36-1.56 6.36 6.36 0 0 0 1.91-4.6V7.98a8.21 8.21 0 0 0 4.77 1.52v-3.4a4.92 4.92 0 0 1-3.46-1.41z" />
+            </svg>
           </div>
-
-          <form id="tiktokForm" class="space-y-4" onsubmit="handleTiktokSubmit(event)">
-            <div>
-              <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
-              <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..."
-                class="input-fix w-full px-4 py-3 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-              <button type="submit" id="tiktokSubmitBtn"
-                class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl shadow-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
-                <i data-lucide="video" class="w-4 h-4"></i> Get Video
-              </button>
-              <button type="button" onclick="handleTiktokAudioSubmit(event)" id="tiktokAudioBtn"
-                class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-emerald-700 transition-opacity flex items-center justify-center gap-2">
-                <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
-              </button>
-            </div>
-          </form>
-
-          <!-- Progress Tracking -->
-          <div id="tiktokProgressCard"
-            class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5"
-            style="display: none;">
-            <p class="text-xs font-bold text-fix-heading mb-2">Bypassing Watermark...</p>
-            <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-              <div id="tiktokProgressBar"
-                class="bg-gradient-to-r from-pink-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300"
-                style="width: 0%"></div>
-            </div>
-            <div id="tiktokProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1">
-            </div>
-          </div>
-
-          <!-- Result Area -->
-          <div id="tiktokResultArea"
-            class="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center gap-3"
-            style="display: none;">
-            <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
-            <a id="tiktokDownloadLink"
-              class="w-full py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
-              target="_blank">
-              <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <!-- MODAL 3: SRT GENERATOR -->
-      <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4" style="display: none;">
-      <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative my-auto">
-        <!-- Mobile drag handle -->
-        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
-        <button onclick="closeModal('srtModal', event)"
-          class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-
-        <div class="flex items-center gap-3 mb-6">
-          <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
-            <i data-lucide="captions" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h2 class="text-xl font-bold text-fix-heading">KaveezCloud Subtitle Studio</h2>
-            <p class="text-xs text-fix-sub">Generate perfectly synced Sinhala & English subtitles from any audio.</p>
-          </div>
-        </div>
-
-        <form id="srtForm" class="space-y-4" onsubmit="handleSrtSubmit(event)">
-          <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Upload Video/Audio File</label>
-            <div
-              class="relative w-full border-2 border-dashed border-purple-500/30 rounded-xl p-4 text-center hover:bg-purple-500/5 transition-colors cursor-pointer"
-              onclick="document.getElementById('srtVideoInput').click()">
-              <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden"
-                onchange="updateSrtFileInfo(this)" />
-              <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-purple-500 mb-2"></i>
-              <p class="text-xs text-fix-heading font-bold" id="srtFileName">Click to Browse Media</p>
-              <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV, MKV up to 50MB</p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <label class="text-xs font-bold text-fix-sub mb-2 block">Target Subtitle Language</label>
-              <select id="srtLanguage"
-                class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
-                <option value="si" selected>Sinhala (à·ƒà·’à¶‚à·„à¶½ Unicode)</option>
-                <option value="en">English (All Accents)</option>
-              </select>
-            </div>
-            <div>
-              <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
-              <input type="number" id="srtWordsLimit" onchange="recalculateWordCount()" value="5" min="1" max="8"
-                class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none" />
-            </div>
-          </div>
-
-          <div class="flex items-center gap-3 p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
-            <input type="checkbox" id="legacyFontCheck" onchange="recalculateWordCount()"
-              class="w-4 h-4 rounded accent-indigo-500" />
-            <div class="flex-1">
-              <label for="legacyFontCheck"
-                class="text-xs font-bold text-indigo-500 dark:text-indigo-400 cursor-pointer block">Convert to Legacy
-                Font
-                (FM Abhaya)</label>
-              <p class="text-[9px] text-indigo-500/70">Enable for legacy desktop editors (Premiere Pro, Vegas)</p>
-            </div>
-          </div>
-
-          <button type="submit" id="srtSubmitBtn"
-            class="w-full py-3.5 bg-purple-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
-            <i data-lucide="zap" class="w-4 h-4"></i> Generate Captions
+          <h3 class="text-lg font-bold text-white mb-3">TikTok Video<br />Downloader</h3>
+          <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
+            Download TikTok videos without watermark and extract high quality MP3s.
+          </p>
+          <button
+            class="w-full py-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 font-medium transition-colors">
+            Open Downloader
           </button>
-        </form>
+        </article>
 
-        <!-- Progress Tracking -->
-        <div id="srtProgressCard"
-          class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5"
-          style="display: none;">
-          <p class="text-xs font-bold text-fix-heading mb-2">Analyzing Audio & Timing...</p>
-          <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-            <div id="srtProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
-              style="width: 0%"></div>
-          </div>
-          <div id="srtProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-24 overflow-y-auto space-y-1"></div>
-        </div>
-
-        <!-- Result Area -->
-        <div id="srtResultArea"
-          class="mt-4 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex flex-col items-center gap-3"
-          style="display: none;">
-          <i data-lucide="file-text" class="w-8 h-8 text-purple-500"></i>
-          <p class="text-xs font-bold text-fix-heading">Captions Generated Successfully!</p>
-          <a id="srtDownloadLink"
-            class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
-            target="_blank">
-            <i data-lucide="download" class="w-4 h-4"></i> Download .SRT File
-          </a>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL 4: AI VIDEO DUBBING -->
-    <div id="dubModal"
-      class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto py-10"
-      style="display: none;">
-      <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative my-auto">
-        <!-- Mobile drag handle -->
-        <div class="w-12 h-1.5 bg-white/20 rounded-full mx-auto mb-4 sm:hidden"></div>
-        <button onclick="closeModal('dubModal', event)"
-          class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
-          <i data-lucide="x" class="w-4 h-4"></i>
-        </button>
-
-        <div class="flex items-center gap-3 mb-6">
-          <div class="p-3 bg-pink-500/10 text-pink-500 rounded-2xl border border-pink-500/20">
+        <article
+          class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
+          onclick="openModal('dubModal', event)">
+          <div
+            class="w-12 h-12 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-6 text-pink-400 group-hover:scale-110 transition-transform">
             <i data-lucide="mic" class="w-6 h-6"></i>
           </div>
-          <div>
-            <h2 class="text-xl font-bold text-fix-heading">AI Video Dubbing</h2>
-            <p class="text-xs text-fix-sub">Dub your video into English or Sinhala with Voice Cloning.</p>
-          </div>
-        </div>
-
-        <form id="dubForm" class="space-y-4" onsubmit="handleDubSubmit(event)">
-          <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Upload Video File</label>
-            <div
-              class="relative w-full border-2 border-dashed border-pink-500/30 rounded-xl p-4 text-center hover:bg-pink-500/5 transition-colors cursor-pointer"
-              onclick="document.getElementById('dubVideoInput').click()">
-              <input type="file" id="dubVideoInput" accept="video/*" required class="hidden"
-                onchange="document.getElementById('dubFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Browse Media'" />
-              <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-pink-500 mb-2"></i>
-              <p class="text-xs text-fix-heading font-bold" id="dubFileName">Click to Browse Media</p>
-              <p class="text-[10px] text-fix-sub mt-1">MP4, MKV up to 50MB</p>
-            </div>
-          </div>
-
-          <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Target Language</label>
-            <select id="dubLanguage"
-              class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none"
-              onchange="document.getElementById('dubGenderWrapper').style.display = this.value === 'en' ? 'block' : 'none'">
-              <option value="en" selected>English (AI Voice via ElevenLabs)</option>
-              <option value="si">Sinhala (Standard AI Voice)</option>
-            </select>
-          </div>
-
-          <div id="dubGenderWrapper">
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Voice Gender (English Only)</label>
-            <select id="dubGender"
-              class="input-fix w-full px-3 py-2.5 rounded-xl bg-black/10 dark:bg-black/30 border border-black/10 dark:border-white/10 text-sm outline-none">
-              <option value="female" selected>Female Voice (Rachel)</option>
-              <option value="male">Male Voice (Adam)</option>
-            </select>
-          </div>
-
-          <button type="submit" id="dubSubmitBtn"
-            class="w-full py-3.5 bg-pink-600 text-white font-bold text-sm rounded-xl shadow-lg hover:bg-pink-700 transition-colors flex items-center justify-center gap-2">
-            <i data-lucide="mic" class="w-4 h-4"></i> Start AI Dubbing
+          <h3 class="text-lg font-bold text-white mb-3">AI Dubbing<br />Studio</h3>
+          <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
+            Dub your videos into English or Sinhala with realistic Voice Cloning.
+          </p>
+          <button
+            class="w-full py-3 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-pink-300 font-medium transition-colors">
+            Start Dubbing
           </button>
-        </form>
+        </article>
 
-        <!-- Progress Tracking -->
-        <div id="dubProgressCard"
-          class="mt-4 p-4 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/5"
-          style="display: none;">
-          <p class="text-xs font-bold text-fix-heading mb-2">Dubbing in Progress...</p>
-          <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-            <div id="dubProgressBar" class="bg-pink-500 h-1.5 rounded-full transition-all duration-300"
-              style="width: 0%"></div>
+
+
+      </section>
+    </div>
+  </main>
+
+  <footer
+    class="glass-panel mt-auto py-8 relative z-10 text-center w-full mt-12 border-t border-white/20 bg-black/40 backdrop-blur-md">
+    <div class="flex flex-col items-center justify-center gap-4">
+      <div class="flex items-center gap-2">
+        <div
+          class="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-blue to-brand-purple flex items-center justify-center shadow-lg">
+          <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"></path>
+          </svg>
+        </div>
+        <span class="font-bold text-white text-xl tracking-wide drop-shadow-md">CapZone</span>
+      </div>
+      <p class="text-sm text-gray-300 font-medium drop-shadow">© 2026 CapZone Video Tools. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative">
+      <button onclick="closeModal('profileModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="text-center mb-6">
+        <div
+          class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg mb-3"
+          id="profileInitial">U</div>
+        <h2 class="text-xl font-bold text-fix-heading" id="profileName">User</h2>
+        <p class="text-xs text-fix-sub mt-1" id="profileEmail">user@example.com</p>
+      </div>
+      <div class="space-y-4">
+        <div class="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-3">
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone API Key
+              (Optional)</label>
+            <input type="text" id="userApiKey" placeholder="AI Studio Key..."
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
           </div>
-          <div id="dubProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-24 overflow-y-auto space-y-1"></div>
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">ElevenLabs API
+              Key</label>
+            <input type="text" id="elevenLabsApiKey" placeholder="sk_..."
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+          <button id="saveApiKeyBtn" type="button"
+            onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
+            class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
+            API Keys</button>
         </div>
-
-        <!-- Result Area -->
-        <div id="dubResultArea"
-          class="mt-4 p-4 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex flex-col items-center gap-3"
-          style="display: none;">
-          <i data-lucide="film" class="w-8 h-8 text-pink-500"></i>
-          <p class="text-xs font-bold text-fix-heading">Dubbing Complete!</p>
-          <a id="dubDownloadLink"
-            class="w-full py-2.5 bg-pink-600 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 text-center"
-            target="_blank">
-            <i data-lucide="download" class="w-4 h-4"></i> Download Dubbed Video
-          </a>
-        </div>
+        <button id="logoutBtn" onclick="handleLogout()"
+          class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+        </button>
       </div>
     </div>
+  </div>
 
-    <!-- TAILWIND TOAST NOTIFICATION -->
-    <div id="toastNotification"
-      class="fixed bottom-20 sm:bottom-6 right-1/2 translate-x-1/2 sm:translate-x-0 sm:right-6 z-50 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
-      <div class="glass-card px-4 py-3 rounded-xl flex items-center gap-3 shadow-2xl border border-white/20">
-        <i data-lucide="info" class="w-5 h-5 text-indigo-500"></i>
-        <span id="toastMessage" class="text-xs font-bold text-fix-heading">Notification Message</span>
+  <!-- FB MODAL -->
+  <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('fbModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-[#1877F2]/20 text-[#1877F2] rounded-xl">
+          <i data-lucide="facebook" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">FB Downloader</h2>
+          <p class="text-[10px] text-slate-300">HD Video & Audio Rip</p>
+        </div>
+      </div>
+      <form id="fbForm" class="space-y-4" onsubmit="handleFbSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
+          <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..."
+            class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="fbSubmitBtn"
+            class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleFbAudioSubmit(event)" id="fbAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
+      </form>
+      <div id="fbProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing Media...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="fbProgressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
+          </div>
+        </div>
+        <div id="fbProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1"></div>
+      </div>
+      <div id="fbResultArea"
+        class="mt-4 p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-green-500"></i>
+        <a id="fbDownloadLink"
+          class="w-full py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
+        </a>
       </div>
     </div>
+  </div>
+
+  <!-- TIKTOK MODAL -->
+  <div id="tiktokModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('tiktokModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-gradient-to-tr from-cyan-500 to-pink-500 text-white rounded-xl shadow-lg">
+          <i data-lucide="music" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">TikTok Downloader</h2>
+          <p class="text-[10px] text-slate-300">No Watermark Video & Audio</p>
+        </div>
+      </div>
+      <form id="tiktokForm" class="space-y-4" onsubmit="handleTiktokSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
+          <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..."
+            class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="tiktokSubmitBtn"
+            class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleTiktokAudioSubmit(event)" id="tiktokAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
+      </form>
+      <div id="tiktokProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5"
+        style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="tiktokProgressBar"
+            class="bg-gradient-to-r from-pink-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+        <div id="tiktokProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1">
+        </div>
+      </div>
+      <div id="tiktokResultArea"
+        class="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+        <a id="tiktokDownloadLink"
+          class="w-full py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SRT MODAL -->
+  <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('srtModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
+          <i data-lucide="captions" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">Subtitle Studio</h2>
+          <p class="text-xs text-fix-sub">Generate synced Sinhala & English subtitles.</p>
+        </div>
+      </div>
+      <form id="srtForm" class="space-y-4" onsubmit="handleSrtSubmit(event)">
+        <div>
+          <div
+            class="relative w-full border-2 border-dashed border-purple-500/30 rounded-xl p-4 text-center hover:bg-purple-500/5 transition-colors cursor-pointer"
+            onclick="document.getElementById('srtVideoInput').click()">
+            <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden"
+              onchange="updateSrtFileInfo(this)" />
+            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-purple-500 mb-2"></i>
+            <p class="text-xs text-fix-heading font-bold" id="srtFileName">Click to Browse Media</p>
+            <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV up to 50MB</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Language</label>
+            <select id="srtLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+              <option value="si" selected>Sinhala</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
+            <input type="number" id="srtWordsLimit" value="5" min="1" max="8"
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+        </div>
+        <button type="submit" id="srtSubmitBtn"
+          class="w-full py-3.5 bg-purple-600 text-white font-bold text-sm rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Captions
+        </button>
+      </form>
+      <div id="srtProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Analyzing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="srtProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+      </div>
+      <div id="srtResultArea"
+        class="mt-4 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="file-text" class="w-8 h-8 text-purple-500"></i>
+        <a id="srtDownloadLink"
+          class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download .SRT
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- DUB MODAL -->
+  <div id="dubModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('dubModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-pink-500/10 text-pink-500 rounded-2xl border border-pink-500/20">
+          <i data-lucide="mic" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">AI Video Dubbing</h2>
+          <p class="text-xs text-fix-sub">Dub your video with Voice Cloning.</p>
+        </div>
+      </div>
+      <form id="dubForm" class="space-y-4" onsubmit="handleDubSubmit(event)">
+        <div
+          class="relative w-full border-2 border-dashed border-pink-500/30 rounded-xl p-4 text-center hover:bg-pink-500/5 transition-colors cursor-pointer"
+          onclick="document.getElementById('dubVideoInput').click()">
+          <input type="file" id="dubVideoInput" accept="video/*" required class="hidden"
+            onchange="document.getElementById('dubFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Browse Media'" />
+          <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-pink-500 mb-2"></i>
+          <p class="text-xs text-fix-heading font-bold" id="dubFileName">Click to Browse Media</p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Target Language</label>
+          <select id="dubLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none"
+            onchange="document.getElementById('dubGenderWrapper').style.display = this.value === 'en' ? 'block' : 'none'">
+            <option value="en" selected>English</option>
+            <option value="si">Sinhala</option>
+          </select>
+        </div>
+        <div id="dubGenderWrapper">
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Voice Gender</label>
+          <select id="dubGender" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+            <option value="female" selected>Female (Rachel)</option>
+            <option value="male">Male (Adam)</option>
+          </select>
+        </div>
+        <button type="submit" id="dubSubmitBtn"
+          class="w-full py-3.5 bg-pink-600 text-white font-bold text-sm rounded-xl hover:bg-pink-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="mic" class="w-4 h-4"></i> Start AI Dubbing
+        </button>
+      </form>
+      <div id="dubProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Dubbing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="dubProgressBar" class="bg-pink-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
+          </div>
+        </div>
+      </div>
+      <div id="dubResultArea"
+        class="mt-4 p-4 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <a id="dubDownloadLink"
+          class="w-full py-2.5 bg-pink-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Video
+        </a>
+      </div>
+    </div>
+  </div>
 
 
-    <!-- Scripts -->
-    <script>
+  <!-- TOAST -->
+  <div id="toastNotification"
+    class="fixed bottom-6 right-6 z-50 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
+    <div class="glass-card px-4 py-3 rounded-xl flex items-center gap-3 shadow-2xl border border-white/20">
+      <i data-lucide="info" class="w-5 h-5 text-indigo-500"></i>
+      <span id="toastMessage" class="text-xs font-bold text-fix-heading">Notification Message</span>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    function openModal(modalId, event) {
+      if (event) event.preventDefault();
+      const modal = document.getElementById(modalId);
+      if (modal) modal.style.display = 'flex';
+    }
+    function closeModal(modalId, event) {
+      if (event) event.preventDefault();
+      const modal = document.getElementById(modalId);
+      if (modal) modal.style.display = 'none';
+    }
+    function showPopup(message, title = 'Notice', type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      const icon = toast.querySelector('i');
+      msg.innerHTML = message;
+      if (type === 'error') {
+        icon.setAttribute('data-lucide', 'alert-circle');
+        icon.classList.remove('text-indigo-500');
+        icon.classList.add('text-red-500');
+      } else {
+        icon.setAttribute('data-lucide', 'check-circle-2');
+        icon.classList.remove('text-red-500');
+        icon.classList.add('text-indigo-500');
+      }
       lucide.createIcons();
-      let isDark = true;
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      }, 5000);
+    }
 
-      function toggleTheme() {
-        isDark = !isDark;
-        const html = document.documentElement;
-        const themeIcon = document.getElementById('themeIcon');
+    // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
+    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://srt.kaveesha.top';
 
-        if (!isDark) {
-          html.classList.remove('dark');
-          html.classList.add('light');
-          themeIcon.setAttribute('data-lucide', 'moon');
-        } else {
-          html.classList.remove('light');
-          html.classList.add('dark');
-          themeIcon.setAttribute('data-lucide', 'sun');
-        }
-        lucide.createIcons();
-      }
-
-      function mobileSwitchTab(tabId) {
-        // Hide all mobile tab contents
-        document.querySelectorAll('.mobile-tab-content').forEach(el => el.classList.add('hidden'));
-
-        // Show selected mobile content
-        const contentEl = document.getElementById(tabId);
-        if (contentEl) contentEl.classList.remove('hidden');
-
-        // Reset bottom nav buttons
-        document.querySelectorAll('.nav-btn').forEach(btn => {
-          btn.className = "nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-slate-400 hover:text-white";
-          const iconDiv = btn.querySelector('div');
-          if (iconDiv) {
-            iconDiv.className = "p-2 rounded-xl border border-transparent transition-all";
-          }
-        });
-
-        // Highlight selected bottom nav button
-        const activeBtn = document.getElementById('nav-btn-' + tabId);
-        if (activeBtn) {
-          activeBtn.className = "nav-btn flex flex-col items-center gap-1 w-1/4 transition-all duration-300 text-indigo-500 scale-110";
-          const activeIconDiv = activeBtn.querySelector('div');
-          if (activeIconDiv) {
-            activeIconDiv.className = "p-2 rounded-xl bg-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.5)]";
-          }
-        }
-      }
-    </script>
-    <script>
-      // --- NEW TAILWIND FUNCTIONS ---
-      function showPopup(message, type = 'success') {
-        const toast = document.getElementById('toastNotification');
-        const msg = document.getElementById('toastMessage');
-        const icon = toast.querySelector('i');
-
-        msg.innerHTML = message;
-
-        if (type === 'error' || type === true) { // handle the old showPopup signature which was boolean
-          icon.setAttribute('data-lucide', 'alert-circle');
-          icon.classList.remove('text-indigo-500');
-          icon.classList.add('text-red-500');
-        } else {
-          icon.setAttribute('data-lucide', 'check-circle-2');
-          icon.classList.remove('text-red-500');
-          icon.classList.add('text-indigo-500');
-        }
-        if (window.lucide) lucide.createIcons();
-
-        toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
-        toast.classList.add('opacity-100', 'translate-y-0');
-
-        setTimeout(() => {
-          toast.classList.remove('opacity-100', 'translate-y-0');
-          toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
-        }, 5000);
-      }
-
-      function openModal(modalId, event) {
-        if (event) event.preventDefault();
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.style.display = 'flex';
-          // zIndex fixes for bottom nav
-          const bnav = document.querySelector('.fixed.bottom-0');
-          if (bnav) bnav.style.zIndex = '0';
-        }
-      }
-      function closeModal(modalId, event) {
-        if (event) event.preventDefault();
-        const modal = document.getElementById(modalId);
-        if (modal) {
-          modal.style.display = 'none';
-          const bnav = document.querySelector('.fixed.bottom-0');
-          if (bnav) bnav.style.zIndex = '50';
-        }
-      }
-      // ------------------------------
-
-      let currentApiMode = 'kaveez';
-      let currentSrtFile = null;
-
-      // Close modal when clicking on overlay background
-      document.querySelectorAll('.modal-overlay').forEach(overlay => {
-        overlay.addEventListener('click', (e) => {
-          if (e.target === overlay) {
-            overlay.classList.remove('active');
-          }
-        });
-      });
-
-      // Tab selection: KaveezCloud vs User API
-      function selectApiMode(mode) {
-        currentApiMode = mode;
-        const tabKaveez = document.getElementById('tab-kaveez');
-        const tabUser = document.getElementById('tab-user');
-        const keyGroup = document.getElementById('userApiKeyGroup');
-
-        if (mode === 'kaveez') {
-          tabKaveez.classList.add('active');
-          tabUser.classList.remove('active');
-          keyGroup.style.display = 'none';
-        } else {
-          tabUser.classList.add('active');
-          tabKaveez.classList.remove('active');
-          keyGroup.style.display = 'block';
-        }
-      }
-
-      function updateSrtFileInfo(input) {
-        if (input.files && input.files[0]) {
-          currentSrtFile = input.files[0];
-          document.getElementById('srtFileName').textContent = input.files[0].name;
-          recalculateWordCount();
-        }
-      }
-
-      function updateAudioFileInfo(input) {
-        if (input.files && input.files[0]) {
-          document.getElementById('audioFileName').textContent = input.files[0].name;
-        }
-      }
-
-      // Auto word count calculation for standard Unicode & FM Abhaya legacy font
-      function recalculateWordCount() {
-        let limit = parseInt(document.getElementById('srtWordsLimit').value) || 5;
-        if (limit > 5) { limit = 5; document.getElementById('srtWordsLimit').value = 5; }
-        if (limit < 1) { limit = 1; document.getElementById('srtWordsLimit').value = 1; }
-
-        const isLegacy = document.getElementById('legacyFontCheck').checked;
-
-        let estimatedWords = 0;
-        if (currentSrtFile) {
-          const durationEstMinutes = (currentSrtFile.size / (1024 * 1024 * 1.5));
-          estimatedWords = Math.max(12, Math.round(durationEstMinutes * 140));
-        } else {
-          estimatedWords = 120;
-        }
-
-        const fontNote = isLegacy ? " (Legacy FM Abhaya font auto-converted)" : "";
-        const countEl = document.getElementById('srtWordCountText');
-        if (countEl) {
-          countEl.textContent = `Estimated Word Count: ~${estimatedWords} words (${limit} words/line)${fontNote}`;
-        }
-      }
-
-      // Backend API Server base URL
-      const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://srt.kaveesha.top';
-
-      // SSE Real-time Progress helper
-      function setupProgressTracker(clientId, stepsPrefix, barId) {
-        const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
-
-        eventSource.onmessage = (event) => {
-          try {
-            const data = JSON.parse(event.data);
-            if (data.message) {
-              updateStepProgress(stepsPrefix, barId, data.message);
-            }
-          } catch (e) { }
-        };
-
-        return eventSource;
-      }
-
-      function updateStepProgress(prefix, barId, message) {
-        const bar = document.getElementById(barId);
-        if (!bar) return;
-        const msgLower = message.toLowerCase();
-
-        if (msgLower.includes('upload') || msgLower.includes('step 1') || msgLower.includes('extracting')) {
-          bar.style.width = '25%';
-          setStepActive(`${prefix}Step1`);
-        } else if (msgLower.includes('gemini') || msgLower.includes('step 2') || msgLower.includes('bypassing') || msgLower.includes('denoise') || msgLower.includes('neural core')) {
-          setStepCompleted(`${prefix}Step1`);
-          setStepActive(`${prefix}Step2`);
-          bar.style.width = '55%';
-        } else if (msgLower.includes('formatting') || msgLower.includes('step 3') || msgLower.includes('mastering') || msgLower.includes('rendering')) {
-          setStepCompleted(`${prefix}Step2`);
-          setStepActive(`${prefix}Step3`);
-          bar.style.width = '85%';
-        } else if (msgLower.includes('complete') || msgLower.includes('step 4') || msgLower.includes('ready') || msgLower.includes('generated')) {
-          setStepCompleted(`${prefix}Step3`);
-          setStepCompleted(`${prefix}Step4`);
-          bar.style.width = '100%';
-        }
-      }
-
-      function setStepActive(stepId) {
-        const el = document.getElementById(stepId);
-        if (el) {
-          el.classList.add('active');
-        }
-      }
-
-      function setStepCompleted(stepId) {
-        const el = document.getElementById(stepId);
-        if (el) {
-          el.classList.remove('active');
-          el.classList.add('completed');
-        }
-      }
-
-      // 1. Handle SRT Submit
-      async function handleSrtSubmit(e) {
-        e.preventDefault();
-        if (!currentSrtFile) {
-          showPopup('Please upload a video or audio file first!');
-          return;
-        }
-
-        const clientId = 'srt_' + Date.now();
-        const wordsLimit = document.getElementById('srtWordsLimit')?.value || 5;
-        const useLegacy = document.getElementById('legacyFontCheck')?.checked || false;
-        const apiKey = (currentApiMode === 'user' ? document.getElementById('userApiKey')?.value : '') || '';
-        const language = document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala';
-
-        document.getElementById('srtSubmitBtn').disabled = true;
-        document.getElementById('srtProgressCard').style.display = 'block';
-        document.getElementById('srtResultArea').style.display = 'none';
-
-        const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
-
-        const formData = new FormData();
-        formData.append('video', currentSrtFile);
-        formData.append('wordsLimit', wordsLimit);
-        formData.append('legacyFont', useLegacy);
-        formData.append('language', language);
-        if (apiKey) {
-          formData.append('apiKey', apiKey);
-          localStorage.setItem('gemini_api_key', apiKey);
-        }
-
+    function setupProgressTracker(clientId, stepsPrefix, barId) {
+      const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
+      eventSource.onmessage = (event) => {
         try {
-          const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, {
-            method: 'POST',
-            body: formData
-          });
-
-          const data = await res.json();
-          es.close();
-
-          if (data.srt) {
-            updateStepProgress('srt', 'srtProgressBar', 'Subtitles Ready!');
-            const blob = new Blob([data.srt], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const downloadLink = document.getElementById('srtDownloadLink');
-            downloadLink.href = url;
-            downloadLink.download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
-            document.getElementById('srtResultArea').style.display = 'flex';
-          } else {
-            showPopup('Error generating SRT: ' + (data.error || 'Failed'), 'Subtitle Engine Notice', 'error');
+          const data = JSON.parse(event.data);
+          if (data.message) {
+            const bar = document.getElementById(barId);
+            if (bar) bar.style.width = '80%';
           }
-        } catch (err) {
-          es.close();
-          showPopup('Request failed: ' + err.message, 'Subtitle Engine Notice', 'error');
-        } finally {
-          document.getElementById('srtSubmitBtn').disabled = false;
-        }
-      }
-
-      // 2. Handle FB Submit
-      async function handleFbSubmit(e) {
-        e.preventDefault();
-        const url = document.getElementById('fbUrlInput').value;
-        const clientId = 'fb_' + Date.now();
-
-        document.getElementById('fbSubmitBtn').disabled = true;
-        document.getElementById('fbProgressCard').style.display = 'block';
-        document.getElementById('fbResultArea').style.display = 'none';
-
-        const es = setupProgressTracker(clientId, 'fb', 'fbProgressBar');
-
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/facebook-download`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, clientId })
-          });
-
-          const data = await res.json();
-          es.close();
-
-          if (data.downloadUrl) {
-            updateStepProgress('fb', 'fbProgressBar', 'Step 4: Facebook Video Ready!');
-            document.getElementById('fbDownloadLink').href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
-            document.getElementById('fbResultArea').style.display = 'block';
-          } else {
-            const errDetails = data.error || data.message || 'Unknown Server Error';
-            showPopup('Error: ' + errDetails, 'Downloader Notice', 'error');
-          }
-        } catch (err) {
-          es.close();
-          showPopup('Fetch failed: ' + err.message, 'Downloader Notice', 'error');
-        } finally {
-          document.getElementById('fbSubmitBtn').disabled = false;
-        }
-      }
-
-      // 3. Handle TikTok Submit
-      async function handleTiktokSubmit(e) {
-        e.preventDefault();
-        const url = document.getElementById('tiktokUrlInput').value;
-        const clientId = 'tiktok_' + Date.now();
-
-        document.getElementById('tiktokSubmitBtn').disabled = true;
-        document.getElementById('tiktokProgressCard').style.display = 'block';
-        document.getElementById('tiktokResultArea').style.display = 'none';
-
-        const es = setupProgressTracker(clientId, 'tiktok', 'tiktokProgressBar');
-
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/tiktok-download`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ url, clientId })
-          });
-
-          const data = await res.json();
-          es.close();
-
-          if (data.downloadUrl) {
-            updateStepProgress('tiktok', 'tiktokProgressBar', 'Step 4: TikTok No-Watermark Video Ready!');
-            document.getElementById('tiktokDownloadLink').href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
-            document.getElementById('tiktokResultArea').style.display = 'block';
-          } else {
-            showPopup('Error: ' + (data.error || 'Failed to fetch TikTok video'), 'Downloader Notice', 'error');
-          }
-        } catch (err) {
-          es.close();
-          showPopup('Fetch failed: ' + err.message, 'Downloader Notice', 'error');
-        } finally {
-          document.getElementById('tiktokSubmitBtn').disabled = false;
-        }
-      }
-
-      // 4. Handle Audio Enhance Submit
-      async function handleAudioSubmit(e) {
-        e.preventDefault();
-        const fileInput = document.getElementById('audioFileInput');
-        if (!fileInput.files || !fileInput.files[0]) {
-          showPopup('Please upload an audio or video file!');
-          return;
-        }
-
-        const clientId = 'audio_' + Date.now();
-        document.getElementById('audioSubmitBtn').disabled = true;
-        document.getElementById('audioProgressCard').style.display = 'block';
-        document.getElementById('audioResultArea').style.display = 'none';
-
-        const es = setupProgressTracker(clientId, 'audio', 'audioProgressBar');
-
-        const formData = new FormData();
-        formData.append('media', fileInput.files[0]);
-
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/enhance-audio?clientId=${clientId}`, {
-            method: 'POST',
-            body: formData
-          });
-
-          const data = await res.json();
-          es.close();
-
-          if (data.downloadUrl) {
-            updateStepProgress('audio', 'audioProgressBar', 'Step 4: 100% Sound Enhancement Complete!');
-            document.getElementById('audioDownloadLink').href = data.downloadUrl;
-            document.getElementById('audioDownloadLink').download = data.filename || 'enhanced_audio.mp3';
-            document.getElementById('audioResultArea').style.display = 'block';
-          } else {
-            showPopup('Error: ' + (data.error || 'Enhancement failed'), 'Audio DSP Notice', 'error');
-          }
-        } catch (err) {
-          es.close();
-          showPopup('Enhance failed: ' + err.message, 'Audio Enhancement Error', 'error');
-        } finally {
-          document.getElementById('audioSubmitBtn').disabled = false;
-        }
-      }
-
-      // 5. Handle AI Dubbing Submit
-      async function handleDubSubmit(e) {
-        e.preventDefault();
-        const fileInput = document.getElementById('dubVideoInput');
-        if (!fileInput.files || !fileInput.files[0]) {
-          showPopup('Please upload a video file!');
-          return;
-        }
-
-        const clientId = 'dub_' + Date.now();
-        const language = document.getElementById('dubLanguage').value;
-        const elevenLabsKey = localStorage.getItem('elevenlabs_api_key') || '';
-
-        document.getElementById('dubSubmitBtn').disabled = true;
-        document.getElementById('dubProgressCard').style.display = 'block';
-        document.getElementById('dubResultArea').style.display = 'none';
-
-        const es = setupProgressTracker(clientId, 'dub', 'dubProgressBar');
-
-        const formData = new FormData();
-        formData.append('video', fileInput.files[0]);
-        formData.append('language', language);
-        if (language === 'en') {
-          formData.append('voiceGender', document.getElementById('dubGender').value);
-        }
-        if (elevenLabsKey) {
-          formData.append('elevenLabsKey', elevenLabsKey);
-        }
-
-        // Add existing Gemini key if available
-        const geminiKey = document.getElementById('userApiKey')?.value || localStorage.getItem('gemini_api_key') || '';
-        if (geminiKey) formData.append('geminiKey', geminiKey);
-
-        try {
-          const res = await fetch(`${API_BASE_URL}/api/dub-video?clientId=${clientId}`, {
-            method: 'POST',
-            body: formData
-          });
-
-          const data = await res.json();
-          es.close();
-
-          if (data.dubbedUrl) {
-            updateStepProgress('dub', 'dubProgressBar', 'AI Dubbing Complete!');
-            document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
-            document.getElementById('dubDownloadLink').download = data.filename || 'dubbed_video.mp4';
-            document.getElementById('dubResultArea').style.display = 'flex';
-          } else {
-            showPopup('Error: ' + (data.error || 'Dubbing failed'), 'AI Dubbing Notice', 'error');
-          }
-        } catch (err) {
-          es.close();
-          showPopup('Dubbing failed: ' + err.message, 'AI Dubbing Error', 'error');
-        } finally {
-          document.getElementById('dubSubmitBtn').disabled = false;
-        }
-      }
-
-      function saveApiKeys() {
-        const geminiKey = document.getElementById('userApiKey')?.value;
-        const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value;
-        if (geminiKey) localStorage.setItem('gemini_api_key', geminiKey);
-        if (elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
-      }
-
-      // Initialize API Keys on load
-      document.addEventListener('DOMContentLoaded', () => {
-        const storedGemini = localStorage.getItem('gemini_api_key');
-        const storedEleven = localStorage.getItem('elevenlabs_api_key');
-        if (storedGemini && document.getElementById('userApiKey')) {
-          document.getElementById('userApiKey').value = storedGemini;
-        }
-        if (storedEleven && document.getElementById('elevenLabsApiKey')) {
-          document.getElementById('elevenLabsApiKey').value = storedEleven;
-        }
-      });
-
-      // ======================================================================
-      // KAVEEZ CUSTOM ALERT & ERROR INTERCEPTOR SYSTEM (NO BROWSER POPUPS)
-      // ======================================================================
-      function showPopup(msg, title = "KaveezCloud Notice", type = "info") {
-        showKaveezAlert(msg, title, type);
-      }
-
-      function showKaveezAlert(msg, title = "KaveezCloud Notice", type = "info") {
-        const modal = document.getElementById('kaveezAlertModal');
-        if (!modal) return;
-        const titleEl = document.getElementById('kaveezAlertTitle');
-        const msgEl = document.getElementById('kaveezAlertMsg');
-        if (titleEl) titleEl.textContent = title;
-        if (msgEl) msgEl.textContent = msg;
-
-        const iconContainer = document.getElementById('kaveezAlertIconContainer');
-        const icon = document.getElementById('kaveezAlertIcon');
-        if (iconContainer && icon) {
-          if (type === 'error') {
-            iconContainer.className = "w-14 h-14 rounded-2xl bg-red-500/10 text-red-400 flex items-center justify-center mb-4 border border-red-500/20 shadow-lg";
-            icon.setAttribute('data-lucide', 'alert-triangle');
-          } else if (type === 'success') {
-            iconContainer.className = "w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-4 border border-emerald-500/20 shadow-lg";
-            icon.setAttribute('data-lucide', 'check-circle-2');
-          } else {
-            iconContainer.className = "w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 shadow-lg";
-            icon.setAttribute('data-lucide', 'info');
-          }
-          if (window.lucide) lucide.createIcons();
-        }
-        modal.style.display = 'flex';
-      }
-
-      function closeKaveezAlert() {
-        const modal = document.getElementById('kaveezAlertModal');
-        if (modal) modal.style.display = 'none';
-      }
-
-      // Global Error Interceptors
-      window.onerror = function (msg, url, line) {
-        console.error("KaveezCloud Catch:", msg, url, line);
-        return true;
+        } catch (e) { }
       };
+      return eventSource;
+    }
 
-      window.addEventListener('unhandledrejection', function (event) {
-        console.error("KaveezCloud Unhandled Rejection:", event.reason);
-        event.preventDefault();
-      });
-    </script>
+    function saveApiKeys() {
+      const geminiKey = document.getElementById('userApiKey')?.value;
+      const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value;
+      if (geminiKey) localStorage.setItem('gemini_api_key', geminiKey);
+      if (elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
+    }
 
-    <script type="module">
-      import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
+    let currentSrtFile = null;
+    function updateSrtFileInfo(input) {
+      if (input.files && input.files[0]) {
+        currentSrtFile = input.files[0];
+        document.getElementById('srtFileName').textContent = input.files[0].name;
+      }
+    }
 
-      onAuthStateChanged(auth, (user) => {
-        if (!user) {
-          window.location.href = 'login.html';
-        } else {
-          const profileName = document.getElementById('profileName');
-          const profileEmail = document.getElementById('profileEmail');
-          const profileInitial = document.getElementById('profileInitial');
-          const navProfileIcon = document.getElementById('navProfileIcon');
+    async function handleSrtSubmit(e) {
+      e.preventDefault();
+      if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
+      document.getElementById('srtSubmitBtn').disabled = true;
+      document.getElementById('srtProgressCard').style.display = 'block';
+      document.getElementById('srtResultArea').style.display = 'none';
+      const clientId = 'srt_' + Date.now();
+      const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
-          if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
-          if (profileEmail) profileEmail.textContent = user.email;
-          if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-          if (navProfileIcon) navProfileIcon.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+      const formData = new FormData();
+      formData.append('video', currentSrtFile);
+      formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
 
-          setInterval(async () => {
-            try {
-              await user.getIdToken(true);
-            } catch (error) {
-              console.warn("Session invalidated or user deleted. Logging out.");
-              await signOut(auth);
-              window.location.href = 'login.html';
-            }
-          }, 60000);
-        }
-      });
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+        es.close();
+        if (data.srt) {
+          const blob = new Blob([data.srt], { type: 'text/plain' });
+          document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
+          document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
+          document.getElementById('srtProgressBar').style.width = '100%';
+          document.getElementById('srtResultArea').style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById('srtSubmitBtn').disabled = false; }
+    }
 
-      document.addEventListener('DOMContentLoaded', () => {
-        const signOutBtn = document.getElementById('logoutBtn');
-        if (signOutBtn) {
-          signOutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            try {
-              await signOut(auth);
-            } catch (error) {
-              console.error("Sign Out Error:", error);
-              showKaveezAlert("Sign Out Failed: " + error.message, "Authentication Notice", "error");
-            }
-          });
-        }
-      });
-    </script>
-    <!-- CUSTOM KAVEEZ ALERT MODAL (NO RAW BROWSER POPUPS) -->
-    <div id="kaveezAlertModal"
-      class="fixed inset-0 z-[999] bg-black/80 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4"
-      style="display: none;">
-      <div
-        class="glass-card w-full max-w-md rounded-3xl p-6 md:p-8 relative border border-white/10 shadow-2xl text-center flex flex-col items-center">
-        <div id="kaveezAlertIconContainer"
-          class="w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 border border-indigo-500/20 shadow-lg">
-          <i id="kaveezAlertIcon" data-lucide="info" class="w-7 h-7"></i>
-        </div>
-        <h3 id="kaveezAlertTitle" class="text-lg font-bold text-white mb-2 tracking-tight">KaveezCloud Notice</h3>
-        <p id="kaveezAlertMsg" class="text-xs text-slate-300 mb-6 leading-relaxed">Service notification details.</p>
+    async function handleFbSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value);
+    }
+    async function handleFbAudioSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value);
+    }
+    async function handleTiktokSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value);
+    }
+    async function handleTiktokAudioSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value);
+    }
 
-        <div class="flex flex-col sm:flex-row gap-3 w-full">
-          <button onclick="closeKaveezAlert()"
-            class="flex-1 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs rounded-xl transition-all">Dismiss</button>
-          <a id="kaveezAlertContactBtn" href="https://t.me/Kaveesha_Theekshana" target="_blank"
-            class="flex-1 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-white font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-1.5 shadow-lg">
-            <i data-lucide="help-circle" class="w-4 h-4"></i> Contact Developer
-          </a>
-        </div>
-      </div>
-    </div>
+    async function handleSocialSubmit(type, url) {
+      const btnId = type + 'SubmitBtn';
+      const progId = type + 'ProgressCard';
+      const resId = type + 'ResultArea';
+      const barId = type + 'ProgressBar';
+      const linkId = type + 'DownloadLink';
+
+      document.getElementById(btnId).disabled = true;
+      document.getElementById(progId).style.display = 'block';
+      document.getElementById(resId).style.display = 'none';
+
+      const clientId = type + '_' + Date.now();
+      const es = setupProgressTracker(clientId, type, barId);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/${type === 'fb' ? 'facebook-download' : 'tiktok-download'}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, clientId })
+        });
+        const data = await res.json();
+        es.close();
+        if (data.downloadUrl) {
+          document.getElementById(barId).style.width = '100%';
+          document.getElementById(linkId).href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          document.getElementById(resId).style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById(btnId).disabled = false; }
+    }
+
+    async function handleDubSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('dubVideoInput');
+      if (!fileInput.files[0]) { showPopup('Upload video', 'Error', 'error'); return; }
+
+      document.getElementById('dubSubmitBtn').disabled = true;
+      document.getElementById('dubProgressCard').style.display = 'block';
+      document.getElementById('dubResultArea').style.display = 'none';
+
+      const clientId = 'dub_' + Date.now();
+      const es = setupProgressTracker(clientId, 'dub', 'dubProgressBar');
+      const formData = new FormData();
+      formData.append('video', fileInput.files[0]);
+      formData.append('language', document.getElementById('dubLanguage').value);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/dub-video?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+        es.close();
+        if (data.dubbedUrl) {
+          document.getElementById('dubProgressBar').style.width = '100%';
+          document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
+          document.getElementById('dubDownloadLink').download = data.filename || 'dubbed.mp4';
+          document.getElementById('dubResultArea').style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById('dubSubmitBtn').disabled = false; }
+    }
+
+
+  </script>
 </body>
 
 </html>
