@@ -656,7 +656,7 @@
     }
 
     // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
-    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? '' : 'https://srt.kaveesha.top';
+    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:6039' : 'https://capzone.kaveesha.top';
 
     function setupProgressTracker(clientId, stepsPrefix, barId) {
       const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
