@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark scroll-smooth" lang="en">
+<html class="scroll-smooth" lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -21,21 +21,21 @@
             theme: {
                 extend: {
                     colors: {
-                        "surface-variant": "#2a2933",
-                        "primary": "#c4a1ff",
-                        "outline": "#948da2",
-                        "on-surface": "#e5e2e1",
-                        "background": "#080b14",
-                        "primary-fixed": "#e8ddff",
-                        "surface-container-high": "#181624",
-                        "primary-container": "#6200ee",
-                        "secondary-container": "#4a12a8",
-                        "surface-container-highest": "#282536",
-                        "surface": "#12101b",
-                        "secondary": "#00f2fe",
-                        "inverse-primary": "#6d23f9",
-                        "surface-container-lowest": "#050409",
-                        "on-background": "#e5e2e1"
+                        "surface-variant": "#2a4d3a",
+                        "primary": "#366a4a",
+                        "outline": "#8ba896",
+                        "on-surface": "#1f3f2d",
+                        "background": "transparent",
+                        "primary-fixed": "#e3ebd5",
+                        "surface-container-high": "rgba(255, 255, 255, 0.7)",
+                        "primary-container": "#2a4d3a",
+                        "secondary-container": "#1f3f2d",
+                        "surface-container-highest": "rgba(255, 255, 255, 0.9)",
+                        "surface": "rgba(255, 255, 255, 0.6)",
+                        "secondary": "#497b5e",
+                        "inverse-primary": "#a6c9a9",
+                        "surface-container-lowest": "transparent",
+                        "on-background": "#1f3f2d"
                     },
                     fontFamily: {
                         "sans": ["Poppins", "sans-serif"],
@@ -65,59 +65,24 @@
             -webkit-tap-highlight-color: transparent !important;
         }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #080b14;
-            background-image:
-                radial-gradient(circle at 15% 50%, rgba(98, 0, 238, 0.05), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(0, 242, 254, 0.05), transparent 25%);
-            color: #e5e2e1;
-            overflow-x: hidden;
-        }
+        body { font-family: 'Poppins', sans-serif; background-color: #f8f5f0; background-image: url('https://i.pinimg.com/1200x/bb/97/78/bb977892cf940c01f50fa84d1ef8036c.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: #1f3f2d; overflow-x: hidden; }
 
         .font-sinhala {
             font-family: 'Noto Sans Sinhala', sans-serif !important;
             line-height: 1.45 !important;
         }
 
-        .glass-panel {
-            background: rgba(18, 16, 27, 0.55);
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), inset 0 0 20px rgba(255, 255, 255, 0.02);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .glass-panel { background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.8); border-left: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 15px 35px 0 rgba(31, 63, 45, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.5); border-radius: 24px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        .glass-panel:hover {
-            background: rgba(25, 22, 38, 0.75);
-            border-color: rgba(196, 161, 255, 0.6);
-            box-shadow: 0 20px 60px -10px rgba(98, 0, 238, 0.5), inset 0 0 25px rgba(255, 255, 255, 0.08) !important;
-            transform: translateY(-8px);
-        }
+        .glass-panel:hover { background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%); border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 25px 60px -10px rgba(31, 63, 45, 0.35), inset 0 0 30px rgba(255, 255, 255, 0.8); transform: translateY(-8px) scale(1.02); }
 
-        .text-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, #c4a1ff 40%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .text-gradient { background: linear-gradient(135deg, #1f3f2d 0%, #366a4a 40%, #497b5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .text-gradient-purple {
-            background: linear-gradient(135deg, #c4a1ff 0%, #9047ff 50%, #00f2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .text-gradient-purple { background: linear-gradient(135deg, #366a4a 0%, #497b5e 50%, #2a4d3a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
-        .glow-btn {
-            position: relative;
-            box-shadow: 0 0 30px rgba(98, 0, 238, 0.55);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        .glow-btn { position: relative; box-shadow: 0 0 30px rgba(42, 77, 58, 0.3); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
 
-        .glow-btn:hover {
-            box-shadow: 0 0 50px rgba(109, 35, 249, 0.85), 0 0 25px rgba(0, 242, 254, 0.5);
-            transform: translateY(-2px) scale(1.03);
-        }
+        .glow-btn:hover { box-shadow: 0 0 40px rgba(42, 77, 58, 0.5), 0 0 25px rgba(73, 123, 94, 0.4); transform: translateY(-2px) scale(1.03); }
 
         @keyframes pulse-glow {
 
@@ -209,11 +174,11 @@
     <link rel="icon" href="assets/logo.jpg" type="image/png" />`n
 </head>
 
-<body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-white">
+<body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-surface">
 
     <!-- Top Sticky Header -->
     <header
-        class="fixed top-0 left-0 right-0 z-50 bg-background/85 backdrop-blur-2xl border-b border-white/10 transition-all duration-300">
+        class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-white/50 shadow-sm transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between">
 
             <!-- Logo -->
@@ -221,25 +186,25 @@
                 <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center p-1 shadow-[0_0_15px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform">
                     <img src="assets/logo.jpg" class="w-full h-full object-contain" alt="CapZone Logo">
                 </div>
-                <span class="text-xl sm:text-2xl font-bold tracking-tight text-white font-sans">
+                <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#1f3f2d] font-sans">
                     CapZone <span class="text-gradient-purple">
             </a>
 
             <!-- Nav Links -->
             <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-on-surface-variant">
-                <a href="#features" class="hover:text-primary transition-colors">Features</a>
-                <a href="#how-it-works" class="hover:text-primary transition-colors">How It Works</a>
+                <a href="#features" class="hover:text-[#366a4a] transition-colors">Features</a>
+                <a href="#how-it-works" class="hover:text-[#366a4a] transition-colors">How It Works</a>
             </nav>
 
             <!-- Action Button -->
             <div class="flex items-center gap-2 sm:gap-3">
                 <a href="login.html"
-                    class="bg-surface-container-high/80 hover:bg-surface-container-highest border border-white/15 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all hover:scale-105">
+                    class="bg-surface-container-high/80 hover:bg-surface-container-highest border border-surface-variant/30 text-on-surface px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all hover:scale-105">
                     <span class="material-symbols-outlined text-lg text-primary">login</span>
                     <span class="hidden sm:block">Login</span>
                 </a>
                 <a href="login.html"
-                    class="glow-btn bg-gradient-to-r from-primary-container to-inverse-primary text-white px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
+                    class="glow-btn bg-gradient-to-r from-primary-container to-inverse-primary text-on-surface px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
                     <span class="material-symbols-outlined text-lg">person_add</span>
                     <span class="hidden sm:block">Sign Up</span>
                 </a>
@@ -262,13 +227,13 @@
 
             <!-- Pill Badge -->
             <div
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high/80 border border-white/10 backdrop-blur-md mb-6 shadow-lg shadow-primary-container/10">
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high/80 border border-surface-variant/20 backdrop-blur-md mb-6 shadow-lg shadow-primary-container/10">
                 <span class="material-symbols-outlined text-primary text-sm animate-pulse">bolt</span>
                 <span class="text-xs font-semibold text-primary tracking-widest uppercase">KaveezCloud Engine</span>
             </div>
 
             <!-- Main Title -->
-            <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-white/95 leading-tight tracking-tight mb-6">
+            <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-on-surface leading-tight tracking-tight mb-6 drop-shadow-[0_2px_15px_rgba(255,255,255,0.8)]">
                 Create Sinhala OR English Subtitles & <br class="hidden sm:block" /><span class="text-gradient">Edit
                     Videos</span> in Milliseconds
             </h1>
@@ -282,13 +247,13 @@
             <!-- CTA Buttons -->
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                 <a href="login.html"
-                    class="glow-btn w-full sm:w-auto bg-gradient-to-r from-primary-container via-inverse-primary to-secondary text-white px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-3 shadow-xl">
+                    class="glow-btn w-full sm:w-auto bg-gradient-to-r from-primary-container via-inverse-primary to-secondary text-on-surface px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-3 shadow-xl">
                     <span class="material-symbols-outlined text-xl">login</span>
                     Login
                 </a>
 
                 <a href="login.html"
-                    class="w-full sm:w-auto bg-surface-container-high/80 hover:bg-surface-container-highest border border-white/10 text-white px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all hover:scale-105">
+                    class="w-full sm:w-auto bg-surface-container-high/80 hover:bg-surface-container-highest border border-surface-variant/20 text-on-surface px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all hover:scale-105">
                     <span class="material-symbols-outlined text-lg">person_add</span>
                     Sign Up
                 </a>
@@ -296,10 +261,10 @@
 
             <!-- Stats Strip with Animated Count-Up Counters -->
             <div id="hero-stats-strip"
-                class="grid grid-cols-3 gap-4 sm:gap-8 mt-14 pt-8 border-t border-white/10 w-full max-w-2xl mx-auto">
+                class="grid grid-cols-3 gap-4 sm:gap-8 mt-14 pt-6 pb-6 border border-surface-variant/20 w-full max-w-2xl mx-auto glass-panel rounded-3xl shadow-2xl">
                 <div>
-                    <div id="stat-count-1" class="text-2xl sm:text-4xl font-bold text-white font-mono">0%</div>
-                    <div class="text-xs sm:text-sm text-on-surface/80 font-medium mt-1 sm:mt-2">Noise Cleaning</div>
+                    <div id="stat-count-1" class="text-2xl sm:text-4xl font-bold text-on-surface font-mono">0%</div>
+                    <div class="text-xs sm:text-sm text-surface-variant font-medium mt-1 sm:mt-2">Noise Cleaning</div>
                 </div>
                 <div>
                     <div id="stat-count-2" class="text-2xl sm:text-4xl font-bold text-primary font-mono">0%
@@ -318,10 +283,10 @@
     </section>
 
     <!-- PRO TICKER MARQUEE (PLACED UP HIGH RIGHT BELOW HERO!) -->
-    <section class="py-8 bg-black/80 border-y border-white/10 overflow-hidden relative z-20">
+    <section class="py-8 bg-surface-container-highest/80 border-y border-surface-variant/20 overflow-hidden relative z-20">
         <div class="max-w-7xl mx-auto px-4 mb-4 text-center">
             <span
-                class="text-xs font-extrabold text-primary uppercase tracking-widest flex items-center justify-center gap-2">
+                class="text-xs font-extrabold text-[#2a4d3a] uppercase tracking-widest flex items-center justify-center gap-2">
                 <span class="material-symbols-outlined text-sm">auto_awesome</span>
                 Compatible & Export Ready For Industry Standard Video Editors
             </span>
@@ -333,7 +298,7 @@
 
                 <!-- Set 1 (Each card has 1-line text with whitespace-nowrap and large 40x40 HD logos) -->
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#00005B" />
@@ -345,7 +310,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-secondary/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-secondary/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#000000" />
@@ -357,7 +322,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-blue-400/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-blue-400/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#0F172A" />
@@ -369,7 +334,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-pink-500/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-pink-500/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#1C1C1E" />
@@ -388,7 +353,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-purple-400/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-purple-400/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#00005B" />
@@ -400,7 +365,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#0F172A" />
@@ -421,7 +386,7 @@
 
                 <!-- Set 2 (Exact duplicate for seamless infinite loop) -->
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#00005B" />
@@ -433,7 +398,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-secondary/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-secondary/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#000000" />
@@ -445,7 +410,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-blue-400/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-blue-400/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#0F172A" />
@@ -457,7 +422,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-pink-500/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-pink-500/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#1C1C1E" />
@@ -476,7 +441,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-purple-400/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-purple-400/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#00005B" />
@@ -488,7 +453,7 @@
                 </div>
 
                 <div
-                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-white/15 text-white font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
+                    class="inline-flex items-center gap-3.5 px-6 py-3.5 rounded-2xl bg-surface-container-high/90 border border-surface-variant/30 text-[#1f3f2d] font-extrabold text-sm whitespace-nowrap shrink-0 shadow-xl backdrop-blur-md hover:border-primary/60 transition-colors">
                     <svg class="w-10 h-10 rounded-xl shadow-lg shrink-0" viewBox="0 0 64 64" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <rect width="64" height="64" rx="14" fill="#0F172A" />
@@ -513,7 +478,7 @@
 
     <!-- FEATURES SECTION -->
     <section id="features"
-        class="py-24 px-4 sm:px-6 lg:px-12 bg-surface-container-lowest relative border-t border-white/10">
+        class="py-24 px-4 sm:px-6 lg:px-12 bg-surface-container-lowest relative border-t border-surface-variant/20">
         <div class="max-w-7xl mx-auto">
 
             <div class="text-center max-w-3xl mx-auto mb-16 reveal-up">
@@ -521,7 +486,7 @@
                     class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-extrabold uppercase tracking-wider mb-3">
                     <span class="material-symbols-outlined text-sm">auto_awesome</span> Power Features
                 </div>
-                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight">Everything You Need for <span
+                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Everything You Need for <span
                         class="text-gradient">Viral Subtitles</span></h2>
                 <p class="text-on-surface-variant text-sm sm:text-base mt-4">Built with cutting-edge AI multimodal
                     processing, instant font rendering, and zero-credit backend capacity.</p>
@@ -536,7 +501,7 @@
                         class="w-14 h-14 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(59,130,246,0.2)]">
                         <span class="text-4xl drop-shadow-2xl">📘</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Facebook MP4 & MP3 Downloader</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-3">Facebook MP4 & MP3 Downloader</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Download high-quality Facebook videos in MP4 format or extract crystal-clear MP3 audio with just one click. Perfect for content creators!</p>
                 </div>
 
@@ -546,7 +511,7 @@
                         class="w-14 h-14 rounded-2xl bg-fuchsia-500/10 border border-fuchsia-500/20 flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(217,70,239,0.2)]">
                         <span class="text-4xl drop-shadow-2xl">🪄</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Image Background Remover</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-3">Image Background Remover</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Instantly remove backgrounds from any image using our smart AI. Get high-quality, transparent PNGs without losing any details.</p>
                 </div>
 
@@ -556,7 +521,7 @@
                         class="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(6,182,212,0.2)]">
                         <span class="text-4xl drop-shadow-2xl">🎵</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">TikTok No-Watermark & Audio</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-3">TikTok No-Watermark & Audio</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Grab TikTok videos completely watermark-free, or easily download them as high-quality MP3 audio files for your own edits.</p>
                 </div>
 
@@ -566,7 +531,7 @@
                         class="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(245,158,11,0.2)]">
                         <span class="text-4xl drop-shadow-2xl">💬</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Sinhala & English Subtitles</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-3">Sinhala & English Subtitles</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Automatically generate perfectly synced subtitles in both Sinhala and English. Advanced typography fixes guarantee 100% correct font rendering.</p>
                 </div>
 
@@ -576,7 +541,7 @@
                         class="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(244,63,94,0.2)]">
                         <span class="text-4xl drop-shadow-2xl">🎙️</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Sinhala & English AI Dubbing</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-3">Sinhala & English AI Dubbing</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Clone voices and seamlessly dub your videos into Sinhala or English using advanced AI voice generation for a global audience.</p>
                 </div>
 
@@ -586,7 +551,7 @@
                         class="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-6 shadow-[0_10px_20px_rgba(16,185,129,0.2)]">
                         <span class="text-4xl drop-shadow-2xl">📲</span>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-3">Auto WhatsApp Share</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-3">Auto WhatsApp Share</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Share your processed videos, downloaded audio, or SRT subtitles directly to WhatsApp with our one-click automated integration.</p>
                 </div>
             </div>
@@ -602,7 +567,7 @@
                     class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-extrabold uppercase tracking-wider mb-3">
                     <span class="material-symbols-outlined text-sm">route</span> Simple Workflow
                 </div>
-                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight">Create Subtitles in <span
+                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Create Subtitles in <span
                         class="text-gradient">3 Simple Steps</span></h2>
             </div>
 
@@ -612,9 +577,9 @@
                 <!-- Step 1 -->
                 <div class="glass-panel p-8 rounded-3xl relative text-center flex flex-col items-center reveal-up">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-container to-inverse-primary text-white text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-primary-container/40">
+                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-container to-inverse-primary text-on-surface text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-primary-container/40">
                         1</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Upload Video or Audio</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-2">Upload Video or Audio</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">ඔබේ වීඩියෝ හෝ ශ්‍රව්‍ය ගොනුව
                         අපගේ අධිවේගී ක්ලවුඩ් පද්ධතියට පහසුවෙන් එක් කරන්න.</p>
                 </div>
@@ -623,9 +588,9 @@
                 <div class="glass-panel p-8 rounded-3xl relative text-center flex flex-col items-center reveal-up"
                     style="transition-delay: 0.15s;">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-inverse-primary to-secondary text-white text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-secondary/30">
+                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-inverse-primary to-secondary text-on-surface text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-secondary/30">
                         2</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Kaveez Cloud Subtitles</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-2">Kaveez Cloud Subtitles</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed font-sinhala">Kaveez Cloud
                         Engine මගින් ශබ්දය විශ්ලේෂණය කර, තත්පර ගණනින් නිවැරදි සිංහල SRT Subtitles සාදයි.</p>
                 </div>
@@ -636,7 +601,7 @@
                     <div
                         class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-secondary to-primary text-background text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-secondary/40">
                         3</div>
-                    <h3 class="text-xl font-bold text-white mb-2">Customize & Export MP4</h3>
+                    <h3 class="text-xl font-bold text-on-surface mb-2">Customize & Export MP4</h3>
                     <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Apply 50+ text animations,
                         custom Sinhala fonts, word limits, and export your video instantly.</p>
                 </div>
@@ -646,30 +611,30 @@
 
     <!-- DEVELOPER & PORTFOLIO FOOTER -->
     <footer
-        class="py-14 bg-black border-t border-white/10 text-center text-xs text-on-surface-variant relative overflow-hidden">
+        class="py-14 bg-surface-container-highest border-t border-surface-variant/20 text-center text-xs text-[#2a4d3a]/80 relative overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-5">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-container to-inverse-primary flex items-center justify-center text-white shadow-lg shadow-primary-container/40">
+                    class="w-9 h-9 rounded-xl bg-gradient-to-tr from-primary-container to-inverse-primary flex items-center justify-center text-on-surface shadow-lg shadow-primary-container/40">
                     <span class="material-symbols-outlined text-xl">code</span>
                 </div>
-                <span class="text-xl font-extrabold text-white tracking-tight">CapZone Subtitle Studio</span>
+                <span class="text-xl font-extrabold text-[#1f3f2d] tracking-tight">CapZone Subtitle Studio</span>
             </div>
 
-            <p class="text-sm font-medium text-white/90">
+            <p class="text-sm font-medium text-on-surface">
                 Designed & Engineered with ❤️ by <span class="text-primary font-bold text-base">Kaveesha
                     Theekshana</span>
             </p>
 
             <a href="https://kaveesha.top" target="_blank" rel="noopener noreferrer"
-                class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-surface-container-high border border-primary/40 text-primary hover:text-white hover:bg-primary-container font-extrabold text-xs transition-all shadow-xl hover:scale-105 group">
+                class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-surface-container-high border border-primary/40 text-primary hover:text-on-surface hover:bg-primary-container font-extrabold text-xs transition-all shadow-xl hover:scale-105 group">
                 <span
                     class="material-symbols-outlined text-base group-hover:rotate-12 transition-transform">language</span>
                 Portfolio: kaveesha.top
                 <span class="material-symbols-outlined text-sm">open_in_new</span>
             </a>
 
-            <p class="text-[11px] text-on-surface-variant/70 mt-2">© 2026 CapZone Subtitle Studio. All rights reserved.
+            <p class="text-[11px] text-[#2a4d3a] mt-2">© 2026 CapZone Subtitle Studio. All rights reserved.
                 Powered by KaveezCloud Engine.</p>
         </div>
     </footer>
@@ -746,4 +711,7 @@
 </body>
 
 </html>
+
+
+
 
