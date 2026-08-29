@@ -785,13 +785,52 @@
       eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (data.message) {
+          
+          if (data.status === 'interactive_question') {
+            document.getElementById('imgProgressCard').style.display = 'none';
+            document.getElementById('imgInteractiveArea').style.display = 'block';
+            document.getElementById('imgQuestionText').innerText = data.data.question;
+          } else if (data.status === 'completed' && data.data && data.data.url) {
+            document.getElementById('imgProgressBar').style.width = '100%';
+            document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.data.url}`;
+            document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.data.url}`;
+            document.getElementById('imgResultArea').style.display = 'flex';
+            document.getElementById('imgProgressCard').style.display = 'none';
+            document.getElementById('imageGenerateBtn').disabled = false;
+            document.getElementById('imageEnhanceBtn').disabled = false;
+            eventSource.close();
+          } else if (data.status === 'error') {
+            showPopup(data.message || 'Failed', 'Error', 'error');
+            document.getElementById('imgProgressCard').style.display = 'none';
+            document.getElementById('imageGenerateBtn').disabled = false;
+            document.getElementById('imageEnhanceBtn').disabled = false;
+            eventSource.close();
+          } else if (data.message) {
             const bar = document.getElementById(barId);
             if (bar) bar.style.width = '80%';
           }
         } catch (e) { }
       };
       return eventSource;
+    }
+    
+    async function sendImageReply() {
+        const reply = document.getElementById('imgReplyInput').value;
+        if (!reply || !window.currentImageClientId) return;
+        
+        document.getElementById('imgInteractiveArea').style.display = 'none';
+        document.getElementById('imgProgressCard').style.display = 'block';
+        document.getElementById('imgReplyInput').value = '';
+        
+        try {
+            await fetch(`${API_BASE_URL}/api/reply-image`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ clientId: window.currentImageClientId, reply })
+            });
+        } catch (err) {
+            showPopup(err.message, 'Error', 'error');
+        }
     }
 
     function saveApiKeys() {
@@ -937,15 +976,19 @@
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, clientId })
         });
         const data = await res.json();
-        es.close();
-        if (data.url) {
-          document.getElementById('imgProgressBar').style.width = '100%';
-          document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.url}`;
-          document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.url}`;
-          document.getElementById('imgResultArea').style.display = 'flex';
-        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
-      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { document.getElementById('imageGenerateBtn').disabled = false; }
+        
+        if (data.success) {
+            window.currentImageClientId = clientId;
+        } else {
+            showPopup(data.error || 'Failed', 'Error', 'error');
+            es.close();
+            document.getElementById('imageGenerateBtn').disabled = false;
+        }
+      } catch (err) { 
+        es.close(); 
+        showPopup(err.message, 'Error', 'error');
+        document.getElementById('imageGenerateBtn').disabled = false;
+      }
     }
 
     async function handleImageEnhanceSubmit(e) {
@@ -967,15 +1010,19 @@
       try {
         const res = await fetch(`${API_BASE_URL}/api/enhance-image?clientId=${clientId}`, { method: 'POST', body: formData });
         const data = await res.json();
-        es.close();
-        if (data.url) {
-          document.getElementById('imgProgressBar').style.width = '100%';
-          document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.url}`;
-          document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.url}`;
-          document.getElementById('imgResultArea').style.display = 'flex';
-        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
-      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { document.getElementById('imageEnhanceBtn').disabled = false; }
+        
+        if (data.success) {
+            window.currentImageClientId = clientId;
+        } else {
+            showPopup(data.error || 'Failed', 'Error', 'error');
+            es.close();
+            document.getElementById('imageEnhanceBtn').disabled = false;
+        }
+      } catch (err) { 
+        es.close(); 
+        showPopup(err.message, 'Error', 'error');
+        document.getElementById('imageEnhanceBtn').disabled = false;
+      }
     }
   </script>
 </body>
