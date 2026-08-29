@@ -808,12 +808,14 @@
             document.getElementById('imgProgressCard').style.display = 'none';
             document.getElementById('imageGenerateBtn').disabled = false;
             document.getElementById('imageEnhanceBtn').disabled = false;
+            window.isImageTaskRunning = false;
             eventSource.close();
           } else if (data.status === 'error') {
             showPopup(data.message || 'Failed', 'Error', 'error');
             document.getElementById('imgProgressCard').style.display = 'none';
             document.getElementById('imageGenerateBtn').disabled = false;
             document.getElementById('imageEnhanceBtn').disabled = false;
+            window.isImageTaskRunning = false;
             eventSource.close();
           } else if (data.message) {
             const bar = document.getElementById(barId);
@@ -968,6 +970,10 @@
     }
 
     function switchImageTab(tab) {
+      if (window.isImageTaskRunning) {
+        showPopup('කරුණාකර දැනට ක්‍රියාත්මක වන Image වැඩකටයුත්ත අවසන් වන තෙක් රැඳී සිටින්න. Server Load එක අවම කිරීම සඳහා එකවර එක් වැඩක් පමණක් සිදුකළ හැක.', 'කරුණාකර රැඳී සිටින්න ⏳', 'error');
+        return;
+      }
       document.getElementById('imageGenerateForm').style.display = tab === 'generate' ? 'block' : 'none';
       document.getElementById('imageEnhanceForm').style.display = tab === 'enhance' ? 'block' : 'none';
       document.getElementById('tabGenerate').className = tab === 'generate' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
@@ -988,6 +994,7 @@
 
       const clientId = 'img_' + Date.now();
       const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      window.isImageTaskRunning = true;
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/generate-image`, {
@@ -1001,11 +1008,13 @@
             showPopup(data.error || 'Failed', 'Error', 'error');
             es.close();
             document.getElementById('imageGenerateBtn').disabled = false;
+            window.isImageTaskRunning = false;
         }
       } catch (err) { 
         es.close(); 
         showPopup(err.message, 'Error', 'error');
         document.getElementById('imageGenerateBtn').disabled = false;
+        window.isImageTaskRunning = false;
       }
     }
 
@@ -1022,6 +1031,7 @@
 
       const clientId = 'img_' + Date.now();
       const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      window.isImageTaskRunning = true;
       const formData = new FormData();
       formData.append('image', fileInput.files[0]);
       const customPrompt = document.getElementById('enhancePromptInput').value;
@@ -1037,11 +1047,13 @@
             showPopup(data.error || 'Failed', 'Error', 'error');
             es.close();
             document.getElementById('imageEnhanceBtn').disabled = false;
+            window.isImageTaskRunning = false;
         }
       } catch (err) { 
         es.close(); 
         showPopup(err.message, 'Error', 'error');
         document.getElementById('imageEnhanceBtn').disabled = false;
+        window.isImageTaskRunning = false;
       }
     }
   </script>
