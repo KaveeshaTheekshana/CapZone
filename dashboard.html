@@ -409,8 +409,8 @@
   </div>
 
   <!-- FB MODAL -->
-  <div id="qualityModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300" style="display: none; opacity: 0;">
-    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 scale-95" id="qualityModalContent">
+  <div id="qualityModal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 ease-out" style="display: none; opacity: 0;">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 ease-out scale-75" id="qualityModalContent">
       <button onclick="closeModal('qualityModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
@@ -952,7 +952,7 @@
       // Small delay to allow display block to apply before animating opacity
       setTimeout(() => {
         modal.style.opacity = '1';
-        content.classList.remove('scale-95');
+        content.classList.remove('scale-75');
         content.classList.add('scale-100');
       }, 10);
     }
@@ -964,7 +964,7 @@
       const content = document.getElementById('qualityModalContent');
       modal.style.opacity = '0';
       content.classList.remove('scale-100');
-      content.classList.add('scale-95');
+      content.classList.add('scale-75');
       setTimeout(() => {
         modal.style.display = 'none';
         handleSocialSubmit(pendingDownload.type, pendingDownload.url, pendingDownload.format, qualityLevel);
