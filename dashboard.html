@@ -715,10 +715,9 @@
       </form>
 
       <div id="imgProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
-        <p class="text-xs font-bold text-fix-heading mb-2">Processing (May take up to 2 mins)...</p>
+        <p id="imgStatusText" class="text-xs font-bold text-fix-heading mb-2">Processing (May take up to 2 mins)...</p>
         <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
-            style="width: 0%">
+          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
           </div>
         </div>
       </div>
@@ -808,6 +807,12 @@
           } else if (data.message) {
             const bar = document.getElementById(barId);
             if (bar) bar.style.width = '80%';
+            
+            // If it's an image process, update the status text dynamically
+            if (barId === 'imgProgressBar') {
+                const statusEl = document.getElementById('imgStatusText');
+                if (statusEl) statusEl.innerText = data.message;
+            }
           }
         } catch (e) { }
       };
@@ -966,6 +971,8 @@
 
       document.getElementById('imageGenerateBtn').disabled = true;
       document.getElementById('imgProgressCard').style.display = 'block';
+      const statusEl = document.getElementById('imgStatusText');
+      if (statusEl) statusEl.innerText = 'Initializing...';
       document.getElementById('imgResultArea').style.display = 'none';
 
       const clientId = 'img_' + Date.now();
@@ -998,6 +1005,8 @@
 
       document.getElementById('imageEnhanceBtn').disabled = true;
       document.getElementById('imgProgressCard').style.display = 'block';
+      const statusEl = document.getElementById('imgStatusText');
+      if (statusEl) statusEl.innerText = 'Initializing...';
       document.getElementById('imgResultArea').style.display = 'none';
 
       const clientId = 'img_' + Date.now();
