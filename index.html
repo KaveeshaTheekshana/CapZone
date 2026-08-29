@@ -21,21 +21,21 @@
             theme: {
                 extend: {
                     colors: {
-                        "surface-variant": "#2a4d3a",
-                        "primary": "#366a4a",
-                        "outline": "#8ba896",
-                        "on-surface": "#1f3f2d",
-                        "background": "transparent",
+                        "surface-variant": "#333333",
+                        "primary": "#ffffff",
+                        "outline": "#555555",
+                        "on-surface": "#ffffff",
+                        "background": "#0a0a0a",
                         "primary-fixed": "#e3ebd5",
-                        "surface-container-high": "rgba(255, 255, 255, 0.7)",
-                        "primary-container": "#2a4d3a",
-                        "secondary-container": "#1f3f2d",
-                        "surface-container-highest": "rgba(255, 255, 255, 0.9)",
-                        "surface": "rgba(255, 255, 255, 0.6)",
-                        "secondary": "#497b5e",
-                        "inverse-primary": "#a6c9a9",
+                        "surface-container-high": "rgba(255, 255, 255, 0.1)",
+                        "primary-container": "#111111",
+                        "secondary-container": "#222222",
+                        "surface-container-highest": "rgba(255, 255, 255, 0.2)",
+                        "surface": "rgba(0, 0, 0, 0.6)",
+                        "secondary": "#aaaaaa",
+                        "inverse-primary": "#dddddd",
                         "surface-container-lowest": "transparent",
-                        "on-background": "#1f3f2d"
+                        "on-background": "#ffffff"
                     },
                     fontFamily: {
                         "sans": ["Poppins", "sans-serif"],
@@ -65,24 +65,69 @@
             -webkit-tap-highlight-color: transparent !important;
         }
 
-        body { font-family: 'Poppins', sans-serif; background-color: #f8f5f0; background-image: url('https://i.pinimg.com/1200x/bb/97/78/bb977892cf940c01f50fa84d1ef8036c.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: #1f3f2d; overflow-x: hidden; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0a0a0a;
+            background-image: url('https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=2000&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        .hero-bg {
+            background-image: url('hero-bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
 
         .font-sinhala {
             font-family: 'Noto Sans Sinhala', sans-serif !important;
             line-height: 1.45 !important;
         }
 
-        .glass-panel { background: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); border: 1px solid rgba(255, 255, 255, 0.3); border-top: 1px solid rgba(255, 255, 255, 0.8); border-left: 1px solid rgba(255, 255, 255, 0.8); box-shadow: 0 15px 35px 0 rgba(31, 63, 45, 0.2), inset 0 0 20px rgba(255, 255, 255, 0.5); border-radius: 24px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.7) 0%, rgba(20, 20, 20, 0.2) 100%);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            border-left: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 35px 0 rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-        .glass-panel:hover { background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.2) 100%); border-color: rgba(255, 255, 255, 0.9); box-shadow: 0 25px 60px -10px rgba(31, 63, 45, 0.35), inset 0 0 30px rgba(255, 255, 255, 0.8); transform: translateY(-8px) scale(1.02); }
+        .glass-panel:hover {
+            background: linear-gradient(135deg, rgba(30, 30, 30, 0.8) 0%, rgba(30, 30, 30, 0.3) 100%);
+            border-color: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(255, 255, 255, 0.1);
+            transform: translateY(-8px) scale(1.02);
+        }
 
-        .text-gradient { background: linear-gradient(135deg, #1f3f2d 0%, #366a4a 40%, #497b5e 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-gradient {
+            background: linear-gradient(135deg, #1f3f2d 0%, #366a4a 40%, #497b5e 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        .text-gradient-purple { background: linear-gradient(135deg, #366a4a 0%, #497b5e 50%, #2a4d3a 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .text-gradient-purple {
+            background: linear-gradient(135deg, #366a4a 0%, #497b5e 50%, #2a4d3a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-        .glow-btn { position: relative; box-shadow: 0 0 30px rgba(42, 77, 58, 0.3); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .glow-btn {
+            position: relative;
+            box-shadow: 0 0 30px rgba(42, 77, 58, 0.3);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-        .glow-btn:hover { box-shadow: 0 0 40px rgba(42, 77, 58, 0.5), 0 0 25px rgba(73, 123, 94, 0.4); transform: translateY(-2px) scale(1.03); }
+        .glow-btn:hover {
+            box-shadow: 0 0 40px rgba(42, 77, 58, 0.5), 0 0 25px rgba(73, 123, 94, 0.4);
+            transform: translateY(-2px) scale(1.03);
+        }
 
         @keyframes pulse-glow {
 
@@ -171,118 +216,95 @@
             transform: translate(0) scale(1) !important;
         }
     </style>
-    <link rel="icon" href="logo.jpg" type="image/png" />`n
+    <link rel="icon" href="logo.jpg" type="image/png" />
 </head>
 
 <body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-surface">
 
     <!-- Top Sticky Header -->
     <header
-        class="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-2xl border-b border-white/50 shadow-sm transition-all duration-300">
+        class="absolute top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-md border-b border-white/10 transition-all duration-300">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-4 flex items-center justify-between">
 
             <!-- Logo -->
             <a href="index.html" class="flex items-center gap-3 group">
-                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform">
+                <div
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] group-hover:scale-105 transition-all duration-300">
                     <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
                 </div>
-                <span class="text-xl sm:text-2xl font-bold tracking-tight text-[#1f3f2d] font-sans">CapZone</span>
+                <span
+                    class="text-xl sm:text-2xl font-bold tracking-tight text-white font-sans drop-shadow-md">CapZone</span>
             </a>
 
             <!-- Nav Links -->
-            <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-on-surface-variant">
-                <a href="#features" class="hover:text-[#366a4a] transition-colors">Features</a>
-                <a href="#how-it-works" class="hover:text-[#366a4a] transition-colors">How It Works</a>
+            <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
+                <a href="#features"
+                    class="hover:text-white hover:text-shadow-glow transition-all duration-300">Features</a>
+                <a href="#how-it-works"
+                    class="hover:text-white hover:text-shadow-glow transition-all duration-300">How It Works</a>
             </nav>
 
             <!-- Action Button -->
-            <div class="flex items-center gap-2 sm:gap-3">
+            <div class="flex items-center gap-4">
                 <a href="login.html"
-                    class="bg-surface-container-high/80 hover:bg-surface-container-highest border border-surface-variant/30 text-on-surface px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 transition-all hover:scale-105">
-                    <span class="material-symbols-outlined text-lg text-primary">login</span>
-                    <span class="hidden sm:block">Login</span>
-                </a>
-                <a href="login.html"
-                    class="glow-btn bg-gradient-to-r from-primary-container to-inverse-primary text-on-surface px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-sm font-bold flex items-center gap-2">
-                    <span class="material-symbols-outlined text-lg">person_add</span>
-                    <span class="hidden sm:block">Sign Up</span>
+                    class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all duration-300 backdrop-blur-sm">
+                    Sign In <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
             </div>
         </div>
     </header>
 
     <!-- HERO SECTION -->
-    <section class="relative min-h-[90vh] flex items-center justify-center pt-28 pb-12 overflow-hidden">
-        <!-- Background Lighting Blobs -->
-        <div
-            class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] sm:w-[60rem] h-[30rem] bg-primary-container/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow">
-        </div>
-        <div
-            class="absolute top-1/3 right-10 w-[25rem] h-[25rem] bg-secondary/15 rounded-full blur-[120px] pointer-events-none">
-        </div>
+    <section
+        class="hero-bg relative min-h-[95vh] flex items-center pt-32 pb-12 overflow-hidden border-b border-white/10">
+        <!-- Dark Overlay for readability -->
+        <div class="absolute inset-0 bg-black/50 z-0 pointer-events-none"></div>
 
         <div
-            class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10 w-full flex flex-col items-center text-center reveal-up">
-
-            <!-- Pill Badge -->
-            <div
-                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-container-high/80 border border-surface-variant/20 backdrop-blur-md mb-6 shadow-lg shadow-primary-container/10">
-                <span class="material-symbols-outlined text-primary text-sm animate-pulse">bolt</span>
-                <span class="text-xs font-semibold text-primary tracking-widest uppercase">KaveezCloud Engine</span>
-            </div>
+            class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10 w-full flex flex-col items-start text-left reveal-up">
 
             <!-- Main Title -->
-            <h1 class="text-4xl sm:text-5xl lg:text-7xl font-bold text-on-surface leading-tight tracking-tight mb-6 drop-shadow-[0_2px_15px_rgba(255,255,255,0.8)]">
-                Create Sinhala OR English Subtitles & <br class="hidden sm:block" /><span class="text-gradient">Edit
-                    Videos</span> in Milliseconds
+            <h1
+                class="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] tracking-tight mb-6 max-w-4xl drop-shadow-2xl">
+                Create Sinhala & English<br />
+                Subtitles in Milliseconds
             </h1>
 
-            <!-- Subtitle in Sinhala & English -->
+            <!-- Subtitle -->
             <p
-                class="text-base sm:text-lg text-on-surface/90 font-normal font-sinhala leading-relaxed max-w-3xl mb-10 mx-auto">
-                Bridge the Language Gap.Unlimited Sinhala & English subtitles for your favorite Videos.
+                class="text-base sm:text-lg lg:text-xl text-white/80 font-normal leading-relaxed max-w-2xl mb-10 drop-shadow-md">
+                Bridge the Language Gap. Unlimited Sinhala & English subtitles for your favorite Videos.
             </p>
 
             <!-- CTA Buttons -->
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+            <div class="flex items-center gap-4 mb-24">
                 <a href="login.html"
-                    class="glow-btn w-full sm:w-auto bg-gradient-to-r from-primary-container via-inverse-primary to-secondary text-on-surface px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-3 shadow-xl">
-                    <span class="material-symbols-outlined text-xl">login</span>
-                    Login
-                </a>
-
-                <a href="login.html"
-                    class="w-full sm:w-auto bg-surface-container-high/80 hover:bg-surface-container-highest border border-surface-variant/20 text-on-surface px-8 py-4 rounded-2xl text-base font-bold flex items-center justify-center gap-2 transition-all hover:scale-105">
-                    <span class="material-symbols-outlined text-lg">person_add</span>
-                    Sign Up
+                    class="bg-white hover:bg-gray-100 text-black px-7 py-3 rounded-full text-sm font-medium transition-all hover:scale-105">
+                    Start Creating
                 </a>
             </div>
 
-            <!-- Stats Strip with Animated Count-Up Counters -->
-            <div id="hero-stats-strip"
-                class="grid grid-cols-3 gap-4 sm:gap-8 mt-14 pt-6 pb-6 border border-surface-variant/20 w-full max-w-2xl mx-auto glass-panel rounded-3xl shadow-2xl">
+            <!-- Bottom Stats -->
+            <div id="hero-stats-strip" class="grid grid-cols-3 gap-12 sm:gap-24">
                 <div>
-                    <div id="stat-count-1" class="text-2xl sm:text-4xl font-bold text-on-surface font-mono">0%</div>
-                    <div class="text-xs sm:text-sm text-surface-variant font-medium mt-1 sm:mt-2">Noise Cleaning</div>
+                    <div id="stat-count-1" class="text-2xl sm:text-3xl font-medium text-white mb-1">+99.9%</div>
+                    <div class="text-xs sm:text-sm text-white/60">Sinhala Accuracy rate</div>
                 </div>
                 <div>
-                    <div id="stat-count-2" class="text-2xl sm:text-4xl font-bold text-primary font-mono">0%
-                    </div>
-                    <div class="text-xs sm:text-sm text-on-surface-variant font-medium mt-1 sm:mt-2">Sinhala Ligatures
-                    </div>
+                    <div id="stat-count-2" class="text-2xl sm:text-3xl font-medium text-white mb-1">3,427</div>
+                    <div class="text-xs sm:text-sm text-white/60">Active creators</div>
                 </div>
                 <div>
-                    <div id="stat-count-3" class="text-2xl sm:text-4xl font-extrabold text-secondary font-mono">0+
-                    </div>
-                    <div class="text-xs sm:text-sm text-on-surface-variant font-medium mt-1 sm:mt-2">Cinematic Anims
-                    </div>
+                    <div id="stat-count-3" class="text-2xl sm:text-3xl font-medium text-white mb-1">72,000+</div>
+                    <div class="text-xs sm:text-sm text-white/60">Global users</div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- PRO TICKER MARQUEE (PLACED UP HIGH RIGHT BELOW HERO!) -->
-    <section class="py-8 bg-surface-container-highest/80 border-y border-surface-variant/20 overflow-hidden relative z-20">
+    <section
+        class="py-8 bg-surface-container-highest/80 border-y border-surface-variant/20 overflow-hidden relative z-20">
         <div class="max-w-7xl mx-auto px-4 mb-4 text-center">
             <span
                 class="text-xs font-extrabold text-[#2a4d3a] uppercase tracking-widest flex items-center justify-center gap-2">
@@ -477,17 +499,17 @@
 
     <!-- FEATURES SECTION -->
     <section id="features"
-        class="py-24 px-4 sm:px-6 lg:px-12 bg-surface-container-lowest relative border-t border-surface-variant/20">
+        class="py-24 px-4 sm:px-6 lg:px-12 bg-black/40 backdrop-blur-sm relative border-t border-white/10">
         <div class="max-w-7xl mx-auto">
 
             <div class="text-center max-w-3xl mx-auto mb-16 reveal-up">
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-extrabold uppercase tracking-wider mb-3">
+                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold uppercase tracking-wider mb-4 shadow-lg backdrop-blur-md">
                     <span class="material-symbols-outlined text-sm">auto_awesome</span> Power Features
                 </div>
-                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Everything You Need for <span
-                        class="text-gradient">Viral Subtitles</span></h2>
-                <p class="text-on-surface-variant text-sm sm:text-base mt-4">Built with cutting-edge AI multimodal
+                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Everything You Need
+                    for <span class="text-white/80 font-medium">Viral Subtitles</span></h2>
+                <p class="text-white/60 text-sm sm:text-base mt-4 font-medium">Built with cutting-edge AI multimodal
                     processing, instant font rendering, and zero-credit backend capacity.</p>
             </div>
 
@@ -501,7 +523,9 @@
                         <span class="text-4xl drop-shadow-2xl">📘</span>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-3">Facebook MP4 & MP3 Downloader</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Download high-quality Facebook videos in MP4 format or extract crystal-clear MP3 audio with just one click. Perfect for content creators!</p>
+                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Download high-quality Facebook
+                        videos in MP4 format or extract crystal-clear MP3 audio with just one click. Perfect for content
+                        creators!</p>
                 </div>
 
                 <!-- Card 2 -->
@@ -511,7 +535,9 @@
                         <span class="text-4xl drop-shadow-2xl">🪄</span>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-3">Image Background Remover</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Instantly remove backgrounds from any image using our smart AI. Get high-quality, transparent PNGs without losing any details.</p>
+                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Instantly remove backgrounds
+                        from any image using our smart AI. Get high-quality, transparent PNGs without losing any
+                        details.</p>
                 </div>
 
                 <!-- Card 3 -->
@@ -521,7 +547,8 @@
                         <span class="text-4xl drop-shadow-2xl">🎵</span>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-3">TikTok No-Watermark & Audio</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Grab TikTok videos completely watermark-free, or easily download them as high-quality MP3 audio files for your own edits.</p>
+                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Grab TikTok videos completely
+                        watermark-free, or easily download them as high-quality MP3 audio files for your own edits.</p>
                 </div>
 
                 <!-- Card 4 -->
@@ -531,7 +558,9 @@
                         <span class="text-4xl drop-shadow-2xl">💬</span>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-3">Sinhala & English Subtitles</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Automatically generate perfectly synced subtitles in both Sinhala and English. Advanced typography fixes guarantee 100% correct font rendering.</p>
+                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Automatically generate
+                        perfectly synced subtitles in both Sinhala and English. Advanced typography fixes guarantee 100%
+                        correct font rendering.</p>
                 </div>
 
                 <!-- Card 5 -->
@@ -541,7 +570,9 @@
                         <span class="text-4xl drop-shadow-2xl">🎙️</span>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-3">Sinhala & English AI Dubbing</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Clone voices and seamlessly dub your videos into Sinhala or English using advanced AI voice generation for a global audience.</p>
+                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Clone voices and seamlessly
+                        dub your videos into Sinhala or English using advanced AI voice generation for a global
+                        audience.</p>
                 </div>
 
                 <!-- Card 6 -->
@@ -551,23 +582,25 @@
                         <span class="text-4xl drop-shadow-2xl">📲</span>
                     </div>
                     <h3 class="text-xl font-bold text-on-surface mb-3">Auto WhatsApp Share</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Share your processed videos, downloaded audio, or SRT subtitles directly to WhatsApp with our one-click automated integration.</p>
+                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Share your processed videos,
+                        downloaded audio, or SRT subtitles directly to WhatsApp with our one-click automated
+                        integration.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- HOW IT WORKS SECTION -->
-    <section id="how-it-works" class="py-24 px-4 sm:px-6 lg:px-12 bg-background relative">
+    <section id="how-it-works" class="py-24 px-4 sm:px-6 lg:px-12 bg-transparent relative">
         <div class="max-w-7xl mx-auto">
 
             <div class="text-center max-w-3xl mx-auto mb-20 reveal-up">
                 <div
-                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary/10 border border-secondary/20 text-secondary text-xs font-extrabold uppercase tracking-wider mb-3">
+                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white text-xs font-bold uppercase tracking-wider mb-4 shadow-lg backdrop-blur-md">
                     <span class="material-symbols-outlined text-sm">route</span> Simple Workflow
                 </div>
-                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Create Subtitles in <span
-                        class="text-gradient">3 Simple Steps</span></h2>
+                <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Create Subtitles in
+                    <span class="text-white/80 font-medium">3 Simple Steps</span></h2>
             </div>
 
             <!-- Steps Grid -->
@@ -576,32 +609,33 @@
                 <!-- Step 1 -->
                 <div class="glass-panel p-8 rounded-3xl relative text-center flex flex-col items-center reveal-up">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-primary-container to-inverse-primary text-on-surface text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-primary-container/40">
+                        class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 text-white text-xl font-bold flex items-center justify-center mb-6 shadow-lg backdrop-blur-md">
                         1</div>
-                    <h3 class="text-xl font-bold text-on-surface mb-2">Upload Video or Audio</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">ඔබේ වීඩියෝ හෝ ශ්‍රව්‍ය ගොනුව
-                        අපගේ අධිවේගී ක්ලවුඩ් පද්ධතියට පහසුවෙන් එක් කරන්න.</p>
+                    <h3 class="text-xl font-bold text-white mb-3">Upload Video or Audio</h3>
+                    <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-sinhala">ඔබේ වීඩියෝ හෝ ශ්‍රව්‍ය
+                        ගොනුව
+                        අපගේ අධිවේගී Cloud පද්ධතියට පහසුවෙන් එක් කරන්න.</p>
                 </div>
 
                 <!-- Step 2 -->
                 <div class="glass-panel p-8 rounded-3xl relative text-center flex flex-col items-center reveal-up"
                     style="transition-delay: 0.15s;">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-inverse-primary to-secondary text-on-surface text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-secondary/30">
+                        class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 text-white text-xl font-bold flex items-center justify-center mb-6 shadow-lg backdrop-blur-md">
                         2</div>
-                    <h3 class="text-xl font-bold text-on-surface mb-2">Kaveez Cloud Subtitles</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed font-sinhala">Kaveez Cloud
+                    <h3 class="text-xl font-bold text-white mb-3">Kaveez Cloud Subtitles</h3>
+                    <p class="text-xs sm:text-sm text-white/60 leading-relaxed font-sinhala">Kaveez Cloud
                         Engine මගින් ශබ්දය විශ්ලේෂණය කර, තත්පර ගණනින් නිවැරදි සිංහල SRT Subtitles සාදයි.</p>
                 </div>
 
                 <!-- Step 3 -->
-                <div class="glass-panel p-8 rounded-3xl relative text-center flex flex-col items-center reveal-up"
+                <div class="glass-panel p-8 rounded-3xl relative text-center flex flex-col items-center reveal-up bg-white/5 border border-white/10 backdrop-blur-md"
                     style="transition-delay: 0.3s;">
                     <div
-                        class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-secondary to-primary text-background text-xl font-black flex items-center justify-center mb-6 shadow-lg shadow-secondary/40">
+                        class="w-14 h-14 rounded-2xl bg-black/40 border border-white/10 text-white text-xl font-bold flex items-center justify-center mb-6 shadow-lg backdrop-blur-md">
                         3</div>
-                    <h3 class="text-xl font-bold text-on-surface mb-2">Customize & Export MP4</h3>
-                    <p class="text-xs sm:text-sm text-on-surface-variant leading-relaxed">Apply 50+ text animations,
+                    <h3 class="text-xl font-bold text-white mb-3">Customize & Export MP4</h3>
+                    <p class="text-xs sm:text-sm text-white/60 leading-relaxed">Apply 50+ text animations,
                         custom Sinhala fonts, word limits, and export your video instantly.</p>
                 </div>
             </div>
@@ -609,30 +643,27 @@
     </section>
 
     <!-- DEVELOPER & PORTFOLIO FOOTER -->
-    <footer
-        class="py-14 bg-surface-container-highest border-t border-surface-variant/20 text-center text-xs text-[#2a4d3a]/80 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-5">
+    <footer class="py-16 bg-black/60 backdrop-blur-xl border-t border-white/10 text-center relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-6">
             <div class="flex items-center gap-3 group">
-                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.2)] group-hover:scale-110 transition-transform">
+                <div
+                    class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:scale-110 transition-transform">
                     <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
                 </div>
-                <span class="text-xl font-extrabold text-[#1f3f2d] tracking-tight">CapZone Subtitle Studio</span>
+                <span class="text-xl font-bold text-white tracking-tight drop-shadow-md">CapZone Subtitle Studio</span>
             </div>
 
-            <p class="text-sm font-medium text-on-surface">
-                Designed & Engineered with ❤️ by <span class="text-primary font-bold text-base">Kaveesha
-                    Theekshana</span>
+            <p class="text-sm font-medium text-white/70">
+                Designed & Engineered with ❤️ by <span class="text-white font-bold">Kaveesha Theekshana</span>
             </p>
 
             <a href="https://kaveesha.top" target="_blank" rel="noopener noreferrer"
-                class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-surface-container-high border border-primary/40 text-primary hover:text-on-surface hover:bg-primary-container font-extrabold text-xs transition-all shadow-xl hover:scale-105 group">
-                <span
-                    class="material-symbols-outlined text-base group-hover:rotate-12 transition-transform">language</span>
-                Portfolio: kaveesha.top
-                <span class="material-symbols-outlined text-sm">open_in_new</span>
+                class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold transition-all hover:scale-105 backdrop-blur-md">
+                <span class="material-symbols-outlined text-[18px]">language</span>
+                Visit kaveesha.top
             </a>
 
-            <p class="text-[11px] text-[#2a4d3a] mt-2">© 2026 CapZone Subtitle Studio. All rights reserved.
+            <p class="text-[11px] text-white/50 mt-2">© 2026 CapZone Subtitle Studio. All rights reserved.
                 Powered by KaveezCloud Engine.</p>
         </div>
     </footer>
@@ -658,18 +689,18 @@
             revealElements.forEach(el => observer.observe(el));
 
             // Smooth Count-Up Animation Function
-            function animateCounter(element, targetVal, duration = 1600, suffix = '') {
+            function animateCounter(element, targetVal, duration = 1600, prefix = '', suffix = '') {
                 let startTimestamp = null;
                 function step(timestamp) {
                     if (!startTimestamp) startTimestamp = timestamp;
                     const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                     const easeOutProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
                     const currentVal = Math.floor(easeOutProgress * targetVal);
-                    element.textContent = currentVal + suffix;
+                    element.textContent = prefix + currentVal.toLocaleString() + suffix;
                     if (progress < 1) {
                         window.requestAnimationFrame(step);
                     } else {
-                        element.textContent = targetVal + suffix;
+                        element.textContent = prefix + targetVal.toLocaleString() + suffix;
                     }
                 }
                 window.requestAnimationFrame(step);
@@ -679,9 +710,9 @@
             const statsContainer = document.getElementById('hero-stats-strip');
             if (statsContainer) {
                 const statElements = [
-                    { el: document.getElementById('stat-count-1'), target: 0, suffix: '%' },
-                    { el: document.getElementById('stat-count-2'), target: 100, suffix: '%' },
-                    { el: document.getElementById('stat-count-3'), target: 50, suffix: '+' }
+                    { el: document.getElementById('stat-count-1'), target: 99, prefix: '+', suffix: '.9%' },
+                    { el: document.getElementById('stat-count-2'), target: 3427, prefix: '', suffix: '' },
+                    { el: document.getElementById('stat-count-3'), target: 72000, prefix: '', suffix: '+' }
                 ];
 
                 const statsObserver = new IntersectionObserver((entries) => {
@@ -689,14 +720,14 @@
                         if (entry.isIntersecting) {
                             statElements.forEach(item => {
                                 if (item.el) {
-                                    item.el.textContent = '0' + item.suffix;
-                                    animateCounter(item.el, item.target, 1600, item.suffix);
+                                    item.el.textContent = item.prefix + '0' + item.suffix;
+                                    animateCounter(item.el, item.target, 2000, item.prefix, item.suffix);
                                 }
                             });
                         } else {
                             // Reset numbers back to 0 so when user scrolls back into view, it re-animates!
                             statElements.forEach(item => {
-                                if (item.el) item.el.textContent = '0' + item.suffix;
+                                if (item.el) item.el.textContent = item.prefix + '0' + item.suffix;
                             });
                         }
                     });
