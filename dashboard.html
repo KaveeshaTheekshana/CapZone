@@ -169,7 +169,7 @@
 
 
   <header class="fixed top-0 inset-x-0 h-20 glass-panel z-40 flex items-center px-4 lg:px-10 gap-3 lg:gap-6">
-    <a class="flex-shrink-0 flex items-center gap-3 group" href="#">
+    <a class="flex-shrink-0 flex items-center gap-3 group" href="index.html">
       <div
         class="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
         <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
@@ -749,7 +749,7 @@
       
       <!-- Interactive Chat Area -->
       <div id="imgInteractiveArea" style="display:none;" class="mt-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-         <p class="text-xs font-bold text-indigo-400 mb-2">Gemini asks:</p>
+         <p class="text-xs font-bold text-indigo-400 mb-2">KaveezCloud asks:</p>
          <p id="imgQuestionText" class="text-sm text-white mb-3"></p>
          <div class="flex gap-2">
             <input type="text" id="imgReplyInput" class="input-fix flex-1 px-3 py-2 rounded-xl text-sm outline-none" placeholder="Type your reply...">
@@ -789,18 +789,36 @@
     function closeModal(modalId, event) {
       if (event) event.preventDefault();
       const modal = document.getElementById(modalId);
-      if (modal) modal.style.display = 'none';
+      if (modal) {
+        modal.style.display = 'none';
+        // Auto-reset forms and specific UI states on close
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(f => f.reset());
+        const fileLabels = modal.querySelectorAll('p[id$="FileName"]');
+        fileLabels.forEach(l => {
+           if(l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
+           if(l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image to Remove BG';
+           if(l.id === 'dubFileName') l.textContent = 'Click to Browse Video';
+        });
+        const progressCards = modal.querySelectorAll('[id$="ProgressCard"]');
+        progressCards.forEach(c => c.style.display = 'none');
+        const resultAreas = modal.querySelectorAll('[id$="ResultArea"]');
+        resultAreas.forEach(c => c.style.display = 'none');
+        // Re-enable submit buttons just in case
+        const buttons = modal.querySelectorAll('button[type="submit"]');
+        buttons.forEach(b => b.disabled = false);
+      }
     }
     function showPopup(message, title = 'Notice', type = 'success') {
       const toast = document.getElementById('toastNotification');
       const msg = document.getElementById('toastMessage');
       const iconContainer = document.getElementById('toastIconContainer');
 
-      msg.innerHTML = message;
-
       if (type === 'error') {
-        iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>';
+        msg.innerHTML = '<div class="flex flex-col gap-1"><span class="text-red-400 text-sm">An unexpected error occurred.</span><span class="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Please Contact Developer if this persists.</span></div>';
+        iconContainer.innerHTML = '<i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>';
       } else {
+        msg.innerHTML = message;
         iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-indigo-500"></i>';
       }
       lucide.createIcons();
