@@ -409,6 +409,36 @@
   </div>
 
   <!-- FB MODAL -->
+  <div id="qualityModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300" style="display: none; opacity: 0;">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 scale-95" id="qualityModalContent">
+      <button onclick="closeModal('qualityModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="text-center mb-6 mt-2">
+        <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3">
+          <i id="qualityModalIcon" data-lucide="settings" class="w-6 h-6"></i>
+        </div>
+        <h2 id="qualityModalTitle" class="text-xl font-bold text-white mb-1">Select Quality</h2>
+        <p id="qualityModalDesc" class="text-xs text-slate-400">Choose your preferred download quality.</p>
+      </div>
+      <div class="space-y-3">
+        <button onclick="confirmQuality('standard')" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-xl border border-white/10 transition-all flex items-center justify-between px-5 group">
+          <div class="flex items-center gap-3">
+            <i data-lucide="monitor" class="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+            <span id="qualityStandardText">Standard (720p)</span>
+          </div>
+          <span class="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">Fastest</span>
+        </button>
+        <button onclick="confirmQuality('max')" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl border border-white/20 shadow-lg shadow-blue-500/20 transition-all flex items-center justify-between px-5 group">
+          <div class="flex items-center gap-3">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-200"></i>
+            <span id="qualityMaxText">Max Quality (1080p)</span>
+          </div>
+          <span class="text-[10px] bg-white/20 px-2 py-1 rounded text-white">Best</span>
+        </button>
+      </div>
+    </div>
+  </div>
   <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
     <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
@@ -889,24 +919,78 @@
       finally { document.getElementById('srtSubmitBtn').disabled = false; }
     }
 
+    // Quality Selection State
+    let pendingDownload = null;
+
+    function openQualityModal(type, url, format) {
+      pendingDownload = { type, url, format };
+      
+      const title = document.getElementById('qualityModalTitle');
+      const desc = document.getElementById('qualityModalDesc');
+      const stdText = document.getElementById('qualityStandardText');
+      const maxText = document.getElementById('qualityMaxText');
+      const icon = document.getElementById('qualityModalIcon');
+
+      if (format === 'audio') {
+        title.textContent = "Select Audio Quality";
+        desc.textContent = "Higher bitrate means better sound.";
+        stdText.textContent = "Standard Bitrate";
+        maxText.textContent = "Highest Quality (320kbps)";
+        icon.setAttribute('data-lucide', 'headphones');
+      } else {
+        title.textContent = "Select Video Quality";
+        desc.textContent = "Choose resolution for download.";
+        stdText.textContent = "Standard (720p HD)";
+        maxText.textContent = "Max Quality (1080p HD)";
+        icon.setAttribute('data-lucide', 'video');
+      }
+      lucide.createIcons();
+
+      const modal = document.getElementById('qualityModal');
+      const content = document.getElementById('qualityModalContent');
+      modal.style.display = 'flex';
+      // Small delay to allow display block to apply before animating opacity
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+      }, 10);
+    }
+
+    function confirmQuality(qualityLevel) {
+      if (!pendingDownload) return;
+      
+      const modal = document.getElementById('qualityModal');
+      const content = document.getElementById('qualityModalContent');
+      modal.style.opacity = '0';
+      content.classList.remove('scale-100');
+      content.classList.add('scale-95');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        handleSocialSubmit(pendingDownload.type, pendingDownload.url, pendingDownload.format, qualityLevel);
+        pendingDownload = null;
+      }, 300);
+    }
+
     async function handleFbSubmit(e) {
       e.preventDefault();
-      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value);
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value, 'video');
     }
     async function handleFbAudioSubmit(e) {
       e.preventDefault();
-      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value);
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value, 'audio');
     }
     async function handleTiktokSubmit(e) {
       e.preventDefault();
-      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value);
+      // Only TikTok Video shows the popup
+      openQualityModal('tiktok', document.getElementById('tiktokUrlInput').value, 'video');
     }
     async function handleTiktokAudioSubmit(e) {
       e.preventDefault();
-      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value);
+      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value, 'audio');
     }
 
-    async function handleSocialSubmit(type, url) {
+    async function handleSocialSubmit(type, url, format = 'video', qualityLevel = 'max') {
       const btnId = type + 'SubmitBtn';
       const progId = type + 'ProgressCard';
       const resId = type + 'ResultArea';
@@ -922,13 +1006,14 @@
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/${type === 'fb' ? 'facebook-download' : 'tiktok-download'}`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, clientId })
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, clientId, format, qualityLevel })
         });
         const data = await res.json();
         es.close();
         if (data.downloadUrl) {
           document.getElementById(barId).style.width = '100%';
           document.getElementById(linkId).href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
           document.getElementById(resId).style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
