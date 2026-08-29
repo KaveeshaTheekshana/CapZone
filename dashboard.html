@@ -721,6 +721,17 @@
           </div>
         </div>
       </div>
+      
+      <!-- Interactive Chat Area -->
+      <div id="imgInteractiveArea" style="display:none;" class="mt-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+         <p class="text-xs font-bold text-indigo-400 mb-2">Gemini asks:</p>
+         <p id="imgQuestionText" class="text-sm text-white mb-3"></p>
+         <div class="flex gap-2">
+            <input type="text" id="imgReplyInput" class="input-fix flex-1 px-3 py-2 rounded-xl text-sm outline-none" placeholder="Type your reply...">
+            <button type="button" onclick="sendImageReply()" class="px-4 py-2 bg-indigo-600 rounded-xl text-white font-bold text-sm hover:bg-indigo-700 transition-colors">Send</button>
+         </div>
+      </div>
+
       <div id="imgResultArea"
         class="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col items-center gap-3"
         style="display: none;">
