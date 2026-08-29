@@ -42,7 +42,7 @@
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         // [DEV MODE] Temporarily bypassing login redirect
-        //window.location.href = 'login.html';
+        window.location.href = 'login.html';
         console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
       } else {
         const profileName = document.getElementById('profileName');
@@ -170,7 +170,8 @@
 
   <header class="fixed top-0 inset-x-0 h-20 glass-panel z-40 flex items-center px-4 lg:px-10 gap-3 lg:gap-6">
     <a class="flex-shrink-0 flex items-center gap-3 group" href="#">
-      <div class="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
+      <div
+        class="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
         <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
       </div>
       <span class="text-xl lg:text-2xl font-bold text-white tracking-wide drop-shadow-md hidden sm:block">CapZone</span>
@@ -225,9 +226,10 @@
         class="rounded-3xl bg-hero-gradient p-1 relative overflow-hidden shadow-2xl shadow-brand-purple/20 group">
         <div class="absolute inset-1 rounded-[22px] glass-panel bg-opacity-20 z-0 pointer-events-none"></div>
         <div class="relative z-10 flex flex-col lg:flex-row h-full min-h-[300px] rounded-[22px] overflow-hidden">
-          
+
           <!-- 4K Editor Side -->
-          <div class="flex-1 relative flex items-center justify-center p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/10 bg-[url('https://images.unsplash.com/photo-1626544827763-d516dce335e2?q=100&w=1000&auto=format&fit=crop')] bg-cover bg-center group/editor">
+          <div
+            class="flex-1 relative flex items-center justify-center p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/10 bg-[url('https://images.unsplash.com/photo-1626544827763-d516dce335e2?q=100&w=1000&auto=format&fit=crop')] bg-cover bg-center group/editor">
             <div class="absolute inset-0 bg-black/60 group-hover/editor:bg-black/40 transition-all duration-500"></div>
             <button onclick="window.location.href='editor.html'"
               class="relative z-10 px-6 py-4 lg:px-8 lg:py-5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-xl lg:rounded-2xl text-white transition-all duration-300 shadow-[0_0_30px_rgba(255,255,255,0.1)] hover:shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95 text-xl lg:text-2xl font-bold whitespace-nowrap">
@@ -236,10 +238,15 @@
           </div>
 
           <!-- Subtitle Generator Side -->
-          <div class="flex-1 relative p-8 lg:p-10 flex flex-col justify-center bg-[url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=100&w=1000&auto=format&fit=crop')] bg-cover bg-center group/sub">
-            <div class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/50 group-hover/sub:bg-black/70 transition-all duration-500 backdrop-blur-[2px] group-hover/sub:backdrop-blur-none"></div>
+          <div
+            class="flex-1 relative p-8 lg:p-10 flex flex-col justify-center bg-[url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=100&w=1000&auto=format&fit=crop')] bg-cover bg-center group/sub">
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-black/80 to-black/50 group-hover/sub:bg-black/70 transition-all duration-500 backdrop-blur-[2px] group-hover/sub:backdrop-blur-none">
+            </div>
             <div class="relative z-10">
-              <span class="text-xs font-semibold uppercase tracking-wider text-purple-300 mb-2 block drop-shadow-md">Featured Tool</span>
+              <span
+                class="text-xs font-semibold uppercase tracking-wider text-purple-300 mb-2 block drop-shadow-md">Featured
+                Tool</span>
               <h2 class="text-2xl lg:text-3xl font-bold text-white mb-4 drop-shadow-lg">Subtitle Generator</h2>
               <p class="text-gray-200 text-sm leading-relaxed mb-8 max-w-md drop-shadow-md font-medium">
                 Generate perfectly synced Sinhala & English subtitles from any audio using AI.
@@ -254,13 +261,14 @@
         </div>
       </section>
 
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <article
           class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
           onclick="openModal('fbModal', event)">
           <div
             class="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(59,130,246,0.15)] group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(59,130,246,0.3)] transition-all duration-300">
-            <img src="https://img.icons8.com/fluency/96/facebook-new.png" alt="Facebook" class="w-10 h-10 drop-shadow-lg" />
+            <img src="https://img.icons8.com/fluency/96/facebook-new.png" alt="Facebook"
+              class="w-10 h-10 drop-shadow-lg" />
           </div>
           <h3 class="text-lg font-bold text-white mb-3">Facebook Video<br />Downloader</h3>
           <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
@@ -294,7 +302,8 @@
           onclick="openModal('dubModal', event)">
           <div
             class="w-16 h-16 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(236,72,153,0.15)] group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(236,72,153,0.3)] transition-all duration-300">
-            <img src="https://img.icons8.com/fluency/96/microphone.png" alt="Dubbing" class="w-10 h-10 drop-shadow-lg" />
+            <img src="https://img.icons8.com/fluency/96/microphone.png" alt="Dubbing"
+              class="w-10 h-10 drop-shadow-lg" />
           </div>
           <h3 class="text-lg font-bold text-white mb-3">AI Dubbing<br />Studio</h3>
           <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
@@ -306,7 +315,23 @@
           </button>
         </article>
 
-
+        <article
+          class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
+          onclick="openModal('imageModal', event)">
+          <div
+            class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(245,158,11,0.15)] group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(245,158,11,0.3)] transition-all duration-300">
+            <img src="https://img.icons8.com/fluency/96/image.png" alt="Image Studio"
+              class="w-10 h-10 drop-shadow-lg" />
+          </div>
+          <h3 class="text-lg font-bold text-white mb-3">AI Image<br />Studio</h3>
+          <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
+            Generate stunning images from text or enhance blurry photos to crystal clear.
+          </p>
+          <button
+            class="w-full py-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-medium transition-colors">
+            Open Studio
+          </button>
+        </article>
 
       </section>
     </div>
@@ -316,24 +341,26 @@
     class="glass-panel mt-auto py-14 relative z-10 text-center w-full mt-12 border-t border-white/10 bg-black/40 backdrop-blur-md overflow-hidden">
     <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-5">
       <div class="flex items-center gap-3 group">
-          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
-              <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
-          </div>
-          <span class="text-xl font-extrabold text-white tracking-tight drop-shadow-md">CapZone Subtitle Studio</span>
+        <div
+          class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
+          <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
+        </div>
+        <span class="text-xl font-extrabold text-white tracking-tight drop-shadow-md">CapZone Subtitle Studio</span>
       </div>
 
       <p class="text-sm font-medium text-gray-300 drop-shadow-md">
-          Designed & Engineered with ❤️ by <span class="text-blue-400 font-bold text-base">Kaveesha Theekshana</span>
+        Designed & Engineered with ❤️ by <span class="text-blue-400 font-bold text-base">Kaveesha Theekshana</span>
       </p>
 
       <a href="https://kaveesha.top" target="_blank" rel="noopener noreferrer"
-          class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/5 border border-white/20 text-white hover:text-blue-300 hover:bg-white/10 hover:border-blue-400/50 font-extrabold text-xs transition-all shadow-xl hover:scale-105 group backdrop-blur-md">
-          <i data-lucide="globe" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
-          Portfolio: kaveesha.top
-          <i data-lucide="external-link" class="w-3 h-3"></i>
+        class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/5 border border-white/20 text-white hover:text-blue-300 hover:bg-white/10 hover:border-blue-400/50 font-extrabold text-xs transition-all shadow-xl hover:scale-105 group backdrop-blur-md">
+        <i data-lucide="globe" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+        Portfolio: kaveesha.top
+        <i data-lucide="external-link" class="w-3 h-3"></i>
       </a>
 
-      <p class="text-[11px] text-gray-400 mt-2">© 2026 CapZone Subtitle Studio. All rights reserved. Powered by KaveezCloud Engine.</p>
+      <p class="text-[11px] text-gray-400 mt-2">© 2026 CapZone Subtitle Studio. All rights reserved. Powered by
+        KaveezCloud Engine.</p>
     </div>
   </footer>
 
@@ -627,12 +654,91 @@
     </div>
   </div>
 
+  <!-- IMAGE STUDIO MODAL -->
+  <div id="imageModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('imageModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-amber-500/20 text-amber-500 rounded-xl shadow-lg">
+          <i data-lucide="image" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">AI Image Studio</h2>
+          <p class="text-[10px] text-slate-300">Generate or Enhance Images</p>
+        </div>
+      </div>
 
-  <!-- TOAST -->
+      <!-- Tabs -->
+      <div class="flex gap-2 border-b border-white/10 mb-4 pb-2">
+        <button id="tabGenerate" class="px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400"
+          onclick="switchImageTab('generate')">Generate</button>
+        <button id="tabEnhance" class="px-4 py-2 text-sm font-bold text-gray-400"
+          onclick="switchImageTab('enhance')">Enhance</button>
+      </div>
+
+      <!-- Generate Form -->
+      <form id="imageGenerateForm" class="space-y-4" onsubmit="handleImageGenerateSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Image Prompt</label>
+          <textarea id="imagePromptInput" required placeholder="Describe the image you want..."
+            class="input-fix w-full px-4 py-3 rounded-xl outline-none" rows="3"></textarea>
+        </div>
+        <button type="submit" id="imageGenerateBtn"
+          class="w-full py-3.5 bg-amber-600 text-white font-bold text-sm rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="wand-2" class="w-4 h-4"></i> Generate Image
+        </button>
+      </form>
+
+      <!-- Enhance Form -->
+      <form id="imageEnhanceForm" class="space-y-4" onsubmit="handleImageEnhanceSubmit(event)" style="display: none;">
+        <div
+          class="border-2 border-dashed border-white/20 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 transition-colors relative"
+          onclick="document.getElementById('enhanceImageInput').click()">
+          <input type="file" id="enhanceImageInput" accept="image/*" required class="hidden"
+            onchange="document.getElementById('enhanceFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Upload Image'" />
+          <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-amber-500 mb-2"></i>
+          <p class="text-xs text-fix-heading font-bold" id="enhanceFileName">Click to Upload Blurry Image</p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Custom Prompt (Optional)</label>
+          <input type="text" id="enhancePromptInput" placeholder="Enhance this image, make it clear..."
+            class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <button type="submit" id="imageEnhanceBtn"
+          class="w-full py-3.5 bg-amber-600 text-white font-bold text-sm rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> Enhance Image
+        </button>
+      </form>
+
+      <div id="imgProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing (May take up to 2 mins)...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%">
+          </div>
+        </div>
+      </div>
+      <div id="imgResultArea"
+        class="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <img id="imgResultPreview" class="w-full rounded-xl object-contain bg-black/20 max-h-48" src="" />
+        <a id="imgDownloadLink"
+          class="w-full py-2.5 bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Result
+        </a>
+      </div>
+    </div>
+  </div>
+
   <div id="toastNotification"
     class="fixed bottom-6 right-6 z-50 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
     <div class="glass-card px-4 py-3 rounded-xl flex items-center gap-3 shadow-2xl border border-white/20">
-      <i data-lucide="info" class="w-5 h-5 text-indigo-500"></i>
+      <div id="toastIconContainer"><i data-lucide="info" class="w-5 h-5 text-indigo-500"></i></div>
       <span id="toastMessage" class="text-xs font-bold text-fix-heading">Notification Message</span>
     </div>
   </div>
@@ -653,16 +759,14 @@
     function showPopup(message, title = 'Notice', type = 'success') {
       const toast = document.getElementById('toastNotification');
       const msg = document.getElementById('toastMessage');
-      const icon = toast.querySelector('i');
+      const iconContainer = document.getElementById('toastIconContainer');
+
       msg.innerHTML = message;
+
       if (type === 'error') {
-        icon.setAttribute('data-lucide', 'alert-circle');
-        icon.classList.remove('text-indigo-500');
-        icon.classList.add('text-red-500');
+        iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-5 h-5 text-red-500"></i>';
       } else {
-        icon.setAttribute('data-lucide', 'check-circle-2');
-        icon.classList.remove('text-red-500');
-        icon.classList.add('text-indigo-500');
+        iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-indigo-500"></i>';
       }
       lucide.createIcons();
       toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
@@ -808,10 +912,72 @@
       finally { document.getElementById('dubSubmitBtn').disabled = false; }
     }
 
+    function switchImageTab(tab) {
+      document.getElementById('imageGenerateForm').style.display = tab === 'generate' ? 'block' : 'none';
+      document.getElementById('imageEnhanceForm').style.display = tab === 'enhance' ? 'block' : 'none';
+      document.getElementById('tabGenerate').className = tab === 'generate' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
+      document.getElementById('tabEnhance').className = tab === 'enhance' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
+      document.getElementById('imgResultArea').style.display = 'none';
+    }
 
+    async function handleImageGenerateSubmit(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('imagePromptInput').value;
+      if (!prompt) return;
+
+      document.getElementById('imageGenerateBtn').disabled = true;
+      document.getElementById('imgProgressCard').style.display = 'block';
+      document.getElementById('imgResultArea').style.display = 'none';
+
+      const clientId = 'img_' + Date.now();
+      const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-image`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, clientId })
+        });
+        const data = await res.json();
+        es.close();
+        if (data.url) {
+          document.getElementById('imgProgressBar').style.width = '100%';
+          document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.url}`;
+          document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.url}`;
+          document.getElementById('imgResultArea').style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById('imageGenerateBtn').disabled = false; }
+    }
+
+    async function handleImageEnhanceSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('enhanceImageInput');
+      if (!fileInput.files[0]) { showPopup('Upload an image', 'Error', 'error'); return; }
+
+      document.getElementById('imageEnhanceBtn').disabled = true;
+      document.getElementById('imgProgressCard').style.display = 'block';
+      document.getElementById('imgResultArea').style.display = 'none';
+
+      const clientId = 'img_' + Date.now();
+      const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+      const customPrompt = document.getElementById('enhancePromptInput').value;
+      if (customPrompt) formData.append('prompt', customPrompt);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/enhance-image?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+        es.close();
+        if (data.url) {
+          document.getElementById('imgProgressBar').style.width = '100%';
+          document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.url}`;
+          document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.url}`;
+          document.getElementById('imgResultArea').style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById('imageEnhanceBtn').disabled = false; }
+    }
   </script>
 </body>
 
 </html>
-
-
