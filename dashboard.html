@@ -912,6 +912,7 @@
     async function handleSrtSubmit(e) {
       e.preventDefault();
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
+      if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
       document.getElementById('srtSubmitBtn').disabled = true;
       document.getElementById('srtProgressCard').style.display = 'block';
       document.getElementById('srtResultArea').style.display = 'none';
@@ -1042,6 +1043,7 @@
       e.preventDefault();
       const fileInput = document.getElementById('dubVideoInput');
       if (!fileInput.files[0]) { showPopup('Upload video', 'Error', 'error'); return; }
+      if (fileInput.files[0].size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
 
       document.getElementById('dubSubmitBtn').disabled = true;
       document.getElementById('dubProgressCard').style.display = 'block';
@@ -1120,6 +1122,7 @@
       e.preventDefault();
       const fileInput = document.getElementById('enhanceImageInput');
       if (!fileInput.files[0]) { showPopup('Upload an image', 'Error', 'error'); return; }
+      if (fileInput.files[0].size > 20 * 1024 * 1024) { showPopup('කරුණාකර 20MB ට වඩා කුඩා ඡායාරූපයක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
 
       document.getElementById('imageEnhanceBtn').disabled = true;
       document.getElementById('imgProgressCard').style.display = 'block';
