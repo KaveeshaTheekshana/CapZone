@@ -908,35 +908,52 @@
           const data = JSON.parse(event.data);
           
           if (data.status === 'interactive_question') {
-            document.getElementById('imgProgressCard').style.display = 'none';
-            document.getElementById('imgInteractiveArea').style.display = 'block';
-            document.getElementById('imgQuestionText').innerText = data.data.question;
-          } else if (data.status === 'completed' && data.data && data.data.url) {
-            document.getElementById('imgProgressBar').style.width = '100%';
-            document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.data.url}`;
-            document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.data.url}`;
-            document.getElementById('imgResultArea').style.display = 'flex';
-            document.getElementById('imgProgressCard').style.display = 'none';
-            document.getElementById('imageGenerateBtn').disabled = false;
-            document.getElementById('imageEnhanceBtn').disabled = false;
-            window.isImageTaskRunning = false;
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            document.getElementById(stepsPrefix + 'InteractiveArea').style.display = 'block';
+            document.getElementById(stepsPrefix + 'QuestionText').innerText = data.data.question;
+          } else if (data.status === 'completed' && data.data) {
+            document.getElementById(barId).style.width = '100%';
+            
+            // For Images
+            if (data.data.url && stepsPrefix === 'img') {
+                document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.data.url}`;
+                document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.data.url}`;
+            }
+            // For SRT Scraper
+            if (data.data.srt && stepsPrefix === 'scraperSrt') {
+                const blob = new Blob([data.data.srt], { type: 'text/plain' });
+                document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
+                document.getElementById('scraperSrtDownloadLink').download = `Scraper_${Date.now()}.srt`;
+            }
+
+            document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            
+            const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
+            if(submitBtn) submitBtn.disabled = false;
+            
+            if(stepsPrefix === 'img') {
+                document.getElementById('imageEnhanceBtn').disabled = false;
+                window.isImageTaskRunning = false;
+            }
             eventSource.close();
           } else if (data.status === 'error') {
             showPopup(data.message || 'Failed', 'Error', 'error');
-            document.getElementById('imgProgressCard').style.display = 'none';
-            document.getElementById('imageGenerateBtn').disabled = false;
-            document.getElementById('imageEnhanceBtn').disabled = false;
-            window.isImageTaskRunning = false;
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
+            if(submitBtn) submitBtn.disabled = false;
+            if(stepsPrefix === 'img') {
+                document.getElementById('imageEnhanceBtn').disabled = false;
+                window.isImageTaskRunning = false;
+            }
             eventSource.close();
           } else if (data.message) {
             const bar = document.getElementById(barId);
             if (bar) bar.style.width = '80%';
             
-            // If it's an image process, update the status text dynamically
-            if (barId === 'imgProgressBar') {
-                const statusEl = document.getElementById('imgStatusText');
-                if (statusEl) statusEl.innerText = data.message;
-            }
+            // Dynamic status text update
+            const statusEl = document.getElementById(stepsPrefix + 'StatusText');
+            if (statusEl) statusEl.innerText = data.message;
           }
         } catch (e) { }
       };
