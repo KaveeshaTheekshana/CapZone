@@ -181,8 +181,8 @@
       class="flex items-center justify-start lg:justify-center gap-4 lg:gap-8 flex-1 overflow-x-auto whitespace-nowrap px-1 lg:px-4 scrollbar-hide w-full">
       <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pl-2"
         onclick="openModal('srtModal', event)">Subtitle Studio</a>
-      <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pl-2"
-        onclick="openModal('scraperSrtModal', event)">Scraping SRT</a>
+      <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+        onclick="openModal('scraperSrtModal', event)">AI Script Writer</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
         onclick="openModal('fbModal', event)">FB Downloader</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
@@ -554,7 +554,7 @@
     </div>
   </div>
 
-  <!-- SCRAPER SRT MODAL -->
+  <!-- AI SCRIPT WRITER MODAL (Reused scraperSrtModal ID for simplicity) -->
   <div id="scraperSrtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
     <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
@@ -564,56 +564,45 @@
       </button>
       <div class="flex items-center gap-3 mb-6">
         <div class="p-3 bg-blue-500/10 text-blue-500 rounded-2xl border border-blue-500/20">
-          <i data-lucide="bot" class="w-6 h-6"></i>
+          <i data-lucide="pen-tool" class="w-6 h-6"></i>
         </div>
         <div>
-          <h2 class="text-xl font-bold text-fix-heading">Scraping SRT</h2>
-          <p class="text-xs text-fix-sub">Generate subtitles directly via Gemini Web UI bypass.</p>
+          <h2 class="text-xl font-bold text-fix-heading">AI Script Writer</h2>
+          <p class="text-xs text-fix-sub">Generate highly engaging video scripts using Gemini AI.</p>
         </div>
       </div>
       <form id="scraperSrtForm" class="space-y-4" onsubmit="handleScraperSrtSubmit(event)">
         <div>
-          <div
-            class="relative w-full border-2 border-dashed border-blue-500/30 rounded-xl p-4 text-center hover:bg-blue-500/5 transition-colors cursor-pointer"
-            onclick="document.getElementById('scraperSrtVideoInput').click()">
-            <input type="file" id="scraperSrtVideoInput" accept="video/*,audio/*" required class="hidden"
-              onchange="updateScraperSrtFileInfo(this)" />
-            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-blue-500 mb-2"></i>
-            <p class="text-xs text-fix-heading font-bold" id="scraperSrtFileName">Click to Browse Media</p>
-            <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV</p>
-          </div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Video Topic / Idea</label>
+          <textarea id="scriptTopic" required placeholder="e.g. How to make a website in 10 minutes..." rows="3"
+            class="input-fix w-full px-3 py-2.5 rounded-xl outline-none resize-none"></textarea>
         </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Language</label>
-            <select id="scraperSrtLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
-              <option value="si" selected>Sinhala</option>
-              <option value="en">English</option>
+        <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Video Format</label>
+            <select id="scriptFormat" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+              <option value="YouTube Long Form" selected>YouTube Long Form</option>
+              <option value="YouTube Shorts">YouTube Shorts</option>
+              <option value="TikTok / Instagram Reels">TikTok / Instagram Reels</option>
             </select>
-          </div>
-          <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
-            <input type="number" id="scraperSrtWordsLimit" value="5" min="1" max="8"
-              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
-          </div>
         </div>
         <button type="submit" id="scraperSrtSubmitBtn"
           class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
-          <i data-lucide="zap" class="w-4 h-4"></i> Start Scraper
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Script
         </button>
       </form>
       <div id="scraperSrtProgressCard" class="mt-6 p-4 rounded-xl bg-black/40 border border-white/10" style="display: none;">
         <div class="flex items-center justify-between mb-2">
-          <span class="text-xs font-medium text-slate-300" id="scraperSrtStatusText">Uploading & Scraping...</span>
+          <span class="text-xs font-medium text-slate-300" id="scraperSrtStatusText">Generating...</span>
         </div>
         <div class="w-full bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
           <div id="scraperSrtProgressBar" class="bg-blue-500 h-1.5 rounded-full w-0 transition-all duration-300"></div>
         </div>
       </div>
-      <div id="scraperSrtResultArea" class="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20" style="display: none;">
+      <div id="scraperSrtResultArea" class="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex-col gap-3" style="display: none;">
+        <textarea id="scriptOutputPreview" readonly class="w-full h-40 bg-black/20 text-slate-200 text-sm p-3 rounded-lg outline-none resize-none" placeholder="Script will appear here..."></textarea>
         <a id="scraperSrtDownloadLink" href="#" download
-          class="w-full py-2.5 bg-blue-500/20 text-blue-300 font-bold text-sm rounded-xl hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2">
-          <i data-lucide="download" class="w-4 h-4"></i> Download SRT
+          class="w-full py-2.5 bg-blue-500/20 text-blue-300 font-bold text-sm rounded-xl hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2 mt-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Script (.txt)
         </a>
       </div>
     </div>
@@ -919,11 +908,12 @@
                 document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.data.url}`;
                 document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.data.url}`;
             }
-            // For SRT Scraper
-            if (data.data.srt && stepsPrefix === 'scraperSrt') {
-                const blob = new Blob([data.data.srt], { type: 'text/plain' });
+            // For AI Script Writer
+            if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
+                document.getElementById('scriptOutputPreview').value = data.data.scriptText;
+                const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
                 document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
-                document.getElementById('scraperSrtDownloadLink').download = `Scraper_${Date.now()}.srt`;
+                document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
             }
 
             document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
@@ -994,17 +984,11 @@
       }
     }
 
-    let currentScraperSrtFile = null;
-    function updateScraperSrtFileInfo(input) {
-      if (input.files && input.files[0]) {
-        currentScraperSrtFile = input.files[0];
-        document.getElementById('scraperSrtFileName').innerText = input.files[0].name;
-      }
-    }
-
     async function handleScraperSrtSubmit(e) {
       e.preventDefault();
-      if (!currentScraperSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
+      const topic = document.getElementById('scriptTopic').value;
+      if (!topic) { showPopup('Please enter a video topic!', 'Error', 'error'); return; }
+      
       document.getElementById('scraperSrtSubmitBtn').disabled = true;
       document.getElementById('scraperSrtProgressCard').style.display = 'block';
       document.getElementById('scraperSrtResultArea').style.display = 'none';
@@ -1012,18 +996,22 @@
       
       const es = setupProgressTracker(clientId, 'scraperSrt', 'scraperSrtProgressBar');
 
-      const formData = new FormData();
-      formData.append('video', currentScraperSrtFile);
-      formData.append('language', document.getElementById('scraperSrtLanguage').value === 'en' ? 'English' : 'Sinhala');
-      formData.append('wordsLimit', document.getElementById('scraperSrtWordsLimit').value);
+      const data = {
+        topic: topic,
+        format: document.getElementById('scriptFormat').value
+      };
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/generate-srt-scraper?clientId=${clientId}`, { method: 'POST', body: formData });
-        const data = await res.json();
+        const res = await fetch(`${API_BASE_URL}/api/generate-script-scraper?clientId=${clientId}`, { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data) 
+        });
+        const resData = await res.json();
         
         if(!res.ok) {
            es.close();
-           showPopup(data.error || 'Failed to start', 'Error', 'error');
+           showPopup(resData.error || 'Failed to start', 'Error', 'error');
            document.getElementById('scraperSrtSubmitBtn').disabled = false;
         }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); document.getElementById('scraperSrtSubmitBtn').disabled = false; }
