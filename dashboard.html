@@ -71,11 +71,20 @@
   </script>
 
   <style data-purpose="custom-styles">
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
     body {
       background-color: #0B0F19;
       color: white;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: none;
     }
 
+    /* Hardware-Accelerated Glass Engine */
     .glass-panel {
       background: rgba(0, 0, 0, 0.4);
       backdrop-filter: blur(12px);
@@ -83,6 +92,38 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-top: 1px solid rgba(255, 255, 255, 0.5);
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
+
+    /* Mobile Ultra-Smooth Scrolling Engine (60/120 FPS) */
+    @media (max-width: 768px) {
+      .glass-panel {
+        background: rgba(12, 16, 26, 0.78) !important;
+        backdrop-filter: blur(6px) !important;
+        -webkit-backdrop-filter: blur(6px) !important;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+        transform: translate3d(0, 0, 0);
+      }
+
+      .glass-card {
+        background: rgba(15, 19, 30, 0.88) !important;
+        backdrop-filter: blur(8px) !important;
+        -webkit-backdrop-filter: blur(8px) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+      }
+
+      /* Prevent touch scroll hesitation from sticky hover transitions */
+      .group:hover, .glass-panel:hover, .glass-card:hover {
+        transform: none !important;
+      }
+
+      /* Layout containment eliminates reflow during scroll */
+      article.glass-panel {
+        contain: paint layout;
+        content-visibility: auto;
+        contain-intrinsic-size: 0 260px;
+      }
     }
 
     .glass-input {
@@ -163,14 +204,14 @@
 
 <body
   class="min-h-screen text-gray-100 font-sans antialiased overflow-x-hidden selection:bg-brand-purple selection:text-white relative">
-  <!-- Hardware Accelerated Fixed Background -->
+  <!-- Hardware Accelerated Fixed Background (Optimized for Mobile Scroll) -->
   <div id="dashboardBackground"
-    class="fixed inset-0 -z-10 h-full w-full bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center transition-all duration-700"
-    style="transform: translateZ(0); will-change: transform;"></div>
+    class="fixed inset-0 -z-10 h-full w-full bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center pointer-events-none"
+    style="transform: translate3d(0, 0, 0); backface-visibility: hidden; transition: opacity 0.4s ease;"></div>
   <!-- Ambient Dark Overlay for Cloud Style -->
   <div
     class="fixed inset-0 -z-10 h-full w-full bg-gradient-to-b from-[#0B0F19]/80 via-transparent to-[#0B0F19]/90 pointer-events-none"
-    style="transform: translateZ(0);"></div>
+    style="transform: translate3d(0, 0, 0); backface-visibility: hidden;"></div>
 
 
   <header class="fixed top-0 inset-x-0 h-20 glass-panel z-40 flex items-center px-4 lg:px-10 gap-3 lg:gap-6">
