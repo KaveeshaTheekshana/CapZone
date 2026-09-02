@@ -12,6 +12,7 @@
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -277,7 +278,30 @@
         </div>
       </section>
 
-      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+
+        <!-- SOCIAL KIT TOOL CARD -->
+        <article
+          class="glass-panel rounded-3xl p-6 flex flex-col hover:border-yellow-400/40 transition-all duration-300 group cursor-pointer border border-yellow-500/25 shadow-[0_0_25px_rgba(234,179,8,0.12)] hover:shadow-[0_0_35px_rgba(234,179,8,0.3)] relative overflow-hidden"
+          onclick="openSocialKitModal(event)">
+          <div class="absolute top-4 right-4 px-2.5 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/40 text-yellow-300 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+            <span>👑</span> PRO
+          </div>
+          <div
+            class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-yellow-500/10 via-amber-500/20 to-orange-500/10 border border-yellow-500/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(234,179,8,0.2)] group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(234,179,8,0.4)] transition-all duration-300">
+            <i data-lucide="messages-square" class="w-8 h-8 text-yellow-400"></i>
+          </div>
+          <h3 class="text-lg font-bold text-white mb-1">Social Kit</h3>
+          <span class="text-xs text-yellow-400/90 font-semibold mb-2">Chats, comments & receipts</span>
+          <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed">
+            Generate viral Fake Text Chats, TikTok/IG/FB comments, X/Reddit posts & receipts with Gemini AI.
+          </p>
+          <button
+            class="w-full py-3 rounded-xl bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 font-bold transition-all duration-200 flex items-center justify-center gap-2">
+            <span>Open Social Kit</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </button>
+        </article>
 
         <article
           class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
@@ -787,6 +811,231 @@
 
     </div>
   </div>
+  <!-- SOCIAL KIT MODAL -->
+  <div id="socialKitModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6" style="display: none;">
+    <div class="glass-card w-full max-w-4xl rounded-3xl p-5 sm:p-8 relative max-h-[92vh] flex flex-col overflow-hidden border border-white/15 bg-[#12141a]/95 shadow-[0_25px_70px_rgba(0,0,0,0.9)] text-gray-100">
+      
+      <!-- Close Button -->
+      <button onclick="closeModal('socialKitModal', event)"
+        class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-white/5 hover:bg-white/15 p-2 sm:p-2.5 rounded-full transition-all duration-200 z-20">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- VIEW 1: Overview Grid of 8 Tools (Matches Screenshot Exactly) -->
+      <div id="socialKitOverview" class="flex flex-col h-full overflow-y-auto custom-scroll pr-1">
+        <div class="mb-6">
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
+            Social Kit
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Chats, comments and receipts.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+
+          <!-- 1. Fake text chat -->
+          <div onclick="selectSocialTool('fake_chat')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="message-square" class="w-6 h-6 text-cyan-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">Fake text chat</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Build a phone conversation for text-story videos.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 2. TikTok comment -->
+          <div onclick="selectSocialTool('tiktok_comment')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="message-circle" class="w-6 h-6 text-emerald-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">TikTok comment</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Comment threads with replies and likes.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 3. Instagram comment -->
+          <div onclick="selectSocialTool('insta_comment')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-purple-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="messages-square" class="w-6 h-6 text-purple-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-purple-300 transition-colors">Instagram comment</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Comment threads in light or dark.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 4. Facebook comment -->
+          <div onclick="selectSocialTool('fb_comment')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-blue-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="thumbs-up" class="w-6 h-6 text-blue-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-blue-300 transition-colors">Facebook comment</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Bubble comments with reactions and replies.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 5. Twitter post -->
+          <div onclick="selectSocialTool('twitter_post')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="hash" class="w-6 h-6 text-indigo-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">Twitter post</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Posts and reply threads with full engagement.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 6. Reddit post -->
+          <div onclick="selectSocialTool('reddit_post')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-amber-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="megaphone" class="w-6 h-6 text-amber-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-amber-300 transition-colors">Reddit post</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Post, comment or story cards for narration.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 7. Text box -->
+          <div onclick="selectSocialTool('text_box')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-yellow-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="type" class="w-6 h-6 text-yellow-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-yellow-300 transition-colors">Text box</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Caption-style text boxes — Sinhala fonts included.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+          <!-- 8. Receipt -->
+          <div onclick="selectSocialTool('receipt')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-amber-400/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="receipt" class="w-6 h-6 text-amber-300"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-amber-200 transition-colors">Receipt</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Custom receipts and invoices, block by block.</p>
+              </div>
+            </div>
+            <span class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 flex-shrink-0">
+              <span>👑</span> PRO
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VIEW 2: Interactive AI Generator & Live Visual Mockup Studio -->
+      <div id="socialKitStudio" class="hidden flex-col h-full overflow-y-auto custom-scroll pr-1">
+        <!-- Studio Header -->
+        <div class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-white/10 flex-shrink-0">
+          <div class="flex items-center gap-3">
+            <button onclick="backToSocialKitOverview()"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <div class="flex items-center gap-2">
+              <div id="studioToolIcon" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10"></div>
+              <h3 id="studioToolTitle" class="text-lg font-bold text-white"></h3>
+            </div>
+          </div>
+          <span class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold">
+            Gemini AI Powered
+          </span>
+        </div>
+
+        <!-- Prompt & Generation Controls -->
+        <div class="glass-panel p-3.5 sm:p-4 rounded-2xl mb-4 border border-white/10 flex-shrink-0">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="socialTopicInput"
+              class="flex-1 glass-input px-4 py-2.5 rounded-xl text-sm placeholder-slate-400 focus:ring-2 focus:ring-indigo-500 outline-none"
+              placeholder="Enter topic or scenario (e.g., 'Funny conversation between boss and employee')...">
+            <div class="flex items-center gap-2">
+              <select id="socialLangSelect"
+                class="glass-input px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-200 outline-none bg-slate-900 border border-white/20">
+                <option value="sinhala" class="bg-slate-900 text-white">සිංහල (Sinhala)</option>
+                <option value="english" class="bg-slate-900 text-white">English</option>
+                <option value="singlish" class="bg-slate-900 text-white">Singlish</option>
+              </select>
+              <button id="socialGenBtn" onclick="generateSocialContent()"
+                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-xs hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span id="socialGenBtnText">Generate AI</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Mockup Canvas Container -->
+        <div class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl bg-black/50 border border-white/10 min-h-[360px] relative overflow-hidden" id="socialCanvasWrapper">
+          <div id="socialMockupCanvas" class="w-full max-w-sm transition-all duration-300">
+            <!-- Dynamically populated mockup -->
+          </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-3 flex-shrink-0">
+          <span class="text-xs text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i> Click any text in the preview to edit!
+          </span>
+          <div class="flex items-center gap-2">
+            <button onclick="copySocialText()"
+              class="px-3.5 py-1.5 rounded-xl glass-input hover:bg-white/15 text-xs font-semibold text-gray-200 flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Text
+            </button>
+            <button onclick="downloadSocialMockup()"
+              class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/30">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Image
+            </button>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -1491,9 +1740,482 @@
       initWallpapers();
     }
 
+    // SOCIAL KIT LOGIC
+    let currentSocialTool = 'fake_chat';
+    let currentSocialData = null;
+
+    const socialToolMeta = {
+      fake_chat: { title: 'Fake text chat', icon: 'message-square', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' },
+      tiktok_comment: { title: 'TikTok comment', icon: 'message-circle', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+      insta_comment: { title: 'Instagram comment', icon: 'messages-square', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
+      fb_comment: { title: 'Facebook comment', icon: 'thumbs-up', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+      twitter_post: { title: 'Twitter post', icon: 'hash', color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/30' },
+      reddit_post: { title: 'Reddit post', icon: 'megaphone', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+      text_box: { title: 'Text box', icon: 'type', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
+      receipt: { title: 'Receipt', icon: 'receipt', color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-500/30' }
+    };
+
+    function openSocialKitModal(e) {
+      if (e) e.preventDefault();
+      backToSocialKitOverview();
+      openModal('socialKitModal', e);
+    }
+
+    function selectSocialTool(toolKey) {
+      currentSocialTool = toolKey;
+      const meta = socialToolMeta[toolKey] || socialToolMeta.fake_chat;
+      
+      document.getElementById('socialKitOverview').classList.add('hidden');
+      const studio = document.getElementById('socialKitStudio');
+      studio.classList.remove('hidden');
+      studio.classList.add('flex');
+
+      document.getElementById('studioToolTitle').innerText = meta.title;
+      document.getElementById('studioToolIcon').className = 'w-8 h-8 rounded-lg flex items-center justify-center border ' + meta.bg;
+      document.getElementById('studioToolIcon').innerHTML = '<i data-lucide="' + meta.icon + '" class="w-4 h-4 ' + meta.color + '"></i>';
+
+      const sampleTopics = {
+        fake_chat: 'යාලුවෙක්ගෙන් සල්ලි ඉල්ලන විහිළු කතාබහක්',
+        tiktok_comment: 'Viral debate on whether night kottu is the best food',
+        insta_comment: 'Aesthetic travel photo compliment thread',
+        fb_comment: 'Relatives commenting on wedding photos',
+        twitter_post: 'Viral hot take on AI replacing programmers',
+        reddit_post: 'r/AskReddit: What is a life hack that feels like cheating?',
+        text_box: 'Mind-blowing fact about the deep ocean',
+        receipt: 'Supermarket shopping list with hilarious items'
+      };
+      document.getElementById('socialTopicInput').value = sampleTopics[toolKey] || '';
+
+      renderDefaultSampleMockup(toolKey);
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function backToSocialKitOverview() {
+      const studio = document.getElementById('socialKitStudio');
+      studio.classList.add('hidden');
+      studio.classList.remove('flex');
+      document.getElementById('socialKitOverview').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    async function generateSocialContent() {
+      const topic = document.getElementById('socialTopicInput').value.trim();
+      const language = document.getElementById('socialLangSelect').value;
+      if (!topic) {
+        showPopup('Please enter a topic or scenario', 'Error', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('socialGenBtn');
+      const btnText = document.getElementById('socialGenBtnText');
+      btn.disabled = true;
+      btnText.innerText = 'Scraping Gemini...';
+
+      try {
+        const res = await fetch('/api/generate-social-kit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ tool: currentSocialTool, topic, language })
+        });
+        const data = await res.json();
+        if (data.success && data.data) {
+          currentSocialData = data.data;
+          renderMockup(currentSocialTool, data.data);
+          showPopup('Generated successfully with Gemini AI!', 'Success', 'success');
+        } else {
+          showPopup(data.error || 'Failed to generate content', 'Error', 'error');
+        }
+      } catch (err) {
+        showPopup(err.message, 'Error', 'error');
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Generate AI';
+      }
+    }
+
+    function renderDefaultSampleMockup(toolKey) {
+      if (toolKey === 'fake_chat') {
+        renderMockup('fake_chat', {
+          personName: 'Kasun',
+          messages: [
+            { sender: 'them', text: 'මචං උඹ කොහෙද ඉන්නේ? ඉක්මනට වරෙන්!', time: '10:24 AM' },
+            { sender: 'me', text: 'මම මේ එන ගමන් බං, ට්‍රැෆික් එකේ හිරවෙලා!', time: '10:25 AM' },
+            { sender: 'them', text: 'උඹ තාම ගෙදර ඇඳ උඩ නේද? බොරු කියන්න එපා 😂', time: '10:25 AM' },
+            { sender: 'me', text: 'අඩෝ කොහොමද දැනගත්තේ? දැන්ම නැගිට්ටා විතරයි! 🏃‍♂️', time: '10:26 AM' }
+          ]
+        });
+      } else if (toolKey === 'tiktok_comment') {
+        renderMockup('tiktok_comment', {
+          username: '@viral_srilanka',
+          comment: 'මේ වීඩියෝ එක දැකලා මගේ බඩ රිදෙනකම් හිනා ගියා බං! 😂🔥',
+          likes: '34.2K',
+          time: '2h ago',
+          replies: [
+            { username: '@nimal_bro', comment: 'සිරාවටම බං, අන්තිම තත්පර 5 සුපිරිම කෑල්ල!', likes: '4,520', time: '1h ago' },
+            { username: '@kavindi_99', comment: 'මම මේක 10 පාරක් බැලුවා තාම ඇති වෙලා නෑ 😂', likes: '1,890', time: '45m ago' }
+          ]
+        });
+      } else if (toolKey === 'insta_comment') {
+        renderMockup('insta_comment', {
+          username: 'wanderlust.lanka',
+          comment: 'Ella vibes are always unmatched! Truly heavenly ✨🇱🇰',
+          likes: '18.4K',
+          time: '3h',
+          replies: [
+            { username: 'travel_with_us', comment: 'Which hotel is this? Stunning view!!', likes: '890', time: '2h' }
+          ]
+        });
+      } else if (toolKey === 'fb_comment') {
+        renderMockup('fb_comment', {
+          name: 'Sunil Perera',
+          comment: 'අපේ කාලේ මෙහෙම දේවල් තිබ්බේ නෑ නේද දරුවනේ... හරිම ලස්සනයි, සුබ පැතුම්! ❤️👏',
+          reactions: '4.8K',
+          time: '4 hrs'
+        });
+      } else if (toolKey === 'twitter_post') {
+        renderMockup('twitter_post', {
+          name: 'Tech Insider',
+          handle: '@techinsider',
+          tweet: 'AI is not going to replace content creators. Creators who use AI are going to replace creators who don\'t. Adapt or get left behind. 🚀 #AI #ContentCreation',
+          time: '4:15 PM · Sep 2, 2026',
+          views: '1.4M',
+          retweets: '18.2K',
+          likes: '92.5K'
+        });
+      } else if (toolKey === 'reddit_post') {
+        renderMockup('reddit_post', {
+          subreddit: 'r/AskReddit',
+          author: 'u/CuriousThinker',
+          time: '5 hours ago',
+          title: 'What is a secret life hack that sounds fake, but actually works 100% of the time?',
+          content: 'I recently found out that if you put a wooden spoon across a boiling pot of water, it never boils over. Tested it all week and it blew my mind!',
+          upvotes: '28.9k',
+          comments: '3.1k'
+        });
+      } else if (toolKey === 'text_box') {
+        renderMockup('text_box', {
+          tag: 'DID YOU KNOW? #1',
+          heading: 'ඔබ දැන සිටියාද?',
+          caption: 'ලෝකයේ ගැඹුරුම සාගර අගාධය වන මරියානා ආගාධයට වඩා එවරස්ට් කන්ද උසින් අඩු බව ඔබ දන්නවාද?'
+        });
+      } else if (toolKey === 'receipt') {
+        renderMockup('receipt', {
+          storeName: 'CAPZONE SUPERMARKET',
+          address: '45 Galle Road, Colombo 03',
+          date: '2026-09-02 20:15',
+          items: [
+            { name: 'Kottu Roti Special', qty: 2, price: '1,800.00' },
+            { name: 'Iced Milo Extra Large', qty: 2, price: '900.00' },
+            { name: 'Garlic Bread Sticks', qty: 1, price: '650.00' }
+          ],
+          subtotal: '3,350.00',
+          tax: '250.00',
+          total: '3,600.00',
+          footer: 'THANK YOU FOR SUPPORTING LOCAL BUSINESS!'
+        });
+      }
+    }
+
+    function renderMockup(tool, data) {
+      const container = document.getElementById('socialMockupCanvas');
+      if (!container) return;
+
+      if (tool === 'fake_chat') {
+        const name = data.personName || 'Contact';
+        const msgs = data.messages || [];
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-black text-white rounded-[32px] p-4 border-2 border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto overflow-hidden">' +
+            '<div class="flex items-center justify-between text-[11px] font-bold px-2 mb-3 text-neutral-300">' +
+              '<span>9:41</span>' +
+              '<div class="w-20 h-4 bg-neutral-900 rounded-full mx-auto"></div>' +
+              '<div class="flex items-center gap-1.5">' +
+                '<i data-lucide="wifi" class="w-3.5 h-3.5"></i>' +
+                '<div class="w-5 h-2.5 border border-neutral-300 rounded-sm p-0.5"><div class="h-full bg-white rounded-xs w-3/4"></div></div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="flex items-center justify-between pb-3 border-b border-neutral-800/80 mb-4 px-1">' +
+              '<div class="flex items-center gap-2.5">' +
+                '<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xs border border-white/20">' +
+                  name.charAt(0).toUpperCase() +
+                '</div>' +
+                '<div>' +
+                  '<div class="text-xs font-bold flex items-center gap-1 cursor-text" contenteditable="true">' + name + '</div>' +
+                  '<div class="text-[9px] text-neutral-400">iMessage</div>' +
+                '</div>' +
+              '</div>' +
+              '<i data-lucide="video" class="w-4 h-4 text-cyan-400"></i>' +
+            '</div>' +
+            '<div class="space-y-2.5 py-1 min-h-[160px] max-h-[260px] overflow-y-auto px-1 custom-scroll">' +
+              msgs.map(m => 
+                '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + '">' +
+                  '<div class="max-w-[80%] rounded-2xl px-3.5 py-2 text-xs font-medium cursor-text ' + (m.sender === 'me' ? 'bg-[#0b84ff] text-white rounded-br-xs' : 'bg-[#26252a] text-neutral-100 rounded-bl-xs') + '" contenteditable="true">' +
+                    m.text +
+                  '</div>' +
+                  '<span class="text-[8px] text-neutral-500 mt-0.5 px-1">' + (m.time || '') + '</span>' +
+                '</div>'
+              ).join('') +
+            '</div>' +
+            '<div class="mt-3 pt-2 border-t border-neutral-800/80 flex items-center gap-2">' +
+              '<div class="flex-1 bg-neutral-900 border border-neutral-700/60 rounded-full px-3 py-1.5 text-neutral-500 text-[11px] flex items-center justify-between">' +
+                '<span>iMessage</span>' +
+                '<div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white"><i data-lucide="arrow-up" class="w-3 h-3"></i></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+
+      } else if (tool === 'tiktok_comment') {
+        const username = data.username || '@tiktok_user';
+        const comment = data.comment || '';
+        const replies = data.replies || [];
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-[#121212] text-white rounded-2xl p-4 border border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+            '<div class="flex items-center justify-between mb-3 text-xs text-neutral-400 font-bold border-b border-neutral-800 pb-2">' +
+              '<span>Comments (1.4K)</span>' +
+              '<i data-lucide="x" class="w-4 h-4 text-neutral-500"></i>' +
+            '</div>' +
+            '<div class="flex items-start gap-3">' +
+              '<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-amber-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">' +
+                username.charAt(1 || 0).toUpperCase() +
+              '</div>' +
+              '<div class="flex-1 min-w-0">' +
+                '<div class="flex items-center gap-1.5">' +
+                  '<span class="text-xs font-bold text-neutral-300 cursor-text" contenteditable="true">' + username + '</span>' +
+                  '<span class="text-[10px] text-neutral-500">' + (data.time || '2h ago') + '</span>' +
+                '</div>' +
+                '<p class="text-xs text-white mt-1 leading-relaxed cursor-text" contenteditable="true">' + comment + '</p>' +
+                '<div class="flex items-center gap-4 mt-2 text-[10px] text-neutral-400 font-semibold">' +
+                  '<span class="cursor-pointer hover:text-white">Reply</span>' +
+                  '<span class="cursor-pointer hover:text-white">Translate</span>' +
+                '</div>' +
+                (replies.length ? 
+                  '<div class="mt-3 pl-3 border-l-2 border-neutral-800 space-y-2">' +
+                    replies.map(r => 
+                      '<div class="flex items-start gap-2">' +
+                        '<div class="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-[9px] font-bold flex-shrink-0">' +
+                          (r.username || 'R').charAt(1 || 0).toUpperCase() +
+                        '</div>' +
+                        '<div class="flex-1 min-w-0">' +
+                          '<span class="text-[10px] font-bold text-neutral-300 cursor-text" contenteditable="true">' + r.username + '</span>' +
+                          '<p class="text-[11px] text-neutral-200 mt-0.5 cursor-text" contenteditable="true">' + r.comment + '</p>' +
+                        '</div>' +
+                      '</div>'
+                    ).join('') +
+                  '</div>' : '') +
+              '</div>' +
+              '<div class="flex flex-col items-center gap-0.5 text-neutral-400 flex-shrink-0">' +
+                '<i data-lucide="heart" class="w-4 h-4 text-red-500 fill-red-500"></i>' +
+                '<span class="text-[10px] font-bold cursor-text" contenteditable="true">' + (data.likes || '24.8K') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+
+      } else if (tool === 'insta_comment') {
+        const username = data.username || 'insta.user';
+        const comment = data.comment || '';
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-black text-white rounded-2xl p-4 border border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+            '<div class="flex items-center justify-between pb-2 mb-3 border-b border-neutral-800 text-xs font-bold text-neutral-400">' +
+              '<span>Comments</span>' +
+              '<i data-lucide="send" class="w-4 h-4"></i>' +
+            '</div>' +
+            '<div class="flex items-start gap-3">' +
+              '<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-500 p-0.5 flex-shrink-0">' +
+                '<div class="w-full h-full bg-black rounded-full flex items-center justify-center text-[10px] font-bold">' +
+                  username.charAt(0).toUpperCase() +
+                '</div>' +
+              '</div>' +
+              '<div class="flex-1 min-w-0">' +
+                '<div class="text-xs leading-relaxed">' +
+                  '<span class="font-bold text-white mr-1.5 cursor-text" contenteditable="true">' + username + '</span>' +
+                  '<span class="text-neutral-200 cursor-text" contenteditable="true">' + comment + '</span>' +
+                '</div>' +
+                '<div class="flex items-center gap-3 mt-2 text-[10px] text-neutral-500 font-semibold">' +
+                  '<span>' + (data.time || '3h') + '</span>' +
+                  '<span class="cursor-text" contenteditable="true">' + (data.likes || '15.2K') + ' likes</span>' +
+                  '<span class="cursor-pointer hover:text-white">Reply</span>' +
+                '</div>' +
+              '</div>' +
+              '<i data-lucide="heart" class="w-3.5 h-3.5 text-neutral-400 hover:text-red-500 cursor-pointer flex-shrink-0 mt-1"></i>' +
+            '</div>' +
+          '</div>';
+
+      } else if (tool === 'fb_comment') {
+        const name = data.name || 'Facebook User';
+        const comment = data.comment || '';
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-[#242526] text-white rounded-2xl p-4 border border-neutral-700 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+            '<div class="flex items-start gap-2.5">' +
+              '<div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm">' +
+                name.charAt(0).toUpperCase() +
+              '</div>' +
+              '<div class="flex-1 min-w-0">' +
+                '<div class="bg-[#3a3b3c] rounded-2xl px-3.5 py-2 relative">' +
+                  '<h4 class="text-xs font-bold text-white hover:underline cursor-pointer cursor-text" contenteditable="true">' + name + '</h4>' +
+                  '<p class="text-xs text-neutral-200 mt-1 leading-relaxed cursor-text" contenteditable="true">' + comment + '</p>' +
+                  '<div class="absolute -bottom-2.5 right-2 bg-[#3a3b3c] border border-neutral-600 rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-md text-[9px]">' +
+                    '<span class="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[7px]"><i data-lucide="thumbs-up" class="w-2 h-2"></i></span>' +
+                    '<span class="font-bold text-neutral-300 cursor-text" contenteditable="true">' + (data.reactions || '4.5K') + '</span>' +
+                  '</div>' +
+                '</div>' +
+                '<div class="flex items-center gap-4 mt-2 pl-2 text-[10px] text-neutral-400 font-bold">' +
+                  '<span class="hover:underline cursor-pointer text-blue-400">Like</span>' +
+                  '<span class="hover:underline cursor-pointer">Reply</span>' +
+                  '<span>' + (data.time || '2h') + '</span>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+
+      } else if (tool === 'twitter_post') {
+        const name = data.name || 'Creator';
+        const handle = data.handle || '@handle';
+        const tweet = data.tweet || '';
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-black text-white rounded-2xl p-4 sm:p-5 border border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+            '<div class="flex items-center justify-between mb-2.5">' +
+              '<div class="flex items-center gap-2.5">' +
+                '<div class="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-xs font-bold">' +
+                  name.charAt(0).toUpperCase() +
+                '</div>' +
+                '<div>' +
+                  '<div class="flex items-center gap-1">' +
+                    '<span class="text-xs font-bold text-white cursor-text" contenteditable="true">' + name + '</span>' +
+                    '<i data-lucide="badge-check" class="w-3.5 h-3.5 text-blue-400 fill-blue-400"></i>' +
+                  '</div>' +
+                  '<span class="text-[10px] text-neutral-500 cursor-text" contenteditable="true">' + handle + '</span>' +
+                '</div>' +
+              '</div>' +
+              '<i data-lucide="twitter" class="w-4 h-4 text-neutral-400"></i>' +
+            '</div>' +
+            '<p class="text-xs sm:text-sm text-neutral-100 my-3 leading-relaxed cursor-text" contenteditable="true">' + tweet + '</p>' +
+            '<div class="text-[10px] text-neutral-500 py-2 border-y border-neutral-800/80 my-2">' +
+              '<span>' + (data.time || '4:15 PM · Sep 2, 2026') + '</span> · <span class="font-bold text-white">' + (data.views || '1.2M') + '</span> Views' +
+            '</div>' +
+            '<div class="flex items-center justify-between text-neutral-500 text-xs pt-1 px-2">' +
+              '<span class="flex items-center gap-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> 240</span>' +
+              '<span class="flex items-center gap-1 text-emerald-400"><i data-lucide="repeat" class="w-3.5 h-3.5"></i> ' + (data.retweets || '14.5K') + '</span>' +
+              '<span class="flex items-center gap-1 text-pink-500"><i data-lucide="heart" class="w-3.5 h-3.5"></i> ' + (data.likes || '89.2K') + '</span>' +
+              '<i data-lucide="bookmark" class="w-3.5 h-3.5"></i>' +
+            '</div>' +
+          '</div>';
+
+      } else if (tool === 'reddit_post') {
+        const title = data.title || 'Reddit Post Title';
+        const content = data.content || '';
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-[#1a1a1b] text-white rounded-2xl p-4 border border-[#343536] shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+            '<div class="flex items-center gap-2 text-[10px] text-neutral-400 mb-2">' +
+              '<div class="w-4 h-4 rounded-full bg-orange-600 flex items-center justify-center font-bold text-[8px] text-white">r/</div>' +
+              '<span class="font-bold text-white cursor-text" contenteditable="true">' + (data.subreddit || 'r/AskReddit') + '</span>' +
+              '<span>•</span>' +
+              '<span>Posted by <span contenteditable="true">' + (data.author || 'u/RedditUser') + '</span> ' + (data.time || '6 hr. ago') + '</span>' +
+            '</div>' +
+            '<h3 class="text-xs sm:text-sm font-bold text-white mb-2 leading-snug cursor-text" contenteditable="true">' + title + '</h3>' +
+            '<p class="text-xs text-neutral-300 leading-relaxed bg-[#272729]/50 p-2.5 rounded-xl border border-neutral-800 cursor-text" contenteditable="true">' + content + '</p>' +
+            '<div class="flex items-center gap-3 mt-3 text-xs text-neutral-400 font-bold">' +
+              '<div class="bg-[#272729] rounded-full px-2.5 py-1 flex items-center gap-1.5 border border-neutral-700">' +
+                '<i data-lucide="arrow-big-up" class="w-3.5 h-3.5 text-orange-500"></i>' +
+                '<span class="text-orange-500 font-extrabold text-[11px] cursor-text" contenteditable="true">' + (data.upvotes || '18.9k') + '</span>' +
+                '<i data-lucide="arrow-big-down" class="w-3.5 h-3.5 text-neutral-500"></i>' +
+              '</div>' +
+              '<div class="bg-[#272729] rounded-full px-2.5 py-1 flex items-center gap-1.5 border border-neutral-700 text-[11px]">' +
+                '<i data-lucide="message-square" class="w-3.5 h-3.5"></i>' +
+                '<span class="cursor-text" contenteditable="true">' + (data.comments || '2.4k') + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+
+      } else if (tool === 'text_box') {
+        const tag = data.tag || 'VIRAL CAPTION';
+        const heading = data.heading || 'Heading';
+        const caption = data.caption || '';
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-gradient-to-br from-neutral-900 via-black to-neutral-900 text-white rounded-2xl p-5 border-2 border-yellow-500/40 shadow-[0_0_30px_rgba(234,179,8,0.15)] w-full max-w-sm font-sans mx-auto text-center relative overflow-hidden">' +
+            '<div class="absolute -top-10 -right-10 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl pointer-events-none"></div>' +
+            '<span class="inline-block px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 text-[9px] font-black uppercase tracking-widest mb-2 cursor-text" contenteditable="true">' +
+              tag +
+            '</span>' +
+            '<h3 class="text-base sm:text-lg font-black text-white mb-2 leading-tight tracking-tight cursor-text" contenteditable="true">' +
+              heading +
+            '</h3>' +
+            '<p class="text-xs sm:text-sm text-neutral-200 leading-relaxed font-sinhala font-medium cursor-text" contenteditable="true">' +
+              caption +
+            '</p>' +
+          '</div>';
+
+      } else if (tool === 'receipt') {
+        const items = data.items || [];
+        container.innerHTML = 
+          '<div id="mockupExportNode" class="bg-[#fcfbf9] text-neutral-800 rounded-xl p-5 shadow-2xl w-full max-w-xs font-mono mx-auto border-t-8 border-dashed border-neutral-300 text-xs">' +
+            '<div class="text-center pb-3 border-b-2 border-dashed border-neutral-300">' +
+              '<h3 class="font-black text-sm tracking-wider uppercase cursor-text" contenteditable="true">' + (data.storeName || 'SUPERMARKET') + '</h3>' +
+              '<p class="text-[9px] text-neutral-500 cursor-text" contenteditable="true">' + (data.address || '123 Main Street') + '</p>' +
+              '<p class="text-[9px] text-neutral-500 mt-1 cursor-text" contenteditable="true">' + (data.date || '2026-09-02') + '</p>' +
+            '</div>' +
+            '<div class="py-3 border-b-2 border-dashed border-neutral-300 space-y-1 text-[10px]">' +
+              items.map(it => 
+                '<div class="flex justify-between items-center">' +
+                  '<span class="cursor-text" contenteditable="true">' + (it.qty || 1) + 'x ' + it.name + '</span>' +
+                  '<span class="font-bold cursor-text" contenteditable="true">' + it.price + '</span>' +
+                '</div>'
+              ).join('') +
+            '</div>' +
+            '<div class="pt-2 text-[11px] space-y-1">' +
+              '<div class="flex justify-between font-black text-xs pt-1 border-t border-neutral-400">' +
+                '<span>TOTAL:</span>' +
+                '<span class="cursor-text" contenteditable="true">LKR ' + (data.total || '3,450.00') + '</span>' +
+              '</div>' +
+            '</div>' +
+            '<div class="text-center pt-4 text-[9px] text-neutral-500">' +
+              '<p class="cursor-text" contenteditable="true">' + (data.footer || 'THANK YOU FOR SHOPPING WITH US!') + '</p>' +
+              '<div class="mt-2 h-7 bg-neutral-800 mx-auto w-36 rounded-xs flex items-center justify-center text-[7px] text-white tracking-widest font-sans">' +
+                '||| | |||| | ||| || |||' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function copySocialText() {
+      const node = document.getElementById('mockupExportNode');
+      if (!node) return;
+      const text = node.innerText || '';
+      navigator.clipboard.writeText(text).then(() => {
+        showPopup('Text copied to clipboard!', 'Success', 'success');
+      }).catch(() => {
+        showPopup('Failed to copy text', 'Error', 'error');
+      });
+    }
+
+    function downloadSocialMockup() {
+      const node = document.getElementById('mockupExportNode');
+      if (!node) return;
+
+      if (typeof html2canvas === 'function') {
+        showPopup('Generating high-res PNG image...', 'info');
+        html2canvas(node, {
+          backgroundColor: null,
+          scale: 3,
+          useCORS: true
+        }).then(canvas => {
+          const a = document.createElement('a');
+          a.download = currentSocialTool + '_mockup_' + Date.now() + '.png';
+          a.href = canvas.toDataURL('image/png');
+          a.click();
+          showPopup('Mockup downloaded successfully!', 'Success', 'success');
+        }).catch(err => {
+          showPopup('Export failed: ' + err.message, 'Error', 'error');
+        });
+      } else {
+        copySocialText();
+      }
+    }
   </script>
+
   <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
-  <div class="fixed bottom-3 inset-x-3 z-40 sm:hidden glass-panel rounded-2xl px-4 py-2.5 flex items-center justify-around border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0b0f19]/80">
+  <div class="fixed bottom-3 inset-x-3 z-40 sm:hidden glass-panel rounded-2xl px-3 py-2 flex items-center justify-around border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0b0f19]/85">
     <a href="dashboard.html" class="flex flex-col items-center gap-0.5 text-indigo-400">
       <i data-lucide="layout-grid" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">Home</span>
@@ -1506,13 +2228,13 @@
       <i data-lucide="film" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">Editor</span>
     </a>
+    <button onclick="openSocialKitModal(event)" class="flex flex-col items-center gap-0.5 text-yellow-400 hover:text-yellow-300">
+      <i data-lucide="messages-square" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Social</span>
+    </button>
     <button onclick="openModal('wallpaperModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
       <i data-lucide="palette" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">Theme</span>
-    </button>
-    <button onclick="openModal('profileModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
-      <i data-lucide="user" class="w-5 h-5"></i>
-      <span class="text-[9px] font-bold">Profile</span>
     </button>
   </div>
 
