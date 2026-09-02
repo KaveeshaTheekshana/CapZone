@@ -6,6 +6,9 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>CapZone | Video Editor Dashboard</title>
   <link rel="icon" href="data:,">
+  <link rel="preload" as="image"
+    href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop"
+    fetchpriority="high">
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -160,8 +163,8 @@
 <body
   class="min-h-screen text-gray-100 font-sans antialiased overflow-x-hidden selection:bg-brand-purple selection:text-white relative">
   <!-- Hardware Accelerated Fixed Background -->
-  <div
-    class="fixed inset-0 -z-10 h-full w-full bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=100&w=2000&auto=format&fit=crop')] bg-cover bg-center"
+  <div id="dashboardBackground"
+    class="fixed inset-0 -z-10 h-full w-full bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center transition-all duration-700"
     style="transform: translateZ(0); will-change: transform;"></div>
   <!-- Ambient Dark Overlay for Cloud Style -->
   <div
@@ -190,7 +193,17 @@
       <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pr-2"
         onclick="openModal('dubModal', event)">AI Dubbing</a>
     </nav>
-    <div class="flex items-center gap-4 ml-auto">
+    <div class="flex items-center gap-3 lg:gap-4 ml-auto">
+      <!-- 4K Wallpaper Switcher Button -->
+      <button onclick="openModal('wallpaperModal', event)"
+        class="flex items-center gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-white/15 border border-indigo-500/30 hover:border-indigo-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(99,102,241,0.25)] hover:shadow-[0_0_20px_rgba(99,102,241,0.5)] group"
+        title="Customize 4K Wallpapers">
+        <div
+          class="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+          <i data-lucide="palette" class="w-3.5 h-3.5 text-white"></i>
+        </div>
+        <span class="text-xs font-bold text-gray-200 hidden sm:inline tracking-wider uppercase">Wallpapers</span>
+      </button>
       <button onclick="openModal('profileModal', event)"
         class="flex items-center gap-2 lg:gap-3 pl-1.5 lg:pl-2 pr-1.5 lg:pr-4 py-1.5 rounded-full glass-input hover:bg-white/10 transition-colors">
         <div
@@ -265,7 +278,7 @@
       </section>
 
       <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-        
+
         <article
           class="glass-panel rounded-3xl p-6 flex flex-col hover:border-white/20 transition-colors group cursor-pointer"
           onclick="openModal('scraperSrtModal', event)">
@@ -431,9 +444,14 @@
   </div>
 
   <!-- FB MODAL -->
-  <div id="qualityModal" class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 ease-out" style="display: none; opacity: 0;">
-    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 ease-out scale-75" id="qualityModalContent">
-      <button onclick="closeModal('qualityModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+  <div id="qualityModal"
+    class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 ease-out"
+    style="display: none; opacity: 0;">
+    <div
+      class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 ease-out scale-75"
+      id="qualityModalContent">
+      <button onclick="closeModal('qualityModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
       <div class="text-center mb-6 mt-2">
@@ -444,14 +462,16 @@
         <p id="qualityModalDesc" class="text-xs text-slate-400">Choose your preferred download quality.</p>
       </div>
       <div class="space-y-3">
-        <button onclick="confirmQuality('standard')" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-xl border border-white/10 transition-all flex items-center justify-between px-5 group">
+        <button onclick="confirmQuality('standard')"
+          class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-xl border border-white/10 transition-all flex items-center justify-between px-5 group">
           <div class="flex items-center gap-3">
             <i data-lucide="monitor" class="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
             <span id="qualityStandardText">Standard (720p)</span>
           </div>
           <span class="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">Fastest</span>
         </button>
-        <button onclick="confirmQuality('max')" class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl border border-white/20 shadow-lg shadow-blue-500/20 transition-all flex items-center justify-between px-5 group">
+        <button onclick="confirmQuality('max')"
+          class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl border border-white/20 shadow-lg shadow-blue-500/20 transition-all flex items-center justify-between px-5 group">
           <div class="flex items-center gap-3">
             <i data-lucide="sparkles" class="w-4 h-4 text-blue-200"></i>
             <span id="qualityMaxText">Max Quality (1080p)</span>
@@ -470,7 +490,11 @@
       </button>
       <div class="flex items-center gap-3 mb-6 mt-2">
         <div class="p-2.5 bg-[#1877F2]/20 text-[#1877F2] rounded-xl">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd"></path></svg>
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+              clip-rule="evenodd"></path>
+          </svg>
         </div>
         <div>
           <h2 class="text-xl font-bold text-white">FB Downloader</h2>
@@ -597,19 +621,20 @@
             class="input-fix w-full px-3 py-2.5 rounded-xl outline-none resize-none"></textarea>
         </div>
         <div>
-            <label class="text-xs font-bold text-fix-sub mb-2 block">Video Format</label>
-            <select id="scriptFormat" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
-              <option value="YouTube Long Form" selected>YouTube Long Form</option>
-              <option value="YouTube Shorts">YouTube Shorts</option>
-              <option value="TikTok / Instagram Reels">TikTok / Instagram Reels</option>
-            </select>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Video Format</label>
+          <select id="scriptFormat" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+            <option value="YouTube Long Form" selected>YouTube Long Form</option>
+            <option value="YouTube Shorts">YouTube Shorts</option>
+            <option value="TikTok / Instagram Reels">TikTok / Instagram Reels</option>
+          </select>
         </div>
         <button type="submit" id="scraperSrtSubmitBtn"
           class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
           <i data-lucide="zap" class="w-4 h-4"></i> Generate Script
         </button>
       </form>
-      <div id="scraperSrtProgressCard" class="mt-6 p-4 rounded-xl bg-black/40 border border-white/10" style="display: none;">
+      <div id="scraperSrtProgressCard" class="mt-6 p-4 rounded-xl bg-black/40 border border-white/10"
+        style="display: none;">
         <div class="flex items-center justify-between mb-2">
           <span class="text-xs font-medium text-slate-300" id="scraperSrtStatusText">Generating...</span>
         </div>
@@ -617,8 +642,11 @@
           <div id="scraperSrtProgressBar" class="bg-blue-500 h-1.5 rounded-full w-0 transition-all duration-300"></div>
         </div>
       </div>
-      <div id="scraperSrtResultArea" class="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex-col gap-3" style="display: none;">
-        <textarea id="scriptOutputPreview" readonly class="w-full h-40 bg-black/20 text-slate-200 text-sm p-3 rounded-lg outline-none resize-none" placeholder="Script will appear here..."></textarea>
+      <div id="scraperSrtResultArea" class="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex-col gap-3"
+        style="display: none;">
+        <textarea id="scriptOutputPreview" readonly
+          class="w-full h-40 bg-black/20 text-slate-200 text-sm p-3 rounded-lg outline-none resize-none"
+          placeholder="Script will appear here..."></textarea>
         <a id="scraperSrtDownloadLink" href="#" download
           class="w-full py-2.5 bg-blue-500/20 text-blue-300 font-bold text-sm rounded-xl hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2 mt-2">
           <i data-lucide="download" class="w-4 h-4"></i> Download Script (.txt)
@@ -692,6 +720,75 @@
           <i data-lucide="download" class="w-4 h-4"></i> Download .SRT
         </a>
       </div>
+    </div>
+  </div>
+
+  <!-- WALLPAPER MODAL -->
+  <div id="wallpaperModal"
+    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 md:p-6"
+    style="display: none;">
+    <div
+      class="glass-card w-full max-w-5xl rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 md:p-8 relative max-h-[94vh] flex flex-col overflow-hidden border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+
+      <!-- Close Button -->
+      <button onclick="closeModal('wallpaperModal', event)"
+        class="absolute top-3 right-3 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-black/40 hover:bg-black/70 p-2 sm:p-2.5 rounded-full transition-all duration-200 z-10">
+        <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-5 flex-shrink-0 pr-8 sm:pr-0">
+        <div
+          class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] flex-shrink-0">
+          <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-lg sm:text-2xl font-extrabold text-white tracking-wide flex items-center gap-2">
+            4K Dashboard Themes
+            <span
+              class="text-[9px] sm:text-[11px] font-bold uppercase tracking-widest px-2 sm:px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Ultra HD</span>
+          </h2>
+          <p class="text-[11px] sm:text-sm text-slate-300 mt-0.5">Select an aesthetic background for your workspace.</p>
+        </div>
+      </div>
+
+      <!-- Categories Filter Tabs -->
+      <div class="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 overflow-x-auto pb-1 scrollbar-hide flex-shrink-0 flex-nowrap">
+        <button onclick="filterWallpapers('all', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 whitespace-nowrap flex-shrink-0">All (10)</button>
+        <button onclick="filterWallpapers('abstract', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Abstract</button>
+        <button onclick="filterWallpapers('nature', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Nature 4K</button>
+        <button onclick="filterWallpapers('studio', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Studio</button>
+        <button onclick="filterWallpapers('cyberpunk', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Cyberpunk</button>
+      </div>
+
+      <!-- Wallpapers Scrollable Grid -->
+      <div class="overflow-y-auto pr-1 flex-1 custom-scroll">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3.5" id="wallpaperGrid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div
+        class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-400 flex-shrink-0">
+        <span class="flex items-center gap-1 sm:gap-1.5">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400"></i> Auto-saved
+        </span>
+        <button onclick="resetDefaultWallpaper()"
+          class="text-[11px] sm:text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-2 transition-colors">
+          Reset Default
+        </button>
+      </div>
+
+    </div>
+  </div>
+      </div>
+
     </div>
   </div>
 
@@ -818,19 +915,23 @@
       <div id="imgProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
         <p id="imgStatusText" class="text-xs font-bold text-fix-heading mb-2">Processing (May take up to 2 mins)...</p>
         <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
-          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
+          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%">
           </div>
         </div>
       </div>
-      
+
       <!-- Interactive Chat Area -->
-      <div id="imgInteractiveArea" style="display:none;" class="mt-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
-         <p class="text-xs font-bold text-indigo-400 mb-2">KaveezCloud asks:</p>
-         <p id="imgQuestionText" class="text-sm text-white mb-3"></p>
-         <div class="flex gap-2">
-            <input type="text" id="imgReplyInput" class="input-fix flex-1 px-3 py-2 rounded-xl text-sm outline-none" placeholder="Type your reply...">
-            <button type="button" onclick="sendImageReply()" class="px-4 py-2 bg-indigo-600 rounded-xl text-white font-bold text-sm hover:bg-indigo-700 transition-colors">Send</button>
-         </div>
+      <div id="imgInteractiveArea" style="display:none;"
+        class="mt-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20">
+        <p class="text-xs font-bold text-indigo-400 mb-2">KaveezCloud asks:</p>
+        <p id="imgQuestionText" class="text-sm text-white mb-3"></p>
+        <div class="flex gap-2">
+          <input type="text" id="imgReplyInput" class="input-fix flex-1 px-3 py-2 rounded-xl text-sm outline-none"
+            placeholder="Type your reply...">
+          <button type="button" onclick="sendImageReply()"
+            class="px-4 py-2 bg-indigo-600 rounded-xl text-white font-bold text-sm hover:bg-indigo-700 transition-colors">Send</button>
+        </div>
       </div>
 
       <div id="imgResultArea"
@@ -872,9 +973,9 @@
         forms.forEach(f => f.reset());
         const fileLabels = modal.querySelectorAll('p[id$="FileName"]');
         fileLabels.forEach(l => {
-           if(l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
-           if(l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image to Remove BG';
-           if(l.id === 'dubFileName') l.textContent = 'Click to Browse Video';
+          if (l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
+          if (l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image to Remove BG';
+          if (l.id === 'dubFileName') l.textContent = 'Click to Browse Video';
         });
         const progressCards = modal.querySelectorAll('[id$="ProgressCard"]');
         progressCards.forEach(c => c.style.display = 'none');
@@ -914,52 +1015,52 @@
       eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          
+
           if (data.status === 'interactive_question') {
             document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
             document.getElementById(stepsPrefix + 'InteractiveArea').style.display = 'block';
             document.getElementById(stepsPrefix + 'QuestionText').innerText = data.data.question;
           } else if (data.status === 'completed' && data.data) {
             document.getElementById(barId).style.width = '100%';
-            
+
             // For Images
             if (data.data.url && stepsPrefix === 'img') {
-                document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.data.url}`;
-                document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.data.url}`;
+              document.getElementById('imgResultPreview').src = `${API_BASE_URL}${data.data.url}`;
+              document.getElementById('imgDownloadLink').href = `${API_BASE_URL}${data.data.url}`;
             }
             // For AI Script Writer
             if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
-                document.getElementById('scriptOutputPreview').value = data.data.scriptText;
-                const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
-                document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
-                document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
+              document.getElementById('scriptOutputPreview').value = data.data.scriptText;
+              const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
+              document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
+              document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
             }
 
             document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
             document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
-            
+
             const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
-            if(submitBtn) submitBtn.disabled = false;
-            
-            if(stepsPrefix === 'img') {
-                document.getElementById('imageEnhanceBtn').disabled = false;
-                window.isImageTaskRunning = false;
+            if (submitBtn) submitBtn.disabled = false;
+
+            if (stepsPrefix === 'img') {
+              document.getElementById('imageEnhanceBtn').disabled = false;
+              window.isImageTaskRunning = false;
             }
             eventSource.close();
           } else if (data.status === 'error') {
             showPopup(data.message || 'Failed', 'Error', 'error');
             document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
             const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
-            if(submitBtn) submitBtn.disabled = false;
-            if(stepsPrefix === 'img') {
-                document.getElementById('imageEnhanceBtn').disabled = false;
-                window.isImageTaskRunning = false;
+            if (submitBtn) submitBtn.disabled = false;
+            if (stepsPrefix === 'img') {
+              document.getElementById('imageEnhanceBtn').disabled = false;
+              window.isImageTaskRunning = false;
             }
             eventSource.close();
           } else if (data.message) {
             const bar = document.getElementById(barId);
             if (bar) bar.style.width = '80%';
-            
+
             // Dynamic status text update
             const statusEl = document.getElementById(stepsPrefix + 'StatusText');
             if (statusEl) statusEl.innerText = data.message;
@@ -968,24 +1069,24 @@
       };
       return eventSource;
     }
-    
+
     async function sendImageReply() {
-        const reply = document.getElementById('imgReplyInput').value;
-        if (!reply || !window.currentImageClientId) return;
-        
-        document.getElementById('imgInteractiveArea').style.display = 'none';
-        document.getElementById('imgProgressCard').style.display = 'block';
-        document.getElementById('imgReplyInput').value = '';
-        
-        try {
-            await fetch(`${API_BASE_URL}/api/reply-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ clientId: window.currentImageClientId, reply })
-            });
-        } catch (err) {
-            showPopup(err.message, 'Error', 'error');
-        }
+      const reply = document.getElementById('imgReplyInput').value;
+      if (!reply || !window.currentImageClientId) return;
+
+      document.getElementById('imgInteractiveArea').style.display = 'none';
+      document.getElementById('imgProgressCard').style.display = 'block';
+      document.getElementById('imgReplyInput').value = '';
+
+      try {
+        await fetch(`${API_BASE_URL}/api/reply-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: window.currentImageClientId, reply })
+        });
+      } catch (err) {
+        showPopup(err.message, 'Error', 'error');
+      }
     }
 
     function saveApiKeys() {
@@ -1007,12 +1108,12 @@
       e.preventDefault();
       const topic = document.getElementById('scriptTopic').value;
       if (!topic) { showPopup('Please enter a video topic!', 'Error', 'error'); return; }
-      
+
       document.getElementById('scraperSrtSubmitBtn').disabled = true;
       document.getElementById('scraperSrtProgressCard').style.display = 'block';
       document.getElementById('scraperSrtResultArea').style.display = 'none';
       const clientId = 'scraper_' + Date.now();
-      
+
       const es = setupProgressTracker(clientId, 'scraperSrt', 'scraperSrtProgressBar');
 
       const data = {
@@ -1021,17 +1122,17 @@
       };
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/generate-script-scraper?clientId=${clientId}`, { 
-          method: 'POST', 
+        const res = await fetch(`${API_BASE_URL}/api/generate-script-scraper?clientId=${clientId}`, {
+          method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data) 
+          body: JSON.stringify(data)
         });
         const resData = await res.json();
-        
-        if(!res.ok) {
-           es.close();
-           showPopup(resData.error || 'Failed to start', 'Error', 'error');
-           document.getElementById('scraperSrtSubmitBtn').disabled = false;
+
+        if (!res.ok) {
+          es.close();
+          showPopup(resData.error || 'Failed to start', 'Error', 'error');
+          document.getElementById('scraperSrtSubmitBtn').disabled = false;
         }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); document.getElementById('scraperSrtSubmitBtn').disabled = false; }
     }
@@ -1070,7 +1171,7 @@
 
     function openQualityModal(type, url, format) {
       pendingDownload = { type, url, format };
-      
+
       const title = document.getElementById('qualityModalTitle');
       const desc = document.getElementById('qualityModalDesc');
       const stdText = document.getElementById('qualityStandardText');
@@ -1105,7 +1206,7 @@
 
     function confirmQuality(qualityLevel) {
       if (!pendingDownload) return;
-      
+
       const modal = document.getElementById('qualityModal');
       const content = document.getElementById('qualityModalContent');
       modal.style.opacity = '0';
@@ -1228,17 +1329,17 @@
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, clientId })
         });
         const data = await res.json();
-        
+
         if (data.success) {
-            window.currentImageClientId = clientId;
+          window.currentImageClientId = clientId;
         } else {
-            showPopup(data.error || 'Failed', 'Error', 'error');
-            es.close();
-            document.getElementById('imageGenerateBtn').disabled = false;
-            window.isImageTaskRunning = false;
+          showPopup(data.error || 'Failed', 'Error', 'error');
+          es.close();
+          document.getElementById('imageGenerateBtn').disabled = false;
+          window.isImageTaskRunning = false;
         }
-      } catch (err) { 
-        es.close(); 
+      } catch (err) {
+        es.close();
         showPopup(err.message, 'Error', 'error');
         document.getElementById('imageGenerateBtn').disabled = false;
         window.isImageTaskRunning = false;
@@ -1266,23 +1367,155 @@
       try {
         const res = await fetch(`${API_BASE_URL}/api/remove-bg?clientId=${clientId}`, { method: 'POST', body: formData });
         const data = await res.json();
-        
+
         if (data.success) {
-            window.currentImageClientId = clientId;
+          window.currentImageClientId = clientId;
         } else {
-            showPopup(data.error || 'Failed', 'Error', 'error');
-            es.close();
-            document.getElementById('imageEnhanceBtn').disabled = false;
-            window.isImageTaskRunning = false;
+          showPopup(data.error || 'Failed', 'Error', 'error');
+          es.close();
+          document.getElementById('imageEnhanceBtn').disabled = false;
+          window.isImageTaskRunning = false;
         }
-      } catch (err) { 
-        es.close(); 
+      } catch (err) {
+        es.close();
         showPopup(err.message, 'Error', 'error');
         document.getElementById('imageEnhanceBtn').disabled = false;
         window.isImageTaskRunning = false;
       }
     }
+
+    // Enhanced 4K Wallpapers Collection
+    const wallpapers = [
+      { id: 'w1', name: 'Dark Nebula Waves', category: 'abstract', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w2', name: 'Misty Mountain Peaks', category: 'nature', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w3', name: 'Emerald Forest Lake', category: 'nature', url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w4', name: 'Cyberpunk Neon Alley', category: 'cyberpunk', url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w5', name: 'Video Creator Studio', category: 'studio', url: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w6', name: 'Minimal Audio Desk', category: 'studio', url: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w7', name: 'Tokyo Rain Night', category: 'cyberpunk', url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w8', name: 'Deep Space Galaxy', category: 'nature', url: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w9', name: 'Dark Obsidian Geometry', category: 'abstract', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w10', name: 'Golden Sunset Beach', category: 'nature', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop' }
+    ];
+
+    let currentActiveFilter = 'all';
+
+    function initWallpapers() {
+      const saved = localStorage.getItem('capzone_wallpaper') || wallpapers[0].url;
+      setWallpaper(saved);
+      renderWallpaperGrid();
+    }
+
+    function renderWallpaperGrid() {
+      const grid = document.getElementById('wallpaperGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const currentUrl = localStorage.getItem('capzone_wallpaper') || wallpapers[0].url;
+      const filtered = currentActiveFilter === 'all'
+        ? wallpapers
+        : wallpapers.filter(w => w.category === currentActiveFilter);
+
+      const fallback = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop';
+
+      filtered.forEach((w) => {
+        const isSelected = currentUrl === w.url;
+        const card = document.createElement('div');
+        card.className = 'group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border-2 transition-all duration-300 hover:scale-[1.02] aspect-[16/10] bg-slate-900 shadow-md sm:shadow-lg ' +
+          (isSelected
+            ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] ring-2 ring-indigo-500/50'
+            : 'border-white/10 hover:border-indigo-400/80 hover:shadow-indigo-500/20');
+
+        card.onclick = () => {
+          setWallpaper(w.url);
+          renderWallpaperGrid();
+          if (typeof showPopup === 'function') {
+            showPopup('Applied theme: ' + w.name, 'success');
+          }
+        };
+
+        card.innerHTML =
+          '<img src="' + w.thumb + '" onerror="this.onerror=null;this.src=\'' + fallback + '\'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" alt="' + w.name + '">' +
+          '<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-between p-2 sm:p-3">' +
+          '<div class="flex items-center justify-between">' +
+          '<span class="text-[8px] sm:text-[10px] font-extrabold uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-black/60 text-indigo-300 border border-white/10 backdrop-blur-sm">' + w.category + '</span>' +
+          (isSelected
+            ? '<div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-lg"><i data-lucide="check" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></div>'
+            : '<div class="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white"><i data-lucide="arrow-up-right" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></div>') +
+          '</div>' +
+          '<div>' +
+          '<h4 class="text-[10px] sm:text-xs font-bold text-white tracking-wide truncate">' + w.name + '</h4>' +
+          '<div class="flex items-center justify-between mt-0.5">' +
+          '<span class="text-[8px] sm:text-[10px] text-slate-300 font-medium">4K Ultra HD</span>' +
+          '<span class="text-[8px] sm:text-[10px] ' + (isSelected ? 'text-indigo-400 font-bold' : 'text-slate-400 group-hover:text-indigo-300') + '">' + (isSelected ? 'Active' : 'Apply') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+        grid.appendChild(card);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterWallpapers(cat, btn) {
+      currentActiveFilter = cat;
+      document.querySelectorAll('.wp-filter-btn').forEach(b => {
+        b.className = 'wp-filter-btn px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10';
+      });
+      if (btn) {
+        btn.className = 'wp-filter-btn px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30';
+      }
+      renderWallpaperGrid();
+    }
+
+    function setWallpaper(url) {
+      const bgDiv = document.getElementById('dashboardBackground');
+      if (bgDiv) {
+        bgDiv.style.backgroundImage = 'url("' + url + '")';
+      }
+      localStorage.setItem('capzone_wallpaper', url);
+    }
+
+    function resetDefaultWallpaper() {
+      setWallpaper(wallpapers[0].url);
+      renderWallpaperGrid();
+      if (typeof showPopup === 'function') {
+        showPopup('Theme reset to default', 'success');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWallpapers);
+    } else {
+      initWallpapers();
+    }
+
   </script>
+  <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
+  <div class="fixed bottom-3 inset-x-3 z-40 sm:hidden glass-panel rounded-2xl px-4 py-2.5 flex items-center justify-around border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0b0f19]/80">
+    <a href="dashboard.html" class="flex flex-col items-center gap-0.5 text-indigo-400">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Home</span>
+    </a>
+    <button onclick="openModal('srtModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="file-text" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Subtitles</span>
+    </button>
+    <a href="editor.html" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="film" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Editor</span>
+    </a>
+    <button onclick="openModal('wallpaperModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="palette" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Theme</span>
+    </button>
+    <button onclick="openModal('profileModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="user" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Profile</span>
+    </button>
+  </div>
+
 </body>
 
 </html>
