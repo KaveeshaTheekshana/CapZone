@@ -89,9 +89,32 @@
         }
 
         .hero-bg {
+            background-color: #0a0a0a;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .hero-bg::before {
+            content: "";
+            position: absolute;
+            inset: 0;
             background-image: url('hero-bg.jpg');
             background-size: cover;
             background-position: center;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hero-bg.loaded::before {
+            opacity: 1;
+        }
+        
+        .hero-bg > div {
+            position: relative;
+            z-index: 10;
         }
 
         .font-sinhala {
@@ -704,6 +727,18 @@
     <!-- SCROLL REVEAL & ANIMATED STATS COUNTERS SCRIPT -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Hero background image smooth loader
+            const heroImg = new Image();
+            heroImg.src = 'hero-bg.jpg';
+            heroImg.onload = () => {
+                const heroSection = document.querySelector('.hero-bg');
+                if (heroSection) heroSection.classList.add('loaded');
+            };
+            if (heroImg.complete) {
+                const heroSection = document.querySelector('.hero-bg');
+                if (heroSection) heroSection.classList.add('loaded');
+            }
+
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
