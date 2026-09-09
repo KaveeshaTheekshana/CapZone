@@ -164,7 +164,17 @@
     }
 
     ::-webkit-scrollbar-thumb:hover {
-      background: rgba(255, 255, 255, 0.7);
+      background: rgba(99, 102, 241, 0.5);
+    }
+
+    /* Fix autofill white background */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active{
+      -webkit-box-shadow: 0 0 0 30px #0b0f19 inset !important;
+      -webkit-text-fill-color: white !important;
+      transition: background-color 5000s ease-in-out 0s;
     }
 
     .input-fix {
@@ -334,7 +344,7 @@
           </div>
           <h3 class="text-lg font-bold text-white mb-1">Social Kit</h3>
           <span class="text-xs text-yellow-400/90 font-semibold mb-2">Chats, comments & receipts</span>
-          <p class="text-sm text-gray-400 mb-8 flex-1 leading-relaxed line-clamp-3">
+          <p class="text-sm text-gray-400 mb-6 flex-1 leading-relaxed line-clamp-2">
             Generate viral Fake Text Chats, TikTok/IG/FB comments, X/Reddit posts & receipts with Gemini AI.
           </p>
           <button
@@ -949,7 +959,7 @@
             <div class="flex items-center gap-4 min-w-0">
               <div
                 class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                <i data-lucide="thumbs-up" class="w-6 h-6 text-blue-400"></i>
+                <i data-lucide="facebook" class="w-6 h-6 text-blue-400"></i>
               </div>
               <div class="min-w-0">
                 <h3 class="text-base font-bold text-white group-hover:text-blue-300 transition-colors">Facebook comment
@@ -1258,6 +1268,12 @@
 
     window.openToolWithIntercept = function (modalId, event) {
       if (event) event.preventDefault();
+      
+      if (['fbModal', 'tiktokModal', 'bgRemoverModal'].includes(modalId)) {
+        if (typeof openModal === 'function') openModal(modalId);
+        return;
+      }
+      
       window.pendingToolModal = modalId;
       const modal = document.getElementById('apiConfigModal');
       const content = document.getElementById('apiConfigContent');
@@ -2308,7 +2324,7 @@
           '</div>' +
           '<p class="text-xs sm:text-sm text-neutral-100 my-3 leading-relaxed cursor-text" contenteditable="true">' + tweet + '</p>' +
           '<div class="text-[10px] text-neutral-500 py-2 border-y border-neutral-800/80 my-2">' +
-          '<span>' + (data.time || '4:15 PM Â· Sep 2, 2026') + '</span> Â· <span class="font-bold text-white">' + (data.views || '1.2M') + '</span> Views' +
+          '<span>' + (data.time || '4:15 PM &middot; Sep 2, 2026') + '</span> &middot; <span class="font-bold text-white">' + (data.views || '1.2M') + '</span> Views' +
           '</div>' +
           '<div class="flex items-center justify-between text-neutral-500 text-xs pt-1 px-2">' +
           '<span class="flex items-center gap-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> 240</span>' +
@@ -2326,7 +2342,7 @@
           '<div class="flex items-center gap-2 text-[10px] text-neutral-400 mb-2">' +
           '<div class="w-4 h-4 rounded-full bg-orange-600 flex items-center justify-center font-bold text-[8px] text-white">r/</div>' +
           '<span class="font-bold text-white cursor-text" contenteditable="true">' + (data.subreddit || 'r/AskReddit') + '</span>' +
-          '<span>â€¢</span>' +
+          '<span>&bull;</span>' +
           '<span>Posted by <span contenteditable="true">' + (data.author || 'u/RedditUser') + '</span> ' + (data.time || '6 hr. ago') + '</span>' +
           '</div>' +
           '<h3 class="text-xs sm:text-sm font-bold text-white mb-2 leading-snug cursor-text" contenteditable="true">' + title + '</h3>' +
@@ -2417,7 +2433,9 @@
         html2canvas(node, {
           backgroundColor: null,
           scale: 3,
-          useCORS: true
+          useCORS: true,
+          scrollX: 0,
+          scrollY: -window.scrollY
         }).then(canvas => {
           const a = document.createElement('a');
           a.download = currentSocialTool + '_mockup_' + Date.now() + '.png';
