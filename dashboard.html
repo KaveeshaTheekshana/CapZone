@@ -488,7 +488,7 @@
           <div>
             <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone API Key
               (Optional)</label>
-            <input type="text" id="userApiKey" placeholder="AI Studio Key..."
+            <input type="text" id="userApiKey" autocomplete="off"
               class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
           </div>
           <div>
@@ -2414,9 +2414,8 @@
       <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
         <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your Gemini API
           Key</label>
-        <input type="password" id="geminiApiKeyInput"
-          class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2"
-          placeholder="AIzaSy...">
+        <input type="password" id="geminiApiKeyInput" autocomplete="off"
+          class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2">
         <p class="text-[10px] text-gray-400 mb-4">Get your free key from Google AI Studio.</p>
 
         <a href="https://aistudio.google.com/app/apikey" target="_blank"
