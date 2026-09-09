@@ -12,7 +12,7 @@
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -1748,6 +1748,8 @@
       document.getElementById('srtSubmitBtn').disabled = true;
       document.getElementById('srtProgressCard').style.display = 'block';
       document.getElementById('srtResultArea').style.display = 'none';
+      const modalBox = e.target.closest('.glass-card');
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
       const clientId = 'srt_' + Date.now();
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
@@ -1767,7 +1769,11 @@
           document.getElementById('srtResultArea').style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { document.getElementById('srtSubmitBtn').disabled = false; }
+      finally { 
+        document.getElementById('srtSubmitBtn').disabled = false;
+        const modalBox = e.target.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
     }
 
     // Quality Selection State
@@ -1880,6 +1886,8 @@
       document.getElementById('dubSubmitBtn').disabled = true;
       document.getElementById('dubProgressCard').style.display = 'block';
       document.getElementById('dubResultArea').style.display = 'none';
+      const modalBox = e.target.closest('.glass-card');
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
 
       const clientId = 'dub_' + Date.now();
       const es = setupProgressTracker(clientId, 'dub', 'dubProgressBar');
@@ -1898,7 +1906,11 @@
           document.getElementById('dubResultArea').style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { document.getElementById('dubSubmitBtn').disabled = false; }
+      finally { 
+        document.getElementById('dubSubmitBtn').disabled = false; 
+        const modalBox = e.target.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
     }
 
     function switchImageTab(tab) {
@@ -2762,7 +2774,7 @@
       const node = document.getElementById('mockupExportNode');
       if (!node) return;
 
-      if (typeof html2canvas === 'function') {
+      if (window.htmlToImage) {
         showPopup('Generating high-res PNG image...', 'info');
 
         // Temporarily expand scrollable message containers so the entire conversation is captured
@@ -2774,32 +2786,32 @@
           el.style.overflow = 'visible';
         });
 
-        html2canvas(node, {
-          backgroundColor: null,
-          scale: 3,
-          useCORS: true,
-          logging: false
-        }).then(canvas => {
-          // Restore container heights
-          scrollContainers.forEach(item => {
-            item.el.style.maxHeight = item.maxH;
-            item.el.style.overflow = item.overflow;
-          });
+        window.htmlToImage.toPng(node, { pixelRatio: 3, skipFonts: true })
+          .then(dataUrl => {
+            // Restore container heights
+            scrollContainers.forEach(item => {
+              item.el.style.maxHeight = item.maxH;
+              item.el.style.overflow = item.overflow;
+            });
 
-          const a = document.createElement('a');
-          a.download = (currentSocialTool || 'social') + '_mockup_' + Date.now() + '.png';
-          a.href = canvas.toDataURL('image/png');
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          showPopup('Full mockup downloaded successfully!', 'Success', 'success');
-        }).catch(err => {
-          scrollContainers.forEach(item => {
-            item.el.style.maxHeight = item.maxH;
-            item.el.style.overflow = item.overflow;
+            const a = document.createElement('a');
+            a.download = (currentSocialTool || 'social') + '_mockup_' + Date.now() + '.png';
+            a.href = dataUrl;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showPopup('Full mockup downloaded successfully!', 'Success', 'success');
+          }).catch(err => {
+            scrollContainers.forEach(item => {
+              item.el.style.maxHeight = item.maxH;
+              item.el.style.overflow = item.overflow;
+            });
+            console.error('Export error:', err);
+            showPopup('Export failed. Trying alternative method...', 'Warning', 'warning');
+            
+            // Fallback to simple html2canvas if loaded, or just copy text
+            copySocialText();
           });
-          showPopup('Export failed: ' + err.message, 'Error', 'error');
-        });
       } else {
         copySocialText();
       }
