@@ -1073,7 +1073,7 @@
             <div class="flex items-center gap-2">
               <select id="socialLangSelect"
                 class="glass-input px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-200 outline-none bg-slate-900 border border-white/20">
-                <option value="sinhala" class="bg-slate-900 text-white">à·ƒà·’à¶‚à·„à¶½ (Sinhala)</option>
+                <option value="sinhala" class="bg-slate-900 text-white">සිංහල (Sinhala)</option>
                 <option value="english" class="bg-slate-900 text-white">English</option>
                 <option value="singlish" class="bg-slate-900 text-white">Singlish</option>
               </select>
@@ -1532,7 +1532,7 @@
           }
 
           // Direct call to Google Gemini API
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
           const requestBody = {
             contents: [{ parts: [{ text: prompt }] }]
           };
