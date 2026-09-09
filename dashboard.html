@@ -2,6 +2,39 @@
 <html class="dark" lang="en">
 
 <head>
+
+  <script>
+    const originalFetch = window.fetch;
+    window.fetch = async function() {
+        let [resource, config] = arguments;
+        if (window.currentUserEmail && typeof resource === 'string' && resource.includes('/api/')) {
+            config = config || {};
+            
+            // If body is FormData, we can append email
+            if (config.body && config.body instanceof FormData) {
+                config.body.append('email', window.currentUserEmail);
+            } else if (config.body && typeof config.body === 'string') {
+                try {
+                    let parsed = JSON.parse(config.body);
+                    if (typeof parsed === 'object' && parsed !== null) {
+                        parsed.email = window.currentUserEmail;
+                        config.body = JSON.stringify(parsed);
+                    }
+                } catch(e){}
+            }
+            
+            // Add header as fallback
+            config.headers = config.headers || {};
+            if (config.headers instanceof Headers) {
+                config.headers.append('x-user-email', window.currentUserEmail);
+            } else {
+                config.headers['x-user-email'] = window.currentUserEmail;
+            }
+        }
+        return originalFetch(resource, config);
+    };
+  </script>
+
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>CapZone | Video Editor Dashboard</title>
@@ -12,7 +45,7 @@
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html-to-image/1.11.11/html-to-image.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -2966,8 +2999,14 @@
 <script>
 
     
-    window.saveToRecentProjects = function(type, title, metadata) {
+    window.saveToRecentProjects = function(type, title, metadata, fileId = null) {
       if (!window.currentUserEmail) return;
+      
+      let metaStr = metadata;
+      if (fileId) {
+          metaStr = JSON.stringify({ text: metadata, file_id: fileId });
+      }
+
       try {
         fetch(`${API_BASE_URL}/api/user-projects`, {
             method: 'POST',
@@ -2976,7 +3015,7 @@
                 email: window.currentUserEmail,
                 type: type,
                 title: title,
-                metadata: metadata,
+                metadata: metaStr,
                 date: new Date().toISOString()
             })
         }).then(() => window.renderRecentProjects());
@@ -3035,7 +3074,7 @@
           const time = new Date(p.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
           
           htmlOut += `
-          <div class="project-3d-card w-64 lg:w-full flex-shrink-0 snap-center group relative p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-500 ease-out backdrop-blur-md overflow-hidden cursor-pointer" onclick="alert('Project: ' + '${p.title}')">
+          <div class="project-3d-card w-64 lg:w-full flex-shrink-0 snap-center group relative p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-500 ease-out backdrop-blur-md overflow-hidden cursor-pointer" onclick="window.location.href='${API_BASE_URL}/api/mtproto/download?msg_id=' + '${p.metadata}'">
               <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div class="relative z-10 flex items-start gap-4 transform transition-transform duration-500 group-hover:translate-z-10">
                   <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${color}/20 text-white border border-white/10">
