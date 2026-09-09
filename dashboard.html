@@ -1588,7 +1588,7 @@
         setTimeout(() => {
           document.getElementById('scraperSrtProgressCard').style.display = 'none';
           document.getElementById('scraperSrtResultArea').style.display = 'block';
-          document.getElementById('scraperSrtResultText').value = scriptText;
+          document.getElementById('scriptOutputPreview').value = scriptText;
           document.getElementById('scraperSrtSubmitBtn').disabled = false;
           showPopup('Script generated successfully!', 'Success', 'success');
         }, 500);
