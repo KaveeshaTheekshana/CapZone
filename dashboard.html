@@ -55,6 +55,7 @@
         const profileInitial = document.getElementById('profileInitial');
         const navProfileName = document.getElementById('navProfileName');
 
+        window.currentUserEmail = user.email;
         if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
         if (profileEmail) profileEmail.textContent = user.email;
         if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
@@ -110,7 +111,7 @@
         background: rgba(15, 19, 30, 0.88) !important;
         backdrop-filter: blur(8px) !important;
         -webkit-backdrop-filter: blur(8px) !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       }
 
       /* Prevent touch scroll hesitation from sticky hover transitions */
@@ -248,7 +249,24 @@
       animation: kaveezBoxGlow 2s infinite ease-in-out !important;
       border-color: rgba(168, 85, 247, 0.85) !important;
     }
-  </style>
+  
+      .project-3d-card {
+        transform-style: preserve-3d;
+        transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+      }
+      .project-3d-card:hover {
+        transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale3d(1.02, 1.02, 1.02);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .hide-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+    </style>
 </head>
 
 <body
@@ -326,10 +344,10 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-lg font-semibold text-white tracking-wide">Recent Projects</h2>
         </div>
-        <div class="space-y-4">
-          <div class="flex flex-col items-center justify-center py-10 opacity-70">
-            <div
-              class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
+        <div id="recentProjectsContainer" class="flex lg:flex-col overflow-x-auto lg:overflow-visible space-x-4 lg:space-x-0 lg:space-y-4 pb-4 lg:pb-0 snap-x snap-mandatory hide-scrollbar">
+          <!-- Default Empty state -->
+          <div class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
+            <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
               <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
             </div>
             <p class="text-slate-300 font-semibold">No active projects</p>
@@ -1567,6 +1585,7 @@
 
             // For Images
             if (data.data.url && stepsPrefix === 'img') {
+              if(!window._imgLogged){ window.saveToRecentProjects('Image', document.getElementById('imagePromptInput') ? document.getElementById('imagePromptInput').value : 'AI Generated Image', 'Image generated successfully'); window._imgLogged=true; setTimeout(()=>window._imgLogged=false,1000); }
               let finalUrl = data.data.url;
               if (!finalUrl.startsWith('http')) {
                 finalUrl = `${API_BASE_URL}${data.data.url}`;
@@ -1576,6 +1595,7 @@
             }
             // For AI Script Writer
             if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
+              if(!window._scriptLogged){ window.saveToRecentProjects('Script', document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script', 'Script generated successfully'); window._scriptLogged=true; setTimeout(()=>window._scriptLogged=false,1000); }
               document.getElementById('scriptOutputPreview').value = data.data.scriptText;
               const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
               document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
@@ -1676,8 +1696,8 @@
 
         if (apiType === 'own' && apiKey) {
           try {
-            // Direct call using modern gemini-2.0-flash model
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            // Direct call using modern gemini-3.6-flash model
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
             const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
 
             document.getElementById('scraperSrtProgressBar').style.width = '50%';
@@ -1762,6 +1782,7 @@
         const data = await res.json();
         es.close();
         if (data.srt) {
+          window.saveToRecentProjects('Subtitle', currentSrtFile ? currentSrtFile.name : 'Subtitles', `${language} - ${wordsLimit} words`);
           const blob = new Blob([data.srt], { type: 'text/plain' });
           document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
           document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
@@ -1868,6 +1889,7 @@
         const data = await res.json();
         es.close();
         if (data.downloadUrl) {
+          if(!window._dlLogged){ window.saveToRecentProjects('Video', type === 'fb' ? 'Facebook Video' : 'TikTok Video', 'Downloaded Media'); window._dlLogged=true; setTimeout(()=>window._dlLogged=false,1000); }
           document.getElementById(barId).style.width = '100%';
           document.getElementById(linkId).href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
           document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
@@ -1900,6 +1922,7 @@
         const data = await res.json();
         es.close();
         if (data.dubbedUrl) {
+          if(!window._dubLogged){ window.saveToRecentProjects('Dubbing', document.getElementById('dubVideoFile').files[0] ? document.getElementById('dubVideoFile').files[0].name : 'Dubbed Video', `Language: ${document.getElementById('dubLanguage').value}`); window._dubLogged=true; setTimeout(()=>window._dubLogged=false,1000); }
           document.getElementById('dubProgressBar').style.width = '100%';
           document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
           document.getElementById('dubDownloadLink').download = data.filename || 'dubbed.mp4';
@@ -2395,6 +2418,7 @@
           generatedData = generateRealisticSocialFallback(currentSocialTool, topic, language);
         }
 
+        window.saveToRecentProjects('Social', topic, `Tool: ${currentSocialTool}`);
         currentSocialData = generatedData;
         renderMockup(currentSocialTool, generatedData);
         showPopup('Generated successfully with KaveezCloud AI!', 'Success', 'success');
@@ -2932,6 +2956,104 @@
   </div>
 
 
+<script>
+
+    
+    window.saveToRecentProjects = function(type, title, metadata) {
+      if (!window.currentUserEmail) return;
+      try {
+        fetch(`${API_BASE_URL}/api/user-projects`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: window.currentUserEmail,
+                type: type,
+                title: title,
+                metadata: metadata,
+                date: new Date().toISOString()
+            })
+        }).then(() => window.renderRecentProjects());
+      } catch (e) {
+        console.error('Save project error:', e);
+      }
+    };
+
+    window.renderRecentProjects = async function() {
+      const container = document.getElementById('recentProjectsContainer');
+      if (!container || !window.currentUserEmail) return;
+      let projects = [];
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(window.currentUserEmail));
+        if(res.ok) projects = await res.json();
+      } catch (e) {
+        console.error('Failed to fetch user projects:', e);
+      }
+      
+      if (!projects || projects.length === 0) {
+          container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
+              <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
+                <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
+              </div>
+              <p class="text-slate-300 font-semibold">No active projects</p>
+              <p class="text-xs text-slate-500 mt-1">Start by launching a tool.</p>
+            </div>`;
+          if (window.lucide) window.lucide.createIcons();
+          return;
+      }
+
+      let htmlOut = '';
+      const icons = {
+          'Subtitle': 'subtitles',
+          'Dubbing': 'mic',
+          'Social': 'share-2',
+          'Script': 'pen-tool',
+          'Image': 'image',
+          'Video': 'video',
+          'Background': 'scissors'
+      };
+      const colors = {
+          'Subtitle': 'bg-blue-500',
+          'Dubbing': 'bg-purple-500',
+          'Social': 'bg-pink-500',
+          'Script': 'bg-emerald-500',
+          'Image': 'bg-amber-500',
+          'Video': 'bg-indigo-500',
+          'Background': 'bg-teal-500'
+      };
+
+      projects.forEach(p => {
+          const icon = icons[p.type] || 'file';
+          const color = colors[p.type] || 'bg-slate-500';
+          const time = new Date(p.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          
+          htmlOut += `
+          <div class="project-3d-card w-64 lg:w-full flex-shrink-0 snap-center group relative p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-500 ease-out backdrop-blur-md overflow-hidden cursor-pointer" onclick="alert('Project: ' + '${p.title}')">
+              <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div class="relative z-10 flex items-start gap-4 transform transition-transform duration-500 group-hover:translate-z-10">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${color}/20 text-white border border-white/10">
+                      <i data-lucide="${icon}" class="w-5 h-5 drop-shadow-md"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                      <h4 class="text-white font-semibold truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all">${p.title}</h4>
+                      <p class="text-xs text-slate-400 truncate mt-0.5">${p.metadata}</p>
+                      <p class="text-[10px] text-slate-500 mt-2 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${time}</p>
+                  </div>
+              </div>
+          </div>`;
+      });
+      
+      container.innerHTML = htmlOut;
+      if (window.lucide) window.lucide.createIcons();
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initial render will fail without currentUserEmail, but we retry in an interval
+        setInterval(() => {
+            if (window.currentUserEmail) window.renderRecentProjects();
+        }, 10000); // refresh every 10 seconds
+    });
+</script>
 </body>
 
 </html>
