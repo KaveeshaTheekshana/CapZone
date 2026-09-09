@@ -1585,7 +1585,14 @@
 
             // For Images
             if (data.data.url && stepsPrefix === 'img') {
-              if(!window._imgLogged){ window.saveToRecentProjects('Image', document.getElementById('imagePromptInput') ? document.getElementById('imagePromptInput').value : 'AI Generated Image', 'Image generated successfully'); window._imgLogged=true; setTimeout(()=>window._imgLogged=false,1000); }
+              if(!window._imgLogged){ 
+                 let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
+                 let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
+                 let type = isBgRemover ? 'Background' : 'Image';
+                 window.saveToRecentProjects(type, title, 'Processed successfully'); 
+                 window._imgLogged=true; 
+                 setTimeout(()=>window._imgLogged=false,1000); 
+              }
               let finalUrl = data.data.url;
               if (!finalUrl.startsWith('http')) {
                 finalUrl = `${API_BASE_URL}${data.data.url}`;
