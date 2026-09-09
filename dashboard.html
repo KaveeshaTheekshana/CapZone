@@ -225,15 +225,15 @@
     <nav
       class="flex items-center justify-start lg:justify-center gap-4 lg:gap-8 flex-1 overflow-x-auto whitespace-nowrap px-1 lg:px-4 scrollbar-hide w-full">
       <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pl-2"
-        onclick="openModal('srtModal', event)">Subtitle Studio</a>
+        onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
-        onclick="openModal('scraperSrtModal', event)">AI Script Writer</a>
+        onclick="openToolWithIntercept('scraperSrtModal', event)">AI Script Writer</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
-        onclick="openModal('fbModal', event)">FB Downloader</a>
+        onclick="openToolWithIntercept('fbModal', event)">FB Downloader</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
-        onclick="openModal('tiktokModal', event)">TikTok Downloader</a>
+        onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pr-2"
-        onclick="openModal('dubModal', event)">AI Dubbing</a>
+        onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
     </nav>
     <div class="flex items-center gap-3 lg:gap-4 ml-auto">
       <!-- 4K Wallpaper Switcher Button -->
@@ -309,7 +309,7 @@
               <p class="text-gray-200 text-sm leading-relaxed mb-8 max-w-md drop-shadow-md font-medium">
                 Generate perfectly synced Sinhala & English subtitles from any audio using AI.
               </p>
-              <button onclick="openModal('srtModal', event)"
+              <button onclick="openToolWithIntercept('srtModal', event)"
                 class="self-start px-6 py-2.5 bg-purple-500/30 hover:bg-purple-500/50 border border-purple-400/40 rounded-xl text-purple-50 transition-colors text-lg lg:text-xl font-bold backdrop-blur-md shadow-lg shadow-purple-500/20 hover:scale-105 active:scale-95 duration-300">
                 Generate Subtitles
               </button>
@@ -1840,7 +1840,7 @@
     function openSocialKitModal(e) {
       if (e) e.preventDefault();
       backToSocialKitOverview();
-      openModal('socialKitModal', e);
+      openToolWithIntercept('socialKitModal', e);
     }
 
     function selectSocialTool(toolKey) {
@@ -1897,7 +1897,7 @@
         const apiType = localStorage.getItem('capzone_api_type');
         const customApiKey = localStorage.getItem('capzone_gemini_key');
         const payload = { tool: currentSocialTool, topic, language };
-        if (apiType === 'client' && customApiKey) {
+        if (apiType === 'own' && customApiKey) {
             payload.apiKey = customApiKey;
         }
 
@@ -2309,7 +2309,7 @@
       <i data-lucide="layout-grid" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">Home</span>
     </a>
-    <button onclick="openModal('srtModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+    <button onclick="openToolWithIntercept('srtModal', event)" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
       <i data-lucide="file-text" class="w-5 h-5"></i>
       <span class="text-[9px] font-bold">Subtitles</span>
     </button>
@@ -2370,7 +2370,11 @@
       <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
         <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your Gemini API Key</label>
         <input type="password" id="geminiApiKeyInput" class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2" placeholder="AIzaSy...">
-        <p class="text-[10px] text-gray-400 mb-4">Get your free key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 hover:underline">Google AI Studio</a>.</p>
+        <p class="text-[10px] text-gray-400 mb-4">Get your free key from Google AI Studio.</p>
+        
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 transition-colors text-sm font-bold">
+          Create API
+        </a>
         
         <div class="flex justify-end gap-3">
           <button onclick="backToOptions()" class="px-4 py-2 rounded-lg text-sm font-bold text-gray-300 hover:text-white transition-colors">Back</button>
@@ -2455,6 +2459,12 @@
       }
       localStorage.setItem('capzone_api_type', 'own');
       localStorage.setItem('capzone_gemini_key', key);
+      
+      const profileInput = document.getElementById('userApiKey');
+      if (profileInput) {
+        profileInput.value = key;
+      }
+      
       closeApiModal();
     }
 
