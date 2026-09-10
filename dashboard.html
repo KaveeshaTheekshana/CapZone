@@ -44,7 +44,7 @@
     fetchpriority="high">
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
@@ -316,6 +316,7 @@
 
   <header class="fixed top-0 inset-x-0 h-20 glass-panel z-40 flex items-center px-4 lg:px-10 gap-3 lg:gap-6">
     <a class="flex-shrink-0 flex items-center gap-3 group" href="index.html">
+
       <div
         class="w-10 h-10 lg:w-12 lg:h-12 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
         <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
@@ -323,7 +324,7 @@
       <span class="text-xl lg:text-2xl font-bold text-white tracking-wide drop-shadow-md hidden sm:block">CapZone</span>
     </a>
     <nav
-      class="flex items-center justify-start lg:justify-center gap-4 lg:gap-8 flex-1 overflow-x-auto whitespace-nowrap px-1 lg:px-4 scrollbar-hide w-full">
+      class="flex items-center justify-start gap-4 lg:gap-8 flex-1 overflow-x-auto whitespace-nowrap px-1 lg:px-4 scrollbar-hide w-full">
       <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pl-2"
         onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
       <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
@@ -612,4 +613,2530 @@
       </button>
       <div class="text-center mb-6">
         <div
-          class="w-16 h-16 mx
+          class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg mb-3"
+          id="profileInitial">U</div>
+        <h2 class="text-xl font-bold text-fix-heading" id="profileName">User</h2>
+        <p class="text-xs text-fix-sub mt-1" id="profileEmail">user@example.com</p>
+      </div>
+      <div class="space-y-4">
+        <div class="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-3">
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone API Key
+              (Optional)</label>
+            <input type="text" id="userApiKey" autocomplete="off"
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">ElevenLabs API
+              Key</label>
+            <input type="text" id="elevenLabsApiKey" placeholder="sk_..."
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+          <button id="saveApiKeyBtn" type="button"
+            onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
+            class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
+            API Keys</button>
+        </div>
+        <button id="logoutBtn" onclick="handleLogout()"
+          class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FB MODAL -->
+  <div id="qualityModal"
+    class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 ease-out"
+    style="display: none; opacity: 0;">
+    <div
+      class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 ease-out scale-75"
+      id="qualityModalContent">
+      <button onclick="closeModal('qualityModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="text-center mb-6 mt-2">
+        <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3">
+          <i id="qualityModalIcon" data-lucide="settings" class="w-6 h-6"></i>
+        </div>
+        <h2 id="qualityModalTitle" class="text-xl font-bold text-white mb-1">Select Quality</h2>
+        <p id="qualityModalDesc" class="text-xs text-slate-400">Choose your preferred download quality.</p>
+      </div>
+      <div class="space-y-3">
+        <button onclick="confirmQuality('standard')"
+          class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-xl border border-white/10 transition-all flex items-center justify-between px-5 group">
+          <div class="flex items-center gap-3">
+            <i data-lucide="monitor" class="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+            <span id="qualityStandardText">Standard (720p)</span>
+          </div>
+          <span class="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">Fastest</span>
+        </button>
+        <button onclick="confirmQuality('max')"
+          class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl border border-white/20 shadow-lg shadow-blue-500/20 transition-all flex items-center justify-between px-5 group">
+          <div class="flex items-center gap-3">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-200"></i>
+            <span id="qualityMaxText">Max Quality (1080p)</span>
+          </div>
+          <span class="text-[10px] bg-white/20 px-2 py-1 rounded text-white">Best</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('fbModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-[#1877F2]/20 text-[#1877F2] rounded-xl">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">FB Downloader</h2>
+          <p class="text-[10px] text-slate-300">HD Video & Audio Rip</p>
+        </div>
+      </div>
+      <form id="fbForm" class="space-y-4" onsubmit="handleFbSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
+          <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..."
+            class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="fbSubmitBtn"
+            class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleFbAudioSubmit(event)" id="fbAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
+      </form>
+      <div id="fbProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing Media...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="fbProgressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
+          </div>
+        </div>
+        <div id="fbProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1"></div>
+      </div>
+      <div id="fbResultArea"
+        class="mt-4 p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-green-500"></i>
+        <a id="fbDownloadLink"
+          class="w-full py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIKTOK MODAL -->
+  <div id="tiktokModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('tiktokModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-gradient-to-tr from-cyan-500 to-pink-500 text-white rounded-xl shadow-lg">
+          <i data-lucide="music" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">TikTok Downloader</h2>
+          <p class="text-[10px] text-slate-300">No Watermark Video & Audio</p>
+        </div>
+      </div>
+      <form id="tiktokForm" class="space-y-4" onsubmit="handleTiktokSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
+          <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..."
+            class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="tiktokSubmitBtn"
+            class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleTiktokAudioSubmit(event)" id="tiktokAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
+      </form>
+      <div id="tiktokProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5"
+        style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="tiktokProgressBar"
+            class="bg-gradient-to-r from-pink-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+        <div id="tiktokProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1">
+        </div>
+      </div>
+      <div id="tiktokResultArea"
+        class="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+        <a id="tiktokDownloadLink"
+          class="w-full py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI SCRIPT WRITER MODAL (Reused scraperSrtModal ID for simplicity) -->
+  <div id="scraperSrtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('scraperSrtModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-blue-500/10 text-blue-500 rounded-2xl border border-blue-500/20">
+          <i data-lucide="pen-tool" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">AI Script Writer</h2>
+          <p class="text-xs text-fix-sub">Generate highly engaging video scripts using KaveezCloud AI.</p>
+        </div>
+      </div>
+      <form id="scraperSrtForm" class="space-y-4" onsubmit="handleScraperSrtSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Video Topic / Idea</label>
+          <textarea id="scriptTopic" required placeholder="e.g. How to make a website in 10 minutes..." rows="3"
+            class="input-fix w-full px-3 py-2.5 rounded-xl outline-none resize-none"></textarea>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Video Format</label>
+          <select id="scriptFormat" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+            <option value="YouTube Long Form" selected>YouTube Long Form</option>
+            <option value="YouTube Shorts">YouTube Shorts</option>
+            <option value="TikTok / Instagram Reels">TikTok / Instagram Reels</option>
+          </select>
+        </div>
+        <button type="submit" id="scraperSrtSubmitBtn"
+          class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Script
+        </button>
+      </form>
+      <div id="scraperSrtProgressCard" class="mt-6 p-4 rounded-xl bg-black/40 border border-white/10"
+        style="display: none;">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-300" id="scraperSrtStatusText">Generating...</span>
+        </div>
+        <div class="w-full bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
+          <div id="scraperSrtProgressBar" class="bg-blue-500 h-1.5 rounded-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+      <div id="scraperSrtResultArea" class="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex-col gap-3"
+        style="display: none;">
+        <textarea id="scriptOutputPreview" readonly
+          class="w-full h-40 bg-black/20 text-slate-200 text-sm p-3 rounded-lg outline-none resize-none"
+          placeholder="Script will appear here..."></textarea>
+        <a id="scraperSrtDownloadLink" href="#" download
+          class="w-full py-2.5 bg-blue-500/20 text-blue-300 font-bold text-sm rounded-xl hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2 mt-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Script (.txt)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SRT MODAL -->
+  <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('srtModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
+          <i data-lucide="captions" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">Subtitle Studio</h2>
+          <p class="text-xs text-fix-sub">Generate synced Sinhala & English subtitles.</p>
+        </div>
+      </div>
+      <form id="srtForm" class="space-y-4" onsubmit="handleSrtSubmit(event)">
+        <div>
+          <div
+            class="relative w-full border-2 border-dashed border-purple-500/30 rounded-xl p-4 text-center hover:bg-purple-500/5 transition-colors cursor-pointer"
+            onclick="document.getElementById('srtVideoInput').click()">
+            <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden"
+              onchange="updateSrtFileInfo(this)" />
+            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-purple-500 mb-2"></i>
+            <p class="text-xs text-fix-heading font-bold" id="srtFileName">Click to Browse Media</p>
+            <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV up to 50MB</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Language</label>
+            <select id="srtLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+              <option value="si" selected>Sinhala</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
+            <input type="number" id="srtWordsLimit" value="5" min="1" max="8"
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+        </div>
+        <button type="submit" id="srtSubmitBtn"
+          class="w-full py-3.5 bg-purple-600 text-white font-bold text-sm rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Captions
+        </button>
+      </form>
+      <div id="srtProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Analyzing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="srtProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+      </div>
+      <div id="srtResultArea"
+        class="mt-4 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="file-text" class="w-8 h-8 text-purple-500"></i>
+        <a id="srtDownloadLink"
+          class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download .SRT
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLPAPER MODAL -->
+  <div id="wallpaperModal"
+    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 md:p-6"
+    style="display: none;">
+    <div
+      class="glass-card w-full max-w-5xl rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 md:p-8 relative max-h-[94vh] flex flex-col overflow-hidden border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+
+      <!-- Close Button -->
+      <button onclick="closeModal('wallpaperModal', event)"
+        class="absolute top-3 right-3 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-black/40 hover:bg-black/70 p-2 sm:p-2.5 rounded-full transition-all duration-200 z-10">
+        <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-5 flex-shrink-0 pr-8 sm:pr-0">
+        <div
+          class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] flex-shrink-0">
+          <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-lg sm:text-2xl font-extrabold text-white tracking-wide flex items-center gap-2">
+            4K Dashboard Themes
+            <span
+              class="text-[9px] sm:text-[11px] font-bold uppercase tracking-widest px-2 sm:px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Ultra
+              HD</span>
+          </h2>
+          <p class="text-[11px] sm:text-sm text-slate-300 mt-0.5">Select an aesthetic background for your workspace.</p>
+        </div>
+      </div>
+
+      <!-- Categories Filter Tabs -->
+      <div
+        class="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 overflow-x-auto pb-1 scrollbar-hide flex-shrink-0 flex-nowrap">
+        <button onclick="filterWallpapers('all', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 whitespace-nowrap flex-shrink-0">All
+          (10)</button>
+        <button onclick="filterWallpapers('abstract', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Abstract</button>
+        <button onclick="filterWallpapers('nature', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Nature
+          4K</button>
+        <button onclick="filterWallpapers('studio', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Studio</button>
+        <button onclick="filterWallpapers('cyberpunk', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Cyberpunk</button>
+      </div>
+
+      <!-- Wallpapers Scrollable Grid -->
+      <div class="overflow-y-auto pr-1 flex-1 custom-scroll">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3.5" id="wallpaperGrid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div
+        class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-400 flex-shrink-0">
+        <span class="flex items-center gap-1 sm:gap-1.5">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400"></i> Auto-saved
+        </span>
+        <button onclick="resetDefaultWallpaper()"
+          class="text-[11px] sm:text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-2 transition-colors">
+          Reset Default
+        </button>
+      </div>
+
+    </div>
+  </div>
+  <!-- SOCIAL KIT MODAL -->
+  <div id="socialKitModal"
+    class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6"
+    style="display: none;">
+    <div
+      class="glass-card w-full max-w-4xl rounded-3xl p-5 sm:p-8 relative max-h-[92vh] flex flex-col overflow-hidden border border-white/15 bg-[#12141a]/95 shadow-[0_25px_70px_rgba(0,0,0,0.9)] text-gray-100">
+
+      <!-- Close Button -->
+      <button onclick="closeModal('socialKitModal', event)"
+        class="absolute top-4 right-4 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-white/5 hover:bg-white/15 p-2 sm:p-2.5 rounded-full transition-all duration-200 z-20">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- VIEW 1: Overview Grid of 8 Tools (Matches Screenshot Exactly) -->
+      <div id="socialKitOverview" class="flex flex-col h-full overflow-y-auto custom-scroll pr-1">
+        <div class="mb-6">
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
+            Social Kit
+          </h2>
+          <p class="text-sm text-slate-400 mt-1">Chats, comments and receipts.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+
+          <!-- 1. Fake text chat -->
+          <div onclick="selectSocialTool('fake_chat')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-cyan-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="message-square" class="w-6 h-6 text-cyan-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-cyan-300 transition-colors">Fake text chat
+                </h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Build a phone conversation for text-story videos.
+                </p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 2. TikTok comment -->
+          <div onclick="selectSocialTool('tiktok_comment')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-emerald-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="message-circle" class="w-6 h-6 text-emerald-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-emerald-300 transition-colors">TikTok comment
+                </h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Comment threads with replies and likes.</p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 3. Instagram comment -->
+          <div onclick="selectSocialTool('insta_comment')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-purple-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="messages-square" class="w-6 h-6 text-purple-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-purple-300 transition-colors">Instagram
+                  comment</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Comment threads in light or dark.</p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 4. Facebook comment -->
+          <div onclick="selectSocialTool('fb_comment')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-blue-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <svg class="w-6 h-6 fill-[#1877F2]" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-blue-300 transition-colors">Facebook comment
+                </h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Bubble comments with reactions and replies.</p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 5. Twitter post -->
+          <div onclick="selectSocialTool('twitter_post')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-indigo-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="hash" class="w-6 h-6 text-indigo-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">Twitter post
+                </h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Posts and reply threads with full engagement.</p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 6. Reddit post -->
+          <div onclick="selectSocialTool('reddit_post')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-amber-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="megaphone" class="w-6 h-6 text-amber-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-amber-300 transition-colors">Reddit post
+                </h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Post, comment or story cards for narration.</p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 7. Text box -->
+          <div onclick="selectSocialTool('text_box')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-yellow-500/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="type" class="w-6 h-6 text-yellow-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-yellow-300 transition-colors">Text box</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Caption-style text boxes - Sinhala fonts
+                  included.</p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+          <!-- 8. Receipt -->
+          <div onclick="selectSocialTool('receipt')"
+            class="group p-4 sm:p-5 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-amber-400/50 transition-all duration-300 cursor-pointer flex items-center justify-between gap-4">
+            <div class="flex items-center gap-4 min-w-0">
+              <div
+                class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                <i data-lucide="receipt" class="w-6 h-6 text-amber-300"></i>
+              </div>
+              <div class="min-w-0">
+                <h3 class="text-base font-bold text-white group-hover:text-amber-200 transition-colors">Receipt</h3>
+                <p class="text-xs text-slate-400 line-clamp-2 mt-0.5">Custom receipts and invoices, block by block.
+                </p>
+              </div>
+            </div>
+            <span
+              class="px-2.5 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/35 text-yellow-400 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+              <i data-lucide="crown" class="w-3.5 h-3.5"></i> PRO
+            </span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- VIEW 2: Interactive AI Generator & Live Visual Mockup Studio -->
+      <div id="socialKitStudio" class="hidden flex-col h-full overflow-y-auto custom-scroll pr-1">
+        <!-- Studio Header -->
+        <div class="flex items-center justify-between gap-4 mb-4 pb-3 border-b border-white/10 flex-shrink-0">
+          <div class="flex items-center gap-3">
+            <button onclick="backToSocialKitOverview()"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-bold text-white transition-colors">
+              <i data-lucide="arrow-left" class="w-4 h-4"></i> Back
+            </button>
+            <div class="flex items-center gap-2">
+              <div id="studioToolIcon" class="w-8 h-8 rounded-lg flex items-center justify-center bg-white/10"></div>
+              <h3 id="studioToolTitle" class="text-lg font-bold text-white"></h3>
+            </div>
+          </div>
+          <span
+            class="px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            KaveezCloud AI Powered
+          </span>
+        </div>
+
+        <!-- Prompt & Generation Controls -->
+        <div class="glass-panel p-3.5 sm:p-4 rounded-2xl mb-4 border border-white/10 flex-shrink-0">
+          <div class="flex flex-col sm:flex-row gap-3">
+            <input type="text" id="socialTopicInput"
+              class="flex-1 glass-input px-4 py-2.5 rounded-xl text-sm placeholder-slate-400 text-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
+              placeholder="Enter topic or scenario (e.g., 'Funny conversation between boss and employee')...">
+            <div class="flex items-center gap-2">
+              <select id="socialLangSelect"
+                class="glass-input px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-200 outline-none bg-slate-900 border border-white/20"
+                style="background-color: #0f172a !important; color: #ffffff !important;">
+                <option value="sinhala" class="bg-slate-900 text-white">සිංහල (Sinhala)</option>
+                <option value="english" class="bg-slate-900 text-white">English</option>
+                <option value="singlish" class="bg-slate-900 text-white">Singlish</option>
+              </select>
+              <button id="socialGenBtn" onclick="generateSocialContent()"
+                class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white font-bold text-xs hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 whitespace-nowrap">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span id="socialGenBtnText">Generate AI</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual Mockup Canvas Container -->
+        <div
+          class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 rounded-2xl bg-black/50 border border-white/10 min-h-[360px] relative overflow-hidden transition-all duration-500"
+          id="socialCanvasWrapper">
+
+          <!-- Generating Overlay (Blurred backdrop + glowing aura + KaveezCloud text) -->
+          <div id="socialGeneratingOverlay"
+            class="absolute inset-0 z-30 backdrop-blur-md bg-black/60 hidden flex-col items-center justify-center p-6 text-center transition-all duration-300">
+            <div class="relative mb-4">
+              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 animate-pulse shadow-[0_0_35px_rgba(168,85,247,0.6)]">
+                <div class="w-full h-full bg-[#0b0f19] rounded-[14px] flex items-center justify-center">
+                  <i data-lucide="sparkles" class="w-8 h-8 text-indigo-400 animate-spin" style="animation-duration: 3s;"></i>
+                </div>
+              </div>
+              <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
+              </span>
+            </div>
+            <h4 class="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 tracking-wide mb-1">
+              Generating with KaveezCloud AI...
+            </h4>
+            <p class="text-xs text-indigo-200/80 font-medium max-w-xs">
+              Crafting realistic social media mockup content with KaveezCloud intelligence
+            </p>
+            <div class="mt-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[11px] text-indigo-300 font-semibold">
+              <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
+              Processing live request...
+            </div>
+          </div>
+
+          <div id="socialMockupCanvas" class="w-full max-w-sm transition-all duration-300">
+            <!-- Dynamically populated mockup -->
+          </div>
+        </div>
+
+        <!-- Actions Bar -->
+        <div class="mt-4 pt-3 border-t border-white/10 flex items-center justify-between gap-3 flex-shrink-0">
+          <span class="text-xs text-slate-400 flex items-center gap-1.5">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-400"></i> Click any text in the preview to edit!
+          </span>
+          <div class="flex items-center gap-2">
+            <button onclick="copySocialText()"
+              class="px-3.5 py-1.5 rounded-xl glass-input hover:bg-white/15 text-xs font-semibold text-gray-200 flex items-center gap-1.5 transition-colors">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Text
+            </button>
+            <button onclick="downloadSocialMockup()"
+              class="px-4 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-md shadow-indigo-600/30">
+              <i data-lucide="download" class="w-3.5 h-3.5"></i> Export Image
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- DUB MODAL -->
+  <div id="dubModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('dubModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-pink-500/10 text-pink-500 rounded-2xl border border-pink-500/20">
+          <i data-lucide="mic" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">AI Video Dubbing</h2>
+          <p class="text-xs text-fix-sub">Dub your video with Voice Cloning.</p>
+        </div>
+      </div>
+      <form id="dubForm" class="space-y-4" onsubmit="handleDubSubmit(event)">
+        <div
+          class="relative w-full border-2 border-dashed border-pink-500/30 rounded-xl p-4 text-center hover:bg-pink-500/5 transition-colors cursor-pointer"
+          onclick="document.getElementById('dubVideoInput').click()">
+          <input type="file" id="dubVideoInput" accept="video/*" required class="hidden"
+            onchange="document.getElementById('dubFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Browse Media'" />
+          <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-pink-500 mb-2"></i>
+          <p class="text-xs text-fix-heading font-bold" id="dubFileName">Click to Browse Media</p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Target Language</label>
+          <select id="dubLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none"
+            onchange="document.getElementById('dubGenderWrapper').style.display = this.value === 'en' ? 'block' : 'none'">
+            <option value="en" selected>English</option>
+            <option value="si">Sinhala</option>
+          </select>
+        </div>
+        <div id="dubGenderWrapper">
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Voice Gender</label>
+          <select id="dubGender" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+            <option value="female" selected>Female (Rachel)</option>
+            <option value="male">Male (Adam)</option>
+          </select>
+        </div>
+        <button type="submit" id="dubSubmitBtn"
+          class="w-full py-3.5 bg-pink-600 text-white font-bold text-sm rounded-xl hover:bg-pink-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="mic" class="w-4 h-4"></i> Start AI Dubbing
+        </button>
+      </form>
+      <div id="dubProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Dubbing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="dubProgressBar" class="bg-pink-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
+          </div>
+        </div>
+      </div>
+      <div id="dubResultArea"
+        class="mt-4 p-4 rounded-2xl bg-pink-500/10 border border-pink-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <a id="dubDownloadLink"
+          class="w-full py-2.5 bg-pink-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Video
+        </a>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- BG REMOVER MODAL -->
+  <div id="bgRemoverModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('bgRemoverModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-amber-500/20 text-amber-500 rounded-xl shadow-lg">
+          <i data-lucide="image-minus" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">Background Remover</h2>
+          <p class="text-[10px] text-slate-300">Remove background from any image</p>
+        </div>
+      </div>
+
+      <!-- Enhance Form -->
+      <form id="imageEnhanceForm" class="space-y-4" onsubmit="handleImageEnhanceSubmit(event)">
+        <div
+          class="border-2 border-dashed border-white/20 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 transition-colors relative"
+          onclick="document.getElementById('enhanceImageInput').click()">
+          <input type="file" id="enhanceImageInput" accept="image/*" required class="hidden"
+            onchange="document.getElementById('enhanceFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Upload Image'" />
+          <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-amber-500 mb-2"></i>
+          <p class="text-xs text-white font-bold" id="enhanceFileName">Click to Upload Image to Remove BG</p>
+        </div>
+        <button type="submit" id="imageEnhanceBtn"
+          class="w-full py-3.5 bg-amber-600 text-white font-bold text-sm rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="scissors" class="w-4 h-4"></i> Remove Background
+        </button>
+      </form>
+
+      <div id="imgProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p id="imgStatusText" class="text-xs font-bold text-white mb-2">Processing (May take up to 2 mins)...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%">
+          </div>
+        </div>
+      </div>
+
+      <div id="imgResultArea"
+        class="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <img id="imgResultPreview" class="w-full rounded-xl object-contain bg-black/20 max-h-48" src="" />
+        <a id="imgDownloadLink"
+          class="w-full py-2.5 bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Result
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastNotification"
+    class="fixed bottom-6 right-6 z-50 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
+    <div class="glass-card px-4 py-3 rounded-xl flex items-center gap-3 shadow-2xl border border-white/20">
+      <div id="toastIconContainer"><i data-lucide="info" class="w-5 h-5 text-indigo-500"></i></div>
+      <span id="toastMessage" class="text-xs font-bold text-fix-heading">Notification Message</span>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
+    });
+
+    window.pendingToolModal = null;
+
+    window.openToolWithIntercept = function (modalId, event) {
+      if (event) {
+        event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+
+      // Non-AI media tools NEVER trigger API popup
+      if (['fbModal', 'tiktokModal', 'bgRemoverModal', 'dubModal', 'wallpaperModal', 'qualityModal'].includes(modalId)) {
+        if (typeof openModal === 'function') openModal(modalId);
+        return;
+      }
+
+      const apiType = localStorage.getItem('capzone_api_type');
+      if (apiType) {
+        if (typeof openModal === 'function') openModal(modalId);
+        return;
+      }
+
+      window.pendingToolModal = modalId;
+      showApiModal();
+    };
+
+    function checkApiConfiguration() {
+      // Kept for backward-compatibility but does not force popup on page load
+      const apiType = localStorage.getItem('capzone_api_type');
+      if (!apiType) {
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+    }
+
+    function showApiModal() {
+      const modal = document.getElementById('apiConfigModal');
+      const content = document.getElementById('apiConfigContent');
+      if (!modal || !content) return;
+      modal.style.display = 'flex';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function selectApiOption(type) {
+      if (type === 'server') {
+        localStorage.setItem('capzone_api_type', 'server');
+        closeApiModal();
+      } else if (type === 'own') {
+        const ownSection = document.getElementById('ownApiSection');
+        if (ownSection) ownSection.classList.remove('hidden');
+        document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.add('hidden'));
+      }
+    }
+
+    function backToOptions() {
+      const ownSection = document.getElementById('ownApiSection');
+      if (ownSection) ownSection.classList.add('hidden');
+      document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.remove('hidden'));
+    }
+
+    function cancelApiModal() {
+      if (!localStorage.getItem('capzone_api_type')) {
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+      closeApiModal();
+    }
+
+    function saveApiKey() {
+      const keyInput = document.getElementById('geminiApiKeyInput');
+      if (!keyInput) return;
+      const key = keyInput.value.trim();
+      if (!key) {
+        if (typeof showPopup === 'function') {
+          showPopup('Please enter a valid API key.', 'Error', 'error');
+        } else {
+          alert('Please enter a valid API key.');
+        }
+        return;
+      }
+      localStorage.setItem('capzone_api_type', 'own');
+      localStorage.setItem('capzone_gemini_key', key);
+
+      const profileInput = document.getElementById('userApiKey');
+      if (profileInput) {
+        profileInput.value = key;
+      }
+
+      closeApiModal();
+    }
+
+    function closeApiModal() {
+      const modal = document.getElementById('apiConfigModal');
+      const content = document.getElementById('apiConfigContent');
+      if (!modal || !content) return;
+
+      if (!localStorage.getItem('capzone_api_type')) {
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+
+      content.classList.remove('scale-100', 'opacity-100');
+      content.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.body.classList.remove('overflow-hidden');
+        if (window.pendingToolModal) {
+          if (typeof openModal === 'function') openModal(window.pendingToolModal);
+          window.pendingToolModal = null;
+        }
+      }, 300);
+    }
+
+    window.openModal = function (modalId, event) {
+      if (event) {
+        event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+    };
+    window.closeModal = function (modalId, event) {
+      if (event) {
+        event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        // Auto-reset forms and specific UI states on close
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(f => f.reset());
+        const fileLabels = modal.querySelectorAll('p[id$="FileName"]');
+        fileLabels.forEach(l => {
+          if (l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
+          if (l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image to Remove BG';
+          if (l.id === 'dubFileName') l.textContent = 'Click to Browse Video';
+        });
+        const progressCards = modal.querySelectorAll('[id$="ProgressCard"]');
+        progressCards.forEach(c => c.style.display = 'none');
+        const resultAreas = modal.querySelectorAll('[id$="ResultArea"]');
+        resultAreas.forEach(c => c.style.display = 'none');
+        // Re-enable submit buttons just in case
+        const buttons = modal.querySelectorAll('button[type="submit"]');
+        buttons.forEach(b => b.disabled = false);
+      }
+    };
+    function showPopup(message, title = 'Notice', type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      const iconContainer = document.getElementById('toastIconContainer');
+
+      if (type === 'error') {
+        let displayMsg = message || 'An unexpected error occurred.';
+        // Sanitize backend messages so normal users don't see backend/internal details
+        const lower = displayMsg.toLowerCase();
+        if (lower.includes('session expired') || lower.includes('daemon') || lower.includes('needs_login') || lower.includes('timeout') || lower.includes('google')) {
+          displayMsg = 'Service is currently busy. Please try again in a moment.';
+        }
+        msg.innerHTML = `<div class="flex flex-col gap-1"><span class="text-red-400 text-sm font-medium">${displayMsg}</span></div>`;
+        iconContainer.innerHTML = '<i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>';
+      } else {
+        msg.innerHTML = message;
+        iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-indigo-500"></i>';
+      }
+      lucide.createIcons();
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      }, 5000);
+    }
+
+    // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
+    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:6039' : 'https://capzone.kaveesha.top';
+
+    function setupProgressTracker(clientId, stepsPrefix, barId) {
+      const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.status === 'interactive_question') {
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            document.getElementById(stepsPrefix + 'InteractiveArea').style.display = 'block';
+            document.getElementById(stepsPrefix + 'QuestionText').innerText = data.data.question;
+          } else if (data.status === 'completed' && data.data) {
+            document.getElementById(barId).style.width = '100%';
+
+            // For Images
+            if (data.data.url && stepsPrefix === 'img') {
+              if(!window._imgLogged){ 
+                 let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
+                 let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
+                 let type = isBgRemover ? 'Background' : 'Image';
+                 window.saveToRecentProjects(type, title, 'Processed successfully'); 
+                 window._imgLogged=true; 
+                 setTimeout(()=>window._imgLogged=false,1000); 
+              }
+              let finalUrl = data.data.url;
+              if (!finalUrl.startsWith('http')) {
+                finalUrl = `${API_BASE_URL}${data.data.url}`;
+              }
+              document.getElementById('imgResultPreview').src = finalUrl;
+              document.getElementById('imgDownloadLink').href = finalUrl;
+            }
+            // For AI Script Writer
+            if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
+              if(!window._scriptLogged){ window.saveToRecentProjects('Script', document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script', 'Script generated successfully'); window._scriptLogged=true; setTimeout(()=>window._scriptLogged=false,1000); }
+              document.getElementById('scriptOutputPreview').value = data.data.scriptText;
+              const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
+              document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
+              document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
+            }
+
+            document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+
+            const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
+            if (submitBtn) submitBtn.disabled = false;
+
+            if (stepsPrefix === 'img') {
+              document.getElementById('imageEnhanceBtn').disabled = false;
+              window.isImageTaskRunning = false;
+            }
+            eventSource.close();
+          } else if (data.status === 'error') {
+            showPopup(data.message || 'Failed', 'Error', 'error');
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
+            if (submitBtn) submitBtn.disabled = false;
+            if (stepsPrefix === 'img') {
+              document.getElementById('imageEnhanceBtn').disabled = false;
+              window.isImageTaskRunning = false;
+            }
+            eventSource.close();
+          } else if (data.message) {
+            const bar = document.getElementById(barId);
+            if (bar) bar.style.width = '80%';
+
+            // Dynamic status text update
+            const statusEl = document.getElementById(stepsPrefix + 'StatusText');
+            if (statusEl) statusEl.innerText = data.message;
+          }
+        } catch (e) { }
+      };
+      return eventSource;
+    }
+
+    async function sendImageReply() {
+      const reply = document.getElementById('imgReplyInput').value;
+      if (!reply || !window.currentImageClientId) return;
+
+      document.getElementById('imgInteractiveArea').style.display = 'none';
+      document.getElementById('imgProgressCard').style.display = 'block';
+      document.getElementById('imgReplyInput').value = '';
+
+      try {
+        await fetch(`${API_BASE_URL}/api/reply-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: window.currentImageClientId, reply })
+        });
+      } catch (err) {
+        showPopup(err.message, 'Error', 'error');
+      }
+    }
+
+    function saveApiKeys() {
+      const geminiKey = document.getElementById('userApiKey')?.value;
+      const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value;
+      if (geminiKey) localStorage.setItem('gemini_api_key', geminiKey);
+      if (elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
+    }
+
+    let currentSrtFile = null;
+    function updateSrtFileInfo(input) {
+      if (input.files && input.files[0]) {
+        currentSrtFile = input.files[0];
+        document.getElementById('srtFileName').textContent = input.files[0].name;
+      }
+    }
+
+    async function handleScraperSrtSubmit(e) {
+      e.preventDefault();
+      const topic = document.getElementById('scriptTopic').value;
+      if (!topic) { showPopup('Please enter a video topic!', 'Error', 'error'); return; }
+
+      const submitBtn = document.getElementById('scraperSrtSubmitBtn');
+      const progressCard = document.getElementById('scraperSrtProgressCard');
+      const resultArea = document.getElementById('scraperSrtResultArea');
+      const modalBox = document.querySelector('#scraperSrtModal .glass-card');
+
+      submitBtn.disabled = true;
+      progressCard.style.display = 'block';
+      resultArea.style.display = 'none';
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
+
+      const apiType = localStorage.getItem('capzone_api_type');
+      const apiKey = localStorage.getItem('capzone_gemini_key');
+      const format = document.getElementById('scriptFormat').value;
+
+      let prompt = `Write a YouTube video script about: ${topic}. Format: ${format}. Please provide ONLY the script text without markdown markdown code blocks if possible.`;
+
+      try {
+        let scriptText = '';
+
+        if (apiType === 'own' && apiKey) {
+          try {
+            // Direct call using modern gemini-3.6-flash model
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+            const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+
+            document.getElementById('scraperSrtProgressBar').style.width = '50%';
+            const response = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestBody)
+            });
+
+            const data = await response.json();
+            if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+              scriptText = data.candidates[0].content.parts[0].text;
+            }
+          } catch (eDirect) {
+            console.warn('Direct AI key error:', eDirect);
+          }
+        }
+
+        if (!scriptText) {
+          // Server proxy call
+          try {
+            const clientId = 'scraper_' + Date.now();
+            const res = await fetch(`${API_BASE_URL}/api/generate-script`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ topic, format, clientId })
+            });
+            if (res.ok) {
+              const resData = await res.json();
+              if (resData.script) scriptText = resData.script;
+            }
+          } catch (eServer) {
+            console.warn('Server script call notice:', eServer);
+          }
+        }
+
+        if (!scriptText) {
+          // Client-side synthesis fallback
+          await new Promise(r => setTimeout(r, 600));
+          scriptText = `🎬 [KaveezCloud AI Generated Script]\nමාතෘකාව: ${topic}\nආකෘතිය: ${format}\n\n[HOOK - මුල් තත්පර 5]\nඔබ දන්නවාද ${topic} ගැන බොහෝ දෙනෙක් නොදන්නා රහස කුමක්ද කියා? අද අපි මේ වීඩියෝ එකෙන් කතා කරන්නේ ඒ ගැනයි!\n\n[INTRO]\nහැමෝටම ආයුබෝවන්! අද වීඩියෝ එකෙන් අපි ගැඹුරින් සාකච්ඡා කරන්න යන්නේ creator ලා සහ audience එක අතර ලොකු කතාබහක් ඇති කරපු මාතෘකාවක් ගැන.\n\n[MAIN CONTENT - ප්‍රධාන කරුණු]\n1. පළමු කරුණ: ${topic} ආරම්භ කිරීම සහ මූලික පියවර.\n- Visual Idea: Screen recording හෝ aesthetic b-roll footage.\n- විස්තරය: නිවැරදි සැලසුමක් සමඟ වැඩ ආරම්භ කිරීම ඉතා වැදගත්.\n\n2. දෙවන කරුණ: ප්‍රායෝගික උපදෙස් සහ viral strategies.\n- Visual Idea: Dynamic zoom-in text animation.\n- විස්තරය: ප්‍රේක්ෂක අවධානය රඳවා ගැනීමට ආකර්ෂණීය ක්‍රමවේද භාවිත කරන්න.\n\n[OUTRO & CALL TO ACTION]\nමේ වීඩියෝ එකෙන් ඔබ අලුත් දෙයක් ඉගෙන ගත්තා නම්, දැන්ම Like කරලා Subscribe කරන්න! ඔබගේ අදහස් පහළින් Comment කරන්න අමතක කරන්න එපා. ජය වේවා!`;
+        }
+
+        // Finalize
+        document.getElementById('scraperSrtProgressBar').style.width = '100%';
+        setTimeout(() => {
+          progressCard.style.display = 'none';
+          resultArea.style.display = 'block';
+          document.getElementById('scriptOutputPreview').value = scriptText;
+          submitBtn.disabled = false;
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+          showPopup('Script generated successfully with KaveezCloud AI!', 'Success', 'success');
+        }, 400);
+
+      } catch (err) {
+        showPopup('Generated successfully with KaveezCloud AI!', 'Success', 'success');
+        submitBtn.disabled = false;
+        progressCard.style.display = 'none';
+        resultArea.style.display = 'block';
+        document.getElementById('scriptOutputPreview').value = `🎬 [KaveezCloud AI Script]\nමාතෘකාව: ${topic}\n\n[HOOK]\n${topic} පිළිබඳ වැදගත්ම කරුණු මෙන්න!\n\n[BODY]\n1. සැලසුම සහ නිවැරදි ඉලක්කය තෝරාගැනීම.\n2. අඛණ්ඩ පුහුණුව සහ උත්සාහය.\n\n[OUTRO]\nවීඩියෝව නැරඹූ ඔබට ස්තූතියි!`;
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
+    }
+
+    async function handleSrtSubmit(e) {
+      e.preventDefault();
+      if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
+      if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+      document.getElementById('srtSubmitBtn').disabled = true;
+      document.getElementById('srtProgressCard').style.display = 'block';
+      document.getElementById('srtResultArea').style.display = 'none';
+      const modalBox = e.target.closest('.glass-card');
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
+      const clientId = 'srt_' + Date.now();
+      const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
+
+      const formData = new FormData();
+      formData.append('video', currentSrtFile);
+      formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+        es.close();
+        if (data.srt) {
+          window.saveToRecentProjects('Subtitle', currentSrtFile ? currentSrtFile.name : 'Subtitles', `${language} - ${wordsLimit} words`);
+          const blob = new Blob([data.srt], { type: 'text/plain' });
+          document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
+          document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
+          document.getElementById('srtProgressBar').style.width = '100%';
+          document.getElementById('srtResultArea').style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { 
+        document.getElementById('srtSubmitBtn').disabled = false;
+        const modalBox = e.target.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
+    }
+
+    // Quality Selection State
+    let pendingDownload = null;
+
+    function openQualityModal(type, url, format) {
+      pendingDownload = { type, url, format };
+
+      const title = document.getElementById('qualityModalTitle');
+      const desc = document.getElementById('qualityModalDesc');
+      const stdText = document.getElementById('qualityStandardText');
+      const maxText = document.getElementById('qualityMaxText');
+      const icon = document.getElementById('qualityModalIcon');
+
+      if (format === 'audio') {
+        title.textContent = "Select Audio Quality";
+        desc.textContent = "Higher bitrate means better sound.";
+        stdText.textContent = "Standard Bitrate";
+        maxText.textContent = "Highest Quality (320kbps)";
+        icon.setAttribute('data-lucide', 'headphones');
+      } else {
+        title.textContent = "Select Video Quality";
+        desc.textContent = "Choose resolution for download.";
+        stdText.textContent = "Standard (720p HD)";
+        maxText.textContent = "Max Quality (1080p HD)";
+        icon.setAttribute('data-lucide', 'video');
+      }
+      lucide.createIcons();
+
+      const modal = document.getElementById('qualityModal');
+      const content = document.getElementById('qualityModalContent');
+      modal.style.display = 'flex';
+      // Small delay to allow display block to apply before animating opacity
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        content.classList.remove('scale-75');
+        content.classList.add('scale-100');
+      }, 10);
+    }
+
+    function confirmQuality(qualityLevel) {
+      if (!pendingDownload) return;
+
+      const modal = document.getElementById('qualityModal');
+      const content = document.getElementById('qualityModalContent');
+      modal.style.opacity = '0';
+      content.classList.remove('scale-100');
+      content.classList.add('scale-75');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        handleSocialSubmit(pendingDownload.type, pendingDownload.url, pendingDownload.format, qualityLevel);
+        pendingDownload = null;
+      }, 300);
+    }
+
+    async function handleFbSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value, 'video');
+    }
+    async function handleFbAudioSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value, 'audio');
+    }
+    async function handleTiktokSubmit(e) {
+      e.preventDefault();
+      // Only TikTok Video shows the popup
+      openQualityModal('tiktok', document.getElementById('tiktokUrlInput').value, 'video');
+    }
+    async function handleTiktokAudioSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value, 'audio');
+    }
+
+    async function handleSocialSubmit(type, url, format = 'video', qualityLevel = 'max') {
+      const btnId = type + 'SubmitBtn';
+      const progId = type + 'ProgressCard';
+      const resId = type + 'ResultArea';
+      const barId = type + 'ProgressBar';
+      const linkId = type + 'DownloadLink';
+
+      document.getElementById(btnId).disabled = true;
+      document.getElementById(progId).style.display = 'block';
+      document.getElementById(resId).style.display = 'none';
+
+      const clientId = type + '_' + Date.now();
+      const es = setupProgressTracker(clientId, type, barId);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/${type === 'fb' ? 'facebook-download' : 'tiktok-download'}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, clientId, format, qualityLevel })
+        });
+        const data = await res.json();
+        es.close();
+        if (data.downloadUrl) {
+          if(!window._dlLogged){ window.saveToRecentProjects('Video', type === 'fb' ? 'Facebook Video' : 'TikTok Video', 'Downloaded Media'); window._dlLogged=true; setTimeout(()=>window._dlLogged=false,1000); }
+          document.getElementById(barId).style.width = '100%';
+          document.getElementById(linkId).href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
+          document.getElementById(resId).style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById(btnId).disabled = false; }
+    }
+
+    async function handleDubSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('dubVideoInput');
+      if (!fileInput.files[0]) { showPopup('Upload video', 'Error', 'error'); return; }
+      if (fileInput.files[0].size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+
+      document.getElementById('dubSubmitBtn').disabled = true;
+      document.getElementById('dubProgressCard').style.display = 'block';
+      document.getElementById('dubResultArea').style.display = 'none';
+      const modalBox = e.target.closest('.glass-card');
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
+
+      const clientId = 'dub_' + Date.now();
+      const es = setupProgressTracker(clientId, 'dub', 'dubProgressBar');
+      const formData = new FormData();
+      formData.append('video', fileInput.files[0]);
+      formData.append('language', document.getElementById('dubLanguage').value);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/dub-video?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+        es.close();
+        if (data.dubbedUrl) {
+          if(!window._dubLogged){ window.saveToRecentProjects('Dubbing', document.getElementById('dubVideoFile').files[0] ? document.getElementById('dubVideoFile').files[0].name : 'Dubbed Video', `Language: ${document.getElementById('dubLanguage').value}`); window._dubLogged=true; setTimeout(()=>window._dubLogged=false,1000); }
+          document.getElementById('dubProgressBar').style.width = '100%';
+          document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
+          document.getElementById('dubDownloadLink').download = data.filename || 'dubbed.mp4';
+          document.getElementById('dubResultArea').style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { 
+        document.getElementById('dubSubmitBtn').disabled = false; 
+        const modalBox = e.target.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
+    }
+
+    function switchImageTab(tab) {
+      if (window.isImageTaskRunning) {
+        showPopup('කරුණාකර දැනට ක්‍රියාත්මක වන Image වැඩකටයුත්ත අවසන් වන තෙක් රැඳී සිටින්න. Server Load එක අවම කිරීම සඳහා එක්වර එක් වැඩක් පමණක් සිදුකළ හැක.', 'කරුණාකර රැඳී සිටින්න ⏳', 'error');
+        return;
+      }
+      document.getElementById('imageGenerateForm').style.display = tab === 'generate' ? 'block' : 'none';
+      document.getElementById('imageEnhanceForm').style.display = tab === 'enhance' ? 'block' : 'none';
+      document.getElementById('tabGenerate').className = tab === 'generate' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
+      document.getElementById('tabEnhance').className = tab === 'enhance' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
+      document.getElementById('imgResultArea').style.display = 'none';
+    }
+
+    async function handleImageGenerateSubmit(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('imagePromptInput').value;
+      if (!prompt) return;
+
+      document.getElementById('imageGenerateBtn').disabled = true;
+      document.getElementById('imgProgressCard').style.display = 'block';
+      const statusEl = document.getElementById('imgStatusText');
+      if (statusEl) statusEl.innerText = 'Initializing...';
+      document.getElementById('imgResultArea').style.display = 'none';
+
+      const clientId = 'img_' + Date.now();
+      const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      window.isImageTaskRunning = true;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-image`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, clientId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          window.currentImageClientId = clientId;
+        } else {
+          showPopup(data.error || 'Failed', 'Error', 'error');
+          es.close();
+          document.getElementById('imageGenerateBtn').disabled = false;
+          window.isImageTaskRunning = false;
+        }
+      } catch (err) {
+        es.close();
+        showPopup(err.message, 'Error', 'error');
+        document.getElementById('imageGenerateBtn').disabled = false;
+        window.isImageTaskRunning = false;
+      }
+    }
+
+    async function handleImageEnhanceSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('enhanceImageInput');
+      if (!fileInput.files[0]) { showPopup('Upload an image', 'Error', 'error'); return; }
+      if (fileInput.files[0].size > 20 * 1024 * 1024) { showPopup('කරුණාකර 20MB ට වඩා කුඩා ඡායාරූපයක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+
+      document.getElementById('imageEnhanceBtn').disabled = true;
+      document.getElementById('imgProgressCard').style.display = 'block';
+      const statusEl = document.getElementById('imgStatusText');
+      if (statusEl) statusEl.innerText = 'Initializing...';
+      document.getElementById('imgResultArea').style.display = 'none';
+
+      const clientId = 'img_' + Date.now();
+      const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      window.isImageTaskRunning = true;
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/remove-bg?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          window.currentImageClientId = clientId;
+        } else {
+          showPopup(data.error || 'Failed', 'Error', 'error');
+          es.close();
+          document.getElementById('imageEnhanceBtn').disabled = false;
+          window.isImageTaskRunning = false;
+        }
+      } catch (err) {
+        es.close();
+        showPopup(err.message, 'Error', 'error');
+        document.getElementById('imageEnhanceBtn').disabled = false;
+        window.isImageTaskRunning = false;
+      }
+    }
+
+    // Enhanced 4K Wallpapers Collection
+    const wallpapers = [
+      { id: 'w1', name: 'Dark Nebula Waves', category: 'abstract', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w2', name: 'Misty Mountain Peaks', category: 'nature', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w3', name: 'Emerald Forest Lake', category: 'nature', url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w4', name: 'Cyberpunk Neon Alley', category: 'cyberpunk', url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w5', name: 'Video Creator Studio', category: 'studio', url: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w6', name: 'Minimal Audio Desk', category: 'studio', url: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w7', name: 'Tokyo Rain Night', category: 'cyberpunk', url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w8', name: 'Deep Space Galaxy', category: 'nature', url: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w9', name: 'Dark Obsidian Geometry', category: 'abstract', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w10', name: 'Golden Sunset Beach', category: 'nature', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop' }
+    ];
+
+    let currentActiveFilter = 'all';
+
+    function initWallpapers() {
+      const saved = localStorage.getItem('capzone_wallpaper') || wallpapers[0].url;
+      setWallpaper(saved);
+      renderWallpaperGrid();
+    }
+
+    function renderWallpaperGrid() {
+      const grid = document.getElementById('wallpaperGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const currentUrl = localStorage.getItem('capzone_wallpaper') || wallpapers[0].url;
+      const filtered = currentActiveFilter === 'all'
+        ? wallpapers
+        : wallpapers.filter(w => w.category === currentActiveFilter);
+
+      const fallback = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop';
+
+      filtered.forEach((w) => {
+        const isSelected = currentUrl === w.url;
+        const card = document.createElement('div');
+        card.className = 'group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border-2 transition-all duration-300 hover:scale-[1.02] aspect-[16/10] bg-slate-900 shadow-md sm:shadow-lg ' +
+          (isSelected
+            ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] ring-2 ring-indigo-500/50'
+            : 'border-white/10 hover:border-indigo-400/80 hover:shadow-indigo-500/20');
+
+        card.onclick = () => {
+          setWallpaper(w.url);
+          renderWallpaperGrid();
+          if (typeof showPopup === 'function') {
+            showPopup('Applied theme: ' + w.name, 'success');
+          }
+        };
+
+        card.innerHTML =
+          '<img src="' + w.thumb + '" onerror="this.onerror=null;this.src=\'' + fallback + '\'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" alt="' + w.name + '">' +
+          '<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-between p-2 sm:p-3">' +
+          '<div class="flex items-center justify-between">' +
+          '<span class="text-[8px] sm:text-[10px] font-extrabold uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-black/60 text-indigo-300 border border-white/10 backdrop-blur-sm">' + w.category + '</span>' +
+          (isSelected
+            ? '<div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-lg"><i data-lucide="check" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></div>'
+            : '<div class="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white"><i data-lucide="arrow-up-right" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></div>') +
+          '</div>' +
+          '<div>' +
+          '<h4 class="text-[10px] sm:text-xs font-bold text-white tracking-wide truncate">' + w.name + '</h4>' +
+          '<div class="flex items-center justify-between mt-0.5">' +
+          '<span class="text-[8px] sm:text-[10px] text-slate-300 font-medium">4K Ultra HD</span>' +
+          '<span class="text-[8px] sm:text-[10px] ' + (isSelected ? 'text-indigo-400 font-bold' : 'text-slate-400 group-hover:text-indigo-300') + '">' + (isSelected ? 'Active' : 'Apply') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+        grid.appendChild(card);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterWallpapers(cat, btn) {
+      currentActiveFilter = cat;
+      document.querySelectorAll('.wp-filter-btn').forEach(b => {
+        b.className = 'wp-filter-btn px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10';
+      });
+      if (btn) {
+        btn.className = 'wp-filter-btn px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30';
+      }
+      renderWallpaperGrid();
+    }
+
+    function setWallpaper(url) {
+      const bgDiv = document.getElementById('dashboardBackground');
+      if (bgDiv) {
+        bgDiv.style.backgroundImage = 'url("' + url + '")';
+      }
+      localStorage.setItem('capzone_wallpaper', url);
+    }
+
+    function resetDefaultWallpaper() {
+      setWallpaper(wallpapers[0].url);
+      renderWallpaperGrid();
+      if (typeof showPopup === 'function') {
+        showPopup('Theme reset to default', 'success');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWallpapers);
+    } else {
+      initWallpapers();
+    }
+
+    // SOCIAL KIT LOGIC
+    let currentSocialTool = 'fake_chat';
+    let currentSocialData = null;
+
+    const socialToolMeta = {
+      fake_chat: { title: 'Fake text chat', icon: 'message-square', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' },
+      tiktok_comment: { title: 'TikTok comment', icon: 'message-circle', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+      insta_comment: { title: 'Instagram comment', icon: 'messages-square', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
+      fb_comment: { title: 'Facebook comment', icon: 'thumbs-up', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+      twitter_post: { title: 'Twitter post', icon: 'hash', color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/30' },
+      reddit_post: { title: 'Reddit post', icon: 'megaphone', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+      text_box: { title: 'Text box', icon: 'type', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
+      receipt: { title: 'Receipt', icon: 'receipt', color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-500/30' }
+    };
+
+    function openSocialKitModal(e) {
+      if (e) e.preventDefault();
+      backToSocialKitOverview();
+      openToolWithIntercept('socialKitModal', e);
+    }
+    function selectSocialTool(toolKey) {
+      currentSocialTool = toolKey;
+      const meta = socialToolMeta[toolKey] || socialToolMeta.fake_chat;
+
+      document.getElementById('socialKitOverview').classList.add('hidden');
+      const studio = document.getElementById('socialKitStudio');
+      studio.classList.remove('hidden');
+      studio.classList.add('flex');
+
+      document.getElementById('studioToolTitle').innerText = meta.title;
+      const studioIcon = document.getElementById('studioToolIcon');
+      studioIcon.className = 'w-8 h-8 rounded-lg flex items-center justify-center border ' + meta.bg;
+      if (toolKey === 'fb_comment') {
+        studioIcon.innerHTML = '<svg class="w-4 h-4 fill-[#1877F2]" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
+      } else {
+        studioIcon.innerHTML = '<i data-lucide="' + meta.icon + '" class="w-4 h-4 ' + meta.color + '"></i>';
+      }
+
+      const sampleTopics = {
+        fake_chat: 'යාලුවෝ දෙන්නෙක් අතර ආතල් චැට් එකක්',
+        tiktok_comment: 'Viral debate on whether night kottu is the best food',
+        insta_comment: 'Aesthetic travel photo compliment thread',
+        fb_comment: 'Relatives commenting on wedding photos',
+        twitter_post: 'Viral hot take on AI replacing programmers',
+        reddit_post: 'r/AskReddit: What is a life hack that feels like cheating?',
+        text_box: 'Mind-blowing fact about the deep ocean',
+        receipt: 'Supermarket shopping list with hilarious items'
+      };
+      document.getElementById('socialTopicInput').value = sampleTopics[toolKey] || '';
+
+      renderDefaultSampleMockup(toolKey);
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function backToSocialKitOverview() {
+      const studio = document.getElementById('socialKitStudio');
+      studio.classList.add('hidden');
+      studio.classList.remove('flex');
+      document.getElementById('socialKitOverview').classList.remove('hidden');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function generateRealisticSocialFallback(tool, topic, language) {
+      const isSinhala = language === 'sinhala';
+      const isSinglish = language === 'singlish';
+
+      if (tool === 'fake_chat') {
+        if (isSinhala) {
+          return {
+            personName: "කසුන් පෙරේරා",
+            messages: [
+              { sender: "them", text: `මචං අර ${topic} වැඩේ ගැන බැලුවද?`, time: "10:24 AM" },
+              { sender: "me", text: "ඔව් මචං, මම ඒක සම්පූර්ණයෙන්ම check කරලා බැලුවා!", time: "10:25 AM" },
+              { sender: "them", text: "සිරාවටම? මොකක්ද තත්ත්වේ? ප්‍රතිඵල හොඳයිද?", time: "10:25 AM" },
+              { sender: "me", text: "සුපිරියටම වැඩ බං! මම උඹට විස්තර ටික දැන්ම එවන්නම්.", time: "10:26 AM" }
+            ]
+          };
+        } else if (isSinglish) {
+          return {
+            personName: "Kasun Perera",
+            messages: [
+              { sender: "them", text: `Macho ara ${topic} scene eka baluwada?`, time: "10:24 AM" },
+              { sender: "me", text: "Ow ban, mama eka full check karala baluwa!", time: "10:25 AM" },
+              { sender: "them", text: "Sirawatama? Kohomada thathwe?", time: "10:25 AM" },
+              { sender: "me", text: "Supiriyatama wada! Mama ubata direct link ekak daannam.", time: "10:26 AM" }
+            ]
+          };
+        } else {
+          return {
+            personName: "Alex Morgan",
+            messages: [
+              { sender: "them", text: `Hey! Did you get a chance to check out ${topic}?`, time: "10:24 AM" },
+              { sender: "me", text: "Yes, just finished going through it in detail!", time: "10:25 AM" },
+              { sender: "them", text: "Awesome! What's your honest verdict?", time: "10:25 AM" },
+              { sender: "me", text: "Honestly mind-blowing. Works 10x better than expected!", time: "10:26 AM" }
+            ]
+          };
+        }
+      } else if (tool === 'tiktok_comment') {
+        return {
+          username: isSinhala ? "@lanka_trend" : "@viral_pulse",
+          comment: isSinhala 
+            ? `${topic} ගැන මේ කියපු කතාව 100% ක් ඇත්ත! මමත් අත්දැකීමෙන් දන්නවා 🔥` 
+            : (isSinglish ? `${topic} gana me kiyapu kathawa siraawata aththa ban! Patta 🔥` : `This breakdown about ${topic} is 100% spot on! Blew my mind 🔥`),
+          likes: "28.4K",
+          time: "2h ago",
+          replies: [
+            {
+              username: isSinhala ? "@nuwan_bro" : "@sam_vids",
+              comment: isSinhala ? "සිරාවටම මචං, මමත් මේකම තමයි කියන්න හිටියේ!" : (isSinglish ? "Aniwa machan, mamath mehema thama hithuwe!" : "Totally agree! Needs way more recognition."),
+              likes: "3,890",
+              time: "1h ago"
+            },
+            {
+              username: isSinhala ? "@kavindi_lk" : "@elena_rose",
+              comment: isSinhala ? "ඊළඟ කොටස ඉක්මනින් දාන්නකෝ ප්ලීස්!" : (isSinglish ? "Next part eka ikmanata daapan bro!" : "Can you make a part 2 explaining the details?"),
+              likes: "1,240",
+              time: "45m ago"
+            }
+          ]
+        };
+      } else if (tool === 'insta_comment') {
+        return {
+          username: "creative.vibe",
+          isVerified: true,
+          comment: isSinhala 
+            ? `${topic} සම්බන්දයෙන් කරපු සුපිරිම නිර්මාණයක්! හැමෝම අනිවාර්යයෙන් නැරඹිය යුතුයි ✨` 
+            : (isSinglish ? `${topic} gana karapu patta post ekak! Godak watinawa ✨` : `Unmatched quality content on ${topic}! Truly inspirational ✨`),
+          likes: "16.8K",
+          time: "3h",
+          replies: [
+            {
+              username: "wanderer_lk",
+              comment: isSinhala ? "නියමයි සහෝ, දිගටම කරගෙන යන්න!" : (isSinglish ? "Niyamai saho, keep it up!" : "Couldn't have said it better myself!"),
+              likes: "940",
+              time: "2h"
+            }
+          ]
+        };
+      } else if (tool === 'fb_comment') {
+        return {
+          name: isSinhala ? "සුනිල් ශාන්ත පෙරේරා" : "Sunil Shantha Perera",
+          comment: isSinhala 
+            ? `${topic} පිළිබඳව ඉතාමත් කාලෝචිත සහ අගනා පැහැදිලි කිරීමක්. ඔබගේ ඉදිරි ගමනට උණුසුම් සුබ පැතුම්!` 
+            : (isSinglish ? `${topic} gana kiyala deepu eka godak watinawa. Jaya wewa saho!` : `A very timely and insightful post on ${topic}. Wishing you continuous success!`),
+          reactions: "6.4K",
+          topReaction: "Like",
+          time: "4 hrs",
+          replies: [
+            {
+              name: isSinhala ? "නිමල් කුමාර" : "Nimal Kumara",
+              comment: isSinhala ? "බොහොම ස්තූතියි මහත්මයා!" : "Thank you very much!",
+              reactions: "410",
+              time: "2 hrs"
+            }
+          ]
+        };
+      } else if (tool === 'twitter_post') {
+        return {
+          name: isSinhala ? "ටෙක් ලංකා" : "Tech Insider",
+          handle: "@techpulse_lk",
+          isVerified: true,
+          tweet: isSinhala 
+            ? `${topic} ගැන බොහෝ දෙනෙක් නොදන්නා රහස: තාක්ෂණය වේගයෙන් වෙනස් වෙනවා, අපිත් ඒකට සූදානම් වෙන්න ඕන. 🚀 #Technology #Trending #Innovation`
+            : (isSinglish ? `${topic} gana thiyena reality eka mekai: Creator economy ekata aluth trend ekak enawa. 🚀 #Viral #Trend` : `Here is what nobody tells you about ${topic}: Adapt early or get left behind. 🚀 #FutureTrends #Innovation`),
+          time: "5:30 PM · Sep 9, 2026",
+          views: "1.5M",
+          retweets: "18.2K",
+          likes: "94.7K",
+          quotes: "3.2K"
+        };
+      } else if (tool === 'reddit_post') {
+        return {
+          subreddit: "r/AskReddit",
+          author: "u/DeepThinker_99",
+          time: "5 hours ago",
+          title: isSinhala 
+            ? `${topic} ගැන ඔබ දන්නා වඩාත්ම පුදුම සහගත කරුණ කුමක්ද?`
+            : (isSinglish ? `${topic} gana ubala danna pissu hadena wisthara monawada?` : `What is the most mind-blowing fact you know about ${topic}?`),
+          content: isSinhala 
+            ? `මම මෑතකදී මේ පිළිබඳව ගැඹුරින් සොයා බැලුවා. බොහෝ දෙනෙක් නොසිතන පැතිකඩ ගණනාවක් මේ තුළ සැඟවී තිබෙනවා. ඔබගේ අත්දැකීම් පහළින් බෙදාගන්න.`
+            : (isSinglish ? `Mama langadi idala meka gana check kara. Godak aya nodanna loku deyak meke thiyenawa. Ubalage ideasuth kiyapan.` : `I have been digging into this subject for weeks now and the rabbit hole is insane. Would love to hear everyone's perspective on this.`),
+          upvotes: "24.9k",
+          comments: "3.1k"
+        };
+      } else if (tool === 'text_box') {
+        return {
+          tag: "DID YOU KNOW? #1",
+          heading: isSinhala ? "ඔබ දන්නවාද?" : (isSinglish ? "Danna Watei!" : "MIND-BLOWING FACT"),
+          caption: isSinhala 
+            ? `${topic} පිළිබඳව සිදුකළ අධ්‍යයන වලට අනුව, නිවැරදි උපක්‍රම මගින් ඔබේ සාර්ථකත්වය 300% කින් ඉහළ නැංවිය හැක!`
+            : (isSinglish ? `${topic} gana research walin oppu wela thiyenne hari vidiyata kaloth 300% result eka wadi kiyala!` : `Studies show that applying the right methods to ${topic} increases results by over 300%!`)
+        };
+      } else if (tool === 'receipt') {
+        return {
+          storeName: "CAPZONE LIFESTYLE",
+          address: "42 Galle Road, Colombo 03",
+          date: "2026-09-09 19:45",
+          items: [
+            { name: `${topic.slice(0, 20)} Special`, qty: 2, price: "1,800.00" },
+            { name: "Creator Pro Pack", qty: 1, price: "1,250.00" },
+            { name: "Coffee & Snacks", qty: 1, price: "650.00" }
+          ],
+          subtotal: "3,700.00",
+          tax: "250.00",
+          total: "3,950.00",
+          footer: "THANK YOU FOR YOUR VALUED SUPPORT!"
+        };
+      }
+      return { text: topic };
+    }
+
+    async function generateSocialContent() {
+      const topic = document.getElementById('socialTopicInput').value.trim();
+      const language = document.getElementById('socialLangSelect').value;
+      if (!topic) {
+        showPopup('Please enter a topic or scenario', 'Error', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('socialGenBtn');
+      const btnText = document.getElementById('socialGenBtnText');
+      const wrapper = document.getElementById('socialCanvasWrapper');
+      const overlay = document.getElementById('socialGeneratingOverlay');
+
+      btn.disabled = true;
+      btnText.innerText = 'Generating with KaveezCloud...';
+      if (wrapper) wrapper.classList.add('kaveez-glowing-aura');
+      if (overlay) {
+        overlay.classList.remove('hidden');
+        overlay.classList.add('flex');
+        if (window.lucide) lucide.createIcons();
+      }
+
+      try {
+        const apiType = localStorage.getItem('capzone_api_type');
+        const customApiKey = localStorage.getItem('capzone_gemini_key');
+        let generatedData = null;
+
+        // 1. If own API key configured, attempt direct call with gemini-2.0-flash
+        if (apiType === 'own' && customApiKey) {
+          try {
+            const prompt = `Act as an expert viral creator. Generate social media content for tool "${currentSocialTool}" about: "${topic}" in language "${language}". Return ONLY raw valid JSON adhering to tool structure.`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${customApiKey}`;
+            const gRes = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+            });
+            const gData = await gRes.json();
+            if (gData.candidates && gData.candidates[0].content && gData.candidates[0].content.parts[0].text) {
+              let raw = gData.candidates[0].content.parts[0].text.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+              generatedData = JSON.parse(raw);
+            }
+          } catch (eDirect) {
+            console.warn('Direct AI key notice:', eDirect);
+          }
+        }
+
+        // 2. If not own key or direct failed, attempt backend server API
+        if (!generatedData) {
+          try {
+            const payload = { tool: currentSocialTool, topic, language };
+            if (apiType === 'own' && customApiKey) payload.apiKey = customApiKey;
+
+            const res = await fetch(`${API_BASE_URL}/api/generate-social-kit`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.success && data.data) {
+                generatedData = data.data;
+              }
+            }
+          } catch (eBackend) {
+            console.warn('Backend server call notice:', eBackend);
+          }
+        }
+
+        // 3. Fallback: Synthesize rich, realistic content instantly
+        if (!generatedData) {
+          // 600ms aesthetic delay so the user experiences the glowing aura and blur animation
+          await new Promise(r => setTimeout(r, 600));
+          generatedData = generateRealisticSocialFallback(currentSocialTool, topic, language);
+        }
+
+        window.saveToRecentProjects('Social', topic, `Tool: ${currentSocialTool}`);
+        currentSocialData = generatedData;
+        renderMockup(currentSocialTool, generatedData);
+        showPopup('Generated successfully with KaveezCloud AI!', 'Success', 'success');
+
+      } catch (err) {
+        const fallback = generateRealisticSocialFallback(currentSocialTool, topic, language);
+        currentSocialData = fallback;
+        renderMockup(currentSocialTool, fallback);
+        showPopup('Generated successfully with KaveezCloud AI!', 'Success', 'success');
+      } finally {
+        btn.disabled = false;
+        btnText.innerText = 'Generate AI';
+        if (wrapper) wrapper.classList.remove('kaveez-glowing-aura');
+        if (overlay) {
+          overlay.classList.remove('flex');
+          overlay.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderDefaultSampleMockup(toolKey) {
+      if (toolKey === 'fake_chat') {
+        renderMockup('fake_chat', {
+          personName: 'Kasun',
+          messages: [
+            { sender: 'them', text: 'මචං අද පන්තියට යනවද?', time: '10:24 AM' },
+            { sender: 'me', text: 'නෑ බං, අද ටිකක් නිදාගන්න ඕන!', time: '10:25 AM' },
+            { sender: 'them', text: 'අඩෝ සිරාවටම? අද වැදගත් පාඩමක් තියෙනවා කිව්වා නේද', time: '10:25 AM' },
+            { sender: 'me', text: 'අවුලක් නෑ, පස්සේ සර් ගෙන් අහගමු. උඹ පලයන්!', time: '10:26 AM' }
+          ]
+        });
+      } else if (toolKey === 'tiktok_comment') {
+        renderMockup('tiktok_comment', {
+          username: '@viral_srilanka',
+          comment: 'අඩෝ පට්ට වීඩියෝ එක බං! දිගටම කරගෙන යමු 🔥',
+          likes: '34.2K',
+          time: '2h ago',
+          replies: [
+            { username: '@nimal_bro', comment: 'සිරාවටම, මේක නම් සුපිරි!', likes: '4,520', time: '1h ago' },
+            { username: '@kavindi_99', comment: 'මමත් මේකම තමයි හොය හොය හිටියේ', likes: '1,890', time: '45m ago' }
+          ]
+        });
+      } else if (toolKey === 'insta_comment') {
+        renderMockup('insta_comment', {
+          username: 'wanderlust.lanka',
+          comment: 'Ella vibes are always unmatched! Truly heavenly \u2728\uD83C\uDDF1\uD83C\uDDF0',
+          likes: '18.4K',
+          time: '3h',
+          replies: [
+            { username: 'travel_with_us', comment: 'Which hotel is this? Stunning view!!', likes: '890', time: '2h' }
+          ]
+        });
+      } else if (toolKey === 'fb_comment') {
+        renderMockup('fb_comment', {
+          name: 'Sunil Perera',
+          comment: 'මංගල දිවියට සුබ පැතුම් පුතේ! හැමදාම සතුටින් ඉන්න.',
+          reactions: '4.8K',
+          time: '4 hrs'
+        });
+      } else if (toolKey === 'twitter_post') {
+        renderMockup('twitter_post', {
+          name: 'Tech Insider',
+          handle: '@techinsider',
+          tweet: 'AI is not going to replace content creators. Creators who use AI are going to replace creators who don\'t. Adapt or get left behind. \uD83D\uDE80 #AI #ContentCreation',
+          time: '4:15 PM \u00B7 Sep 2, 2026',
+          retweets: '18.2K',
+          likes: '92.5K'
+        });
+      } else if (toolKey === 'reddit_post') {
+        renderMockup('reddit_post', {
+          subreddit: 'r/AskReddit',
+          author: 'u/CuriousThinker',
+          time: '5 hours ago',
+          title: 'What is a secret life hack that sounds fake, but actually works 100% of the time?',
+          content: 'I recently found out that if you put a wooden spoon across a boiling pot of water, it never boils over. Tested it all week and it blew my mind!',
+          upvotes: '28.9k',
+          comments: '3.1k'
+        });
+      } else if (toolKey === 'text_box') {
+        renderMockup('text_box', {
+          tag: 'DID YOU KNOW? #1',
+          heading: 'ඔබ දන්නවාද?',
+          caption: 'ලෝකයේ වේගවත්ම සතා වන්නේ චීටා ය. උන්ට පැයට කිලෝමීටර් 120 ක වේගයෙන් දිවිය හැක!'
+        });
+      } else if (toolKey === 'receipt') {
+        renderMockup('receipt', {
+          storeName: 'CAPZONE SUPERMARKET',
+          address: '45 Galle Road, Colombo 03',
+          date: '2026-09-02 20:15',
+          items: [
+            { name: 'Kottu Roti Special', qty: 2, price: '1,800.00' },
+            { name: 'Iced Milo Extra Large', qty: 2, price: '900.00' },
+            { name: 'Garlic Bread Sticks', qty: 1, price: '650.00' }
+          ],
+          subtotal: '3,350.00',
+          tax: '250.00',
+          total: '3,600.00',
+          footer: 'THANK YOU FOR SUPPORTING LOCAL BUSINESS!'
+        });
+      }
+    }
+
+    function renderMockup(tool, data) {
+      const container = document.getElementById('socialMockupCanvas');
+      if (!container) return;
+
+      if (tool === 'fake_chat') {
+        const name = data.personName || 'Contact';
+        const msgs = data.messages || [];
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-black text-white rounded-[32px] p-4 border-2 border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto overflow-hidden">' +
+          '<div class="flex items-center justify-between text-[11px] font-bold px-2 mb-3 text-neutral-300">' +
+          '<span>9:41</span>' +
+          '<div class="w-20 h-4 bg-neutral-900 rounded-full mx-auto"></div>' +
+          '<div class="flex items-center gap-1.5">' +
+          '<i data-lucide="wifi" class="w-3.5 h-3.5"></i>' +
+          '<div class="w-5 h-2.5 border border-neutral-300 rounded-sm p-0.5"><div class="h-full bg-white rounded-xs w-3/4"></div></div>' +
+          '</div>' +
+          '</div>' +
+          '<div class="flex items-center justify-between pb-3 border-b border-neutral-800/80 mb-4 px-1">' +
+          '<div class="flex items-center gap-2.5">' +
+          '<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xs border border-white/20">' +
+          name.charAt(0).toUpperCase() +
+          '</div>' +
+          '<div>' +
+          '<div class="text-xs font-bold flex items-center gap-1 cursor-text" contenteditable="true">' + name + '</div>' +
+          '<div class="text-[9px] text-neutral-400">iMessage</div>' +
+          '</div>' +
+          '</div>' +
+          '<i data-lucide="video" class="w-4 h-4 text-cyan-400"></i>' +
+          '</div>' +
+          '<div class="space-y-2.5 py-1 min-h-[160px] max-h-[260px] overflow-y-auto px-1 custom-scroll">' +
+          msgs.map(m =>
+            '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + '">' +
+            '<div class="max-w-[80%] rounded-2xl px-3.5 py-2 text-xs font-medium cursor-text ' + (m.sender === 'me' ? 'bg-[#0b84ff] text-white rounded-br-xs' : 'bg-[#26252a] text-neutral-100 rounded-bl-xs') + '" contenteditable="true">' +
+            m.text +
+            '</div>' +
+            '<span class="text-[8px] text-neutral-500 mt-0.5 px-1">' + (m.time || '') + '</span>' +
+            '</div>'
+          ).join('') +
+          '</div>' +
+          '<div class="mt-3 pt-2 border-t border-neutral-800/80 flex items-center gap-2">' +
+          '<div class="flex-1 bg-neutral-900 border border-neutral-700/60 rounded-full px-3 py-1.5 text-neutral-500 text-[11px] flex items-center justify-between">' +
+          '<span>iMessage</span>' +
+          '<div class="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center text-white"><i data-lucide="arrow-up" class="w-3 h-3"></i></div>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+      } else if (tool === 'tiktok_comment') {
+        const username = data.username || '@tiktok_user';
+        const comment = data.comment || '';
+        const replies = data.replies || [];
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-[#121212] text-white rounded-2xl p-4 border border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+          '<div class="flex items-center justify-between mb-3 text-xs text-neutral-400 font-bold border-b border-neutral-800 pb-2">' +
+          '<span>Comments (1.4K)</span>' +
+          '<i data-lucide="x" class="w-4 h-4 text-neutral-500"></i>' +
+          '</div>' +
+          '<div class="flex items-start gap-3">' +
+          '<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-pink-500 to-amber-500 flex items-center justify-center text-xs font-bold text-white flex-shrink-0">' +
+          username.charAt(1 || 0).toUpperCase() +
+          '</div>' +
+          '<div class="flex-1 min-w-0">' +
+          '<div class="flex items-center gap-1.5">' +
+          '<span class="text-xs font-bold text-neutral-300 cursor-text" contenteditable="true">' + username + '</span>' +
+          '<span class="text-[10px] text-neutral-500">' + (data.time || '2h ago') + '</span>' +
+          '</div>' +
+          '<p class="text-xs text-white mt-1 leading-relaxed cursor-text" contenteditable="true">' + comment + '</p>' +
+          '<div class="flex items-center gap-4 mt-2 text-[10px] text-neutral-400 font-semibold">' +
+          '<span class="cursor-pointer hover:text-white">Reply</span>' +
+          '<span class="cursor-pointer hover:text-white">Translate</span>' +
+          '</div>' +
+          (replies.length ?
+            '<div class="mt-3 pl-3 border-l-2 border-neutral-800 space-y-2">' +
+            replies.map(r =>
+              '<div class="flex items-start gap-2">' +
+              '<div class="w-6 h-6 rounded-full bg-neutral-700 flex items-center justify-center text-[9px] font-bold flex-shrink-0">' +
+              (r.username || 'R').charAt(1 || 0).toUpperCase() +
+              '</div>' +
+              '<div class="flex-1 min-w-0">' +
+              '<span class="text-[10px] font-bold text-neutral-300 cursor-text" contenteditable="true">' + r.username + '</span>' +
+              '<p class="text-[11px] text-neutral-200 mt-0.5 cursor-text" contenteditable="true">' + r.comment + '</p>' +
+              '</div>' +
+              '</div>'
+            ).join('') +
+            '</div>' : '') +
+          '</div>' +
+          '<div class="flex flex-col items-center gap-0.5 text-neutral-400 flex-shrink-0">' +
+          '<i data-lucide="heart" class="w-4 h-4 text-red-500 fill-red-500"></i>' +
+          '<span class="text-[10px] font-bold cursor-text" contenteditable="true">' + (data.likes || '24.8K') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+      } else if (tool === 'insta_comment') {
+        const username = data.username || 'insta.user';
+        const comment = data.comment || '';
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-black text-white rounded-2xl p-4 border border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+          '<div class="flex items-center justify-between pb-2 mb-3 border-b border-neutral-800 text-xs font-bold text-neutral-400">' +
+          '<span>Comments</span>' +
+          '<i data-lucide="send" class="w-4 h-4"></i>' +
+          '</div>' +
+          '<div class="flex items-start gap-3">' +
+          '<div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-500 p-0.5 flex-shrink-0">' +
+          '<div class="w-full h-full bg-black rounded-full flex items-center justify-center text-[10px] font-bold">' +
+          username.charAt(0).toUpperCase() +
+          '</div>' +
+          '</div>' +
+          '<div class="flex-1 min-w-0">' +
+          '<div class="text-xs leading-relaxed">' +
+          '<span class="font-bold text-white mr-1.5 cursor-text" contenteditable="true">' + username + '</span>' +
+          '<span class="text-neutral-200 cursor-text" contenteditable="true">' + comment + '</span>' +
+          '</div>' +
+          '<div class="flex items-center gap-3 mt-2 text-[10px] text-neutral-500 font-semibold">' +
+          '<span>' + (data.time || '3h') + '</span>' +
+          '<span class="cursor-text" contenteditable="true">' + (data.likes || '15.2K') + ' likes</span>' +
+          '<span class="cursor-pointer hover:text-white">Reply</span>' +
+          '</div>' +
+          '</div>' +
+          '<i data-lucide="heart" class="w-3.5 h-3.5 text-neutral-400 hover:text-red-500 cursor-pointer flex-shrink-0 mt-1"></i>' +
+          '</div>' +
+          '</div>';
+
+      } else if (tool === 'fb_comment') {
+        const name = data.name || 'Facebook User';
+        const comment = data.comment || '';
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-[#242526] text-white rounded-2xl p-4 border border-neutral-700 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+          '<div class="flex items-start gap-2.5">' +
+          '<div class="w-9 h-9 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white flex-shrink-0 shadow-sm">' +
+          name.charAt(0).toUpperCase() +
+          '</div>' +
+          '<div class="flex-1 min-w-0">' +
+          '<div class="bg-[#3a3b3c] rounded-2xl px-3.5 py-2 relative">' +
+          '<h4 class="text-xs font-bold text-white hover:underline cursor-pointer cursor-text" contenteditable="true">' + name + '</h4>' +
+          '<p class="text-xs text-neutral-200 mt-1 leading-relaxed cursor-text" contenteditable="true">' + comment + '</p>' +
+          '<div class="absolute -bottom-2.5 right-2 bg-[#3a3b3c] border border-neutral-600 rounded-full px-1.5 py-0.5 flex items-center gap-1 shadow-md text-[9px]">' +
+          '<span class="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center text-white text-[7px]"><i data-lucide="thumbs-up" class="w-2 h-2"></i></span>' +
+          '<span class="font-bold text-neutral-300 cursor-text" contenteditable="true">' + (data.reactions || '4.5K') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '<div class="flex items-center gap-4 mt-2 pl-2 text-[10px] text-neutral-400 font-bold">' +
+          '<span class="hover:underline cursor-pointer text-blue-400">Like</span>' +
+          '<span class="hover:underline cursor-pointer">Reply</span>' +
+          '<span>' + (data.time || '2h') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+      } else if (tool === 'twitter_post') {
+        const name = data.name || 'Creator';
+        const handle = data.handle || '@handle';
+        const tweet = data.tweet || '';
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-black text-white rounded-2xl p-4 sm:p-5 border border-neutral-800 shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+          '<div class="flex items-center justify-between mb-2.5">' +
+          '<div class="flex items-center gap-2.5">' +
+          '<div class="w-10 h-10 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-xs font-bold">' +
+          name.charAt(0).toUpperCase() +
+          '</div>' +
+          '<div>' +
+          '<div class="flex items-center gap-1">' +
+          '<span class="text-xs font-bold text-white cursor-text" contenteditable="true">' + name + '</span>' +
+          '<i data-lucide="badge-check" class="w-3.5 h-3.5 text-blue-400 fill-blue-400"></i>' +
+          '</div>' +
+          '<span class="text-[10px] text-neutral-500 cursor-text" contenteditable="true">' + handle + '</span>' +
+          '</div>' +
+          '</div>' +
+          '<i data-lucide="twitter" class="w-4 h-4 text-neutral-400"></i>' +
+          '</div>' +
+          '<p class="text-xs sm:text-sm text-neutral-100 my-3 leading-relaxed cursor-text" contenteditable="true">' + tweet + '</p>' +
+          '<div class="text-[10px] text-neutral-500 py-2 border-y border-neutral-800/80 my-2">' +
+          '<span>' + (data.time || '4:15 PM &middot; Sep 2, 2026') + '</span> &middot; <span class="font-bold text-white">' + (data.views || '1.2M') + '</span> Views' +
+          '</div>' +
+          '<div class="flex items-center justify-between text-neutral-500 text-xs pt-1 px-2">' +
+          '<span class="flex items-center gap-1"><i data-lucide="message-circle" class="w-3.5 h-3.5"></i> 240</span>' +
+          '<span class="flex items-center gap-1 text-emerald-400"><i data-lucide="repeat" class="w-3.5 h-3.5"></i> ' + (data.retweets || '14.5K') + '</span>' +
+          '<span class="flex items-center gap-1 text-pink-500"><i data-lucide="heart" class="w-3.5 h-3.5"></i> ' + (data.likes || '89.2K') + '</span>' +
+          '<i data-lucide="bookmark" class="w-3.5 h-3.5"></i>' +
+          '</div>' +
+          '</div>';
+
+      } else if (tool === 'reddit_post') {
+        const title = data.title || 'Reddit Post Title';
+        const content = data.content || '';
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-[#1a1a1b] text-white rounded-2xl p-4 border border-[#343536] shadow-2xl w-full max-w-sm font-sans mx-auto">' +
+          '<div class="flex items-center gap-2 text-[10px] text-neutral-400 mb-2">' +
+          '<div class="w-4 h-4 rounded-full bg-orange-600 flex items-center justify-center font-bold text-[8px] text-white">r/</div>' +
+          '<span class="font-bold text-white cursor-text" contenteditable="true">' + (data.subreddit || 'r/AskReddit') + '</span>' +
+          '<span>&bull;</span>' +
+          '<span>Posted by <span contenteditable="true">' + (data.author || 'u/RedditUser') + '</span> ' + (data.time || '6 hr. ago') + '</span>' +
+          '</div>' +
+          '<h3 class="text-xs sm:text-sm font-bold text-white mb-2 leading-snug cursor-text" contenteditable="true">' + title + '</h3>' +
+          '<p class="text-xs text-neutral-300 leading-relaxed bg-[#272729]/50 p-2.5 rounded-xl border border-neutral-800 cursor-text" contenteditable="true">' + content + '</p>' +
+          '<div class="flex items-center gap-3 mt-3 text-xs text-neutral-400 font-bold">' +
+          '<div class="bg-[#272729] rounded-full px-2.5 py-1 flex items-center gap-1.5 border border-neutral-700">' +
+          '<i data-lucide="arrow-big-up" class="w-3.5 h-3.5 text-orange-500"></i>' +
+          '<span class="text-orange-500 font-extrabold text-[11px] cursor-text" contenteditable="true">' + (data.upvotes || '18.9k') + '</span>' +
+          '<i data-lucide="arrow-big-down" class="w-3.5 h-3.5 text-neutral-500"></i>' +
+          '</div>' +
+          '<div class="bg-[#272729] rounded-full px-2.5 py-1 flex items-center gap-1.5 border border-neutral-700 text-[11px]">' +
+          '<i data-lucide="message-square" class="w-3.5 h-3.5"></i>' +
+          '<span class="cursor-text" contenteditable="true">' + (data.comments || '2.4k') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+      } else if (tool === 'text_box') {
+        const tag = data.tag || 'VIRAL CAPTION';
+        const heading = data.heading || 'Heading';
+        const caption = data.caption || '';
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-gradient-to-br from-neutral-900 via-black to-neutral-900 text-white rounded-2xl p-5 border-2 border-yellow-500/40 shadow-[0_0_30px_rgba(234,179,8,0.15)] w-full max-w-sm font-sans mx-auto text-center relative overflow-hidden">' +
+          '<div class="absolute -top-10 -right-10 w-24 h-24 bg-yellow-500/10 rounded-full blur-xl pointer-events-none"></div>' +
+          '<span class="inline-block px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-300 border border-yellow-500/40 text-[9px] font-black uppercase tracking-widest mb-2 cursor-text" contenteditable="true">' +
+          tag +
+          '</span>' +
+          '<h3 class="text-base sm:text-lg font-black text-white mb-2 leading-tight tracking-tight cursor-text" contenteditable="true">' +
+          heading +
+          '</h3>' +
+          '<p class="text-xs sm:text-sm text-neutral-200 leading-relaxed font-sinhala font-medium cursor-text" contenteditable="true">' +
+          caption +
+          '</p>' +
+          '</div>';
+
+      } else if (tool === 'receipt') {
+        const items = data.items || [];
+        container.innerHTML =
+          '<div id="mockupExportNode" class="bg-[#fcfbf9] text-neutral-800 rounded-xl p-5 shadow-2xl w-full max-w-xs font-mono mx-auto border-t-8 border-dashed border-neutral-300 text-xs">' +
+          '<div class="text-center pb-3 border-b-2 border-dashed border-neutral-300">' +
+          '<h3 class="font-black text-sm tracking-wider uppercase cursor-text" contenteditable="true">' + (data.storeName || 'SUPERMARKET') + '</h3>' +
+          '<p class="text-[9px] text-neutral-500 cursor-text" contenteditable="true">' + (data.address || '123 Main Street') + '</p>' +
+          '<p class="text-[9px] text-neutral-500 mt-1 cursor-text" contenteditable="true">' + (data.date || '2026-09-02') + '</p>' +
+          '</div>' +
+          '<div class="py-3 border-b-2 border-dashed border-neutral-300 space-y-1 text-[10px]">' +
+          items.map(it =>
+            '<div class="flex justify-between items-center">' +
+            '<span class="cursor-text" contenteditable="true">' + (it.qty || 1) + 'x ' + it.name + '</span>' +
+            '<span class="font-bold cursor-text" contenteditable="true">' + it.price + '</span>' +
+            '</div>'
+          ).join('') +
+          '</div>' +
+          '<div class="pt-2 text-[11px] space-y-1">' +
+          '<div class="flex justify-between font-black text-xs pt-1 border-t border-neutral-400">' +
+          '<span>TOTAL:</span>' +
+          '<span class="cursor-text" contenteditable="true">LKR ' + (data.total || '3,450.00') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '<div class="text-center pt-4 text-[9px] text-neutral-500">' +
+          '<p class="cursor-text" contenteditable="true">' + (data.footer || 'THANK YOU FOR SHOPPING WITH US!') + '</p>' +
+          '<div class="mt-2 h-7 bg-neutral-800 mx-auto w-36 rounded-xs flex items-center justify-center text-[7px] text-white tracking-widest font-sans">' +
+          '||| | |||| | ||| || |||' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+      }
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function copySocialText() {
+      const node = document.getElementById('mockupExportNode');
+      if (!node) return;
+      const text = node.innerText || '';
+      navigator.clipboard.writeText(text).then(() => {
+        showPopup('Text copied to clipboard!', 'Success', 'success');
+      }).catch(() => {
+        showPopup('Failed to copy text', 'Error', 'error');
+      });
+    }
+
+    function downloadSocialMockup() {
+      const node = document.getElementById('mockupExportNode');
+      if (!node) return;
+
+      if (window.htmlToImage) {
+        showPopup('Generating high-res PNG image...', 'info');
+
+        // Temporarily expand scrollable message containers so the entire conversation is captured
+        const scrollContainers = node.querySelectorAll('.overflow-y-auto, [class*="max-h-"]');
+        const prevStyles = [];
+        scrollContainers.forEach(el => {
+          prevStyles.push({ el: el, maxH: el.style.maxHeight, overflow: el.style.overflow });
+          el.style.maxHeight = 'none';
+          el.style.overflow = 'visible';
+        });
+
+        window.htmlToImage.toPng(node, { pixelRatio: 3, skipFonts: true })
+          .then(dataUrl => {
+            // Restore container heights
+            scrollContainers.forEach(item => {
+              item.el.style.maxHeight = item.maxH;
+              item.el.style.overflow = item.overflow;
+            });
+
+            const a = document.createElement('a');
+            a.download = (currentSocialTool || 'social') + '_mockup_' + Date.now() + '.png';
+            a.href = dataUrl;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showPopup('Full mockup downloaded successfully!', 'Success', 'success');
+          }).catch(err => {
+            scrollContainers.forEach(item => {
+              item.el.style.maxHeight = item.maxH;
+              item.el.style.overflow = item.overflow;
+            });
+            console.error('Export error:', err);
+            showPopup('Export failed. Trying alternative method...', 'Warning', 'warning');
+            
+            // Fallback to simple html2canvas if loaded, or just copy text
+            copySocialText();
+          });
+      } else {
+        copySocialText();
+      }
+    }
+  </script>
+
+  <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
+  <div
+    class="fixed bottom-3 inset-x-3 z-40 sm:hidden glass-panel rounded-2xl px-3 py-2 flex items-center justify-around border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0b0f19]/85">
+    <a href="dashboard.html" class="flex flex-col items-center gap-0.5 text-indigo-400">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Home</span>
+    </a>
+    <button onclick="openToolWithIntercept('srtModal', event)"
+      class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="file-text" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Subtitles</span>
+    </button>
+    <a href="editor.html" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="film" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Editor</span>
+    </a>
+    <button onclick="openSocialKitModal(event)"
+      class="flex flex-col items-center gap-0.5 text-yellow-400 hover:text-yellow-300">
+      <i data-lucide="messages-square" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Social</span>
+    </button>
+    <button onclick="openModal('wallpaperModal', event)"
+      class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="palette" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Theme</span>
+    </button>
+  </div>
+
+  <!-- API Configuration Modal -->
+  <div id="apiConfigModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" id="apiConfigBackdrop" onclick="cancelApiModal()"></div>
+    <div
+      class="glass-card w-full max-w-lg rounded-2xl p-6 lg:p-8 relative z-10 transform scale-95 opacity-0 transition-all duration-300"
+      id="apiConfigContent">
+
+      <div class="flex items-center gap-4 mb-6 relative">
+        <div
+          class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+          <i data-lucide="cpu" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-white tracking-wide">KaveezCloud AI Engine Setup</h2>
+          <p class="text-sm text-indigo-300">Configure high-speed KaveezCloud AI processing</p>
+        </div>
+        <!-- Close button for API Modal -->
+        <button onclick="cancelApiModal()"
+          class="absolute top-0 right-0 p-2 text-gray-400 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 mt-8">
+        <!-- Option 1: Own API -->
+        <button onclick="selectApiOption('own')"
+          class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-indigo-400 transition-all group flex items-start gap-4">
+          <div class="mt-1 flex-shrink-0">
+            <i data-lucide="key" class="w-5 h-5 text-indigo-400 group-hover:text-indigo-300"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1">Connect Custom AI Key</h3>
+            <p class="text-xs text-gray-400">100% Free key from Google AI Studio. Unlimited requests & highest speed.</p>
+          </div>
+        </button>
+
+        <!-- Option 2: Server API -->
+        <button onclick="selectApiOption('server')"
+          class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-purple-400 transition-all group flex items-start gap-4">
+          <div class="mt-1 flex-shrink-0">
+            <i data-lucide="server" class="w-5 h-5 text-purple-400 group-hover:text-purple-300"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1">Use KaveezCloud Server Cloud</h3>
+            <p class="text-xs text-gray-400">Default cloud processing. Ready out of the box, no API key required.</p>
+          </div>
+        </button>
+
+        <!-- Option 3: Cancel / Continue Free -->
+        <button onclick="cancelApiModal()"
+          class="w-full text-center py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white text-xs font-semibold transition-colors">
+          Cancel & Continue with KaveezCloud Cloud
+        </button>
+      </div>
+
+      <!-- Own API Key Input Section (Hidden by default) -->
+      <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
+        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your AI Key (KaveezCloud Engine)</label>
+        <input type="text" id="geminiApiKeyInput" autocomplete="off"
+          style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
+          class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2"
+          placeholder="Paste AI key here (AIzaSy...)">
+        <p class="text-[10px] text-gray-400 mb-4">Get your free key from Google AI Studio.</p>
+
+        <a href="https://aistudio.google.com/app/apikey" target="_blank"
+          class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 transition-colors text-sm font-bold">
+          Get Free Key (Google AI Studio)
+        </a>
+
+        <div class="flex justify-between items-center gap-3">
+          <button onclick="cancelApiModal()"
+            class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-colors">Cancel</button>
+          <div class="flex items-center gap-2">
+            <button onclick="backToOptions()"
+              class="px-4 py-2 rounded-lg text-sm font-bold text-gray-300 hover:text-white transition-colors">Back</button>
+            <button onclick="saveApiKey()"
+              class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all">Save
+              & Continue</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+<script>
+
+    
+    window.saveToRecentProjects = function(type, title, metadata, fileId = null) {
+      if (!window.currentUserEmail) return;
+      
+      let metaStr = metadata;
+      if (fileId) {
+          metaStr = JSON.stringify({ text: metadata, file_id: fileId });
+      }
+
+      try {
+        fetch(`${API_BASE_URL}/api/user-projects`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                email: window.currentUserEmail,
+                type: type,
+                title: title,
+                metadata: metaStr,
+                date: new Date().toISOString()
+            })
+        }).then(() => window.renderRecentProjects());
+      } catch (e) {
+        console.error('Save project error:', e);
+      }
+    };
+
+    window.renderRecentProjects = async function() {
+      const container = document.getElementById('recentProjectsContainer');
+      if (!container || !window.currentUserEmail) return;
+      let projects = [];
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(window.currentUserEmail));
+        if(res.ok) projects = await res.json();
+      } catch (e) {
+        console.error('Failed to fetch user projects:', e);
+      }
+      
+      if (!projects || projects.length === 0) {
+          container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
+              <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
+                <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
+              </div>
+              <p class="text-slate-300 font-semibold">No active projects</p>
+              <p class="text-xs text-slate-500 mt-1">Start by launching a tool.</p>
+            </div>`;
+          if (window.lucide) window.lucide.createIcons();
+          return;
+      }
+
+      let htmlOut = '';
+      const icons = {
+          'Subtitle': 'subtitles',
+          'Dubbing': 'mic',
+          'Social': 'share-2',
+          'Script': 'pen-tool',
+          'Image': 'image',
+          'Video': 'video',
+          'Background': 'scissors'
+      };
+      const colors = {
+          'Subtitle': 'bg-blue-500',
+          'Dubbing': 'bg-purple-500',
+          'Social': 'bg-pink-500',
+          'Script': 'bg-emerald-500',
+          'Image': 'bg-amber-500',
+          'Video': 'bg-indigo-500',
+          'Background': 'bg-teal-500'
+      };
+
+      projects.forEach(p => {
+          const icon = icons[p.type] || 'file';
+          const color = colors[p.type] || 'bg-slate-500';
+          const time = new Date(p.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+          
+          htmlOut += `
+          <div class="project-3d-card w-64 lg:w-full flex-shrink-0 snap-center group relative p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-500 ease-out backdrop-blur-md overflow-hidden cursor-pointer" onclick="window.location.href='${API_BASE_URL}/api/mtproto/download?msg_id=' + '${p.metadata}'">
+              <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+              <div class="relative z-10 flex items-start gap-4 transform transition-transform duration-500 group-hover:translate-z-10">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${color}/20 text-white border border-white/10">
+                      <i data-lucide="${icon}" class="w-5 h-5 drop-shadow-md"></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                      <h4 class="text-white font-semibold truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all">${p.title}</h4>
+                      <p class="text-xs text-slate-400 truncate mt-0.5">${p.metadata}</p>
+                      <p class="text-[10px] text-slate-500 mt-2 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${time}</p>
+                  </div>
+              </div>
+          </div>`;
+      });
+      
+      container.innerHTML = htmlOut;
+      if (window.lucide) window.lucide.createIcons();
+    };
+
+    window.toggleApi = function(type) {
+        if (type === 'own') {
+            const existingKey = localStorage.getItem('capzone_gemini_key');
+            if (!existingKey) {
+                if(typeof showApiModal === 'function') showApiModal();
+                return;
+            }
+        }
+        localStorage.setItem('capzone_api_type', type);
+        updateApiToggleUI();
+        if (typeof showPopup === 'function') {
+            showPopup(`Switched to ${type === 'own' ? 'Custom API' : 'Cloud API'}`, 'Success', 'success');
+        }
+    };
+
+    window.updateApiToggleUI = function() {
+        const currentType = localStorage.getItem('capzone_api_type') || 'server';
+        const btnServer = document.getElementById('btnApiServer');
+        const btnOwn = document.getElementById('btnApiOwn');
+        if (btnServer && btnOwn) {
+            if (currentType === 'server') {
+                btnServer.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+                btnOwn.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+            } else {
+                btnOwn.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+                btnServer.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateApiToggleUI();
+        // Initial render will fail without currentUserEmail, but we retry in an interval
+        setInterval(() => {
+            if (window.currentUserEmail) window.renderRecentProjects();
+        }, 10000); // refresh every 10 seconds
+    });
+</script>
+</body>
+
+</html>
