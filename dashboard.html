@@ -7,28 +7,33 @@
     const originalFetch = window.fetch;
     window.fetch = async function() {
         let [resource, config] = arguments;
-        if (window.currentUserEmail && typeof resource === 'string' && resource.includes('/api/')) {
+        if (typeof resource === 'string' && resource.includes('/api/')) {
             config = config || {};
             
             // If body is FormData, we can append email
-            if (config.body && config.body instanceof FormData) {
-                config.body.append('email', window.currentUserEmail);
-            } else if (config.body && typeof config.body === 'string') {
-                try {
-                    let parsed = JSON.parse(config.body);
-                    if (typeof parsed === 'object' && parsed !== null) {
-                        parsed.email = window.currentUserEmail;
-                        config.body = JSON.stringify(parsed);
-                    }
-                } catch(e){}
+            if (window.currentUserEmail) {
+                if (config.body && config.body instanceof FormData) {
+                    config.body.append('email', window.currentUserEmail);
+                } else if (config.body && typeof config.body === 'string') {
+                    try {
+                        let parsed = JSON.parse(config.body);
+                        if (typeof parsed === 'object' && parsed !== null) {
+                            parsed.email = window.currentUserEmail;
+                            config.body = JSON.stringify(parsed);
+                        }
+                    } catch(e){}
+                }
             }
             
-            // Add header as fallback
+            // Add headers
             config.headers = config.headers || {};
+            let customApiKey = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : '';
             if (config.headers instanceof Headers) {
-                config.headers.append('x-user-email', window.currentUserEmail);
+                if (window.currentUserEmail) config.headers.append('x-user-email', window.currentUserEmail);
+                if (customApiKey) config.headers.append('x-api-key', customApiKey);
             } else {
-                config.headers['x-user-email'] = window.currentUserEmail;
+                if (window.currentUserEmail) config.headers['x-user-email'] = window.currentUserEmail;
+                if (customApiKey) config.headers['x-api-key'] = customApiKey;
             }
         }
         return originalFetch(resource, config);
@@ -45,18 +50,6 @@
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-          },
-          colors: {
-            brand: {
               purple: '#8B5CF6',
               blue: '#3B82F6',
               dark: '#0B0F19',
@@ -324,17 +317,32 @@
       <span class="text-xl lg:text-2xl font-bold text-white tracking-wide drop-shadow-md hidden sm:block">CapZone</span>
     </a>
     <nav
-      class="flex items-center justify-start gap-4 lg:gap-8 flex-1 overflow-x-auto whitespace-nowrap px-1 lg:px-4 scrollbar-hide w-full">
-      <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pl-2"
-        onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
-      <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
-        onclick="openToolWithIntercept('scraperSrtModal', event)">AI Script Writer</a>
-      <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
-        onclick="openToolWithIntercept('fbModal', event)">FB Downloader</a>
-                <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
-        onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
-      <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap pr-2"
-        onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
+      class="flex items-center justify-start gap-4 lg:gap-8 flex-1 overflow-x-hidden whitespace-nowrap px-1 lg:px-4 w-full relative group"
+      style="mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);">
+      <div class="flex items-center gap-4 lg:gap-8 min-w-max animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] px-2" style="will-change: transform;">
+        <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          onclick="openToolWithIntercept('scraperSrtModal', event)">AI Script Writer</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          onclick="openToolWithIntercept('fbModal', event)">FB Downloader</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
+          
+        <!-- Duplicate for Marquee -->
+        <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
+          onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
+          onclick="openToolWithIntercept('scraperSrtModal', event)">AI Script Writer</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
+          onclick="openToolWithIntercept('fbModal', event)">FB Downloader</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
+          onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
+          onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
+      </div>
     </nav>
     <div class="flex items-center gap-3 lg:gap-4 ml-auto">
       <!-- AI API Toggle -->
@@ -3103,7 +3111,10 @@
         if (type === 'own') {
             const existingKey = localStorage.getItem('capzone_gemini_key');
             if (!existingKey) {
-                if(typeof showApiModal === 'function') showApiModal();
+                if(typeof showApiModal === 'function') {
+                    showApiModal();
+                    if(typeof selectApiOption === 'function') selectApiOption('own');
+                }
                 return;
             }
         }
