@@ -97,6 +97,9 @@
         // [DEV MODE] Temporarily bypassing login redirect
         //window.location.href = 'login.html';
         console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
+        const savedEmail = localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+        window.currentUserEmail = savedEmail;
+        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
       } else {
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
@@ -104,10 +107,12 @@
         const navProfileName = document.getElementById('navProfileName');
 
         window.currentUserEmail = user.email;
+        localStorage.setItem('capzone_user_email', user.email);
         if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
         if (profileEmail) profileEmail.textContent = user.email;
         if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
         if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
+        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
       }
     });
     window.handleLogout = () => {
@@ -419,30 +424,72 @@
     </div>
   </header>
 
-  <main class="pt-28 pb-12 px-4 lg:px-10 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-8 min-h-screen">
+  <main class="pt-24 sm:pt-28 pb-28 px-3.5 sm:px-4 lg:px-10 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-screen">
 
-    <aside class="w-full lg:w-80 flex-shrink-0 order-2 lg:order-1">
-      <div class="glass-panel rounded-3xl h-full min-h-[300px] lg:min-h-[calc(100vh-10rem)] p-6 lg:p-8">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-lg font-semibold text-white tracking-wide">Recent Projects</h2>
+    <!-- Dedicated Mobile View Segment Controller (AI Studios vs Project History) -->
+    <div class="block lg:hidden w-full mb-1">
+      <div class="p-1.5 rounded-2xl glass-panel border border-white/15 bg-black/75 backdrop-blur-xl shadow-2xl">
+        <div class="grid grid-cols-2 gap-1.5 text-xs font-bold">
+          <button id="mobileTabStudioBtn" onclick="window.switchMobileView('studio')"
+            class="py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>AI Studios</span>
+          </button>
+          <button id="mobileTabProjectsBtn" onclick="window.switchMobileView('projects')"
+            class="py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95">
+            <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+            <span>Project History</span>
+            <span id="mobileProjectCountPill" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 font-mono">0</span>
+          </button>
         </div>
+      </div>
+    </div>
+
+    <!-- Projects History Sidebar (Responsive on Mobile & Desktop) -->
+    <aside id="projectsSidebar" class="w-full lg:w-80 flex-shrink-0 hidden lg:block order-2 lg:order-1">
+      <div class="glass-panel rounded-3xl h-full min-h-[350px] lg:min-h-[calc(100vh-10rem)] p-5 lg:p-6 flex flex-col">
+        <!-- Header with Count & Refresh -->
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <h2 class="text-base lg:text-lg font-bold text-white tracking-wide flex items-center gap-2">
+              <i data-lucide="folder-kanban" class="w-4 h-4 text-indigo-400"></i>
+              Projects History
+            </h2>
+            <span id="projectCountBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-500/30">0</span>
+          </div>
+          <button onclick="window.loadAndRenderProjects(true)" title="Refresh Projects" class="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors active:rotate-180">
+            <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 hide-scrollbar text-[11px] font-semibold">
+          <button onclick="window.filterProjects('all')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-md" data-filter="all">All</button>
+          <button onclick="window.filterProjects('Image')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Image">Images</button>
+          <button onclick="window.filterProjects('Video')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Video">Videos</button>
+          <button onclick="window.filterProjects('Subtitle')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Subtitle">SRTs</button>
+          <button onclick="window.filterProjects('Script')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Script">Scripts</button>
+          <button onclick="window.filterProjects('Social')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Social">Social</button>
+        </div>
+
+        <!-- Project Cards Container (Vertical layout on both Mobile & Desktop) -->
         <div id="recentProjectsContainer"
-          class="flex lg:flex-col overflow-x-auto lg:overflow-visible space-x-4 lg:space-x-0 lg:space-y-4 pb-4 lg:pb-0 snap-x snap-mandatory hide-scrollbar">
+          class="flex flex-col space-y-3 overflow-y-auto hide-scrollbar flex-1 max-h-[70vh] lg:max-h-[calc(100vh-18rem)] pr-1">
           <!-- Default Empty state -->
           <div
-            class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
+            class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
             <div
-              class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
-              <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
+              class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/10 border-dashed">
+              <i data-lucide="folder-open" class="w-7 h-7 text-indigo-400"></i>
             </div>
-            <p class="text-slate-300 font-semibold">No active projects</p>
-            <p class="text-xs text-slate-500 mt-1">Start by launching a tool.</p>
+            <p class="text-slate-300 text-sm font-semibold">No active projects</p>
+            <p class="text-[11px] text-slate-500 mt-1 text-center">Generated media & scripts save here automatically.</p>
           </div>
         </div>
       </div>
     </aside>
 
-    <div class="flex-1 flex flex-col gap-8 min-w-0 order-1 lg:order-2">
+    <div id="studioMainArea" class="flex-1 flex flex-col gap-6 lg:gap-8 min-w-0 order-1 lg:order-2">
 
       <!-- Dedicated Mobile UI API Switcher Bar (Highly Visible on Mobile) -->
       <div
@@ -1816,24 +1863,48 @@
 
             // For Images
             if (data.data.url && stepsPrefix === 'img') {
-              if (!window._imgLogged) {
-                let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
-                let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
-                let type = isBgRemover ? 'Background' : 'Image';
-                window.saveToRecentProjects(type, title, 'Processed successfully');
-                window._imgLogged = true;
-                setTimeout(() => window._imgLogged = false, 1000);
-              }
               let finalUrl = data.data.url;
               if (!finalUrl.startsWith('http')) {
                 finalUrl = `${API_BASE_URL}${data.data.url}`;
               }
               document.getElementById('imgResultPreview').src = finalUrl;
               document.getElementById('imgDownloadLink').href = finalUrl;
+
+              if (!window._imgLogged) {
+                let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
+                let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
+                let type = isBgRemover ? 'Background' : 'Image';
+                window.saveToRecentProjects({
+                  type: type,
+                  title: title,
+                  metadata: '1080p AI Processed',
+                  media_url: finalUrl,
+                  payload: {
+                    prompt: document.getElementById('imagePromptInput')?.value || '',
+                    isBgRemover: isBgRemover,
+                    url: finalUrl
+                  }
+                });
+                window._imgLogged = true;
+                setTimeout(() => window._imgLogged = false, 1000);
+              }
             }
             // For AI Script Writer
             if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
-              if (!window._scriptLogged) { window.saveToRecentProjects('Script', document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script', 'Script generated successfully'); window._scriptLogged = true; setTimeout(() => window._scriptLogged = false, 1000); }
+              const topic = document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script';
+              if (!window._scriptLogged) { 
+                window.saveToRecentProjects({
+                  type: 'Script',
+                  title: topic,
+                  metadata: `Length: ${data.data.scriptText.length} chars`,
+                  payload: {
+                    topic: topic,
+                    scriptText: data.data.scriptText
+                  }
+                }); 
+                window._scriptLogged = true; 
+                setTimeout(() => window._scriptLogged = false, 1000); 
+              }
               document.getElementById('scriptOutputPreview').value = data.data.scriptText;
               const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
               document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
@@ -2005,20 +2076,95 @@
       }
     }
 
+    // Convert AudioBuffer to 16kHz mono WAV Blob
+    function audioBufferToWavBlob(buffer, targetSampleRate = 16000) {
+      const channelData = buffer.getChannelData(0);
+      const numSamples = channelData.length;
+      const bitDepth = 16;
+      const bytesPerSample = bitDepth / 8;
+      const blockAlign = 1 * bytesPerSample;
+      const byteRate = targetSampleRate * blockAlign;
+      const dataSize = numSamples * bytesPerSample;
+      const totalSize = 44 + dataSize;
+      const arrayBuffer = new ArrayBuffer(totalSize);
+      const view = new DataView(arrayBuffer);
+
+      function writeStr(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      }
+
+      writeStr(0, 'RIFF');
+      view.setUint32(4, totalSize - 8, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, 1, true); // Mono
+      view.setUint32(24, targetSampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitDepth, true);
+      writeStr(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      let offset = 44;
+      for (let i = 0; i < numSamples; i++) {
+        let sample = Math.max(-1, Math.min(1, channelData[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+      return new Blob([view], { type: 'audio/wav' });
+    }
+
+    // Fast In-Browser Audio Extractor (Transforms 100MB video into 1-2MB lightweight audio)
+    async function extractOptimizedAudio(file) {
+      if (!file || file.type.startsWith('audio/')) return file;
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return file;
+        const arrayBuf = await file.arrayBuffer();
+        const ctx = new AudioContextClass();
+        const decoded = await ctx.decodeAudioData(arrayBuf);
+        
+        // Render downsampled 16kHz mono using OfflineAudioContext
+        const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
+        const source = offlineCtx.createBufferSource();
+        source.buffer = decoded;
+        source.connect(offlineCtx.destination);
+        source.start(0);
+        const resampled = await offlineCtx.startRendering();
+        const wavBlob = audioBufferToWavBlob(resampled, 16000);
+        return new File([wavBlob], `${file.name.replace(/\.[^/.]+$/, "")}.wav`, { type: 'audio/wav' });
+      } catch (err) {
+        console.warn('In-browser audio extraction notice, fallback to original:', err);
+        return file;
+      }
+    }
+
     async function handleSrtSubmit(e) {
       e.preventDefault();
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
       if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+      
       document.getElementById('srtSubmitBtn').disabled = true;
       document.getElementById('srtProgressCard').style.display = 'block';
       document.getElementById('srtResultArea').style.display = 'none';
+      const srtStatus = document.getElementById('srtStatusText');
+      if (srtStatus) srtStatus.innerText = 'Optimizing media for instant upload...';
       const modalBox = e.target.closest('.glass-card');
       if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
       const clientId = 'srt_' + Date.now();
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
+      let fileToUpload = currentSrtFile;
+      try {
+        fileToUpload = await extractOptimizedAudio(currentSrtFile);
+      } catch (eOpt) {
+        console.warn('Audio extraction fallback:', eOpt);
+      }
+
       const formData = new FormData();
-      formData.append('video', currentSrtFile);
+      formData.append('video', fileToUpload);
       formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
 
       try {
@@ -2026,7 +2172,19 @@
         const data = await res.json();
         es.close();
         if (data.srt) {
-          window.saveToRecentProjects('Subtitle', currentSrtFile ? currentSrtFile.name : 'Subtitles', `${language} - ${wordsLimit} words`);
+          const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
+          const lang = document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala';
+          window.saveToRecentProjects({
+            type: 'Subtitle',
+            title: srtName,
+            metadata: `${lang} Subtitles`,
+            media_url: data.downloadUrl ? `${API_BASE_URL}${data.downloadUrl}` : '',
+            payload: {
+              srt: data.srt,
+              language: lang,
+              filename: `${srtName.replace(/\.[^/.]+$/, "")}.srt`
+            }
+          });
           const blob = new Blob([data.srt], { type: 'text/plain' });
           document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
           document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
@@ -2133,9 +2291,27 @@
         const data = await res.json();
         es.close();
         if (data.downloadUrl) {
-          if (!window._dlLogged) { window.saveToRecentProjects('Video', type === 'fb' ? 'Facebook Video' : 'TikTok Video', 'Downloaded Media'); window._dlLogged = true; setTimeout(() => window._dlLogged = false, 1000); }
+          const finalDlUrl = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          if (!window._dlLogged) { 
+            window.saveToRecentProjects({
+              type: 'Video',
+              title: (type === 'fb' ? 'Facebook Video' : 'TikTok Video') + (data.filename ? ` (${data.filename})` : ''),
+              metadata: `${format === 'audio' ? 'Audio MP3' : 'Video MP4'} - ${qualityLevel || 'HD'}`,
+              media_url: finalDlUrl,
+              payload: {
+                url: url,
+                downloadUrl: finalDlUrl,
+                filename: data.filename,
+                type: type,
+                format: format,
+                qualityLevel: qualityLevel
+              }
+            }); 
+            window._dlLogged = true; 
+            setTimeout(() => window._dlLogged = false, 1000); 
+          }
           document.getElementById(barId).style.width = '100%';
-          document.getElementById(linkId).href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          document.getElementById(linkId).href = finalDlUrl;
           document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
           document.getElementById(resId).style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
@@ -2166,9 +2342,25 @@
         const data = await res.json();
         es.close();
         if (data.dubbedUrl) {
-          if (!window._dubLogged) { window.saveToRecentProjects('Dubbing', document.getElementById('dubVideoFile').files[0] ? document.getElementById('dubVideoFile').files[0].name : 'Dubbed Video', `Language: ${document.getElementById('dubLanguage').value}`); window._dubLogged = true; setTimeout(() => window._dubLogged = false, 1000); }
+          const dubbedFileName = fileInput.files[0] ? fileInput.files[0].name : 'Dubbed Video';
+          const finalDubUrl = `${API_BASE_URL}${data.dubbedUrl}`;
+          if (!window._dubLogged) { 
+            window.saveToRecentProjects({
+              type: 'Dubbing',
+              title: dubbedFileName,
+              metadata: `Dubbed (${document.getElementById('dubLanguage').value})`,
+              media_url: finalDubUrl,
+              payload: {
+                dubbedUrl: finalDubUrl,
+                filename: data.filename || 'dubbed.mp4',
+                language: document.getElementById('dubLanguage').value
+              }
+            }); 
+            window._dubLogged = true; 
+            setTimeout(() => window._dubLogged = false, 1000); 
+          }
           document.getElementById('dubProgressBar').style.width = '100%';
-          document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
+          document.getElementById('dubDownloadLink').href = finalDubUrl;
           document.getElementById('dubDownloadLink').download = data.filename || 'dubbed.mp4';
           document.getElementById('dubResultArea').style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
@@ -2705,7 +2897,17 @@
           generatedData = generateRealisticSocialFallback(currentSocialTool, topic, language);
         }
 
-        window.saveToRecentProjects('Social', topic, `Tool: ${currentSocialTool}`);
+        window.saveToRecentProjects({
+          type: 'Social',
+          title: topic || 'Social Kit Mockup',
+          metadata: `Platform: ${currentSocialTool}`,
+          payload: {
+            tool: currentSocialTool,
+            topic: topic,
+            language: language,
+            data: generatedData
+          }
+        });
         currentSocialData = generatedData;
         renderMockup(currentSocialTool, generatedData);
         showPopup('Generated successfully with KaveezCloud AI!', 'Success', 'success');
@@ -3496,101 +3698,635 @@
   </div>
 
 
+  <!-- Intelligent Project Details & Studio Modal -->
+  <div id="projectDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300 opacity-0" style="display: none;">
+    <div id="projectDetailContent" class="glass-panel w-full max-w-2xl rounded-3xl p-6 lg:p-8 border border-white/20 shadow-2xl bg-slate-900/95 max-h-[90vh] flex flex-col transform scale-95 transition-all duration-300">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-5 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="projectModalIconBox" class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shadow-lg">
+            <i id="projectModalIcon" data-lucide="folder" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="projectModalTitle" class="text-lg font-bold text-white tracking-wide truncate max-w-[240px] sm:max-w-md">Project Title</h3>
+              <span id="projectModalTypeBadge" class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">IMAGE</span>
+            </div>
+            <p id="projectModalDate" class="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
+              <i data-lucide="clock" class="w-3 h-3"></i> <span>Just now</span>
+            </p>
+          </div>
+        </div>
+        <button onclick="window.closeProjectDetailModal()" class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Preview & Details) -->
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1 hide-scrollbar">
+        <!-- Media Preview Area (Images / Videos) -->
+        <div id="projectModalMediaArea" class="hidden rounded-2xl overflow-hidden bg-black/40 border border-white/10 flex items-center justify-center max-h-80">
+          <img id="projectModalImage" src="" alt="Project Preview" class="hidden max-h-80 w-auto object-contain rounded-xl shadow-lg">
+          <video id="projectModalVideo" controls class="hidden max-h-80 w-full rounded-xl bg-black"></video>
+        </div>
+
+        <!-- Text / Script / Subtitle / Data Content Area -->
+        <div id="projectModalTextArea" class="hidden">
+          <div class="flex items-center justify-between mb-2">
+            <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Project Content</label>
+            <button onclick="window.copyProjectText()" class="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+              <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Content
+            </button>
+          </div>
+          <div id="projectModalTextContent" class="w-full rounded-2xl p-4 bg-black/50 border border-white/10 text-xs sm:text-sm text-slate-200 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed"></div>
+        </div>
+
+        <!-- Metadata Info Grid -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Status</span>
+            <span class="text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Saved & Active
+            </span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Telegram Cloud</span>
+            <span class="text-sky-400 font-semibold flex items-center gap-1 mt-0.5" title="Channel ID: -1004498616218">
+              <i data-lucide="cloud" class="w-3 h-3"></i> Backed Up
+            </span>
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Target Channel</span>
+            <span class="text-slate-300 font-mono text-[11px] mt-0.5 block truncate">-1004498616218</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer (Re-Edit, Download, Delete) -->
+      <div class="flex items-center justify-between pt-4 border-t border-white/10 mt-5 flex-shrink-0 gap-3">
+        <button onclick="window.deleteActiveProjectModal()" class="px-4 py-2.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="projectModalDownloadBtn" onclick="window.downloadActiveProjectMedia()" class="px-4 py-2.5 rounded-xl border border-white/20 hover:bg-white/10 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i> Download
+          </button>
+          <button id="projectModalReEditBtn" onclick="window.reEditActiveProject()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs sm:text-sm font-bold shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all flex items-center gap-1.5">
+            <i data-lucide="pen-tool" class="w-4 h-4"></i> Re-Edit in Studio
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
+    window.allProjects = [];
+    window.activeProjectFilter = 'all';
+    window.activeModalProject = null;
 
+    // Helper to format relative time nicely
+    function formatTimeAgo(dateStr) {
+      if (!dateStr) return 'Just now';
+      const diffMs = Date.now() - new Date(dateStr).getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
 
-    window.saveToRecentProjects = function (type, title, metadata, fileId = null) {
-      if (!window.currentUserEmail) return;
-
-      let metaStr = metadata;
-      if (fileId) {
-        metaStr = JSON.stringify({ text: metadata, file_id: fileId });
+    // Save project universally to fast-cache, SQLite DB, and Telegram (-1004498616218)
+    window.saveToRecentProjects = function (typeOrObj, title, metadata, fileId = null) {
+      let project = {};
+      if (typeof typeOrObj === 'object' && typeOrObj !== null) {
+        project = Object.assign({}, typeOrObj);
+      } else {
+        let metaStr = metadata;
+        if (fileId) {
+          metaStr = typeof metadata === 'object' ? JSON.stringify(metadata) : metadata;
+        }
+        project = {
+          type: typeOrObj,
+          title: title || 'Untitled Project',
+          metadata: metaStr || '',
+          media_url: typeof fileId === 'string' && (fileId.startsWith('http') || fileId.startsWith('/')) ? fileId : ''
+        };
       }
 
+      project.email = project.email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
+      if (!project.email) return;
+      project.date = project.date || new Date().toISOString();
+      if (!project.id) project.id = Date.now();
+
+      // 1. Instant Fast-Cache in localStorage
+      const cacheKey = 'capzone_projects_' + project.email;
+      let cached = [];
+      try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
+      cached = cached.filter(p => p.id !== project.id);
+      cached.unshift(project);
+      if (cached.length > 50) cached.pop();
+      localStorage.setItem(cacheKey, JSON.stringify(cached));
+      window.allProjects = cached;
+      window.renderRecentProjects();
+
+      // 2. Persist to Backend Server & Telegram Backup Channel (-1004498616218)
       try {
         fetch(`${API_BASE_URL}/api/user-projects`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: window.currentUserEmail,
-            type: type,
-            title: title,
-            metadata: metaStr,
-            date: new Date().toISOString()
-          })
-        }).then(() => window.renderRecentProjects());
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-email': project.email
+          },
+          body: JSON.stringify(project)
+        }).then(res => res.json()).then(data => {
+          if (data && data.success) {
+            project.id = data.id || project.id;
+            project.telegram_msg_id = data.telegram_msg_id;
+            project.telegram_file_id = data.telegram_file_id;
+            localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+          }
+        }).catch(err => console.warn('Sync project error:', err));
       } catch (e) {
         console.error('Save project error:', e);
       }
     };
 
-    window.renderRecentProjects = async function () {
-      const container = document.getElementById('recentProjectsContainer');
-      if (!container || !window.currentUserEmail) return;
-      let projects = [];
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(window.currentUserEmail));
-        if (res.ok) projects = await res.json();
-      } catch (e) {
-        console.error('Failed to fetch user projects:', e);
+    // Filter projects by category chip
+    window.filterProjects = function (category) {
+      window.activeProjectFilter = category;
+      document.querySelectorAll('.project-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === category) {
+          btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-md';
+        } else {
+          btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all';
+        }
+      });
+      window.renderRecentProjects();
+    };
+
+    // Load projects from fast-cache and backend server
+    window.loadAndRenderProjects = async function (forceRefresh = false) {
+      const email = window.currentUserEmail || localStorage.getItem('capzone_user_email');
+      if (!email) return;
+
+      const cacheKey = 'capzone_projects_' + email;
+      if (!forceRefresh) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+          if (cached && cached.length > 0) {
+            window.allProjects = cached;
+            window.renderRecentProjects();
+          }
+        } catch (e) { }
       }
 
-      if (!projects || projects.length === 0) {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(email), {
+          headers: { 'x-user-email': email }
+        });
+        if (res.ok) {
+          const serverProjects = await res.json();
+          if (Array.isArray(serverProjects)) {
+            window.allProjects = serverProjects;
+            localStorage.setItem(cacheKey, JSON.stringify(serverProjects));
+            window.renderRecentProjects();
+          }
+        }
+      } catch (e) {
+        console.warn('Could not fetch projects from server:', e);
+      }
+    };
+
+    // Render projects list in sidebar with rich 3D cards & action buttons
+    window.renderRecentProjects = function (listToRender) {
+      const container = document.getElementById('recentProjectsContainer');
+      if (!container) return;
+
+      const projects = listToRender || window.allProjects || [];
+      const badge = document.getElementById('projectCountBadge');
+      if (badge) badge.innerText = projects.length;
+      const mobPill = document.getElementById('mobileProjectCountPill');
+      if (mobPill) mobPill.innerText = projects.length;
+      const dockBadge = document.getElementById('mobileDockBadge');
+      if (dockBadge) dockBadge.style.display = projects.length > 0 ? 'block' : 'none';
+
+      // Filter by active category
+      let filtered = projects;
+      if (window.activeProjectFilter && window.activeProjectFilter !== 'all') {
+        filtered = projects.filter(p => p.type === window.activeProjectFilter);
+      }
+
+      if (!filtered || filtered.length === 0) {
         container.innerHTML = `
-            <div class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
-              <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
-                <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
-              </div>
-              <p class="text-slate-300 font-semibold">No active projects</p>
-              <p class="text-xs text-slate-500 mt-1">Start by launching a tool.</p>
-            </div>`;
+          <div class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
+            <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/10 border-dashed">
+              <i data-lucide="folder-open" class="w-7 h-7 text-indigo-400"></i>
+            </div>
+            <p class="text-slate-300 text-sm font-semibold">No active projects</p>
+            <p class="text-[11px] text-slate-500 mt-1 text-center">Generated media & scripts save here automatically.</p>
+          </div>`;
         if (window.lucide) window.lucide.createIcons();
         return;
       }
 
-      let htmlOut = '';
       const icons = {
         'Subtitle': 'subtitles',
         'Dubbing': 'mic',
         'Social': 'share-2',
-        'Script': 'pen-tool',
+        'Script': 'file-text',
         'Image': 'image',
         'Video': 'video',
         'Background': 'scissors'
       };
       const colors = {
-        'Subtitle': 'bg-blue-500',
-        'Dubbing': 'bg-purple-500',
-        'Social': 'bg-pink-500',
-        'Script': 'bg-emerald-500',
-        'Image': 'bg-amber-500',
-        'Video': 'bg-indigo-500',
-        'Background': 'bg-teal-500'
+        'Subtitle': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        'Dubbing': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+        'Social': 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+        'Script': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+        'Image': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+        'Video': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+        'Background': 'bg-teal-500/20 text-teal-400 border-teal-500/30'
       };
 
-      projects.forEach(p => {
-        const icon = icons[p.type] || 'file';
-        const color = colors[p.type] || 'bg-slate-500';
-        const time = new Date(p.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      let htmlOut = '';
+      filtered.forEach(p => {
+        const icon = icons[p.type] || 'folder';
+        const colorClass = colors[p.type] || 'bg-slate-500/20 text-slate-300 border-slate-500/30';
+        const timeStr = formatTimeAgo(p.date);
+        const hasThumb = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+
+        let thumbnailHtml = '';
+        if (hasThumb) {
+          thumbnailHtml = `
+            <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/40 border border-white/10 flex-shrink-0 shadow-md relative">
+              <img src="${p.media_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'">
+            </div>`;
+        } else {
+          thumbnailHtml = `
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-md ${colorClass} border flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <i data-lucide="${icon}" class="w-5 h-5"></i>
+            </div>`;
+        }
 
         htmlOut += `
-          <div class="project-3d-card w-64 lg:w-full flex-shrink-0 snap-center group relative p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-500 ease-out backdrop-blur-md overflow-hidden cursor-pointer" onclick="window.location.href='${API_BASE_URL}/api/mtproto/download?msg_id=' + '${p.metadata}'">
-              <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              <div class="relative z-10 flex items-start gap-4 transform transition-transform duration-500 group-hover:translate-z-10">
-                  <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-lg ${color}/20 text-white border border-white/10">
-                      <i data-lucide="${icon}" class="w-5 h-5 drop-shadow-md"></i>
-                  </div>
-                  <div class="flex-1 min-w-0">
-                      <h4 class="text-white font-semibold truncate group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-slate-300 transition-all">${p.title}</h4>
-                      <p class="text-xs text-slate-400 truncate mt-0.5">${p.metadata}</p>
-                      <p class="text-[10px] text-slate-500 mt-2 flex items-center gap-1"><i data-lucide="clock" class="w-3 h-3"></i> ${time}</p>
-                  </div>
+          <div class="project-3d-card w-full group relative p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 ease-out backdrop-blur-md overflow-hidden cursor-pointer shadow-lg hover:shadow-indigo-500/10 active:scale-[0.99]" onclick="window.openProjectDetailsModal('${p.id}')">
+            <div class="flex items-start gap-3">
+              ${thumbnailHtml}
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between gap-1">
+                  <h4 class="text-white text-xs sm:text-sm font-semibold truncate group-hover:text-indigo-300 transition-colors">${p.title || 'Untitled Project'}</h4>
+                </div>
+                <div class="flex items-center gap-1.5 mt-1">
+                  <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${colorClass}">${p.type || 'Media'}</span>
+                  <span class="text-[10px] text-slate-400 flex items-center gap-1"><i data-lucide="clock" class="w-2.5 h-2.5"></i> ${timeStr}</span>
+                </div>
               </div>
+            </div>
+
+            <!-- Card Action Hover Buttons -->
+            <div class="flex items-center justify-between pt-2 mt-2 border-t border-white/5 text-[10px] text-slate-400">
+              <span class="flex items-center gap-1 text-sky-400/90 font-mono text-[9px]" title="Auto backed up to Telegram Channel -1004498616218">
+                <i data-lucide="cloud" class="w-3 h-3"></i> TG Backup
+              </span>
+              <div class="flex items-center gap-1">
+                <button onclick="event.stopPropagation(); window.reEditProject('${p.id}')" title="Re-Edit in Studio" class="p-1.5 rounded-lg hover:bg-white/10 text-indigo-400 hover:text-white transition-colors active:scale-90">
+                  <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="event.stopPropagation(); window.downloadProjectMedia('${p.id}')" title="Download Media" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition-colors active:scale-90">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                </button>
+                <button onclick="event.stopPropagation(); window.deleteUserProject('${p.id}')" title="Delete Project & Telegram Backup" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors active:scale-90">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
           </div>`;
       });
 
       container.innerHTML = htmlOut;
       if (window.lucide) window.lucide.createIcons();
+    };
+
+    // Switch between AI Studios and Projects History on Mobile
+    window.currentMobileView = 'studio';
+    window.switchMobileView = function (view) {
+      window.currentMobileView = view;
+      const aside = document.getElementById('projectsSidebar');
+      const studioArea = document.getElementById('studioMainArea');
+      const btnStudio = document.getElementById('mobileTabStudioBtn');
+      const btnProjects = document.getElementById('mobileTabProjectsBtn');
+      const dockStudio = document.getElementById('mobileDockStudio');
+      const dockProjects = document.getElementById('mobileDockProjects');
+
+      if (view === 'projects') {
+        if (aside) {
+          aside.classList.remove('hidden');
+          aside.classList.add('block');
+        }
+        if (studioArea) {
+          studioArea.classList.add('hidden');
+          studioArea.classList.remove('flex');
+        }
+        if (btnProjects) {
+          btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
+        }
+        if (btnStudio) {
+          btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
+        }
+        if (dockProjects) {
+          dockProjects.classList.add('text-indigo-400');
+          dockProjects.classList.remove('text-gray-400');
+        }
+        if (dockStudio) {
+          dockStudio.classList.remove('text-indigo-400');
+          dockStudio.classList.add('text-gray-400');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        if (aside) {
+          aside.classList.add('hidden');
+          aside.classList.remove('block');
+        }
+        if (studioArea) {
+          studioArea.classList.remove('hidden');
+          studioArea.classList.add('flex');
+        }
+        if (btnStudio) {
+          btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
+        }
+        if (btnProjects) {
+          btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
+        }
+        if (dockStudio) {
+          dockStudio.classList.add('text-indigo-400');
+          dockStudio.classList.remove('text-gray-400');
+        }
+        if (dockProjects) {
+          dockProjects.classList.remove('text-indigo-400');
+          dockProjects.classList.add('text-gray-400');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      if (window.lucide) lucide.createIcons();
+    };
+
+    // Open Project Details & Studio Modal
+    window.openProjectDetailsModal = function (projectId) {
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      if (!p) return;
+      window.activeModalProject = p;
+
+      const modal = document.getElementById('projectDetailModal');
+      const content = document.getElementById('projectDetailContent');
+      if (!modal || !content) return;
+
+      document.getElementById('projectModalTitle').innerText = p.title || 'Untitled Project';
+      document.getElementById('projectModalTypeBadge').innerText = (p.type || 'PROJECT').toUpperCase();
+      document.getElementById('projectModalDate').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> ${new Date(p.date || Date.now()).toLocaleString()}`;
+
+      // Handle media preview vs text preview
+      const mediaArea = document.getElementById('projectModalMediaArea');
+      const imgEl = document.getElementById('projectModalImage');
+      const vidEl = document.getElementById('projectModalVideo');
+      const textArea = document.getElementById('projectModalTextArea');
+      const textContent = document.getElementById('projectModalTextContent');
+
+      mediaArea.classList.add('hidden');
+      imgEl.classList.add('hidden');
+      vidEl.classList.add('hidden');
+      textArea.classList.add('hidden');
+
+      const isImage = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+      const isVideo = (p.type === 'Video' || p.type === 'Dubbing') && p.media_url;
+
+      if (isImage) {
+        imgEl.src = p.media_url;
+        imgEl.classList.remove('hidden');
+        mediaArea.classList.remove('hidden');
+      } else if (isVideo) {
+        vidEl.src = p.media_url;
+        vidEl.classList.remove('hidden');
+        mediaArea.classList.remove('hidden');
+      }
+
+      // Format readable text for scripts, subtitles, social kit or metadata
+      let readableText = '';
+      let parsedPayload = null;
+      if (p.payload) {
+        try { parsedPayload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+      }
+
+      if (parsedPayload && parsedPayload.scriptText) {
+        readableText = parsedPayload.scriptText;
+      } else if (parsedPayload && parsedPayload.srt) {
+        readableText = parsedPayload.srt;
+      } else if (parsedPayload && parsedPayload.data) {
+        readableText = JSON.stringify(parsedPayload.data, null, 2);
+      } else if (p.metadata && p.metadata !== 'Processed successfully') {
+        readableText = p.metadata;
+      }
+
+      if (readableText) {
+        textContent.innerText = readableText;
+        textArea.classList.remove('hidden');
+      }
+
+      modal.style.display = 'flex';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+        if (window.lucide) window.lucide.createIcons();
+      }, 10);
+    };
+
+    window.closeProjectDetailModal = function () {
+      const modal = document.getElementById('projectDetailModal');
+      const content = document.getElementById('projectDetailContent');
+      if (!modal || !content) return;
+
+      modal.classList.add('opacity-0');
+      content.classList.remove('scale-100');
+      content.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.body.classList.remove('overflow-hidden');
+        const vidEl = document.getElementById('projectModalVideo');
+        if (vidEl) vidEl.pause();
+      }, 250);
+    };
+
+    // Re-Edit Project in its corresponding Studio
+    window.reEditActiveProject = function () {
+      if (!window.activeModalProject) return;
+      window.reEditProject(window.activeModalProject.id);
+    };
+
+    window.reEditProject = function (projectId) {
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      if (!p) return;
+
+      window.closeProjectDetailModal();
+      let payload = null;
+      if (p.payload) {
+        try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+      }
+
+      if (p.type === 'Script') {
+        if (typeof openModal === 'function') openModal('scraperSrtModal');
+        const topicInp = document.getElementById('scriptTopic');
+        const previewEl = document.getElementById('scriptOutputPreview');
+        if (topicInp) topicInp.value = (payload && payload.topic) ? payload.topic : p.title;
+        if (previewEl && payload && payload.scriptText) {
+          previewEl.value = payload.scriptText;
+          const resArea = document.getElementById('scraperSrtResultArea');
+          if (resArea) resArea.style.display = 'block';
+        }
+        if (typeof showPopup === 'function') showPopup('Script එක AI Writer Studio එකට සාර්ථකව Load විය!', 'Studio Active', 'success');
+      } else if (p.type === 'Social') {
+        if (typeof openSocialKitModal === 'function') openSocialKitModal();
+        else if (typeof openModal === 'function') openModal('socialKitModal');
+
+        if (payload) {
+          if (payload.tool && typeof selectSocialTool === 'function') selectSocialTool(payload.tool);
+          if (payload.topic && document.getElementById('socialTopicInput')) {
+            document.getElementById('socialTopicInput').value = payload.topic;
+          }
+          if (payload.data && typeof renderMockup === 'function') {
+            window.currentSocialData = payload.data;
+            renderMockup(payload.tool || 'fake_chat', payload.data);
+          }
+        }
+        if (typeof showPopup === 'function') showPopup('Social Kit Mockup එක සාර්ථකව Studio එකට Load විය!', 'Studio Active', 'success');
+      } else if (p.type === 'Subtitle') {
+        if (typeof openModal === 'function') openModal('srtModal');
+        if (payload && payload.srt) {
+          const blob = new Blob([payload.srt], { type: 'text/plain' });
+          const dlLink = document.getElementById('srtDownloadLink');
+          if (dlLink) {
+            dlLink.href = URL.createObjectURL(blob);
+            dlLink.download = `${p.title || 'subtitles'}.srt`;
+          }
+          const resArea = document.getElementById('srtResultArea');
+          if (resArea) resArea.style.display = 'block';
+        }
+        if (typeof showPopup === 'function') showPopup('Subtitles සාර්ථකව Subtitle Studio එකට Load විය!', 'Studio Active', 'success');
+      } else if (p.type === 'Image') {
+        if (typeof openModal === 'function') openModal('bgRemoverModal'); // Image generation or enhancement
+        const promptInp = document.getElementById('imagePromptInput');
+        if (promptInp) promptInp.value = (payload && payload.prompt) ? payload.prompt : p.title;
+        if (p.media_url && document.getElementById('imgResultPreview')) {
+          document.getElementById('imgResultPreview').src = p.media_url;
+          const resArea = document.getElementById('imgResultArea');
+          if (resArea) resArea.style.display = 'block';
+        }
+        if (typeof showPopup === 'function') showPopup('Image Prompt එක Studio එකට සාර්ථකව Load විය!', 'Studio Active', 'success');
+      } else if (p.type === 'Background') {
+        if (typeof openModal === 'function') openModal('bgRemoverModal');
+        if (typeof showPopup === 'function') showPopup('Background Remover Studio එක විවෘත විය!', 'Studio Active', 'success');
+      } else if (p.type === 'Video' || p.type === 'Dubbing') {
+        if (p.type === 'Dubbing' && typeof openModal === 'function') openModal('dubModal');
+        else if (typeof openModal === 'function') openModal('fbModal');
+        if (typeof showPopup === 'function') showPopup('Video Studio විවෘත විය!', 'Studio Active', 'success');
+      }
+    };
+
+    // Download Active Project Media
+    window.downloadActiveProjectMedia = function () {
+      if (!window.activeModalProject) return;
+      window.downloadProjectMedia(window.activeModalProject.id);
+    };
+
+    window.downloadProjectMedia = function (projectId) {
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      if (!p) return;
+
+      let payload = null;
+      if (p.payload) {
+        try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+      }
+
+      if (p.media_url) {
+        const a = document.createElement('a');
+        a.href = p.media_url;
+        a.download = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else if (payload && payload.scriptText) {
+        const blob = new Blob([payload.scriptText], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else if (payload && payload.srt) {
+        const blob = new Blob([payload.srt], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_')}.srt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else if (payload && payload.data) {
+        const blob = new Blob([JSON.stringify(payload.data, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(p.title || 'social_kit').replace(/[^a-zA-Z0-9_-]/g, '_')}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        if (typeof showPopup === 'function') showPopup('බාගත කිරීමට Media File එකක් හමු නොවීය.', 'තොරතුරු', 'info');
+      }
+    };
+
+    // Delete User Project
+    window.deleteActiveProjectModal = function () {
+      if (!window.activeModalProject) return;
+      window.deleteUserProject(window.activeModalProject.id);
+    };
+
+    window.deleteUserProject = function (projectId) {
+      const email = window.currentUserEmail || localStorage.getItem('capzone_user_email');
+      if (!confirm('මෙම Project එක සහ Telegram Cloud Backup එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍යද?')) return;
+
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      const tgMsgId = p ? (p.telegram_msg_id || p.tg_msg_id) : null;
+
+      window.allProjects = (window.allProjects || []).filter(item => String(item.id) !== String(projectId));
+      if (email) {
+        localStorage.setItem('capzone_projects_' + email, JSON.stringify(window.allProjects));
+      }
+      window.renderRecentProjects();
+      window.closeProjectDetailModal();
+
+      let delUrl = `${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(projectId)}&email=${encodeURIComponent(email || '')}`;
+      if (tgMsgId) delUrl += `&tg_msg_id=${encodeURIComponent(tgMsgId)}`;
+
+      try {
+        fetch(delUrl, {
+          method: 'DELETE',
+          headers: { 'x-user-email': email || '' }
+        }).then(r => r.json()).then(() => {
+          if (typeof showPopup === 'function') showPopup('Project එක සහ Telegram Backup එක සාර්ථකව Delete විය!', 'Deleted from Cloud', 'success');
+        });
+      } catch (e) { }
+    };
+
+    window.copyProjectText = function () {
+      const textEl = document.getElementById('projectModalTextContent');
+      if (!textEl || !textEl.innerText) return;
+      navigator.clipboard.writeText(textEl.innerText).then(() => {
+        if (typeof showPopup === 'function') showPopup('Content එක Clipboard එකට Copy විය!', 'Copied', 'success');
+      });
     };
 
     window.toggleApi = function (type) {
@@ -3676,12 +4412,43 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateApiToggleUI();
-      // Initial render will fail without currentUserEmail, but we retry in an interval
+      if (typeof window.loadAndRenderProjects === 'function') {
+        window.loadAndRenderProjects();
+      }
       setInterval(() => {
-        if (window.currentUserEmail) window.renderRecentProjects();
-      }, 10000); // refresh every 10 seconds
+        if (window.currentUserEmail && typeof window.loadAndRenderProjects === 'function') {
+          window.loadAndRenderProjects();
+        }
+      }, 15000);
     });
   </script>
+
+  <!-- Ultra-Modern Mobile Glass Bottom Dock (CapZone iOS/Android App Style) -->
+  <nav class="fixed bottom-3 left-3 right-3 z-50 block lg:hidden pointer-events-auto">
+    <div class="px-2 py-2 rounded-2xl glass-panel border border-white/20 bg-neutral-950/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9)] flex items-center justify-around">
+      <button onclick="window.switchMobileView('studio')" id="mobileDockStudio" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-indigo-400 transition-all active:scale-95">
+        <i data-lucide="sparkles" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Studios</span>
+      </button>
+      <button onclick="window.switchMobileView('projects')" id="mobileDockProjects" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95 relative">
+        <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Projects</span>
+        <span id="mobileDockBadge" class="absolute top-1 right-2 w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+      </button>
+      <button onclick="openModal('wallpaperModal')" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="palette" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Themes</span>
+      </button>
+      <button onclick="showApiModal()" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="cpu" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">AI Setup</span>
+      </button>
+      <button onclick="openModal('profileModal')" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Profile</span>
+      </button>
+    </div>
+  </nav>
 </body>
 
 </html>
