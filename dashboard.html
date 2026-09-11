@@ -365,9 +365,9 @@
     </nav>
     <div class="flex items-center gap-3 lg:gap-4 ml-auto">
       <!-- AI API Toggle -->
-      <div class="hidden sm:flex items-center p-1 rounded-full bg-black/40 border border-white/10 shadow-inner mr-2" id="apiToggleContainer">
-        <button onclick="toggleApi('server')" id="btnApiServer" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud API</button>
-        <button onclick="toggleApi('own')" id="btnApiOwn" class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom API</button>
+      <div class="flex items-center p-1 rounded-full bg-black/40 border border-white/10 shadow-inner mr-1 sm:mr-2 scale-[0.8] sm:scale-100 origin-right" id="apiToggleContainer">
+        <button onclick="toggleApi('server')" id="btnApiServer" class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud API</button>
+        <button onclick="toggleApi('own')" id="btnApiOwn" class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom API</button>
       </div>
       <!-- KaveezCloud AI Setup Button -->
       <button onclick="showApiModal()"
@@ -3243,3 +3243,6 @@
 </body>
 
 </html>
+
+
+
