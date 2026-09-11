@@ -113,6 +113,17 @@
         if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
         if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
         if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+        
+        // Fetch saved API key from backend
+        fetch(`${window.API_BASE_URL || ''}/api/save-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email })
+        }).then(res => res.json()).then(data => {
+          if (data.api_key) {
+            syncApiKeys(data.api_key);
+          }
+        }).catch(e => console.error("Could not fetch API key", e));
       }
     });
     window.handleLogout = () => {
@@ -304,22 +315,27 @@
     }
 
     @keyframes kaveezBoxGlow {
-
-      0%,
-      100% {
-        box-shadow: 0 0 25px rgba(99, 102, 241, 0.5), 0 0 50px rgba(168, 85, 247, 0.3), inset 0 0 15px rgba(99, 102, 241, 0.2);
-        border-color: rgba(168, 85, 247, 0.8);
+      0%, 100% {
+        box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 10px rgba(168, 85, 247, 0.2);
+        -webkit-box-shadow: 0 0 20px rgba(168, 85, 247, 0.4), inset 0 0 10px rgba(168, 85, 247, 0.2);
       }
-
       50% {
-        box-shadow: 0 0 45px rgba(236, 72, 153, 0.7), 0 0 80px rgba(99, 102, 241, 0.5), inset 0 0 25px rgba(236, 72, 153, 0.3);
-        border-color: rgba(236, 72, 153, 0.95);
+        box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), inset 0 0 20px rgba(168, 85, 247, 0.4);
+        -webkit-box-shadow: 0 0 40px rgba(168, 85, 247, 0.8), inset 0 0 20px rgba(168, 85, 247, 0.4);
       }
     }
 
     .kaveez-glowing-aura {
       animation: kaveezBoxGlow 2s infinite ease-in-out !important;
       border-color: rgba(168, 85, 247, 0.85) !important;
+      transform: translate3d(0, 0, 0); /* Fix for iOS rendering bugs */
+      position: relative;
+    }
+    
+    /* Ensure shadows aren't clipped by overflow */
+    .kaveez-glowing-aura.overflow-hidden,
+    .kaveez-glowing-aura.overflow-y-auto {
+      overflow: visible !important;
     }
 
     .project-3d-card {
@@ -364,7 +380,7 @@
       <span class="text-xl lg:text-2xl font-bold text-white tracking-wide drop-shadow-md hidden sm:block">CapZone</span>
     </a>
     <nav
-      class="flex items-center justify-start gap-4 lg:gap-8 flex-1 overflow-x-hidden whitespace-nowrap px-1 lg:px-4 w-full relative group"
+      class="hidden lg:flex items-center justify-start gap-4 lg:gap-8 flex-1 overflow-x-hidden whitespace-nowrap px-1 lg:px-4 w-full relative group"
       style="mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);">
       <div
         class="flex items-center gap-4 lg:gap-8 min-w-max animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] px-2"
@@ -838,7 +854,7 @@
       <form id="fbForm" class="space-y-4" onsubmit="handleFbSubmit(event)">
         <div>
           <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
-          <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/..."
+          <input type="url" id="fbUrlInput" required
             class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -893,7 +909,7 @@
       <form id="tiktokForm" class="space-y-4" onsubmit="handleTiktokSubmit(event)">
         <div>
           <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
-          <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@user/video/..."
+          <input type="url" id="tiktokUrlInput" required 
             class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -1867,6 +1883,18 @@
 
     function setupProgressTracker(clientId, stepsPrefix, barId) {
       const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
+      let originalMsg = 'Processing';
+      let dots = 0;
+      const animInterval = setInterval(() => {
+        const statusEl = document.getElementById(stepsPrefix + 'StatusText');
+        if (statusEl) {
+          let suffix = '';
+          for (let i = 0; i < dots; i++) suffix += '.';
+          statusEl.innerText = originalMsg + suffix;
+          dots = (dots + 1) % 4;
+        }
+      }, 500);
+
       eventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
@@ -1938,6 +1966,7 @@
               document.getElementById('imageEnhanceBtn').disabled = false;
               window.isImageTaskRunning = false;
             }
+            clearInterval(animInterval);
             eventSource.close();
           } else if (data.status === 'error') {
             showPopup(data.message || 'Failed', 'Error', 'error');
@@ -1948,14 +1977,14 @@
               document.getElementById('imageEnhanceBtn').disabled = false;
               window.isImageTaskRunning = false;
             }
+            clearInterval(animInterval);
             eventSource.close();
           } else if (data.message) {
             const bar = document.getElementById(barId);
             if (bar) bar.style.width = '80%';
 
             // Dynamic status text update
-            const statusEl = document.getElementById(stepsPrefix + 'StatusText');
-            if (statusEl) statusEl.innerText = data.message;
+            originalMsg = data.message;
           }
         } catch (e) { }
       };
@@ -1981,14 +2010,37 @@
       }
     }
 
+    window.syncApiKeys = function(key) {
+      if (!key) return;
+      localStorage.setItem('capzone_api_key', key);
+      localStorage.setItem('capzone_gemini_key', key);
+      localStorage.setItem('gemini_api_key', key);
+      localStorage.setItem('capzone_api_type', 'custom');
+      
+      const userApiKey = document.getElementById('userApiKey');
+      const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
+      
+      if (userApiKey) userApiKey.value = key;
+      if (geminiApiKeyInput) geminiApiKeyInput.value = key;
+      
+      if (typeof window.updateApiToggleUI === 'function') {
+        window.updateApiToggleUI();
+      }
+    };
+
     function saveApiKeys() {
-      const geminiKey = document.getElementById('userApiKey')?.value?.trim();
+      const geminiKey = document.getElementById('userApiKey')?.value?.trim() || document.getElementById('geminiApiKeyInput')?.value?.trim();
       const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value?.trim();
+      
       if (geminiKey) {
-        localStorage.setItem('gemini_api_key', geminiKey);
-        localStorage.setItem('capzone_gemini_key', geminiKey);
-        if (typeof window.updateApiToggleUI === 'function') {
-          window.updateApiToggleUI();
+        window.syncApiKeys(geminiKey);
+        
+        if (window.currentUserEmail) {
+          fetch(`${window.API_BASE_URL || ''}/api/save-api-key`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: window.currentUserEmail, api_key: geminiKey })
+          }).catch(e => console.error("Could not save API key to cloud", e));
         }
       }
       if (elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
