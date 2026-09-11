@@ -150,27 +150,43 @@
       backface-visibility: hidden;
     }
 
-    /* Mobile Ultra-Smooth Scrolling Engine (60/120 FPS) */
+    /* Mobile Ultra-Smooth Scrolling & Performance Engine */
     @media (max-width: 768px) {
+      /* Disable expensive backdrop filters for performance */
+      .glass-panel, .glass-card, .backdrop-blur-sm, .backdrop-blur-md, .backdrop-blur-xl {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
+      /* Modal Backgrounds without blur */
+      .fixed.inset-0.bg-black\/60,
+      .fixed.inset-0.bg-black\/80 {
+        background: rgba(0, 0, 0, 0.9) !important;
+      }
+
       .glass-panel {
-        background: rgba(12, 16, 26, 0.78) !important;
-        backdrop-filter: blur(6px) !important;
-        -webkit-backdrop-filter: blur(6px) !important;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+        background: rgba(15, 20, 31, 0.98) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
         transform: translate3d(0, 0, 0);
+        border: 1px solid rgba(255, 255, 255, 0.08) !important;
       }
 
       .glass-card {
-        background: rgba(15, 19, 30, 0.88) !important;
-        backdrop-filter: blur(8px) !important;
-        -webkit-backdrop-filter: blur(8px) !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        background: rgba(18, 24, 38, 0.98) !important;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        transform: translate3d(0, 0, 0);
       }
 
       /* Prevent touch scroll hesitation from sticky hover transitions */
       .group:hover,
       .glass-panel:hover,
       .glass-card:hover {
+        transform: none !important;
+      }
+
+      /* Disable inner hover scaling on mobile */
+      .group:hover *, .group:active * {
         transform: none !important;
       }
 
@@ -307,13 +323,12 @@
     }
 
     .project-3d-card {
-      transform-style: preserve-3d;
-      transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
     .project-3d-card:hover {
-      transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale3d(1.02, 1.02, 1.02);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 0 15px rgba(99, 102, 241, 0.15);
     }
 
     .hide-scrollbar::-webkit-scrollbar {
@@ -463,7 +478,7 @@
         </div>
 
         <!-- Filter Chips -->
-        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 hide-scrollbar text-[11px] font-semibold">
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-3 hide-scrollbar text-[11px] font-semibold flex-shrink-0">
           <button onclick="window.filterProjects('all')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-md" data-filter="all">All</button>
           <button onclick="window.filterProjects('Image')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Image">Images</button>
           <button onclick="window.filterProjects('Video')" class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all" data-filter="Video">Videos</button>
@@ -474,7 +489,7 @@
 
         <!-- Project Cards Container (Vertical layout on both Mobile & Desktop) -->
         <div id="recentProjectsContainer"
-          class="flex flex-col space-y-3 overflow-y-auto hide-scrollbar flex-1 max-h-[70vh] lg:max-h-[calc(100vh-18rem)] pr-1">
+          class="flex flex-col space-y-2.5 overflow-y-auto hide-scrollbar flex-1 max-h-[70vh] lg:max-h-[calc(100vh-18rem)] pr-1 pt-1">
           <!-- Default Empty state -->
           <div
             class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
@@ -1846,7 +1861,9 @@
     }
 
     // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
-    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:6039' : 'https://capzone.kaveesha.top';
+    const _hostname = window.location.hostname;
+    const isLocalNetwork = _hostname === 'localhost' || _hostname === '127.0.0.1' || _hostname.startsWith('192.168.') || _hostname.startsWith('10.') || _hostname.startsWith('172.');
+    const API_BASE_URL = (isLocalNetwork || window.location.protocol === 'file:') ? `http://${_hostname || 'localhost'}:6039` : 'https://capzone.kaveesha.top';
 
     function setupProgressTracker(clientId, stepsPrefix, barId) {
       const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
@@ -2011,8 +2028,8 @@
 
         if (apiType === 'own' && apiKey) {
           try {
-            // Direct call using modern gemini-3.6-flash model
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
+            // Direct call using modern gemini-1.5-flash model
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
             const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
 
             document.getElementById('scraperSrtProgressBar').style.width = '50%';
@@ -2166,6 +2183,9 @@
       const formData = new FormData();
       formData.append('video', fileToUpload);
       formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
+      
+      const customApiKeySrt = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
+      if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, { method: 'POST', body: formData });
@@ -2336,6 +2356,9 @@
       const formData = new FormData();
       formData.append('video', fileInput.files[0]);
       formData.append('language', document.getElementById('dubLanguage').value);
+
+      const customApiKeyDub = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
+      if (customApiKeyDub) formData.append('apiKey', customApiKeyDub);
 
       try {
         const res = await fetch(`${API_BASE_URL}/api/dub-video?clientId=${clientId}`, { method: 'POST', body: formData });
@@ -2848,11 +2871,11 @@
         const customApiKey = localStorage.getItem('capzone_gemini_key');
         let generatedData = null;
 
-        // 1. If own API key configured, attempt direct call with gemini-2.0-flash
+        // 1. If own API key configured, attempt direct call with gemini-3.6-flash
         if (apiType === 'own' && customApiKey) {
           try {
             const prompt = `Act as an expert viral creator. Generate social media content for tool "${currentSocialTool}" about: "${topic}" in language "${language}". Return ONLY raw valid JSON adhering to tool structure.`;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${customApiKey}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${customApiKey}`;
             const gRes = await fetch(url, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -3204,19 +3227,17 @@
             '<div class="mt-3 relative pl-3 before:absolute before:left-0 before:top-0 before:bottom-0 before:w-0.5 before:bg-neutral-800">' +
             replies.map(r =>
               '<div class="flex gap-2.5 mb-3">' +
-              '<div class="w-6 h-6 rounded-full bg-neutral-800 border border-white/10 flex-shrink-0 mt-0.5 overflow-hidden"><img src="' + avatarUrl + '" class="w-full h-full object-cover opacity-80"></div>' +
+              '<div onclick="document.getElementById(\'socialAvatarInput\').click()" class="w-6 h-6 rounded-full bg-neutral-800 border border-white/10 flex-shrink-0 mt-0.5 overflow-hidden cursor-pointer"><img src="' + avatarUrl + '" class="w-full h-full object-cover"></div>' +
               '<div class="flex-1 min-w-0">' +
               '<h4 contenteditable="true" class="text-[12px] font-bold text-neutral-400 outline-none">' + r.username + '</h4>' +
               '<p contenteditable="true" class="text-[14px] text-white leading-snug outline-none">' + r.comment + '</p>' +
               '<div class="flex items-center gap-3 mt-1 text-[11px] font-semibold text-neutral-500">' +
               '<span contenteditable="true" class="outline-none">' + r.time + '</span><span class="cursor-pointer hover:text-white">Reply</span>' +
               '</div></div>' +
-              '<div class="flex flex-col items-center ml-1 text-neutral-400 flex-shrink-0"><i data-lucide="heart" class="w-3.5 h-3.5"></i><span contenteditable="true" class="text-[10px] mt-0.5 outline-none">' + r.likes + '</span></div>' +
               '</div>'
             ).join('') +
             '</div>' : '') +
           '</div>' +
-          '<div class="flex flex-col items-center ml-2 text-neutral-400 flex-shrink-0"><i data-lucide="heart" class="w-4 h-4 cursor-pointer hover:text-pink-500"></i><span contenteditable="true" class="text-[11px] mt-0.5 outline-none">' + (data.likes || '0') + '</span></div>' +
           '</div>' +
           '</div>';
 
@@ -3234,28 +3255,26 @@
           '<span contenteditable="true" class="text-[#F5F5F5] outline-none whitespace-pre-wrap">' + (data.comment || 'Comment') + '</span>' +
           '</div>' +
           '<div class="flex items-center gap-4 mt-2 text-[12px] font-semibold text-[#A8A8A8]">' +
-          '<span contenteditable="true" class="outline-none">' + (data.time || '1h') + '</span><span contenteditable="true" class="outline-none">' + (data.likes || '0') + ' likes</span><span class="cursor-pointer hover:text-white">Reply</span>' +
+          '<span contenteditable="true" class="outline-none">' + (data.time || '1h') + '</span><span class="cursor-pointer hover:text-white">Reply</span>' +
           '</div>' +
           (replies.length > 0 ?
             '<div class="mt-3 space-y-3 pl-3 border-l border-neutral-800">' +
             replies.map(r =>
               '<div class="flex gap-2.5">' +
-              '<div class="w-6 h-6 rounded-full bg-neutral-800 flex-shrink-0 overflow-hidden"><img src="' + avatarUrl + '" class="w-full h-full object-cover opacity-80"></div>' +
+              '<div onclick="document.getElementById(\'socialAvatarInput\').click()" class="w-6 h-6 rounded-full bg-neutral-800 flex-shrink-0 overflow-hidden cursor-pointer"><img src="' + avatarUrl + '" class="w-full h-full object-cover"></div>' +
               '<div class="flex-1 min-w-0">' +
               '<div class="text-[13px] leading-snug">' +
               '<span contenteditable="true" class="font-semibold text-[#F5F5F5] mr-1.5 outline-none">' + r.username + '</span>' +
               '<span contenteditable="true" class="text-[#F5F5F5] outline-none">' + r.comment + '</span>' +
               '</div>' +
               '<div class="flex items-center gap-3 mt-1.5 text-[11px] font-semibold text-[#A8A8A8]">' +
-              '<span contenteditable="true" class="outline-none">' + r.time + '</span><span contenteditable="true" class="outline-none">' + r.likes + ' likes</span><span class="cursor-pointer hover:text-white">Reply</span>' +
+              '<span contenteditable="true" class="outline-none">' + r.time + '</span><span class="cursor-pointer hover:text-white">Reply</span>' +
               '</div>' +
               '</div>' +
-              '<div class="pt-1 flex-shrink-0"><i data-lucide="heart" class="w-3 h-3 text-[#A8A8A8]"></i></div>' +
               '</div>'
             ).join('') +
             '</div>' : '') +
           '</div>' +
-          '<div class="pt-1 flex-shrink-0"><i data-lucide="heart" class="w-4 h-4 text-[#A8A8A8] hover:text-red-500 cursor-pointer transition-colors"></i></div>' +
           '</div>';
 
       } else if (tool === 'fb_comment') {
@@ -3269,30 +3288,22 @@
           '<div class="bg-[#242526] border border-white/5 rounded-[18px] px-3.5 py-2.5 relative inline-block max-w-full shadow-sm">' +
           '<h4 contenteditable="true" class="text-[13px] font-bold text-[#E4E6EB] leading-tight outline-none">' + (data.name || 'Name') + '</h4>' +
           '<p contenteditable="true" class="text-[14px] text-[#E4E6EB] leading-snug mt-1 outline-none whitespace-pre-wrap">' + (data.comment || 'Comment') + '</p>' +
-          '<div class="absolute -bottom-2.5 right-2 bg-[#242526] border border-white/10 rounded-full px-1.5 py-0.5 shadow-md flex items-center gap-1">' +
-          '<div class="w-4 h-4 rounded-full bg-[#1877F2] flex justify-center items-center"><i data-lucide="thumbs-up" class="w-2.5 h-2.5 text-white fill-white"></i></div>' +
-          '<span contenteditable="true" class="text-[11px] text-[#B0B3B8] font-medium outline-none">' + (data.reactions || '0') + '</span>' +
-          '</div>' +
           '</div>' +
           '<div class="flex items-center gap-4 mt-2 ml-2 text-[12px] font-semibold text-[#B0B3B8]">' +
-          '<span contenteditable="true" class="outline-none">' + (data.time || '1h') + '</span><span class="cursor-pointer hover:underline">Like</span><span class="cursor-pointer hover:underline">Reply</span>' +
+          '<span contenteditable="true" class="outline-none">' + (data.time || '1h') + '</span><span class="cursor-pointer hover:underline">Reply</span>' +
           '</div>' +
           (replies.length > 0 ?
             '<div class="mt-2.5 space-y-2.5 pl-3 border-l border-neutral-800">' +
             replies.map(r =>
               '<div class="flex gap-2.5">' +
-              '<div class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-1"><img src="' + avatarUrl + '" class="w-full h-full object-cover opacity-80"></div>' +
+              '<div onclick="document.getElementById(\'socialAvatarInput\').click()" class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 mt-1 cursor-pointer"><img src="' + avatarUrl + '" class="w-full h-full object-cover"></div>' +
               '<div class="flex-1 min-w-0">' +
               '<div class="bg-[#242526] border border-white/5 rounded-[18px] px-3 py-2 relative inline-block max-w-full shadow-sm">' +
               '<h4 contenteditable="true" class="text-[12.5px] font-bold text-[#E4E6EB] leading-tight outline-none">' + r.name + '</h4>' +
               '<p contenteditable="true" class="text-[13.5px] text-[#E4E6EB] leading-snug mt-0.5 outline-none">' + r.comment + '</p>' +
-              '<div class="absolute -bottom-2 right-1 bg-[#242526] border border-white/10 rounded-full px-1 py-0.5 shadow-md flex items-center gap-1">' +
-              '<div class="w-3.5 h-3.5 rounded-full bg-[#1877F2] flex justify-center items-center"><i data-lucide="thumbs-up" class="w-2 h-2 text-white fill-white"></i></div>' +
-              '<span contenteditable="true" class="text-[10px] text-[#B0B3B8] font-medium outline-none">' + r.reactions + '</span>' +
-              '</div>' +
               '</div>' +
               '<div class="flex items-center gap-3 mt-1 ml-2 text-[11px] font-semibold text-[#B0B3B8]">' +
-              '<span contenteditable="true" class="outline-none">' + r.time + '</span><span class="cursor-pointer hover:underline">Like</span><span class="cursor-pointer hover:underline">Reply</span>' +
+              '<span contenteditable="true" class="outline-none">' + r.time + '</span><span class="cursor-pointer hover:underline">Reply</span>' +
               '</div>' +
               '</div></div>'
             ).join('') +
@@ -3528,11 +3539,14 @@
       const fullWidth = clone.offsetWidth || targetWidth;
       const fullHeight = Math.max(clone.scrollHeight, clone.offsetHeight);
 
+      // Reduce scale on mobile to prevent canvas memory limits/crashes
+      const renderScale = window.innerWidth < 768 ? 2 : 3;
+
       // Try html2canvas with complete dimensions and scroll offsets reset
       if (window.html2canvas) {
         try {
           const canvas = await window.html2canvas(clone, {
-            scale: 3,
+            scale: renderScale,
             useCORS: true,
             allowTaint: true,
             backgroundColor: null,
@@ -3560,7 +3574,7 @@
       if (window.htmlToImage) {
         try {
           const dataUrl = await window.htmlToImage.toPng(clone, {
-            pixelRatio: 3,
+            pixelRatio: renderScale,
             skipFonts: true,
             cacheBust: false,
             width: fullWidth,
@@ -3823,7 +3837,7 @@
       const cacheKey = 'capzone_projects_' + project.email;
       let cached = [];
       try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
-      cached = cached.filter(p => p.id !== project.id);
+      cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && p.title === project.title && Math.abs(new Date(p.date || 0) - new Date(project.date || 0)) < 15000));
       cached.unshift(project);
       if (cached.length > 50) cached.pop();
       localStorage.setItem(cacheKey, JSON.stringify(cached));
@@ -3917,6 +3931,18 @@
         filtered = projects.filter(p => p.type === window.activeProjectFilter);
       }
 
+      // Deduplicate consecutive or identical projects (by type + title)
+      const uniqueList = [];
+      const seenMap = new Map();
+      for (const p of filtered) {
+        const key = `${p.type || ''}_${(p.title || '').trim().toLowerCase()}`;
+        if (!seenMap.has(key)) {
+          seenMap.set(key, true);
+          uniqueList.push(p);
+        }
+      }
+      filtered = uniqueList;
+
       if (!filtered || filtered.length === 0) {
         container.innerHTML = `
           <div class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
@@ -3959,47 +3985,37 @@
         let thumbnailHtml = '';
         if (hasThumb) {
           thumbnailHtml = `
-            <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/40 border border-white/10 flex-shrink-0 shadow-md relative">
-              <img src="${p.media_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'">
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-black/40 border border-white/10 flex-shrink-0 shadow-md relative flex items-center justify-center">
+              <img src="${p.media_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.style.display='none'">
             </div>`;
         } else {
           thumbnailHtml = `
-            <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-md ${colorClass} border flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-              <i data-lucide="${icon}" class="w-5 h-5"></i>
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center shadow-md ${colorClass} border flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <i data-lucide="${icon}" class="w-4 h-4"></i>
             </div>`;
         }
 
         htmlOut += `
-          <div class="project-3d-card w-full group relative p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/40 transition-all duration-300 ease-out backdrop-blur-md overflow-hidden cursor-pointer shadow-lg hover:shadow-indigo-500/10 active:scale-[0.99]" onclick="window.openProjectDetailsModal('${p.id}')">
-            <div class="flex items-start gap-3">
+          <div class="project-3d-card w-full group relative p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/40 transition-all duration-200 backdrop-blur-md overflow-hidden cursor-pointer shadow-md hover:shadow-indigo-500/10 active:scale-[0.99] flex items-center justify-between gap-3 min-h-[62px]" onclick="window.openProjectDetailsModal('${p.id}')">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
               ${thumbnailHtml}
               <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between gap-1">
-                  <h4 class="text-white text-xs sm:text-sm font-semibold truncate group-hover:text-indigo-300 transition-colors">${p.title || 'Untitled Project'}</h4>
-                </div>
-                <div class="flex items-center gap-1.5 mt-1">
-                  <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded ${colorClass}">${p.type || 'Media'}</span>
-                  <span class="text-[10px] text-slate-400 flex items-center gap-1"><i data-lucide="clock" class="w-2.5 h-2.5"></i> ${timeStr}</span>
+                <h4 class="text-white text-xs sm:text-[13px] font-semibold truncate group-hover:text-indigo-300 transition-colors leading-tight">${p.title || 'Untitled Project'}</h4>
+                <div class="flex items-center gap-2 mt-1">
+                  <span class="text-[9px] uppercase font-bold px-1.5 py-0.5 rounded leading-none ${colorClass}">${p.type || 'Media'}</span>
+                  <span class="text-[10px] text-slate-400 flex items-center gap-1 leading-none"><i data-lucide="clock" class="w-2.5 h-2.5"></i> ${timeStr}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Card Action Hover Buttons -->
-            <div class="flex items-center justify-between pt-2 mt-2 border-t border-white/5 text-[10px] text-slate-400">
-              <span class="flex items-center gap-1 text-sky-400/90 font-mono text-[9px]" title="Auto backed up to Telegram Channel -1004498616218">
-                <i data-lucide="cloud" class="w-3 h-3"></i> TG Backup
-              </span>
-              <div class="flex items-center gap-1">
-                <button onclick="event.stopPropagation(); window.reEditProject('${p.id}')" title="Re-Edit in Studio" class="p-1.5 rounded-lg hover:bg-white/10 text-indigo-400 hover:text-white transition-colors active:scale-90">
-                  <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="event.stopPropagation(); window.downloadProjectMedia('${p.id}')" title="Download Media" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition-colors active:scale-90">
-                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
-                </button>
-                <button onclick="event.stopPropagation(); window.deleteUserProject('${p.id}')" title="Delete Project & Telegram Backup" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors active:scale-90">
-                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                </button>
-              </div>
+            <!-- Quick Action Hover Icons -->
+            <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+              <button onclick="event.stopPropagation(); window.reEditProject('${p.id}')" title="Re-Edit in Studio" class="p-1.5 rounded-lg hover:bg-white/10 text-indigo-400 hover:text-white transition-colors active:scale-90">
+                <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="event.stopPropagation(); window.deleteUserProject('${p.id}')" title="Delete Project" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors active:scale-90">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
             </div>
           </div>`;
       });
@@ -4412,6 +4428,19 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateApiToggleUI();
+      const currentEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+      const storageKey = 'capzone_projects_' + currentEmail;
+      if (!localStorage.getItem(storageKey)) {
+        const testList = [
+          { id: 101, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 102, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 103, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 104, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 105, type: 'Subtitle', title: 'Generated Media', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 106, type: 'Subtitle', title: 'IMG_0190.MOV', date: new Date(Date.now() - 3600000).toISOString() }
+        ];
+        localStorage.setItem(storageKey, JSON.stringify(testList));
+      }
       if (typeof window.loadAndRenderProjects === 'function') {
         window.loadAndRenderProjects();
       }
@@ -4435,9 +4464,9 @@
         <span class="text-[10px] font-bold tracking-wide">Projects</span>
         <span id="mobileDockBadge" class="absolute top-1 right-2 w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
       </button>
-      <button onclick="openModal('wallpaperModal')" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
-        <i data-lucide="palette" class="w-5 h-5"></i>
-        <span class="text-[10px] font-bold tracking-wide">Themes</span>
+      <button onclick="document.getElementById('mobileMenuOverlay').classList.remove('hidden'); document.getElementById('mobileMenuOverlay').classList.add('flex'); if(window.lucide) lucide.createIcons();" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="grid-2x2" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Menu</span>
       </button>
       <button onclick="showApiModal()" class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
         <i data-lucide="cpu" class="w-5 h-5"></i>
@@ -4449,6 +4478,62 @@
       </button>
     </div>
   </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobileMenuOverlay" class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[60] hidden flex-col transition-all duration-300">
+    <div class="flex justify-between items-center p-5 border-b border-white/10">
+      <h2 class="text-xl font-bold text-white tracking-wide">Kaveez<span class="text-indigo-400">Cloud</span></h2>
+      <button onclick="document.getElementById('mobileMenuOverlay').classList.remove('flex'); document.getElementById('mobileMenuOverlay').classList.add('hidden');" class="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-full">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 pb-20 space-y-3 custom-scroll">
+      <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 pl-1">Tools & Features</div>
+      
+      <button onclick="switchTab('subtitles'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20"><i data-lucide="subtitles" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">Subtitle Studio</h3><p class="text-gray-400 text-xs">AI Auto Captions</p></div>
+      </button>
+      
+      <button onclick="switchTab('script'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20"><i data-lucide="scroll-text" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">AI Script Writer</h3><p class="text-gray-400 text-xs">Viral Scripts</p></div>
+      </button>
+      
+      <button onclick="switchTab('social'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-pink-500/10 text-pink-400 flex items-center justify-center border border-pink-500/20"><i data-lucide="smartphone" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">Social Kit</h3><p class="text-gray-400 text-xs">Mockup Generator</p></div>
+      </button>
+
+      <button onclick="switchTab('image'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20"><i data-lucide="image-plus" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">Image Gen</h3><p class="text-gray-400 text-xs">AI Text to Image</p></div>
+      </button>
+
+      <button onclick="switchTab('dubbing'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-orange-500/10 text-orange-400 flex items-center justify-center border border-orange-500/20"><i data-lucide="mic" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">AI Dubbing</h3><p class="text-gray-400 text-xs">Voice Translator</p></div>
+      </button>
+
+      <button onclick="switchTab('bgremover'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20"><i data-lucide="eraser" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">Remove BG</h3><p class="text-gray-400 text-xs">AI Cutout</p></div>
+      </button>
+      
+      <button onclick="switchTab('downloader'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20"><i data-lucide="download" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">Media Downloader</h3><p class="text-gray-400 text-xs">TikTok/FB/Insta</p></div>
+      </button>
+
+      <div class="w-full h-px bg-white/10 my-5"></div>
+      
+      <button onclick="openModal('wallpaperModal'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex');" class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div class="w-11 h-11 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center border border-yellow-500/20"><i data-lucide="palette" class="w-5 h-5"></i></div>
+        <div class="text-left"><h3 class="text-white font-bold text-sm">Themes</h3><p class="text-gray-400 text-xs">Customize Workspace</p></div>
+      </button>
+    </div>
+  </div>
+
 </body>
 
 </html>
