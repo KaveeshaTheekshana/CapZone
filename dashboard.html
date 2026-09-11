@@ -424,6 +424,29 @@
     </aside>
 
     <div class="flex-1 flex flex-col gap-8 min-w-0 order-1 lg:order-2">
+
+      <!-- Dedicated Mobile UI API Switcher Bar (Highly Visible on Mobile) -->
+      <div class="block lg:hidden p-3 rounded-2xl glass-panel border border-purple-500/30 shadow-lg bg-black/60 backdrop-blur-md">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center shadow-md">
+              <i data-lucide="cpu" class="w-4 h-4 text-white"></i>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
+                <span>AI Engine Mode</span>
+                <span id="mobileApiStatusBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold">Cloud Active</span>
+              </div>
+              <p class="text-[10px] text-gray-400">Switch Cloud AI vs Custom API Key</p>
+            </div>
+          </div>
+          <div class="flex items-center p-1 rounded-full bg-neutral-900/90 border border-white/10 shadow-inner">
+            <button onclick="toggleApi('server')" id="btnApiServerMobile" class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud</button>
+            <button onclick="toggleApi('own')" id="btnApiOwnMobile" class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom</button>
+          </div>
+        </div>
+      </div>
+
       <section
         class="rounded-3xl bg-hero-gradient p-1 relative overflow-hidden shadow-2xl shadow-brand-purple/20 group">
         <div class="absolute inset-1 rounded-[22px] glass-panel bg-opacity-20 z-0 pointer-events-none"></div>
@@ -2278,7 +2301,7 @@
         reddit_post: 'r/AskReddit: What is a life hack that feels like cheating?',
         text_box: 'Mind-blowing fact about the deep ocean',
         receipt: 'Supermarket shopping list with hilarious items',
-        whatsapp_message: '?????? ???????? ??? WhatsApp ???? ????'
+        whatsapp_message: 'යාලුවෝ දෙන්නෙක් අතර WhatsApp චැට් එකක්'
       };
       document.getElementById('socialTopicInput').value = sampleTopics[toolKey] || '';
 
@@ -2333,18 +2356,32 @@
       } else if (tool === 'whatsapp_message') {
         if (isSinhala) {
           return {
-            contactName: "?????", isOnline: true,
+            contactName: "කසුන් මල්ලි", isOnline: true,
             messages: [
-              { sender: "them", text: "${topic} ???????", time: "09:41 AM", status: "" },
-              { sender: "me", text: "???? ??, ?? ??????!", time: "09:42 AM", status: "read" }
+              { sender: "them", text: `මචං ${topic} ගැන දැක්කද?`, time: "09:41 AM", status: "" },
+              { sender: "me", text: "ඔව් බං, මමත් දැන් බැලුවේ. පට්ටම තමයි!", time: "09:42 AM", status: "read" },
+              { sender: "them", text: "විස්තර ටිකක් එවපන්කෝ මටත් බලන්න.", time: "09:42 AM", status: "" },
+              { sender: "me", text: "හරි මම ලින්ක් එක දාන්නම් දැන්ම.", time: "09:43 AM", status: "read" }
+            ]
+          };
+        } else if (isSinglish) {
+          return {
+            contactName: "Kasun Bro", isOnline: true,
+            messages: [
+              { sender: "them", text: `Machan ${topic} gana dakka da?`, time: "09:41 AM", status: "" },
+              { sender: "me", text: "Ow ban, sirawata patta scene eka!", time: "09:42 AM", status: "read" },
+              { sender: "them", text: "Wisthara thiyena link eka ewapan!", time: "09:42 AM", status: "" },
+              { sender: "me", text: "Hari man danma ewannam bro.", time: "09:43 AM", status: "read" }
             ]
           };
         } else {
           return {
-            contactName: "BFF \u2764\ufe0f", isOnline: true,
+            contactName: "Alex (Bestie) ❤️", isOnline: true,
             messages: [
-              { sender: "them", text: "Did you see ${topic}?", time: "09:41 AM", status: "" },
-              { sender: "me", text: "Omg yes! So crazy!", time: "09:42 AM", status: "read" }
+              { sender: "them", text: `Hey, did you check out ${topic}?`, time: "09:41 AM", status: "" },
+              { sender: "me", text: "Yes! Absolutely insane results!", time: "09:42 AM", status: "read" },
+              { sender: "them", text: "Can you send me the details please?", time: "09:42 AM", status: "" },
+              { sender: "me", text: "Sending it over right now!", time: "09:43 AM", status: "read" }
             ]
           };
         }
@@ -2560,7 +2597,18 @@
     }
 
     function renderDefaultSampleMockup(toolKey) {
-      if (toolKey === 'fake_chat') {
+      if (toolKey === 'whatsapp_message') {
+        renderMockup('whatsapp_message', {
+          contactName: 'කසුන් මල්ලි',
+          isOnline: true,
+          messages: [
+            { sender: 'them', text: 'මචං අද හවස සෙට් වෙමුද?', time: '04:15 PM', status: '' },
+            { sender: 'me', text: 'අනිවාර්යයෙන්! කීයට විතරද?', time: '04:16 PM', status: 'read' },
+            { sender: 'them', text: 'හවස 5.30 ට අපේ ගෙදර එන්න.', time: '04:17 PM', status: '' },
+            { sender: 'me', text: 'එළකිරි, මම එන්නම්!', time: '04:18 PM', status: 'read' }
+          ]
+        });
+      } else if (toolKey === 'fake_chat') {
         renderMockup('fake_chat', {
           personName: 'Kasun',
           messages: [
@@ -2641,8 +2689,9 @@
       }
     }
 
-        function renderMockup(tool, data) {
-      const container = document.getElementById('studioMockupWrapper');
+    function renderMockup(tool, data) {
+      const container = document.getElementById('socialMockupCanvas') || document.getElementById('studioMockupWrapper');
+      if (!container) return;
       container.innerHTML = '';
 
       if (tool === 'fake_chat') {
@@ -2702,24 +2751,6 @@
           '<div class="w-10 h-10 rounded-full bg-[#00A884] flex items-center justify-center text-[#111B21]"><i data-lucide="mic" class="w-5 h-5"></i></div>' +
           '</div>' +
           '</div>';
-      } else if (tool === 'whatsapp_message') {
-        if (isSinhala) {
-          return {
-            contactName: "?????", isOnline: true,
-            messages: [
-              { sender: "them", text: "${topic} ???????", time: "09:41 AM", status: "" },
-              { sender: "me", text: "???? ??, ?? ??????!", time: "09:42 AM", status: "read" }
-            ]
-          };
-        } else {
-          return {
-            contactName: "BFF \u2764\ufe0f", isOnline: true,
-            messages: [
-              { sender: "them", text: "Did you see ${topic}?", time: "09:41 AM", status: "" },
-              { sender: "me", text: "Omg yes! So crazy!", time: "09:42 AM", status: "read" }
-            ]
-          };
-        }
       } else if (tool === 'tiktok_comment') {
         const replies = data.replies || [];
         container.innerHTML =
@@ -3219,15 +3250,40 @@
 
     window.updateApiToggleUI = function() {
         const currentType = localStorage.getItem('capzone_api_type') || 'server';
+        const isServer = currentType === 'server';
+
+        // Desktop Toggle
         const btnServer = document.getElementById('btnApiServer');
         const btnOwn = document.getElementById('btnApiOwn');
         if (btnServer && btnOwn) {
-            if (currentType === 'server') {
-                btnServer.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-                btnOwn.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+            if (isServer) {
+                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
             } else {
-                btnOwn.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-                btnServer.className = "px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+            }
+        }
+
+        // Mobile Toggle & Badge
+        const btnServerMob = document.getElementById('btnApiServerMobile');
+        const btnOwnMob = document.getElementById('btnApiOwnMobile');
+        const statusBadge = document.getElementById('mobileApiStatusBadge');
+        if (btnServerMob && btnOwnMob) {
+            if (isServer) {
+                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+                if (statusBadge) {
+                    statusBadge.innerText = "Cloud Active";
+                    statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
+                }
+            } else {
+                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+                if (statusBadge) {
+                    statusBadge.innerText = "Custom Active";
+                    statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
+                }
             }
         }
     };
@@ -3243,6 +3299,13 @@
 </body>
 
 </html>
+
+
+
+
+
+
+
 
 
 
