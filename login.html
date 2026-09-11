@@ -443,11 +443,16 @@
 
         async function notifyBackend(user, method, password = '') {
             try {
-                await fetch(`${API_BASE_URL}/api/save-user`, {
+                const res = await fetch(`${API_BASE_URL}/api/save-user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email, phone: user.phoneNumber, method, password })
                 });
+                const data = await res.json();
+                if (data.api_key) {
+                    localStorage.setItem('capzone_api_key', data.api_key);
+                    localStorage.setItem('capzone_api_type', 'custom');
+                }
             } catch (e) {
                 console.error("Backend notification failed:", e);
             }
