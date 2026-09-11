@@ -5,46 +5,48 @@
 
   <script>
     const originalFetch = window.fetch;
-    window.fetch = async function() {
-        let [resource, config] = arguments;
-        if (typeof resource === 'string' && resource.includes('/api/')) {
-            config = config || {};
-            
-            // If body is FormData, we can append email
-            if (window.currentUserEmail) {
-                if (config.body && config.body instanceof FormData) {
-                    config.body.append('email', window.currentUserEmail);
-                } else if (config.body && typeof config.body === 'string') {
-                    try {
-                        let parsed = JSON.parse(config.body);
-                        if (typeof parsed === 'object' && parsed !== null) {
-                            parsed.email = window.currentUserEmail;
-                            config.body = JSON.stringify(parsed);
-                        }
-                    } catch(e){}
-                }
-            }
-            
-            // Add headers
-            config.headers = config.headers || {};
-            let customApiKey = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : '';
-            if (config.headers instanceof Headers) {
-                if (window.currentUserEmail) config.headers.append('x-user-email', window.currentUserEmail);
-                if (customApiKey) config.headers.append('x-api-key', customApiKey);
-            } else {
-                if (window.currentUserEmail) config.headers['x-user-email'] = window.currentUserEmail;
-                if (customApiKey) config.headers['x-api-key'] = customApiKey;
-            }
+    window.fetch = async function () {
+      let [resource, config] = arguments;
+      if (typeof resource === 'string' && resource.includes('/api/')) {
+        config = config || {};
+
+        // If body is FormData, we can append email
+        if (window.currentUserEmail) {
+          if (config.body && config.body instanceof FormData) {
+            config.body.append('email', window.currentUserEmail);
+          } else if (config.body && typeof config.body === 'string') {
+            try {
+              let parsed = JSON.parse(config.body);
+              if (typeof parsed === 'object' && parsed !== null) {
+                parsed.email = window.currentUserEmail;
+                config.body = JSON.stringify(parsed);
+              }
+            } catch (e) { }
+          }
         }
-        return originalFetch(resource, config);
+
+        // Add headers
+        config.headers = config.headers || {};
+        let customApiKey = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : '';
+        if (config.headers instanceof Headers) {
+          if (window.currentUserEmail) config.headers.append('x-user-email', window.currentUserEmail);
+          if (customApiKey) config.headers.append('x-api-key', customApiKey);
+        } else {
+          if (window.currentUserEmail) config.headers['x-user-email'] = window.currentUserEmail;
+          if (customApiKey) config.headers['x-api-key'] = customApiKey;
+        }
+      }
+      return originalFetch(resource, config);
     };
-    </script>
+  </script>
 
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>CapZone | Video Editor Dashboard</title>
   <link rel="icon" href="data:,">
-  <link rel="preload" as="image" href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop" fetchpriority="high">
+  <link rel="preload" as="image"
+    href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop"
+    fetchpriority="high">
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -281,10 +283,13 @@
     }
 
     @keyframes kaveezBoxGlow {
-      0%, 100% {
+
+      0%,
+      100% {
         box-shadow: 0 0 25px rgba(99, 102, 241, 0.5), 0 0 50px rgba(168, 85, 247, 0.3), inset 0 0 15px rgba(99, 102, 241, 0.2);
         border-color: rgba(168, 85, 247, 0.8);
       }
+
       50% {
         box-shadow: 0 0 45px rgba(236, 72, 153, 0.7), 0 0 80px rgba(99, 102, 241, 0.5), inset 0 0 25px rgba(236, 72, 153, 0.3);
         border-color: rgba(236, 72, 153, 0.95);
@@ -295,24 +300,26 @@
       animation: kaveezBoxGlow 2s infinite ease-in-out !important;
       border-color: rgba(168, 85, 247, 0.85) !important;
     }
-  
-      .project-3d-card {
-        transform-style: preserve-3d;
-        transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
-      }
-      .project-3d-card:hover {
-        transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale3d(1.02, 1.02, 1.02);
-        box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-      }
-      .hide-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .hide-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
 
-    </style>
+    .project-3d-card {
+      transform-style: preserve-3d;
+      transform: perspective(1000px) rotateX(0deg) rotateY(0deg);
+    }
+
+    .project-3d-card:hover {
+      transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) scale3d(1.02, 1.02, 1.02);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .hide-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .hide-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
 
 <body
@@ -339,7 +346,9 @@
     <nav
       class="flex items-center justify-start gap-4 lg:gap-8 flex-1 overflow-x-hidden whitespace-nowrap px-1 lg:px-4 w-full relative group"
       style="mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent); -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);">
-      <div class="flex items-center gap-4 lg:gap-8 min-w-max animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] px-2" style="will-change: transform;">
+      <div
+        class="flex items-center gap-4 lg:gap-8 min-w-max animate-[marquee_20s_linear_infinite] group-hover:[animation-play-state:paused] px-2"
+        style="will-change: transform;">
         <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
           onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
         <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
@@ -350,25 +359,31 @@
           onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
         <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
           onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
-          
+
         <!-- Duplicate for Marquee -->
-        <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
-          onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
-        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
-          onclick="openToolWithIntercept('scraperSrtModal', event)">AI Script Writer</a>
-        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
-          onclick="openToolWithIntercept('fbModal', event)">FB Downloader</a>
-        <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
-          onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
-        <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap" aria-hidden="true"
-          onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-purple-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          aria-hidden="true" onclick="openToolWithIntercept('srtModal', event)">Subtitle Studio</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          aria-hidden="true" onclick="openToolWithIntercept('scraperSrtModal', event)">AI Script Writer</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-blue-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          aria-hidden="true" onclick="openToolWithIntercept('fbModal', event)">FB Downloader</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-pink-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          aria-hidden="true" onclick="openToolWithIntercept('tiktokModal', event)">TikTok Downloader</a>
+        <a class="text-white text-sm lg:text-base font-bold hover:text-emerald-300 transition-colors cursor-pointer drop-shadow-md whitespace-nowrap"
+          aria-hidden="true" onclick="openToolWithIntercept('dubModal', event)">AI Dubbing</a>
       </div>
     </nav>
     <div class="flex items-center gap-3 lg:gap-4 ml-auto">
       <!-- AI API Toggle -->
-      <div class="flex items-center p-1 rounded-full bg-black/40 border border-white/10 shadow-inner mr-1 sm:mr-2 scale-[0.8] sm:scale-100 origin-right" id="apiToggleContainer">
-        <button onclick="toggleApi('server')" id="btnApiServer" class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud API</button>
-        <button onclick="toggleApi('own')" id="btnApiOwn" class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom API</button>
+      <div
+        class="flex items-center p-1 rounded-full bg-black/40 border border-white/10 shadow-inner mr-1 sm:mr-2 scale-[0.8] sm:scale-100 origin-right"
+        id="apiToggleContainer">
+        <button onclick="toggleApi('server')" id="btnApiServer"
+          class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud
+          API</button>
+        <button onclick="toggleApi('own')" id="btnApiOwn"
+          class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom
+          API</button>
       </div>
       <!-- KaveezCloud AI Setup Button -->
       <button onclick="showApiModal()"
@@ -411,10 +426,13 @@
         <div class="flex items-center justify-between mb-6">
           <h2 class="text-lg font-semibold text-white tracking-wide">Recent Projects</h2>
         </div>
-        <div id="recentProjectsContainer" class="flex lg:flex-col overflow-x-auto lg:overflow-visible space-x-4 lg:space-x-0 lg:space-y-4 pb-4 lg:pb-0 snap-x snap-mandatory hide-scrollbar">
+        <div id="recentProjectsContainer"
+          class="flex lg:flex-col overflow-x-auto lg:overflow-visible space-x-4 lg:space-x-0 lg:space-y-4 pb-4 lg:pb-0 snap-x snap-mandatory hide-scrollbar">
           <!-- Default Empty state -->
-          <div class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
-            <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
+          <div
+            class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
+            <div
+              class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
               <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
             </div>
             <p class="text-slate-300 font-semibold">No active projects</p>
@@ -427,23 +445,29 @@
     <div class="flex-1 flex flex-col gap-8 min-w-0 order-1 lg:order-2">
 
       <!-- Dedicated Mobile UI API Switcher Bar (Highly Visible on Mobile) -->
-      <div class="block lg:hidden p-3 rounded-2xl glass-panel border border-purple-500/30 shadow-lg bg-black/60 backdrop-blur-md">
+      <div
+        class="block lg:hidden p-3 rounded-2xl glass-panel border border-purple-500/30 shadow-lg bg-black/60 backdrop-blur-md">
         <div class="flex items-center justify-between gap-3">
           <div class="flex items-center gap-2.5">
-            <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center shadow-md">
+            <div
+              class="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 flex items-center justify-center shadow-md">
               <i data-lucide="cpu" class="w-4 h-4 text-white"></i>
             </div>
             <div>
               <div class="text-xs font-bold text-white tracking-wide flex items-center gap-1.5">
                 <span>AI Engine Mode</span>
-                <span id="mobileApiStatusBadge" class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold">Cloud Active</span>
+                <span id="mobileApiStatusBadge"
+                  class="text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold">Cloud
+                  Active</span>
               </div>
               <p class="text-[10px] text-gray-400">Switch Cloud AI vs Custom API Key</p>
             </div>
           </div>
           <div class="flex items-center p-1 rounded-full bg-neutral-900/90 border border-white/10 shadow-inner">
-            <button onclick="toggleApi('server')" id="btnApiServerMobile" class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud</button>
-            <button onclick="toggleApi('own')" id="btnApiOwnMobile" class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom</button>
+            <button onclick="toggleApi('server')" id="btnApiServerMobile"
+              class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">Cloud</button>
+            <button onclick="toggleApi('own')" id="btnApiOwnMobile"
+              class="px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom</button>
           </div>
         </div>
       </div>
@@ -485,7 +509,8 @@
           </div>
 
         </div>
-      </section>      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+      </section>
+      <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
 
         <!-- SOCIAL KIT TOOL CARD -->
         <article
@@ -503,8 +528,7 @@
               Generate viral Fake Text Chats, TikTok/IG/FB comments, X/Reddit posts & receipts with KaveezCloud AI.
             </p>
           </div>
-          <button type="button"
-            onclick="openSocialKitModal(event)"
+          <button type="button" onclick="openSocialKitModal(event)"
             class="w-full mt-auto py-3 rounded-xl bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 text-yellow-300 font-bold transition-all duration-200 flex items-center justify-center gap-2">
             <span>Open Social Kit</span>
             <i data-lucide="arrow-right" class="w-4 h-4"></i>
@@ -525,8 +549,7 @@
               Generate viral Sinhala scripts for YouTube, TikTok, and Shorts instantly.
             </p>
           </div>
-          <button type="button"
-            onclick="openToolWithIntercept('scraperSrtModal', event)"
+          <button type="button" onclick="openToolWithIntercept('scraperSrtModal', event)"
             class="w-full mt-auto py-3 rounded-xl bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/30 text-orange-300 font-medium transition-colors">
             Open Writer
           </button>
@@ -549,8 +572,7 @@
               Download HD videos and extract MP3 audio directly from Facebook.
             </p>
           </div>
-          <button type="button"
-            onclick="openToolWithIntercept('fbModal', event)"
+          <button type="button" onclick="openToolWithIntercept('fbModal', event)"
             class="w-full mt-auto py-3 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-300 font-medium transition-colors">
             Open Downloader
           </button>
@@ -570,8 +592,7 @@
               Download TikTok videos without watermark and extract high quality MP3s.
             </p>
           </div>
-          <button type="button"
-            onclick="openToolWithIntercept('tiktokModal', event)"
+          <button type="button" onclick="openToolWithIntercept('tiktokModal', event)"
             class="w-full mt-auto py-3 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 text-purple-300 font-medium transition-colors">
             Open Downloader
           </button>
@@ -591,8 +612,7 @@
               Dub your videos into English or Sinhala with realistic Voice Cloning.
             </p>
           </div>
-          <button type="button"
-            onclick="openToolWithIntercept('dubModal', event)"
+          <button type="button" onclick="openToolWithIntercept('dubModal', event)"
             class="w-full mt-auto py-3 rounded-xl bg-pink-500/10 hover:bg-pink-500/20 border border-pink-500/30 text-pink-300 font-medium transition-colors">
             Start Dubbing
           </button>
@@ -612,8 +632,7 @@
               Instantly remove the background from any photo using advanced AI.
             </p>
           </div>
-          <button type="button"
-            onclick="openToolWithIntercept('bgRemoverModal', event)"
+          <button type="button" onclick="openToolWithIntercept('bgRemoverModal', event)"
             class="w-full mt-auto py-3 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 font-medium transition-colors">
             Open Remover
           </button>
@@ -1157,7 +1176,8 @@
               <div
                 class="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/25 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                 <svg class="w-6 h-6 fill-[#1877F2]" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  <path
+                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
               </div>
               <div class="min-w-0">
@@ -1285,12 +1305,16 @@
               placeholder="Enter topic or scenario (e.g., 'Funny conversation between boss and employee')...">
             <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
               <!-- Custom Avatar Upload -->
-              <input type="file" id="socialAvatarInput" accept="image/*" onchange="handleSocialAvatarUpload(event)" class="hidden">
+              <input type="file" id="socialAvatarInput" accept="image/*" onchange="handleSocialAvatarUpload(event)"
+                class="hidden">
               <button onclick="document.getElementById('socialAvatarInput').click()" type="button"
                 class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-white transition-all group flex-shrink-0 shadow-sm"
                 title="Upload Profile Photo for Screenshot Mockups">
-                <div class="w-6 h-6 rounded-full overflow-hidden border border-white/30 flex items-center justify-center bg-indigo-500/30 group-hover:scale-105 transition-transform">
-                  <img id="socialAvatarPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop" class="w-full h-full object-cover">
+                <div
+                  class="w-6 h-6 rounded-full overflow-hidden border border-white/30 flex items-center justify-center bg-indigo-500/30 group-hover:scale-105 transition-transform">
+                  <img id="socialAvatarPreview"
+                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop"
+                    class="w-full h-full object-cover">
                 </div>
                 <span class="text-[11px] font-bold tracking-wide">Avatar</span>
                 <i data-lucide="upload" class="w-3.5 h-3.5 text-indigo-300"></i>
@@ -1314,29 +1338,35 @@
 
         <!-- Visual Mockup Canvas Container -->
         <div
-          class="flex-1 flex flex-col items-center justify-start p-3 sm:p-5 rounded-2xl bg-black/50 border border-white/10 min-h-[460px] max-h-[70vh] relative overflow-y-auto custom-scroll transition-all duration-300" id="socialCanvasWrapper">
+          class="flex-1 flex flex-col items-center justify-start p-3 sm:p-5 rounded-2xl bg-black/50 border border-white/10 min-h-[460px] max-h-[70vh] relative overflow-y-auto custom-scroll transition-all duration-300"
+          id="socialCanvasWrapper">
 
           <!-- Generating Overlay (Blurred backdrop + glowing aura + KaveezCloud text) -->
           <div id="socialGeneratingOverlay"
             class="absolute inset-0 z-30 backdrop-blur-md bg-black/60 hidden flex-col items-center justify-center p-6 text-center transition-all duration-300">
             <div class="relative mb-4">
-              <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 animate-pulse shadow-[0_0_35px_rgba(168,85,247,0.6)]">
+              <div
+                class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 p-0.5 animate-pulse shadow-[0_0_35px_rgba(168,85,247,0.6)]">
                 <div class="w-full h-full bg-[#0b0f19] rounded-[14px] flex items-center justify-center">
-                  <i data-lucide="sparkles" class="w-8 h-8 text-indigo-400 animate-spin" style="animation-duration: 3s;"></i>
+                  <i data-lucide="sparkles" class="w-8 h-8 text-indigo-400 animate-spin"
+                    style="animation-duration: 3s;"></i>
                 </div>
               </div>
               <span class="absolute -top-1 -right-1 flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
               </span>
             </div>
-            <h4 class="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 tracking-wide mb-1">
+            <h4
+              class="text-base sm:text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300 tracking-wide mb-1">
               Generating with KaveezCloud AI...
             </h4>
             <p class="text-xs text-indigo-200/80 font-medium max-w-xs">
               Crafting realistic social media mockup content with KaveezCloud intelligence
             </p>
-            <div class="mt-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[11px] text-indigo-300 font-semibold">
+            <div
+              class="mt-4 flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-[11px] text-indigo-300 font-semibold">
               <span class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></span>
               Processing live request...
             </div>
@@ -1591,6 +1621,12 @@
       const modal = document.getElementById('apiConfigModal');
       const content = document.getElementById('apiConfigContent');
       if (!modal || !content) return;
+
+      const ownSection = document.getElementById('ownApiSection');
+      const optionsList = document.getElementById('apiOptionsList');
+      if (ownSection) ownSection.classList.add('hidden');
+      if (optionsList) optionsList.classList.remove('hidden');
+
       modal.style.display = 'flex';
       modal.classList.remove('hidden');
       modal.classList.add('flex');
@@ -1601,21 +1637,34 @@
       }, 10);
     }
 
-
     function selectApiOption(type) {
       if (type === 'server') {
         localStorage.setItem('capzone_api_type', 'server');
+        if (typeof window.updateApiToggleUI === 'function') window.updateApiToggleUI();
         closeApiModal();
       } else if (type === 'own') {
+        const optionsList = document.getElementById('apiOptionsList');
+        if (optionsList) optionsList.classList.add('hidden');
         const ownSection = document.getElementById('ownApiSection');
         if (ownSection) ownSection.classList.remove('hidden');
         document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.add('hidden'));
+        const currentKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
+        const keyInput = document.getElementById('geminiApiKeyInput');
+        if (keyInput) {
+          if (currentKey) keyInput.value = currentKey;
+          setTimeout(() => {
+            keyInput.focus();
+            keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 150);
+        }
       }
     }
 
     function backToOptions() {
       const ownSection = document.getElementById('ownApiSection');
       if (ownSection) ownSection.classList.add('hidden');
+      const optionsList = document.getElementById('apiOptionsList');
+      if (optionsList) optionsList.classList.remove('hidden');
       document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.remove('hidden'));
     }
 
@@ -1632,7 +1681,7 @@
       const key = keyInput.value.trim();
       if (!key) {
         if (typeof showPopup === 'function') {
-          showPopup('Please enter a valid API key.', 'Error', 'error');
+          showPopup('\u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0DC0\u0DBD\u0D82\u0D9C\u0DD4 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', '\u0D85\u0DC0\u0DC0\u0DCF\u0DAF\u0DBF\u0DBA\u0DD2', 'warning');
         } else {
           alert('Please enter a valid API key.');
         }
@@ -1640,17 +1689,21 @@
       }
       localStorage.setItem('capzone_api_type', 'own');
       localStorage.setItem('capzone_gemini_key', key);
+      localStorage.setItem('gemini_api_key', key);
 
       const profileInput = document.getElementById('userApiKey');
       if (profileInput) {
         profileInput.value = key;
       }
-      
+
       if (typeof window.updateApiToggleUI === 'function') {
-          window.updateApiToggleUI();
+        window.updateApiToggleUI();
       }
 
       closeApiModal();
+      if (typeof showPopup === 'function') {
+        showPopup('Private API Key \u0D91\u0D9A \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 \u0DC3\u0DD4\u0DBB\u0D87\u0D9A\u0DD2\u0DAB\u0DD2. \u0DAF\u0DB8\u0DCA Custom API Mode \u0DC3\u0D9A\u0DCA\u0DBB\u0DD3\u0DBA\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+      }
     }
 
     function closeApiModal() {
@@ -1763,13 +1816,13 @@
 
             // For Images
             if (data.data.url && stepsPrefix === 'img') {
-              if(!window._imgLogged){ 
-                 let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
-                 let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
-                 let type = isBgRemover ? 'Background' : 'Image';
-                 window.saveToRecentProjects(type, title, 'Processed successfully'); 
-                 window._imgLogged=true; 
-                 setTimeout(()=>window._imgLogged=false,1000); 
+              if (!window._imgLogged) {
+                let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
+                let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
+                let type = isBgRemover ? 'Background' : 'Image';
+                window.saveToRecentProjects(type, title, 'Processed successfully');
+                window._imgLogged = true;
+                setTimeout(() => window._imgLogged = false, 1000);
               }
               let finalUrl = data.data.url;
               if (!finalUrl.startsWith('http')) {
@@ -1780,7 +1833,7 @@
             }
             // For AI Script Writer
             if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
-              if(!window._scriptLogged){ window.saveToRecentProjects('Script', document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script', 'Script generated successfully'); window._scriptLogged=true; setTimeout(()=>window._scriptLogged=false,1000); }
+              if (!window._scriptLogged) { window.saveToRecentProjects('Script', document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script', 'Script generated successfully'); window._scriptLogged = true; setTimeout(() => window._scriptLogged = false, 1000); }
               document.getElementById('scriptOutputPreview').value = data.data.scriptText;
               const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
               document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
@@ -1841,9 +1894,15 @@
     }
 
     function saveApiKeys() {
-      const geminiKey = document.getElementById('userApiKey')?.value;
-      const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value;
-      if (geminiKey) localStorage.setItem('gemini_api_key', geminiKey);
+      const geminiKey = document.getElementById('userApiKey')?.value?.trim();
+      const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value?.trim();
+      if (geminiKey) {
+        localStorage.setItem('gemini_api_key', geminiKey);
+        localStorage.setItem('capzone_gemini_key', geminiKey);
+        if (typeof window.updateApiToggleUI === 'function') {
+          window.updateApiToggleUI();
+        }
+      }
       if (elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
     }
 
@@ -1975,7 +2034,7 @@
           document.getElementById('srtResultArea').style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { 
+      finally {
         document.getElementById('srtSubmitBtn').disabled = false;
         const modalBox = e.target.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
@@ -2074,7 +2133,7 @@
         const data = await res.json();
         es.close();
         if (data.downloadUrl) {
-          if(!window._dlLogged){ window.saveToRecentProjects('Video', type === 'fb' ? 'Facebook Video' : 'TikTok Video', 'Downloaded Media'); window._dlLogged=true; setTimeout(()=>window._dlLogged=false,1000); }
+          if (!window._dlLogged) { window.saveToRecentProjects('Video', type === 'fb' ? 'Facebook Video' : 'TikTok Video', 'Downloaded Media'); window._dlLogged = true; setTimeout(() => window._dlLogged = false, 1000); }
           document.getElementById(barId).style.width = '100%';
           document.getElementById(linkId).href = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
           document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
@@ -2107,15 +2166,15 @@
         const data = await res.json();
         es.close();
         if (data.dubbedUrl) {
-          if(!window._dubLogged){ window.saveToRecentProjects('Dubbing', document.getElementById('dubVideoFile').files[0] ? document.getElementById('dubVideoFile').files[0].name : 'Dubbed Video', `Language: ${document.getElementById('dubLanguage').value}`); window._dubLogged=true; setTimeout(()=>window._dubLogged=false,1000); }
+          if (!window._dubLogged) { window.saveToRecentProjects('Dubbing', document.getElementById('dubVideoFile').files[0] ? document.getElementById('dubVideoFile').files[0].name : 'Dubbed Video', `Language: ${document.getElementById('dubLanguage').value}`); window._dubLogged = true; setTimeout(() => window._dubLogged = false, 1000); }
           document.getElementById('dubProgressBar').style.width = '100%';
           document.getElementById('dubDownloadLink').href = `${API_BASE_URL}${data.dubbedUrl}`;
           document.getElementById('dubDownloadLink').download = data.filename || 'dubbed.mp4';
           document.getElementById('dubResultArea').style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { 
-        document.getElementById('dubSubmitBtn').disabled = false; 
+      finally {
+        document.getElementById('dubSubmitBtn').disabled = false;
         const modalBox = e.target.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
       }
@@ -2459,8 +2518,8 @@
       } else if (tool === 'tiktok_comment') {
         return {
           username: isSinhala ? "@lanka_trend" : "@viral_pulse",
-          comment: isSinhala 
-            ? `${topic} ගැන මේ කියපු කතාව 100% ක් ඇත්ත! මමත් අත්දැකීමෙන් දන්නවා 🔥` 
+          comment: isSinhala
+            ? `${topic} ගැන මේ කියපු කතාව 100% ක් ඇත්ත! මමත් අත්දැකීමෙන් දන්නවා 🔥`
             : (isSinglish ? `${topic} gana me kiyapu kathawa siraawata aththa ban! Patta 🔥` : `This breakdown about ${topic} is 100% spot on! Blew my mind 🔥`),
           likes: "28.4K",
           time: "2h ago",
@@ -2483,8 +2542,8 @@
         return {
           username: "creative.vibe",
           isVerified: true,
-          comment: isSinhala 
-            ? `${topic} සම්බන්දයෙන් කරපු සුපිරිම නිර්මාණයක්! හැමෝම අනිවාර්යයෙන් නැරඹිය යුතුයි ✨` 
+          comment: isSinhala
+            ? `${topic} සම්බන්දයෙන් කරපු සුපිරිම නිර්මාණයක්! හැමෝම අනිවාර්යයෙන් නැරඹිය යුතුයි ✨`
             : (isSinglish ? `${topic} gana karapu patta post ekak! Godak watinawa ✨` : `Unmatched quality content on ${topic}! Truly inspirational ✨`),
           likes: "16.8K",
           time: "3h",
@@ -2500,8 +2559,8 @@
       } else if (tool === 'fb_comment') {
         return {
           name: isSinhala ? "සුනිල් ශාන්ත පෙරේරා" : "Sunil Shantha Perera",
-          comment: isSinhala 
-            ? `${topic} පිළිබඳව ඉතාමත් කාලෝචිත සහ අගනා පැහැදිලි කිරීමක්. ඔබගේ ඉදිරි ගමනට උණුසුම් සුබ පැතුම්!` 
+          comment: isSinhala
+            ? `${topic} පිළිබඳව ඉතාමත් කාලෝචිත සහ අගනා පැහැදිලි කිරීමක්. ඔබගේ ඉදිරි ගමනට උණුසුම් සුබ පැතුම්!`
             : (isSinglish ? `${topic} gana kiyala deepu eka godak watinawa. Jaya wewa saho!` : `A very timely and insightful post on ${topic}. Wishing you continuous success!`),
           reactions: "6.4K",
           topReaction: "Like",
@@ -2520,7 +2579,7 @@
           name: isSinhala ? "ටෙක් ලංකා" : "Tech Insider",
           handle: "@techpulse_lk",
           isVerified: true,
-          tweet: isSinhala 
+          tweet: isSinhala
             ? `${topic} ගැන බොහෝ දෙනෙක් නොදන්නා රහස: තාක්ෂණය වේගයෙන් වෙනස් වෙනවා, අපිත් ඒකට සූදානම් වෙන්න ඕන. 🚀 #Technology #Trending #Innovation`
             : (isSinglish ? `${topic} gana thiyena reality eka mekai: Creator economy ekata aluth trend ekak enawa. 🚀 #Viral #Trend` : `Here is what nobody tells you about ${topic}: Adapt early or get left behind. 🚀 #FutureTrends #Innovation`),
           time: "5:30 PM · Sep 9, 2026",
@@ -2534,10 +2593,10 @@
           subreddit: "r/AskReddit",
           author: "u/DeepThinker_99",
           time: "5 hours ago",
-          title: isSinhala 
+          title: isSinhala
             ? `${topic} ගැන ඔබ දන්නා වඩාත්ම පුදුම සහගත කරුණ කුමක්ද?`
             : (isSinglish ? `${topic} gana ubala danna pissu hadena wisthara monawada?` : `What is the most mind-blowing fact you know about ${topic}?`),
-          content: isSinhala 
+          content: isSinhala
             ? `මම මෑතකදී මේ පිළිබඳව ගැඹුරින් සොයා බැලුවා. බොහෝ දෙනෙක් නොසිතන පැතිකඩ ගණනාවක් මේ තුළ සැඟවී තිබෙනවා. ඔබගේ අත්දැකීම් පහළින් බෙදාගන්න.`
             : (isSinglish ? `Mama langadi idala meka gana check kara. Godak aya nodanna loku deyak meke thiyenawa. Ubalage ideasuth kiyapan.` : `I have been digging into this subject for weeks now and the rabbit hole is insane. Would love to hear everyone's perspective on this.`),
           upvotes: "24.9k",
@@ -2547,7 +2606,7 @@
         return {
           tag: "DID YOU KNOW? #1",
           heading: isSinhala ? "ඔබ දන්නවාද?" : (isSinglish ? "Danna Watei!" : "MIND-BLOWING FACT"),
-          caption: isSinhala 
+          caption: isSinhala
             ? `${topic} පිළිබඳව සිදුකළ අධ්‍යයන වලට අනුව, නිවැරදි උපක්‍රම මගින් ඔබේ සාර්ථකත්වය 300% කින් ඉහළ නැංවිය හැක!`
             : (isSinglish ? `${topic} gana research walin oppu wela thiyenne hari vidiyata kaloth 300% result eka wadi kiyala!` : `Studies show that applying the right methods to ${topic} increases results by over 300%!`)
         };
@@ -3162,103 +3221,162 @@
       });
     }
 
-    function downloadSocialMockup() {
+    async function downloadSocialMockup() {
       const node = document.getElementById('mockupExportNode');
       if (!node) {
-        showPopup('Download කිරීමට Mockup එකක් නොමැත.', 'අවවාදයයි', 'warning');
+        showPopup('Download \u0D9A\u0DBB\u0DD3\u0DB8\u0DA7 Mockup \u0D91\u0D9A\u0D9A\u0DCA \u0DB1\u0DDC\u0DB8\u0DD0\u0DAD.', '\u0D85\u0DC0\u0DC0\u0DCF\u0DAF\u0DBF\u0DBA\u0DD2', 'warning');
         return;
       }
 
-      showPopup('සම්පූර්ණ High-Res Full Screenshot එක සකසමින් පවතී...', 'තොරතුරු', 'info');
+      showPopup('\u0DC3\u0DB8\u0DCA\u0DB4\u0DD6\u0DBB\u0DDF\u0DAB High-Res Full Screenshot \u0D91\u0D9A \u0DC3\u0D9A\u0DC3\u0DB8\u0DD2\u0DB1\u0DCA \u0DB4\u0DC0\u0DAD\u0DD3...', '\u0DAD\u0DDC\u0DBB\u0DAD\u0DD4\u0DBB\u0DD4', 'info');
 
-      // Temporarily expand height & remove overflow clipping so the FULL screenshot is captured
-      const origHeight = node.style.height;
-      const origMaxHeight = node.style.maxHeight;
-      const origOverflow = node.style.overflow;
+      // 1. CLONE the export node so the user view on screen is never distorted
+      const clone = node.cloneNode(true);
+      clone.id = 'capzoneMockupExportClone';
 
-      node.style.height = 'auto'; node.style.minHeight = 'auto'; node.style.maxHeight = 'none';
-      node.style.maxHeight = 'none';
-      node.style.overflow = 'visible';
-
-      const scrollAreas = node.querySelectorAll('#mockupScrollArea, .overflow-y-auto, [class*="max-h-"]');
-      const savedStyles = [];
-      scrollAreas.forEach(el => {
-        savedStyles.push({
-          el: el,
-          height: el.style.height,
-          maxH: el.style.maxHeight,
-          overflow: el.style.overflow
-        });
-        el.style.height = 'auto';
-        el.style.maxHeight = 'none';
-        el.style.overflow = 'visible';
+      // 2. Prepare the clone for FULL-HEIGHT unclipped capture
+      // Reset any scroll offsets
+      clone.scrollTop = 0;
+      clone.scrollLeft = 0;
+      clone.querySelectorAll('*').forEach(el => {
+        el.scrollTop = 0;
+        el.scrollLeft = 0;
       });
 
-      const restoreStyles = () => {
-        node.style.height = origHeight;
-        node.style.maxHeight = origMaxHeight;
-        node.style.overflow = origOverflow;
-        savedStyles.forEach(item => {
-          item.el.style.height = item.height;
-          item.el.style.maxHeight = item.maxH;
-          item.el.style.overflow = item.overflow;
-        });
+      // Position off-screen safely
+      clone.style.position = 'fixed';
+      clone.style.left = '-9999px';
+      clone.style.top = '0';
+      clone.style.margin = '0';
+      clone.style.transform = 'none';
+      clone.style.transition = 'none';
+      clone.style.zIndex = '-99999';
+
+      // Force auto full height
+      clone.style.height = 'auto';
+      clone.style.minHeight = 'auto';
+      clone.style.maxHeight = 'none';
+      clone.style.overflow = 'visible';
+      clone.style.display = 'flex';
+      clone.style.flexDirection = 'column';
+
+      // Preserve clean mockup width
+      const targetWidth = Math.max(340, node.offsetWidth || 340);
+      clone.style.width = targetWidth + 'px';
+      clone.style.maxWidth = targetWidth + 'px';
+
+      // 3. Unconstrain ALL inner scroll containers and message lists
+      const scrollAreas = clone.querySelectorAll('#mockupScrollArea, .overflow-y-auto, [class*="max-h-"], [class*="overflow-"]');
+      scrollAreas.forEach(el => {
+        el.style.height = 'auto';
+        el.style.minHeight = 'auto';
+        el.style.maxHeight = 'none';
+        el.style.overflow = 'visible';
+        el.style.flex = 'none';
+        el.style.flexGrow = '0';
+        el.style.flexShrink = '0';
+        el.style.flexBasis = 'auto';
+      });
+
+      // 4. Convert sticky headers to static/relative so they render at the exact top
+      clone.querySelectorAll('.sticky, [class*="sticky"]').forEach(el => {
+        el.style.position = 'relative';
+        el.style.top = '0';
+        el.style.flexShrink = '0';
+      });
+
+      // 5. Position bottom bar naturally right after the conversation
+      clone.querySelectorAll('.absolute.bottom-0, [class*="bottom-0"]').forEach(el => {
+        el.style.position = 'relative';
+        el.style.bottom = 'auto';
+        el.style.flexShrink = '0';
+        el.style.marginTop = '0';
+      });
+
+      // 6. Ensure any images inside clone have crossOrigin set to anonymous
+      clone.querySelectorAll('img').forEach(img => {
+        img.crossOrigin = 'anonymous';
+      });
+
+      // 7. Append clone to document.body for layout calculation
+      document.body.appendChild(clone);
+
+      // Await layout settling
+      await new Promise(resolve => setTimeout(resolve, 140));
+
+      const cleanup = () => {
+        if (clone && clone.parentNode) {
+          clone.parentNode.removeChild(clone);
+        }
       };
 
-      const doDownload = (dataUrl) => {
-        restoreStyles();
+      const triggerDownload = (dataUrl) => {
+        cleanup();
         const a = document.createElement('a');
-        const filename = (currentSocialTool || 'social') + '_full_screenshot_' + Date.now() + '.png';
-        a.download = filename;
+        const toolName = currentSocialTool || 'social';
+        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+        a.download = `${toolName}_full_screenshot_${timestamp}.png`;
         a.href = dataUrl;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        showPopup('සම්පූර්ණ Full Screenshot එක සාර්ථකව Download විය!', 'සාර්ථකයි', 'success');
+        showPopup('\u0DC3\u0DB8\u0DCA\u0DB4\u0DD6\u0DBB\u0DDF\u0DAB Full Screenshot \u0D91\u0D9A \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 Download \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
       };
 
-      setTimeout(() => {
-        if (window.htmlToImage) {
-          window.htmlToImage.toPng(node, { pixelRatio: 3, skipFonts: true, cacheBust: true })
-            .then(dataUrl => {
-              doDownload(dataUrl);
-            })
-            .catch(err => {
-              console.warn('htmlToImage failed, trying html2canvas fallback:', err);
-              if (window.html2canvas) {
-                window.html2canvas(node, { scale: 3, useCORS: true, allowTaint: true, backgroundColor: null })
-                  .then(canvas => {
-                    doDownload(canvas.toDataURL('image/png'));
-                  })
-                  .catch(err2 => {
-                    restoreStyles();
-                    console.error('Canvas export error:', err2);
-                    showPopup('Image එක Export කිරීමට නොහැකි විය. Text පිටපත් කෙරිණි.', 'දෝෂයකි', 'error');
-                    copySocialText();
-                  });
-              } else {
-                restoreStyles();
-                showPopup('Export Engine එකෙහි ගැටළුවක්. Text පිටපත් කෙරිණි.', 'අවවාදයයි', 'warning');
-                copySocialText();
-              }
-            });
-        } else if (window.html2canvas) {
-          window.html2canvas(node, { scale: 3, useCORS: true, allowTaint: true, backgroundColor: null })
-            .then(canvas => {
-              doDownload(canvas.toDataURL('image/png'));
-            })
-            .catch(err => {
-              restoreStyles();
-              console.error('Canvas export error:', err);
-              copySocialText();
-            });
-        } else {
-          restoreStyles();
-          copySocialText();
-        }
-      }, 150);
-    }
+      const fullWidth = clone.offsetWidth || targetWidth;
+      const fullHeight = Math.max(clone.scrollHeight, clone.offsetHeight);
 
+      // Try html2canvas with complete dimensions and scroll offsets reset
+      if (window.html2canvas) {
+        try {
+          const canvas = await window.html2canvas(clone, {
+            scale: 3,
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: null,
+            width: fullWidth,
+            height: fullHeight,
+            windowWidth: fullWidth + 200,
+            windowHeight: fullHeight + 200,
+            x: 0,
+            y: 0,
+            scrollX: 0,
+            scrollY: 0,
+            logging: false
+          });
+          const dataUrl = canvas.toDataURL('image/png');
+          if (dataUrl && dataUrl.length > 500) {
+            triggerDownload(dataUrl);
+            return;
+          }
+        } catch (err1) {
+          console.warn('html2canvas on clone error, trying htmlToImage:', err1);
+        }
+      }
+
+      // Fallback: htmlToImage
+      if (window.htmlToImage) {
+        try {
+          const dataUrl = await window.htmlToImage.toPng(clone, {
+            pixelRatio: 3,
+            skipFonts: true,
+            cacheBust: false,
+            width: fullWidth,
+            height: fullHeight
+          });
+          if (dataUrl && dataUrl.length > 500) {
+            triggerDownload(dataUrl);
+            return;
+          }
+        } catch (err2) {
+          console.warn('htmlToImage on clone error:', err2);
+        }
+      }
+
+      cleanup();
+      showPopup('Screenshot Download \u0D9A\u0DBB\u0DD3\u0DB8\u0DDA \u0DAF\u0DDB\u0DC2\u0DBA\u0D9A\u0DCA. Text \u0DB4\u0DD2\u0D9F\u0DB4\u0DAD\u0DCA \u0D9A\u0DD9\u0DBB\u0DD2\u0DAB\u0DD2.', '\u0DAF\u0DDB\u0DC2\u0DBA\u0D9A\u0DCA', 'error');
+      copySocialText();
+    }
   </script>
 
   <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
@@ -3291,7 +3409,8 @@
 
   <!-- API Configuration Modal -->
   <div id="apiConfigModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" id="apiConfigBackdrop" onclick="cancelApiModal()"></div>
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" id="apiConfigBackdrop"
+      onclick="cancelApiModal()"></div>
     <div
       class="glass-card w-full max-w-lg rounded-2xl p-6 lg:p-8 relative z-10 transform scale-95 opacity-0 transition-all duration-300"
       id="apiConfigContent">
@@ -3312,7 +3431,7 @@
         </button>
       </div>
 
-      <div class="space-y-4 mt-8">
+      <div id="apiOptionsList" class="space-y-4 mt-8">
         <!-- Option 1: Own API -->
         <button onclick="selectApiOption('own')"
           class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-indigo-400 transition-all group flex items-start gap-4">
@@ -3321,7 +3440,8 @@
           </div>
           <div>
             <h3 class="text-lg font-bold text-white mb-1">Connect Custom AI Key</h3>
-            <p class="text-xs text-gray-400">100% Free key from Google AI Studio. Unlimited requests & highest speed.</p>
+            <p class="text-xs text-gray-400">100% Free key from Google AI Studio. Unlimited requests & highest speed.
+            </p>
           </div>
         </button>
 
@@ -3346,7 +3466,8 @@
 
       <!-- Own API Key Input Section (Hidden by default) -->
       <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
-        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your AI Key (KaveezCloud Engine)</label>
+        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your AI Key
+          (KaveezCloud Engine)</label>
         <input type="text" id="geminiApiKeyInput" autocomplete="off"
           style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
           class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2"
@@ -3375,47 +3496,47 @@
   </div>
 
 
-<script>
+  <script>
 
-    
-    window.saveToRecentProjects = function(type, title, metadata, fileId = null) {
+
+    window.saveToRecentProjects = function (type, title, metadata, fileId = null) {
       if (!window.currentUserEmail) return;
-      
+
       let metaStr = metadata;
       if (fileId) {
-          metaStr = JSON.stringify({ text: metadata, file_id: fileId });
+        metaStr = JSON.stringify({ text: metadata, file_id: fileId });
       }
 
       try {
         fetch(`${API_BASE_URL}/api/user-projects`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: window.currentUserEmail,
-                type: type,
-                title: title,
-                metadata: metaStr,
-                date: new Date().toISOString()
-            })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: window.currentUserEmail,
+            type: type,
+            title: title,
+            metadata: metaStr,
+            date: new Date().toISOString()
+          })
         }).then(() => window.renderRecentProjects());
       } catch (e) {
         console.error('Save project error:', e);
       }
     };
 
-    window.renderRecentProjects = async function() {
+    window.renderRecentProjects = async function () {
       const container = document.getElementById('recentProjectsContainer');
       if (!container || !window.currentUserEmail) return;
       let projects = [];
       try {
         const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(window.currentUserEmail));
-        if(res.ok) projects = await res.json();
+        if (res.ok) projects = await res.json();
       } catch (e) {
         console.error('Failed to fetch user projects:', e);
       }
-      
+
       if (!projects || projects.length === 0) {
-          container.innerHTML = `
+        container.innerHTML = `
             <div class="flex flex-col items-center justify-center py-10 opacity-70 w-64 lg:w-full flex-shrink-0 snap-center">
               <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10 border-dashed">
                 <i data-lucide="inbox" class="w-8 h-8 text-slate-400"></i>
@@ -3423,36 +3544,36 @@
               <p class="text-slate-300 font-semibold">No active projects</p>
               <p class="text-xs text-slate-500 mt-1">Start by launching a tool.</p>
             </div>`;
-          if (window.lucide) window.lucide.createIcons();
-          return;
+        if (window.lucide) window.lucide.createIcons();
+        return;
       }
 
       let htmlOut = '';
       const icons = {
-          'Subtitle': 'subtitles',
-          'Dubbing': 'mic',
-          'Social': 'share-2',
-          'Script': 'pen-tool',
-          'Image': 'image',
-          'Video': 'video',
-          'Background': 'scissors'
+        'Subtitle': 'subtitles',
+        'Dubbing': 'mic',
+        'Social': 'share-2',
+        'Script': 'pen-tool',
+        'Image': 'image',
+        'Video': 'video',
+        'Background': 'scissors'
       };
       const colors = {
-          'Subtitle': 'bg-blue-500',
-          'Dubbing': 'bg-purple-500',
-          'Social': 'bg-pink-500',
-          'Script': 'bg-emerald-500',
-          'Image': 'bg-amber-500',
-          'Video': 'bg-indigo-500',
-          'Background': 'bg-teal-500'
+        'Subtitle': 'bg-blue-500',
+        'Dubbing': 'bg-purple-500',
+        'Social': 'bg-pink-500',
+        'Script': 'bg-emerald-500',
+        'Image': 'bg-amber-500',
+        'Video': 'bg-indigo-500',
+        'Background': 'bg-teal-500'
       };
 
       projects.forEach(p => {
-          const icon = icons[p.type] || 'file';
-          const color = colors[p.type] || 'bg-slate-500';
-          const time = new Date(p.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-          
-          htmlOut += `
+        const icon = icons[p.type] || 'file';
+        const color = colors[p.type] || 'bg-slate-500';
+        const time = new Date(p.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        htmlOut += `
           <div class="project-3d-card w-64 lg:w-full flex-shrink-0 snap-center group relative p-4 rounded-2xl bg-white/5 border border-white/10 hover:border-white/20 transition-all duration-500 ease-out backdrop-blur-md overflow-hidden cursor-pointer" onclick="window.location.href='${API_BASE_URL}/api/mtproto/download?msg_id=' + '${p.metadata}'">
               <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               <div class="relative z-10 flex items-start gap-4 transform transition-transform duration-500 group-hover:translate-z-10">
@@ -3467,82 +3588,100 @@
               </div>
           </div>`;
       });
-      
+
       container.innerHTML = htmlOut;
       if (window.lucide) window.lucide.createIcons();
     };
 
-    window.toggleApi = function(type) {
-        if (type === 'own') {
-            const existingKey = localStorage.getItem('capzone_gemini_key');
-            if (!existingKey) {
-                if(typeof showApiModal === 'function') {
-                    showApiModal();
-                    if(typeof selectApiOption === 'function') selectApiOption('own');
-                }
-                return;
+    window.toggleApi = function (type) {
+      if (type === 'own') {
+        const existingKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
+        if (!existingKey) {
+          // If private key is not entered: guide user directly to the private key input
+          if (typeof showPopup === 'function') {
+            showPopup('\u0D94\u0DB6 \u0DAD\u0DC0\u0DB8 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB \u0DB1\u0DDC\u0DB8\u0DD0\u0DAD. \u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0D94\u0DB6\u0DDA Private Key \u0D91\u0D9A \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', 'Private Key \u0D85\u0DC0\u0DC1\u0DDF\u0DBA\u0DD2', 'info');
+          }
+          if (typeof showApiModal === 'function') {
+            showApiModal();
+            if (typeof selectApiOption === 'function') {
+              selectApiOption('own');
             }
+            setTimeout(() => {
+              const keyInput = document.getElementById('geminiApiKeyInput');
+              if (keyInput) {
+                keyInput.focus();
+                keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, 200);
+          }
+          return;
+        } else {
+          // Private key already entered: auto-switch smoothly!
+          localStorage.setItem('capzone_api_type', 'own');
+          updateApiToggleUI();
+          if (typeof showPopup === 'function') {
+            showPopup('Private Key \u0D91\u0D9A \u0DC4\u0DB3\u0DD4\u0DB1\u0DCF\u0D9C\u0DD0\u0DB1\u0DD2\u0DAB\u0DD2. \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 Custom API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+          }
+          return;
         }
-        localStorage.setItem('capzone_api_type', type);
-        updateApiToggleUI();
-        if (typeof showPopup === 'function') {
-            showPopup(`Switched to ${type === 'own' ? 'Custom API' : 'Cloud API'}`, 'Success', 'success');
-        }
+      }
+
+      // Switch to Server Cloud API
+      localStorage.setItem('capzone_api_type', 'server');
+      updateApiToggleUI();
+      if (typeof showPopup === 'function') {
+        showPopup('KaveezCloud Server Cloud API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+      }
     };
 
-    window.updateApiToggleUI = function() {
-        const currentType = localStorage.getItem('capzone_api_type') || 'server';
-        const isServer = currentType === 'server';
+    window.updateApiToggleUI = function () {
+      const currentType = localStorage.getItem('capzone_api_type') || 'server';
+      const isServer = currentType === 'server';
 
-        // Desktop Toggle
-        const btnServer = document.getElementById('btnApiServer');
-        const btnOwn = document.getElementById('btnApiOwn');
-        if (btnServer && btnOwn) {
-            if (isServer) {
-                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-            } else {
-                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-            }
+      // Desktop Toggle
+      const btnServer = document.getElementById('btnApiServer');
+      const btnOwn = document.getElementById('btnApiOwn');
+      if (btnServer && btnOwn) {
+        if (isServer) {
+          btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+          btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+        } else {
+          btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+          btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
         }
+      }
 
-        // Mobile Toggle & Badge
-        const btnServerMob = document.getElementById('btnApiServerMobile');
-        const btnOwnMob = document.getElementById('btnApiOwnMobile');
-        const statusBadge = document.getElementById('mobileApiStatusBadge');
-        if (btnServerMob && btnOwnMob) {
-            if (isServer) {
-                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-                if (statusBadge) {
-                    statusBadge.innerText = "Cloud Active";
-                    statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
-                }
-            } else {
-                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-                if (statusBadge) {
-                    statusBadge.innerText = "Custom Active";
-                    statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
-                }
-            }
+      // Mobile Toggle & Badge
+      const btnServerMob = document.getElementById('btnApiServerMobile');
+      const btnOwnMob = document.getElementById('btnApiOwnMobile');
+      const statusBadge = document.getElementById('mobileApiStatusBadge');
+      if (btnServerMob && btnOwnMob) {
+        if (isServer) {
+          btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+          btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+          if (statusBadge) {
+            statusBadge.innerText = "Cloud Active";
+            statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
+          }
+        } else {
+          btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+          btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+          if (statusBadge) {
+            statusBadge.innerText = "Custom Active";
+            statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
+          }
         }
+      }
     };
 
     document.addEventListener('DOMContentLoaded', () => {
-        updateApiToggleUI();
-        // Initial render will fail without currentUserEmail, but we retry in an interval
-        setInterval(() => {
-            if (window.currentUserEmail) window.renderRecentProjects();
-        }, 10000); // refresh every 10 seconds
+      updateApiToggleUI();
+      // Initial render will fail without currentUserEmail, but we retry in an interval
+      setInterval(() => {
+        if (window.currentUserEmail) window.renderRecentProjects();
+      }, 10000); // refresh every 10 seconds
     });
-</script>
+  </script>
 </body>
 
 </html>
-
-
-
-
-
