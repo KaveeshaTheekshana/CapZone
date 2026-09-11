@@ -39,37 +39,6 @@
         return originalFetch(resource, config);
     };
   </script>
-
-  <meta charset="utf-8" />
-  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-  <title>CapZone | Video Editor Dashboard</title>
-  <link rel="icon" href="data:,">
-  <link rel="preload" as="image"
-    href="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop"
-    fetchpriority="high">
-
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-              purple: '#8B5CF6',
-              blue: '#3B82F6',
-              dark: '#0B0F19',
-              darker: '#05070D',
-              surface: 'rgba(255, 255, 255, 0.05)',
-              border: 'rgba(255, 255, 255, 0.1)',
-            }
-          },
-          backgroundImage: {
-            'cosmic': 'radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%)',
-            'hero-gradient': 'linear-gradient(135deg, #1E3A8A 0%, #4C1D95 100%)',
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Firebase Auth Protection -->
-  <script type="module">
-    import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
     onAuthStateChanged(auth, (user) => {
       if (!user) {
         // [DEV MODE] Temporarily bypassing login redirect
@@ -1476,6 +1445,7 @@
       }, 10);
     }
 
+
     function selectApiOption(type) {
       if (type === 'server') {
         localStorage.setItem('capzone_api_type', 'server');
@@ -1519,6 +1489,10 @@
       if (profileInput) {
         profileInput.value = key;
       }
+      
+      if (typeof window.updateApiToggleUI === 'function') {
+          window.updateApiToggleUI();
+      }
 
       closeApiModal();
     }
@@ -1541,7 +1515,7 @@
         modal.style.display = 'none';
         document.body.classList.remove('overflow-hidden');
         if (window.pendingToolModal) {
-          if (typeof openModal === 'function') openModal(window.pendingToolModal);
+          if (typeof window.openModal === 'function') window.openModal(window.pendingToolModal);
           window.pendingToolModal = null;
         }
       }, 300);
@@ -1559,6 +1533,7 @@
         document.body.classList.add('overflow-hidden');
       }
     };
+
     window.closeModal = function (modalId, event) {
       if (event) {
         event.preventDefault();
@@ -3151,3 +3126,6 @@
 </body>
 
 </html>
+
+
+
