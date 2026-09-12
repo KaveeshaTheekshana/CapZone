@@ -2,8 +2,12 @@
 <html class="dark" lang="en">
 
 <head>
-
+  <meta charset="utf-8" />
   <script>
+    const _hostname = window.location.hostname;
+    const isLocalNetwork = _hostname === 'localhost' || _hostname === '127.0.0.1' || _hostname.startsWith('192.168.') || _hostname.startsWith('10.') || _hostname.startsWith('172.');
+    window.API_BASE_URL = (isLocalNetwork || window.location.protocol === 'file:') ? `http://${_hostname || 'localhost'}:6039` : 'https://capzone.kaveesha.top';
+
     const originalFetch = window.fetch;
     window.fetch = async function () {
       let [resource, config] = arguments;
@@ -40,7 +44,7 @@
     };
   </script>
 
-  <meta charset="utf-8" />
+
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>CapZone | Video Editor Dashboard</title>
   <link rel="icon" href="data:,">
@@ -96,7 +100,7 @@
       if (!user) {
         // [DEV MODE] Temporarily bypassing login redirect
         //window.location.href = 'login.html';
-        console.warn("Ã¢Å¡Â Ã¯Â¸Â DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
+    console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
         const savedEmail = localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
         window.currentUserEmail = savedEmail;
         if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
@@ -733,7 +737,7 @@
       </div>
 
       <p class="text-sm font-medium text-gray-300 drop-shadow-md">
-        Designed & Engineered with Ã¢ÂÂ¤Ã¯Â¸Â by <span class="text-blue-400 font-bold text-base">Kaveesha
+            Designed & Engineered with ❤️ by <span class="text-blue-400 font-bold text-base">Kaveesha
           Theekshana</span>
       </p>
 
@@ -744,7 +748,7 @@
         <i data-lucide="external-link" class="w-3 h-3"></i>
       </a>
 
-      <p class="text-[11px] text-gray-400 mt-2">Ã‚Â© 2026 CapZone Subtitle Studio. All rights reserved. Powered by
+          <p class="text-[11px] text-gray-400 mt-2">© 2026 CapZone Subtitle Studio. All rights reserved. Powered by <span class="text-blue-400">KaveezCloud AI</span></p>
         KaveezCloud Engine.</p>
     </div>
   </footer>
@@ -1376,7 +1380,7 @@
               <select id="socialLangSelect"
                 class="glass-input px-3 py-2.5 rounded-xl text-xs font-semibold text-gray-200 outline-none bg-slate-900 border border-white/20"
                 style="background-color: #0f172a !important; color: #ffffff !important;">
-                <option value="sinhala" class="bg-slate-900 text-white">Ã Â·Æ’Ã Â·â€™Ã Â¶â€šÃ Â·â€žÃ Â¶Â½ (Sinhala)</option>
+                    <option value="sinhala" class="bg-slate-900 text-white">සිංහල (Sinhala)</option>
                 <option value="english" class="bg-slate-900 text-white">English</option>
                 <option value="singlish" class="bg-slate-900 text-white">Singlish</option>
               </select>
@@ -1828,33 +1832,44 @@
       const toast = document.getElementById('toastNotification');
       const msg = document.getElementById('toastMessage');
       const iconContainer = document.getElementById('toastIconContainer');
+      if (!toast || !msg) return;
+
+      let displayMsg = message || 'Notice';
+      const lower = String(displayMsg).toLowerCase();
+
+      // Normalize any system/AI/backend error message to the exact developer prompt requested
+      if (type === 'error' || lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('weda na') || lower.includes('gemini') || lower.includes('quota') || lower.includes('timeout') || lower.includes('contact developer')) {
+        type = 'warning';
+        displayMsg = 'System Error, please contact developer';
+      }
 
       if (type === 'error') {
-        let displayMsg = message || 'An unexpected error occurred.';
-        // Sanitize backend messages so normal users don't see backend/internal details
-        const lower = displayMsg.toLowerCase();
-        if (lower.includes('session expired') || lower.includes('daemon') || lower.includes('needs_login') || lower.includes('timeout') || lower.includes('google')) {
-          displayMsg = 'Service is currently busy. Please try again in a moment.';
-        }
-        msg.innerHTML = `<div class="flex flex-col gap-1"><span class="text-red-400 text-sm font-medium">${displayMsg}</span></div>`;
-        iconContainer.innerHTML = '<i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i>';
+        msg.innerHTML = `<span class="text-red-400 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>';
+      } else if (type === 'warning') {
+        msg.innerHTML = `<span class="text-amber-300 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-5 h-5 text-amber-400"></i>';
+      } else if (type === 'info') {
+        msg.innerHTML = `<span class="text-cyan-300 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="info" class="w-5 h-5 text-cyan-400"></i>';
       } else {
-        msg.innerHTML = message;
-        iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-indigo-500"></i>';
+        msg.innerHTML = `<span class="text-emerald-300 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>';
       }
-      lucide.createIcons();
+
+      try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
+
       toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
       toast.classList.add('opacity-100', 'translate-y-0');
-      setTimeout(() => {
+      if (window._popupTimeout) clearTimeout(window._popupTimeout);
+      window._popupTimeout = setTimeout(() => {
         toast.classList.remove('opacity-100', 'translate-y-0');
         toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
       }, 5000);
     }
 
     // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
-    const _hostname = window.location.hostname;
-    const isLocalNetwork = _hostname === 'localhost' || _hostname === '127.0.0.1' || _hostname.startsWith('192.168.') || _hostname.startsWith('10.') || _hostname.startsWith('172.');
-    const API_BASE_URL = (isLocalNetwork || window.location.protocol === 'file:') ? `http://${_hostname || 'localhost'}:6039` : 'https://capzone.kaveesha.top';
+    const API_BASE_URL = window.API_BASE_URL;
 
     function setupProgressTracker(clientId, stepsPrefix, barId) {
       const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
@@ -2048,7 +2063,7 @@
       const apiKey = localStorage.getItem('capzone_gemini_key');
       const format = document.getElementById('scriptFormat').value;
 
-      let prompt = `Act as an expert YouTube scriptwriter and produce a highly engaging, super advanced viral video script about '${topic}'. Format: ${format}. CRITICAL INSTRUCTIONS: 1. The script MUST be 100% in natural Sinhala (Ã Â·Æ’Ã Â·â€™Ã Â¶â€šÃ Â·â€žÃ Â¶Â½ Unicode). 2. Write in PLAIN TEXT ONLY. DO NOT use ANY Markdown formatting (no **, no ##, no bullets). Provide a clean text output. 3. Include a catchy HOOK, a detailed INTRO, a comprehensive BODY with creative visual scene descriptions (B-Roll ideas), and a strong CALL-TO-ACTION OUTRO. 4. Ensure paragraphs are well-separated with blank lines for readability. Make the language highly compelling and professional for content creators.`;
+      let prompt = `Act as an expert YouTube scriptwriter and produce a highly engaging, super advanced viral video script about '${topic}'. Format: ${format}. CRITICAL INSTRUCTIONS: 1. The script MUST be 100% in natural Sinhala (සිංහල Unicode). 2. Write in PLAIN TEXT ONLY. DO NOT use ANY Markdown formatting (no **, no ##, no bullets). Provide a clean text output. 3. Include a catchy HOOK, a detailed INTRO, a comprehensive BODY with creative visual scene descriptions (B-Roll ideas), and a strong CALL-TO-ACTION OUTRO. 4. Ensure paragraphs are well-separated with blank lines for readability. Make the language highly compelling and professional for content creators.`;
 
       try {
         let scriptText = '';
@@ -2188,7 +2203,7 @@
     async function handleSrtSubmit(e) {
       e.preventDefault();
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
-      if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» 100MB Ã Â¶Â§ Ã Â·â‚¬Ã Â¶Â©Ã Â·Â Ã Â¶Å¡Ã Â·â€Ã Â¶Â©Ã Â·Â Ã Â·â‚¬Ã Â·â€œÃ Â¶Â©Ã Â·â€™Ã Â¶ÂºÃ Â·ÂÃ Â·â‚¬Ã Â¶Å¡Ã Â·Å  Ã Â¶Â½Ã Â¶Â¶Ã Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â±.', 'File Too Large', 'error'); return; }
+      if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
       
       document.getElementById('srtSubmitBtn').disabled = true;
       document.getElementById('srtProgressCard').style.display = 'block';
@@ -2370,7 +2385,7 @@
       e.preventDefault();
       const fileInput = document.getElementById('dubVideoInput');
       if (!fileInput.files[0]) { showPopup('Upload video', 'Error', 'error'); return; }
-      if (fileInput.files[0].size > 99 * 1024 * 1024) { showPopup('Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» 100MB Ã Â¶Â§ Ã Â·â‚¬Ã Â¶Â©Ã Â·Â Ã Â¶Å¡Ã Â·â€Ã Â¶Â©Ã Â·Â Ã Â·â‚¬Ã Â·â€œÃ Â¶Â©Ã Â·â€™Ã Â¶ÂºÃ Â·ÂÃ Â·â‚¬Ã Â¶Å¡Ã Â·Å  Ã Â¶Â½Ã Â¶Â¶Ã Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â±.', 'File Too Large', 'error'); return; }
+      if (fileInput.files[0].size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
 
       document.getElementById('dubSubmitBtn').disabled = true;
       document.getElementById('dubProgressCard').style.display = 'block';
@@ -2424,7 +2439,7 @@
 
     function switchImageTab(tab) {
       if (window.isImageTaskRunning) {
-        showPopup('Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â¶Â§ Ã Â¶Å¡Ã Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â·â€™Ã Â¶ÂºÃ Â·ÂÃ Â¶Â­Ã Â·Å Ã Â¶Â¸Ã Â¶Å¡ Ã Â·â‚¬Ã Â¶Â± Image Ã Â·â‚¬Ã Â·ÂÃ Â¶Â©Ã Â¶Å¡Ã Â¶Â§Ã Â¶ÂºÃ Â·â€Ã Â¶Â­Ã Â·Å Ã Â¶Â­ Ã Â¶â€¦Ã Â·â‚¬Ã Â·Æ’Ã Â¶Â±Ã Â·Å  Ã Â·â‚¬Ã Â¶Â± Ã Â¶Â­Ã Â·â„¢Ã Â¶Å¡Ã Â·Å  Ã Â¶Â»Ã Â·ÂÃ Â¶Â³Ã Â·â€œ Ã Â·Æ’Ã Â·â€™Ã Â¶Â§Ã Â·â€™Ã Â¶Â±Ã Â·Å Ã Â¶Â±. Server Load Ã Â¶â€˜Ã Â¶Å¡ Ã Â¶â€¦Ã Â·â‚¬Ã Â¶Â¸ Ã Â¶Å¡Ã Â·â€™Ã Â¶Â»Ã Â·â€œÃ Â¶Â¸ Ã Â·Æ’Ã Â¶Â³Ã Â·â€žÃ Â·Â Ã Â¶â€˜Ã Â¶Å¡Ã Â·Å Ã Â·â‚¬Ã Â¶Â» Ã Â¶â€˜Ã Â¶Å¡Ã Â·Å  Ã Â·â‚¬Ã Â·ÂÃ Â¶Â©Ã Â¶Å¡Ã Â·Å  Ã Â¶Â´Ã Â¶Â¸Ã Â¶Â«Ã Â¶Å¡Ã Â·Å  Ã Â·Æ’Ã Â·â€™Ã Â¶Â¯Ã Â·â€Ã Â¶Å¡Ã Â·â€¦ Ã Â·â€žÃ Â·ÂÃ Â¶Å¡.', 'Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» Ã Â¶Â»Ã Â·ÂÃ Â¶Â³Ã Â·â€œ Ã Â·Æ’Ã Â·â€™Ã Â¶Â§Ã Â·â€™Ã Â¶Â±Ã Â·Å Ã Â¶Â± Ã¢ÂÂ³', 'error');
+        showPopup('කරුණාකර වීඩියෝවක් තෝරන්න', 'Warning', 'warning');
         return;
       }
       document.getElementById('imageGenerateForm').style.display = tab === 'generate' ? 'block' : 'none';
@@ -2475,7 +2490,7 @@
       e.preventDefault();
       const fileInput = document.getElementById('enhanceImageInput');
       if (!fileInput.files[0]) { showPopup('Upload an image', 'Error', 'error'); return; }
-      if (fileInput.files[0].size > 20 * 1024 * 1024) { showPopup('Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» 20MB Ã Â¶Â§ Ã Â·â‚¬Ã Â¶Â©Ã Â·Â Ã Â¶Å¡Ã Â·â€Ã Â¶Â©Ã Â·Â Ã Â¶Â¡Ã Â·ÂÃ Â¶ÂºÃ Â·ÂÃ Â¶Â»Ã Â·â€“Ã Â¶Â´Ã Â¶ÂºÃ Â¶Å¡Ã Â·Å  Ã Â¶Â½Ã Â¶Â¶Ã Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â±.', 'File Too Large', 'error'); return; }
+      if (fileInput.files[0].size > 20 * 1024 * 1024) { showPopup('කරුණාකර 20MB ට වඩා කුඩා ඡායාරූපයක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
 
       document.getElementById('imageEnhanceBtn').disabled = true;
       document.getElementById('imgProgressCard').style.display = 'block';
@@ -2606,31 +2621,6 @@
       setWallpaper(wallpapers[0].url);
       renderWallpaperGrid();
       if (typeof showPopup === 'function') {
-        showPopup('Theme reset to default', 'success');
-      }
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initWallpapers);
-    } else {
-      initWallpapers();
-    }
-
-    // SOCIAL KIT LOGIC
-    let currentSocialTool = 'fake_chat';
-    let currentSocialData = null;
-
-    const socialToolMeta = {
-      whatsapp_message: { title: 'WhatsApp', icon: 'message-circle', color: 'text-green-500', bg: 'bg-green-500/10 border-green-500/30' },
-      fake_chat: { title: 'Fake text chat', icon: 'message-square', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' },
-      tiktok_comment: { title: 'TikTok comment', icon: 'message-circle', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
-      insta_comment: { title: 'Instagram comment', icon: 'messages-square', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
-      fb_comment: { title: 'Facebook comment', icon: 'thumbs-up', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
-      twitter_post: { title: 'Twitter post', icon: 'hash', color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/30' },
-      reddit_post: { title: 'Reddit post', icon: 'megaphone', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
-      text_box: { title: 'Text box', icon: 'type', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
-      receipt: { title: 'Receipt', icon: 'receipt', color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-500/30' }
-    };
 
     function openSocialKitModal(e) {
       if (e) {
@@ -2666,12 +2656,73 @@
       studioIcon.className = 'w-8 h-8 rounded-lg flex items-center justify-center border ' + meta.bg;
       if (toolKey === 'fb_comment') {
         studioIcon.innerHTML = '<svg class="w-4 h-4 fill-[#1877F2]" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
+
+      setWallpaper(wallpapers[0].url);
+      renderWallpaperGrid();
+      if (typeof showPopup === 'function') {
+        showPopup('Theme reset to default', 'success');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWallpapers);
+    } else {
+      initWallpapers();
+    }
+
+    // SOCIAL KIT LOGIC
+    let currentSocialTool = 'fake_chat';
+    let currentSocialData = null;
+
+    const socialToolMeta = {
+      whatsapp_message: { title: 'WhatsApp', icon: 'message-circle', color: 'text-green-500', bg: 'bg-green-500/10 border-green-500/30' },
+      fake_chat: { title: 'Fake text chat', icon: 'message-square', color: 'text-cyan-400', bg: 'bg-cyan-500/10 border-cyan-500/30' },
+      tiktok_comment: { title: 'TikTok comment', icon: 'message-circle', color: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/30' },
+      insta_comment: { title: 'Instagram comment', icon: 'messages-square', color: 'text-purple-400', bg: 'bg-purple-500/10 border-purple-500/30' },
+      fb_comment: { title: 'Facebook comment', icon: 'thumbs-up', color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/30' },
+      twitter_post: { title: 'Twitter post', icon: 'hash', color: 'text-indigo-400', bg: 'bg-indigo-500/10 border-indigo-500/30' },
+      reddit_post: { title: 'Reddit post', icon: 'megaphone', color: 'text-amber-400', bg: 'bg-amber-500/10 border-amber-500/30' },
+      text_box: { title: 'Text box', icon: 'type', color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/30' },
+      receipt: { title: 'Receipt', icon: 'receipt', color: 'text-amber-300', bg: 'bg-amber-500/10 border-amber-500/30' }
+    };
+
+    function openSocialKitModal(e) {
+      if (e) {
+        e.preventDefault();
+      }
+      document.getElementById('socialKitModal').classList.remove('hidden');
+      document.getElementById('socialKitModal').classList.add('flex');
+      document.getElementById('socialKitStudio').classList.add('hidden');
+      document.getElementById('socialKitStudio').classList.remove('flex');
+      document.getElementById('socialKitOverview').classList.remove('hidden');
+    }
+
+    function closeSocialKitModal() {
+      document.getElementById('socialKitModal').classList.add('hidden');
+      document.getElementById('socialKitModal').classList.remove('flex');
+      currentSocialData = null;
+    }
+
+    function openSocialStudio(toolKey) {
+      currentSocialTool = toolKey;
+      document.getElementById('socialKitOverview').classList.add('hidden');
+      const studio = document.getElementById('socialKitStudio');
+      studio.classList.remove('hidden');
+      studio.classList.add('flex');
+
+      const meta = socialToolMeta[toolKey] || socialToolMeta['fake_chat'];
+      document.getElementById('studioTitle').innerText = meta.title;
+      const studioIcon = document.getElementById('studioIcon');
+      studioIcon.className = 'w-8 h-8 rounded-lg flex items-center justify-center ' + meta.bg;
+      
+      if (meta.icon === 'facebook-colored') {
+        studioIcon.innerHTML = '<svg class="w-4 h-4 fill-[#1877F2]" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>';
       } else {
         studioIcon.innerHTML = '<i data-lucide="' + meta.icon + '" class="w-4 h-4 ' + meta.color + '"></i>';
       }
 
-      const sampleTopics = {
-        fake_chat: 'Ã Â¶ÂºÃ Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·â„¢Ã Â¶Å¡Ã Â·Å  Ã Â¶â€¦Ã Â¶Â­Ã Â¶Â» Ã Â¶â€ Ã Â¶Â­Ã Â¶Â½Ã Â·Å  Ã Â¶Â Ã Â·ÂÃ Â¶Â§Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å ',
+            const sampleTopics = {
+        fake_chat: 'ඔබගේ Fake text පණිවිඩය ඇතුලත් කරන්න (Sinhala)',
         tiktok_comment: 'Viral debate on whether night kottu is the best food',
         insta_comment: 'Aesthetic travel photo compliment thread',
         fb_comment: 'Relatives commenting on wedding photos',
@@ -2679,8 +2730,9 @@
         reddit_post: 'r/AskReddit: What is a life hack that feels like cheating?',
         text_box: 'Mind-blowing fact about the deep ocean',
         receipt: 'Supermarket shopping list with hilarious items',
-        whatsapp_message: 'Ã Â¶ÂºÃ Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·â„¢Ã Â¶Å¡Ã Â·Å  Ã Â¶â€¦Ã Â¶Â­Ã Â¶Â» WhatsApp Ã Â¶Â Ã Â·ÂÃ Â¶Â§Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å '
+        whatsapp_message: 'ඔබගේ WhatsApp පණිවිඩය ඇතුලත් කරන්න (Sinhala)'
       };
+
       document.getElementById('socialTopicInput').value = sampleTopics[toolKey] || '';
 
       renderDefaultSampleMockup(toolKey);
@@ -2702,12 +2754,12 @@
       if (tool === 'fake_chat') {
         if (isSinhala) {
           return {
-            personName: "Ã Â¶Å¡Ã Â·Æ’Ã Â·â€Ã Â¶Â±Ã Â·Å  Ã Â¶Â´Ã Â·â„¢Ã Â¶Â»Ã Â·Å¡Ã Â¶Â»Ã Â·Â",
+            personName: "කසුන් පෙරේරා",
             messages: [
-              { sender: "them", text: `Ã Â¶Â¸Ã Â¶Â Ã Â¶â€š Ã Â¶â€¦Ã Â¶Â» ${topic} Ã Â·â‚¬Ã Â·ÂÃ Â¶Â©Ã Â·Å¡ Ã Â¶Å“Ã Â·ÂÃ Â¶Â± Ã Â¶Â¶Ã Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â¶Â¯?`, time: "10:24 AM" },
-              { sender: "me", text: "Ã Â¶â€Ã Â·â‚¬Ã Â·Å  Ã Â¶Â¸Ã Â¶Â Ã Â¶â€š, Ã Â¶Â¸Ã Â¶Â¸ Ã Â¶â€™Ã Â¶Å¡ Ã Â·Æ’Ã Â¶Â¸Ã Â·Å Ã Â¶Â´Ã Â·â€“Ã Â¶Â»Ã Â·Å Ã Â¶Â«Ã Â¶ÂºÃ Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â¸ check Ã Â¶Å¡Ã Â¶Â»Ã Â¶Â½Ã Â·Â Ã Â¶Â¶Ã Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â·Â!", time: "10:25 AM" },
-              { sender: "them", text: "Ã Â·Æ’Ã Â·â€™Ã Â¶Â»Ã Â·ÂÃ Â·â‚¬Ã Â¶Â§Ã Â¶Â¸? Ã Â¶Â¸Ã Â·Å“Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å Ã Â¶Â¯ Ã Â¶Â­Ã Â¶Â­Ã Â·Å Ã Â¶Â­Ã Â·Å Ã Â·â‚¬Ã Â·Å¡? Ã Â¶Â´Ã Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â¶Â­Ã Â·â€™Ã Â¶ÂµÃ Â¶Â½ Ã Â·â€žÃ Â·Å“Ã Â¶Â³Ã Â¶ÂºÃ Â·â€™Ã Â¶Â¯?", time: "10:25 AM" },
-              { sender: "me", text: "Ã Â·Æ’Ã Â·â€Ã Â¶Â´Ã Â·â€™Ã Â¶Â»Ã Â·â€™Ã Â¶ÂºÃ Â¶Â§Ã Â¶Â¸ Ã Â·â‚¬Ã Â·ÂÃ Â¶Â© Ã Â¶Â¶Ã Â¶â€š! Ã Â¶Â¸Ã Â¶Â¸ Ã Â¶â€¹Ã Â¶Â¹Ã Â¶Â§ Ã Â·â‚¬Ã Â·â€™Ã Â·Æ’Ã Â·Å Ã Â¶Â­Ã Â¶Â» Ã Â¶Â§Ã Â·â€™Ã Â¶Å¡ Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â·Å Ã Â¶Â¸ Ã Â¶â€˜Ã Â·â‚¬Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â¶Â¸Ã Â·Å .", time: "10:26 AM" }
+              { sender: "them", text: `මචං අර ${topic} වැඩේ ගැන බැලුවද?`, time: "10:24 AM" },
+              { sender: "me", text: "ඔව් මචං, මම ඒක සම්පූර්ණයෙන්ම check කරලා බැලුවා!", time: "10:25 AM" },
+              { sender: "them", text: "සිරාවටම? මොකක්ද තත්ත්වේ? ප්‍රතිඵල හොඳයිද?", time: "10:25 AM" },
+              { sender: "me", text: "සුපිරියටම වැඩ බං! මම උඹට විස්තර ටික දැන්ම එවන්නම්.", time: "10:26 AM" }
             ]
           };
         } else if (isSinglish) {
@@ -2734,12 +2786,12 @@
       } else if (tool === 'whatsapp_message') {
         if (isSinhala) {
           return {
-            contactName: "Ã Â¶Å¡Ã Â·Æ’Ã Â·â€Ã Â¶Â±Ã Â·Å  Ã Â¶Â¸Ã Â¶Â½Ã Â·Å Ã Â¶Â½Ã Â·â€™", isOnline: true,
+            contactName: "කසුන් මල්ලි", isOnline: true,
             messages: [
-              { sender: "them", text: `Ã Â¶Â¸Ã Â¶Â Ã Â¶â€š ${topic} Ã Â¶Å“Ã Â·ÂÃ Â¶Â± Ã Â¶Â¯Ã Â·ÂÃ Â¶Å¡Ã Â·Å Ã Â¶Å¡Ã Â¶Â¯?`, time: "09:41 AM", status: "" },
-              { sender: "me", text: "Ã Â¶â€Ã Â·â‚¬Ã Â·Å  Ã Â¶Â¶Ã Â¶â€š, Ã Â¶Â¸Ã Â¶Â¸Ã Â¶Â­Ã Â·Å  Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â·Å  Ã Â¶Â¶Ã Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â·Å¡. Ã Â¶Â´Ã Â¶Â§Ã Â·Å Ã Â¶Â§Ã Â¶Â¸ Ã Â¶Â­Ã Â¶Â¸Ã Â¶ÂºÃ Â·â€™!", time: "09:42 AM", status: "read" },
-              { sender: "them", text: "Ã Â·â‚¬Ã Â·â€™Ã Â·Æ’Ã Â·Å Ã Â¶Â­Ã Â¶Â» Ã Â¶Â§Ã Â·â€™Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å  Ã Â¶â€˜Ã Â·â‚¬Ã Â¶Â´Ã Â¶Â±Ã Â·Å Ã Â¶Å¡Ã Â·Â Ã Â¶Â¸Ã Â¶Â§Ã Â¶Â­Ã Â·Å  Ã Â¶Â¶Ã Â¶Â½Ã Â¶Â±Ã Â·Å Ã Â¶Â±.", time: "09:42 AM", status: "" },
-              { sender: "me", text: "Ã Â·â€žÃ Â¶Â»Ã Â·â€™ Ã Â¶Â¸Ã Â¶Â¸ Ã Â¶Â½Ã Â·â€™Ã Â¶Â±Ã Â·Å Ã Â¶Å¡Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡ Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â¶Â¸Ã Â·Å  Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â·Å Ã Â¶Â¸.", time: "09:43 AM", status: "read" }
+              { sender: "them", text: `මචං ${topic} ගැන දැක්කද?`, time: "09:41 AM", status: "" },
+              { sender: "me", text: "ඔව් බං, මමත් දැන් බැලුවේ. පට්ටම තමයි!", time: "09:42 AM", status: "read" },
+              { sender: "them", text: "විස්තර ටිකක් එවපන්කෝ මටත් බලන්න.", time: "09:42 AM", status: "" },
+              { sender: "me", text: "හරි මම ලින්ක් එක දාන්නම් දැන්ම.", time: "09:43 AM", status: "read" }
             ]
           };
         } else if (isSinglish) {
@@ -2754,7 +2806,7 @@
           };
         } else {
           return {
-            contactName: "Alex (Bestie) Ã¢ÂÂ¤Ã¯Â¸Â", isOnline: true,
+            contactName: "Alex (Bestie) ❤️", isOnline: true,
             messages: [
               { sender: "them", text: `Hey, did you check out ${topic}?`, time: "09:41 AM", status: "" },
               { sender: "me", text: "Yes! Absolutely insane results!", time: "09:42 AM", status: "read" },
@@ -2767,20 +2819,20 @@
         return {
           username: isSinhala ? "@lanka_trend" : "@viral_pulse",
           comment: isSinhala
-            ? `${topic} Ã Â¶Å“Ã Â·ÂÃ Â¶Â± Ã Â¶Â¸Ã Â·Å¡ Ã Â¶Å¡Ã Â·â€™Ã Â¶ÂºÃ Â¶Â´Ã Â·â€ Ã Â¶Å¡Ã Â¶Â­Ã Â·ÂÃ Â·â‚¬ 100% Ã Â¶Å¡Ã Â·Å  Ã Â¶â€¡Ã Â¶Â­Ã Â·Å Ã Â¶Â­! Ã Â¶Â¸Ã Â¶Â¸Ã Â¶Â­Ã Â·Å  Ã Â¶â€¦Ã Â¶Â­Ã Â·Å Ã Â¶Â¯Ã Â·ÂÃ Â¶Å¡Ã Â·â€œÃ Â¶Â¸Ã Â·â„¢Ã Â¶Â±Ã Â·Å  Ã Â¶Â¯Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·â‚¬Ã Â·Â Ã°Å¸â€Â¥`
-            : (isSinglish ? `${topic} gana me kiyapu kathawa siraawata aththa ban! Patta Ã°Å¸â€Â¥` : `This breakdown about ${topic} is 100% spot on! Blew my mind Ã°Å¸â€Â¥`),
+            ? `${topic} ගැන මේ කියපු කතාව 100% ක් ඇත්ත! මමත් අත්දැකීමෙන් දන්නවා 🔥`
+            : (isSinglish ? `${topic} gana me kiyapu kathawa siraawata aththa ban! Patta 🔥` : `This breakdown about ${topic} is 100% spot on! Blew my mind 🔥`),
           likes: "28.4K",
           time: "2h ago",
           replies: [
             {
               username: isSinhala ? "@nuwan_bro" : "@sam_vids",
-              comment: isSinhala ? "Ã Â·Æ’Ã Â·â€™Ã Â¶Â»Ã Â·ÂÃ Â·â‚¬Ã Â¶Â§Ã Â¶Â¸ Ã Â¶Â¸Ã Â¶Â Ã Â¶â€š, Ã Â¶Â¸Ã Â¶Â¸Ã Â¶Â­Ã Â·Å  Ã Â¶Â¸Ã Â·Å¡Ã Â¶Å¡Ã Â¶Â¸ Ã Â¶Â­Ã Â¶Â¸Ã Â¶ÂºÃ Â·â€™ Ã Â¶Å¡Ã Â·â€™Ã Â¶ÂºÃ Â¶Â±Ã Â·Å Ã Â¶Â± Ã Â·â€žÃ Â·â€™Ã Â¶Â§Ã Â·â€™Ã Â¶ÂºÃ Â·Å¡!" : (isSinglish ? "Aniwa machan, mamath mehema thama hithuwe!" : "Totally agree! Needs way more recognition."),
+              comment: isSinhala ? "සිරාවටම මචං, මමත් මේකම තමයි කියන්න හිටියේ!" : (isSinglish ? "Aniwa machan, mamath mehema thama hithuwe!" : "Totally agree! Needs way more recognition."),
               likes: "3,890",
               time: "1h ago"
             },
             {
               username: isSinhala ? "@kavindi_lk" : "@elena_rose",
-              comment: isSinhala ? "Ã Â¶Å Ã Â·â€¦Ã Â¶Å¸ Ã Â¶Å¡Ã Â·Å“Ã Â¶Â§Ã Â·Æ’ Ã Â¶â€°Ã Â¶Å¡Ã Â·Å Ã Â¶Â¸Ã Â¶Â±Ã Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â¶Å¡Ã Â·Â Ã Â¶Â´Ã Â·Å Ã Â¶Â½Ã Â·â€œÃ Â·Æ’Ã Â·Å !" : (isSinglish ? "Next part eka ikmanata daapan bro!" : "Can you make a part 2 explaining the details?"),
+              comment: isSinhala ? "ඊළඟ කොටස ඉක්මනින් දාන්නකෝ ප්ලීස්!" : (isSinglish ? "Next part eka ikmanata daapan bro!" : "Can you make a part 2 explaining the details?"),
               likes: "1,240",
               time: "45m ago"
             }
@@ -2791,14 +2843,14 @@
           username: "creative.vibe",
           isVerified: true,
           comment: isSinhala
-            ? `${topic} Ã Â·Æ’Ã Â¶Â¸Ã Â·Å Ã Â¶Â¶Ã Â¶Â±Ã Â·Å Ã Â¶Â¯Ã Â¶ÂºÃ Â·â„¢Ã Â¶Â±Ã Â·Å  Ã Â¶Å¡Ã Â¶Â»Ã Â¶Â´Ã Â·â€ Ã Â·Æ’Ã Â·â€Ã Â¶Â´Ã Â·â€™Ã Â¶Â»Ã Â·â€™Ã Â¶Â¸ Ã Â¶Â±Ã Â·â€™Ã Â¶Â»Ã Â·Å Ã Â¶Â¸Ã Â·ÂÃ Â¶Â«Ã Â¶ÂºÃ Â¶Å¡Ã Â·Å ! Ã Â·â€žÃ Â·ÂÃ Â¶Â¸Ã Â·ÂÃ Â¶Â¸ Ã Â¶â€¦Ã Â¶Â±Ã Â·â€™Ã Â·â‚¬Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶ÂºÃ Â¶ÂºÃ Â·â„¢Ã Â¶Â±Ã Â·Å  Ã Â¶Â±Ã Â·ÂÃ Â¶Â»Ã Â¶Â¹Ã Â·â€™Ã Â¶Âº Ã Â¶ÂºÃ Â·â€Ã Â¶Â­Ã Â·â€Ã Â¶ÂºÃ Â·â€™ Ã¢Å“Â¨`
-            : (isSinglish ? `${topic} gana karapu patta post ekak! Godak watinawa Ã¢Å“Â¨` : `Unmatched quality content on ${topic}! Truly inspirational Ã¢Å“Â¨`),
+            ? `${topic} සම්බන්දයෙන් කරපු සුපිරිම නිර්මාණයක්! හැමෝම අනිවාර්යයෙන් නැරඹිය යුතුයි ✨`
+            : (isSinglish ? `${topic} gana karapu patta post ekak! Godak watinawa ✨` : `Unmatched quality content on ${topic}! Truly inspirational ✨`),
           likes: "16.8K",
           time: "3h",
           replies: [
             {
               username: "wanderer_lk",
-              comment: isSinhala ? "Ã Â¶Â±Ã Â·â€™Ã Â¶ÂºÃ Â¶Â¸Ã Â¶ÂºÃ Â·â€™ Ã Â·Æ’Ã Â·â€žÃ Â·Â, Ã Â¶Â¯Ã Â·â€™Ã Â¶Å“Ã Â¶Â§Ã Â¶Â¸ Ã Â¶Å¡Ã Â¶Â»Ã Â¶Å“Ã Â·â„¢Ã Â¶Â± Ã Â¶ÂºÃ Â¶Â±Ã Â·Å Ã Â¶Â±!" : (isSinglish ? "Niyamai saho, keep it up!" : "Couldn't have said it better myself!"),
+              comment: isSinhala ? "නියමයි සහෝ, දිගටම කරගෙන යන්න!" : (isSinglish ? "Niyamai saho, keep it up!" : "Couldn't have said it better myself!"),
               likes: "940",
               time: "2h"
             }
@@ -2806,17 +2858,17 @@
         };
       } else if (tool === 'fb_comment') {
         return {
-          name: isSinhala ? "Ã Â·Æ’Ã Â·â€Ã Â¶Â±Ã Â·â€™Ã Â¶Â½Ã Â·Å  Ã Â·ÂÃ Â·ÂÃ Â¶Â±Ã Â·Å Ã Â¶Â­ Ã Â¶Â´Ã Â·â„¢Ã Â¶Â»Ã Â·Å¡Ã Â¶Â»Ã Â·Â" : "Sunil Shantha Perera",
+          name: isSinhala ? "සුනිල් ශාන්ත පෙරේරා" : "Sunil Shantha Perera",
           comment: isSinhala
-            ? `${topic} Ã Â¶Â´Ã Â·â€™Ã Â·â€¦Ã Â·â€™Ã Â¶Â¶Ã Â¶Â³Ã Â·â‚¬ Ã Â¶â€°Ã Â¶Â­Ã Â·ÂÃ Â¶Â¸Ã Â¶Â­Ã Â·Å  Ã Â¶Å¡Ã Â·ÂÃ Â¶Â½Ã Â·ÂÃ Â¶Â Ã Â·â€™Ã Â¶Â­ Ã Â·Æ’Ã Â·â€ž Ã Â¶â€¦Ã Â¶Å“Ã Â¶Â±Ã Â·Â Ã Â¶Â´Ã Â·ÂÃ Â·â€žÃ Â·ÂÃ Â¶Â¯Ã Â·â€™Ã Â¶Â½Ã Â·â€™ Ã Â¶Å¡Ã Â·â€™Ã Â¶Â»Ã Â·â€œÃ Â¶Â¸Ã Â¶Å¡Ã Â·Å . Ã Â¶â€Ã Â¶Â¶Ã Â¶Å“Ã Â·Å¡ Ã Â¶â€°Ã Â¶Â¯Ã Â·â€™Ã Â¶Â»Ã Â·â€™ Ã Â¶Å“Ã Â¶Â¸Ã Â¶Â±Ã Â¶Â§ Ã Â¶â€¹Ã Â¶Â«Ã Â·â€Ã Â·Æ’Ã Â·â€Ã Â¶Â¸Ã Â·Å  Ã Â·Æ’Ã Â·â€Ã Â¶Â¶ Ã Â¶Â´Ã Â·ÂÃ Â¶Â­Ã Â·â€Ã Â¶Â¸Ã Â·Å !`
+            ? `${topic} පිළිබඳව ඉතාමත් කාලෝචිත සහ අගනා පැහැදිලි කිරීමක්. ඔබගේ ඉදිරි ගමනට උණුසුම් සුබ පැතුම්!`
             : (isSinglish ? `${topic} gana kiyala deepu eka godak watinawa. Jaya wewa saho!` : `A very timely and insightful post on ${topic}. Wishing you continuous success!`),
           reactions: "6.4K",
           topReaction: "Like",
           time: "4 hrs",
           replies: [
             {
-              name: isSinhala ? "Ã Â¶Â±Ã Â·â€™Ã Â¶Â¸Ã Â¶Â½Ã Â·Å  Ã Â¶Å¡Ã Â·â€Ã Â¶Â¸Ã Â·ÂÃ Â¶Â»" : "Nimal Kumara",
-              comment: isSinhala ? "Ã Â¶Â¶Ã Â·Å“Ã Â·â€žÃ Â·Å“Ã Â¶Â¸ Ã Â·Æ’Ã Â·Å Ã Â¶Â­Ã Â·â€“Ã Â¶Â­Ã Â·â€™Ã Â¶ÂºÃ Â·â€™ Ã Â¶Â¸Ã Â·â€žÃ Â¶Â­Ã Â·Å Ã Â¶Â¸Ã Â¶ÂºÃ Â·Â!" : "Thank you very much!",
+              name: isSinhala ? "නිමල් කුමාර" : "Nimal Kumara",
+              comment: isSinhala ? "බොහොම ස්තූතියි මහත්මයා!" : "Thank you very much!",
               reactions: "410",
               time: "2 hrs"
             }
@@ -2824,13 +2876,14 @@
         };
       } else if (tool === 'twitter_post') {
         return {
-          name: isSinhala ? "Ã Â¶Â§Ã Â·â„¢Ã Â¶Å¡Ã Â·Å  Ã Â¶Â½Ã Â¶â€šÃ Â¶Å¡Ã Â·Â" : "Tech Insider",
+          name: isSinhala ? "ටෙක් ලංකා" : "Tech Insider",
           handle: "@techpulse_lk",
           isVerified: true,
+
           tweet: isSinhala
-            ? `${topic} Ã Â¶Å“Ã Â·ÂÃ Â¶Â± Ã Â¶Â¶Ã Â·Å“Ã Â·â€žÃ Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·â„¢Ã Â¶Å¡Ã Â·Å  Ã Â¶Â±Ã Â·Å“Ã Â¶Â¯Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·Â Ã Â¶Â»Ã Â·â€žÃ Â·Æ’: Ã Â¶Â­Ã Â·ÂÃ Â¶Å¡Ã Â·Å Ã Â·â€šÃ Â¶Â«Ã Â¶Âº Ã Â·â‚¬Ã Â·Å¡Ã Â¶Å“Ã Â¶ÂºÃ Â·â„¢Ã Â¶Â±Ã Â·Å  Ã Â·â‚¬Ã Â·â„¢Ã Â¶Â±Ã Â·Æ’Ã Â·Å  Ã Â·â‚¬Ã Â·â„¢Ã Â¶Â±Ã Â·â‚¬Ã Â·Â, Ã Â¶â€¦Ã Â¶Â´Ã Â·â€™Ã Â¶Â­Ã Â·Å  Ã Â¶â€™Ã Â¶Å¡Ã Â¶Â§ Ã Â·Æ’Ã Â·â€“Ã Â¶Â¯Ã Â·ÂÃ Â¶Â±Ã Â¶Â¸Ã Â·Å  Ã Â·â‚¬Ã Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â± Ã Â¶â€¢Ã Â¶Â±. Ã°Å¸Å¡â‚¬ #Technology #Trending #Innovation`
-            : (isSinglish ? `${topic} gana thiyena reality eka mekai: Creator economy ekata aluth trend ekak enawa. Ã°Å¸Å¡â‚¬ #Viral #Trend` : `Here is what nobody tells you about ${topic}: Adapt early or get left behind. Ã°Å¸Å¡â‚¬ #FutureTrends #Innovation`),
-          time: "5:30 PM Ã‚Â· Sep 9, 2026",
+            ? `${topic} ගැන බොහෝ දෙනෙක් නොදන්නා රහස: තාක්ෂණය වේගයෙන් වෙනස් වෙනවා, අපිත් ඒකට සූදානම් වෙන්න ඕන. 🚀 #Technology #Trending #Innovation`
+            : (isSinglish ? `${topic} gana thiyena reality eka mekai: Creator economy ekata aluth trend ekak enawa. 🚀 #Viral #Trend` : `Here is what nobody tells you about ${topic}: Adapt early or get left behind. 🚀 #FutureTrends #Innovation`),
+          time: "5:30 PM · Sep 9, 2026",
           views: "1.5M",
           retweets: "18.2K",
           likes: "94.7K",
@@ -2842,10 +2895,10 @@
           author: "u/DeepThinker_99",
           time: "5 hours ago",
           title: isSinhala
-            ? `${topic} Ã Â¶Å“Ã Â·ÂÃ Â¶Â± Ã Â¶â€Ã Â¶Â¶ Ã Â¶Â¯Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·Â Ã Â·â‚¬Ã Â¶Â©Ã Â·ÂÃ Â¶Â­Ã Â·Å Ã Â¶Â¸ Ã Â¶Â´Ã Â·â€Ã Â¶Â¯Ã Â·â€Ã Â¶Â¸ Ã Â·Æ’Ã Â·â€žÃ Â¶Å“Ã Â¶Â­ Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â« Ã Â¶Å¡Ã Â·â€Ã Â¶Â¸Ã Â¶Å¡Ã Â·Å Ã Â¶Â¯?`
+            ? `${topic} ගැන ඔබ දන්නා වඩාත්ම පුදුම සහගත කරුණ කුමක්ද?`
             : (isSinglish ? `${topic} gana ubala danna pissu hadena wisthara monawada?` : `What is the most mind-blowing fact you know about ${topic}?`),
           content: isSinhala
-            ? `Ã Â¶Â¸Ã Â¶Â¸ Ã Â¶Â¸Ã Â·â€˜Ã Â¶Â­Ã Â¶Å¡Ã Â¶Â¯Ã Â·â€œ Ã Â¶Â¸Ã Â·Å¡ Ã Â¶Â´Ã Â·â€™Ã Â·â€¦Ã Â·â€™Ã Â¶Â¶Ã Â¶Â³Ã Â·â‚¬ Ã Â¶Å“Ã Â·ÂÃ Â¶Â¹Ã Â·â€Ã Â¶Â»Ã Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â·Æ’Ã Â·Å“Ã Â¶ÂºÃ Â·Â Ã Â¶Â¶Ã Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â·Â. Ã Â¶Â¶Ã Â·Å“Ã Â·â€žÃ Â·Â Ã Â¶Â¯Ã Â·â„¢Ã Â¶Â±Ã Â·â„¢Ã Â¶Å¡Ã Â·Å  Ã Â¶Â±Ã Â·Å“Ã Â·Æ’Ã Â·â€™Ã Â¶Â­Ã Â¶Â± Ã Â¶Â´Ã Â·ÂÃ Â¶Â­Ã Â·â€™Ã Â¶Å¡Ã Â¶Â© Ã Â¶Å“Ã Â¶Â«Ã Â¶Â±Ã Â·ÂÃ Â·â‚¬Ã Â¶Å¡Ã Â·Å  Ã Â¶Â¸Ã Â·Å¡ Ã Â¶Â­Ã Â·â€Ã Â·â€¦ Ã Â·Æ’Ã Â·ÂÃ Â¶Å¸Ã Â·â‚¬Ã Â·â€œ Ã Â¶Â­Ã Â·â€™Ã Â¶Â¶Ã Â·â„¢Ã Â¶Â±Ã Â·â‚¬Ã Â·Â. Ã Â¶â€Ã Â¶Â¶Ã Â¶Å“Ã Â·Å¡ Ã Â¶â€¦Ã Â¶Â­Ã Â·Å Ã Â¶Â¯Ã Â·ÂÃ Â¶Å¡Ã Â·â€œÃ Â¶Â¸Ã Â·Å  Ã Â¶Â´Ã Â·â€žÃ Â·â€¦Ã Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â¶Â¶Ã Â·â„¢Ã Â¶Â¯Ã Â·ÂÃ Â¶Å“Ã Â¶Â±Ã Â·Å Ã Â¶Â±.`
+            ? `මම මෑතකදී මේ පිළිබඳව ගැඹුරින් සොයා බැලුවා. බොහෝ දෙනෙක් නොසිතන පැතිකඩ ගණනාවක් මේ තුළ සැඟවී තිබෙනවා. ඔබගේ අත්දැකීම් පහළින් බෙදාගන්න.`
             : (isSinglish ? `Mama langadi idala meka gana check kara. Godak aya nodanna loku deyak meke thiyenawa. Ubalage ideasuth kiyapan.` : `I have been digging into this subject for weeks now and the rabbit hole is insane. Would love to hear everyone's perspective on this.`),
           upvotes: "24.9k",
           comments: "3.1k"
@@ -2853,9 +2906,9 @@
       } else if (tool === 'text_box') {
         return {
           tag: "DID YOU KNOW? #1",
-          heading: isSinhala ? "Ã Â¶â€Ã Â¶Â¶ Ã Â¶Â¯Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·â‚¬Ã Â·ÂÃ Â¶Â¯?" : (isSinglish ? "Danna Watei!" : "MIND-BLOWING FACT"),
+          heading: isSinhala ? "ඔබ දන්නවාද?" : (isSinglish ? "Danna Watei!" : "MIND-BLOWING FACT"),
           caption: isSinhala
-            ? `${topic} Ã Â¶Â´Ã Â·â€™Ã Â·â€¦Ã Â·â€™Ã Â¶Â¶Ã Â¶Â³Ã Â·â‚¬ Ã Â·Æ’Ã Â·â€™Ã Â¶Â¯Ã Â·â€Ã Â¶Å¡Ã Â·â€¦ Ã Â¶â€¦Ã Â¶Â°Ã Â·Å Ã¢â‚¬ÂÃ Â¶ÂºÃ Â¶ÂºÃ Â¶Â± Ã Â·â‚¬Ã Â¶Â½Ã Â¶Â§ Ã Â¶â€¦Ã Â¶Â±Ã Â·â€Ã Â·â‚¬, Ã Â¶Â±Ã Â·â€™Ã Â·â‚¬Ã Â·ÂÃ Â¶Â»Ã Â¶Â¯Ã Â·â€™ Ã Â¶â€¹Ã Â¶Â´Ã Â¶Å¡Ã Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â¶Â¸ Ã Â¶Â¸Ã Â¶Å“Ã Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â¶â€Ã Â¶Â¶Ã Â·Å¡ Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â¶Â­Ã Â·Å Ã Â·â‚¬Ã Â¶Âº 300% Ã Â¶Å¡Ã Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â¶â€°Ã Â·â€žÃ Â·â€¦ Ã Â¶Â±Ã Â·ÂÃ Â¶â€šÃ Â·â‚¬Ã Â·â€™Ã Â¶Âº Ã Â·â€žÃ Â·ÂÃ Â¶Å¡!`
+            ? `${topic} පිළිබඳව සිදුකළ අධ්‍යයන වලට අනුව, නිවැරදි උපක්‍රම මගින් ඔබේ සාර්ථකත්වය 300% කින් ඉහළ නැංවිය හැක!`
             : (isSinglish ? `${topic} gana research walin oppu wela thiyenne hari vidiyata kaloth 300% result eka wadi kiyala!` : `Studies show that applying the right methods to ${topic} increases results by over 300%!`)
         };
       } else if (tool === 'receipt') {
@@ -3003,7 +3056,7 @@
       const file = event && event.target && event.target.files && event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) {
-        showPopup('Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» Ã Â·â‚¬Ã Â¶Â½Ã Â¶â€šÃ Â¶Å“Ã Â·â€ Image (Ã Â¶Â´Ã Â·â€™Ã Â¶Â±Ã Â·Å Ã Â¶Â­Ã Â·â€“Ã Â¶Â») Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å  Ã Â¶Â­Ã Â·ÂÃ Â¶Â»Ã Â¶Â±Ã Â·Å Ã Â¶Â±.', 'Ã Â¶â€¦Ã Â·â‚¬Ã Â·â‚¬Ã Â·ÂÃ Â¶Â¯Ã Â¶ÂºÃ Â¶ÂºÃ Â·â€™', 'warning');
+        showPopup('කරුණාකර වලංගු Image (පින්තූර) එකක් තෝරන්න.', 'අවවාදයයි', 'warning');
         return;
       }
       const reader = new FileReader();
@@ -3023,7 +3076,7 @@
       const file = event && event.target && event.target.files && event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) {
-        showPopup('Ã Â¶Å¡Ã Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·ÂÃ Â¶Å¡Ã Â¶Â» Ã Â·â‚¬Ã Â¶Â½Ã Â¶â€šÃ Â¶Å“Ã Â·â€ Image (Ã Â¶Â´Ã Â·â€™Ã Â¶Â±Ã Â·Å Ã Â¶Â­Ã Â·â€“Ã Â¶Â») Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å  Ã Â¶Â­Ã Â·ÂÃ Â¶Â»Ã Â¶Â±Ã Â·Å Ã Â¶Â±.', 'Ã Â¶â€¦Ã Â·â‚¬Ã Â·â‚¬Ã Â·ÂÃ Â¶Â¯Ã Â¶ÂºÃ Â¶ÂºÃ Â·â€™', 'warning');
+        showPopup('කරුණාකර වලංගු Image (පින්තූර) එකක් තෝරන්න.', 'අවවාදයයි', 'warning');
         return;
       }
       const reader = new FileReader();
@@ -3056,7 +3109,7 @@
           scrollArea.style.overflow = 'visible';
         }
         if (toggleText) toggleText.innerText = 'Collapse View';
-        showPopup('Ã Â·Æ’Ã Â¶Â¸Ã Â·Å Ã Â¶Â´Ã Â·â€“Ã Â¶Â»Ã Â·Å Ã Â¶Â« Ã Â·Æ’Ã Â¶â€šÃ Â·â‚¬Ã Â·ÂÃ Â¶Â¯Ã Â¶ÂºÃ Â¶Â¸ Ã Â¶Â¶Ã Â¶Â½Ã Â·ÂÃ Â¶Å“Ã Â·ÂÃ Â¶Â±Ã Â·â€œÃ Â¶Â¸Ã Â¶Â§ Full View Ã Â¶â€˜Ã Â¶Å¡ Ã Â¶Â¯Ã Â·â€™Ã Â¶Å“Ã Â·â€žÃ Â·ÂÃ Â¶Â»Ã Â·â€Ã Â¶Â«Ã Â·â€™.', 'Full View', 'info');
+        showPopup('සම්පූර්ණ සංවාදයම බලාගැනීමට Full View එක දිගහැරුණි.', 'Full View', 'info');
       } else {
         node.style.height = ''; node.style.minHeight = ''; node.style.maxHeight = '';
         node.style.maxHeight = '';
@@ -3079,42 +3132,40 @@
 
       if (toolKey === 'whatsapp_message') {
         renderMockup('whatsapp_message', {
-          contactName: 'Ã Â¶Å¡Ã Â·Æ’Ã Â·â€Ã Â¶Â±Ã Â·Å  Ã Â¶Â´Ã Â·â„¢Ã Â¶Â»Ã Â·Å¡Ã Â¶Â»Ã Â·Â',
+          contactName: 'Nimal Perera',
           isOnline: true,
           messages: [
-            { sender: 'them', text: 'Ã Â¶Â¸Ã Â¶Â Ã Â¶â€š Ã Â¶â€¦Ã Â¶Â¯ Ã Â¶Â»Ã Â·â€˜Ã Â¶Â§ Ã Â·Æ’Ã Â·â„¢Ã Â¶Â§Ã Â·Å  Ã Â·â‚¬Ã Â·â„¢Ã Â¶Â¸Ã Â·â€Ã Â¶Â¯?', time: '04:15 PM', status: '' },
-            { sender: 'me', text: 'Ã Â¶â€¦Ã Â¶Â±Ã Â·â€™Ã Â·â‚¬Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶ÂºÃ Â¶ÂºÃ Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â¸! Ã Â¶Å¡Ã Â·Å“Ã Â·â€žÃ Â·â„¢Ã Â¶Â¯ Ã Â¶ÂºÃ Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â·Å¡?', time: '04:16 PM', status: 'read' },
-            { sender: 'them', text: 'Ã Â¶â€¦Ã Â¶Â» Ã Â¶â€¦Ã Â¶Â½Ã Â·â€Ã Â¶Â­Ã Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â¶Â¯Ã Â·ÂÃ Â¶Â´Ã Â·â€ Ã Â¶Å¡Ã Â·Å“Ã Â¶Â­Ã Â·Å Ã Â¶Â­Ã Â·â€ Ã Â·Æ’Ã Â·Å Ã Â¶Â´Ã Â·Å“Ã Â¶Â§Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Ã Â¶ÂºÃ Â¶Â¸Ã Â·â€. Ã Â¶Â´Ã Â¶Â§Ã Â·Å Ã Â¶Â§ Ã Â¶Â»Ã Â·Æ’Ã Â¶ÂºÃ Â·â€™Ã Â¶Â½Ã Â·â€!', time: '04:17 PM', status: '' },
-            { sender: 'me', text: 'Ã Â¶â€˜Ã Â·â€¦Ã Â¶Â¸, Ã Â¶Â¸Ã Â¶Â¸ 7 Ã Â·â‚¬Ã Â·â„¢Ã Â¶Â¯Ã Â·Å Ã Â¶Â¯Ã Â·â€™ Ã Â¶â€˜Ã Â¶Â±Ã Â·Å Ã Â¶Â±Ã Â¶Â¸Ã Â·Å  Ã Â¶Â¶Ã Â¶ÂºÃ Â·â€™Ã Â¶Å¡Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡Ã Â·Å¡.', time: '04:18 PM', status: 'read' },
-            { sender: 'them', text: 'Ã Â·â€žÃ Â¶Â»Ã Â·â€™ Ã Â¶Â¸Ã Â¶Â Ã Â¶â€š, Ã Â¶Â¸Ã Â¶Â¸ Ã Â·ÂÃ Â·â„¢Ã Â·â€žÃ Â·ÂÃ Â¶Â±Ã Â·Å Ã Â¶Â§Ã Â¶Â­Ã Â·Å  Ã Â¶Å¡Ã Â¶Â­Ã Â·Â Ã Â¶Å¡Ã Â·â€¦Ã Â·Â. Ã Â¶Å’Ã Â¶Â­Ã Â·Å  Ã Â¶â€˜Ã Â¶Â±Ã Â·â‚¬Ã Â·Â.', time: '04:19 PM', status: '' },
-            { sender: 'me', text: 'Ã Â·Æ’Ã Â·â€Ã Â¶Â´Ã Â·â€™Ã Â¶Â»Ã Â·â€™! Ã Â¶Â»Ã Â·â€˜Ã Â¶Â§ Ã Â·Æ’Ã Â·â„¢Ã Â¶Â§Ã Â·Å  Ã Â·â‚¬Ã Â·â„¢Ã Â¶Â½Ã Â·Â Ã Â¶Å¡Ã Â¶Â­Ã Â·Â Ã Â¶Å¡Ã Â¶Â»Ã Â¶Â¸Ã Â·â€.', time: '04:20 PM', status: 'read' }
+            { sender: 'them', text: 'Hey bro! Did you check that thing?', time: '04:15 PM', status: '' },
+            { sender: 'me', text: 'Yes! I checked it completely!', time: '04:16 PM', status: 'read' },
+            { sender: 'them', text: 'Really? What is the situation? Are the results good?', time: '04:17 PM', status: '' },
+            { sender: 'me', text: 'It works perfectly! I will send you the details now.', time: '04:18 PM', status: 'read' }
           ]
         });
       } else if (toolKey === 'fake_chat') {
         renderMockup('fake_chat', {
-          personName: 'Ã Â¶Â¯Ã Â·â€™Ã Â¶Â±Ã Â·â€Ã Â¶Å¡ Ã Â·Æ’Ã Â·â„¢Ã Â¶Â±Ã Â·â„¢Ã Â·â‚¬Ã Â·â€™Ã Â¶Â»Ã Â¶Â­Ã Â·Å Ã Â¶Â±',
+          personName: 'Sunil Silva',
           messages: [
-            { sender: 'them', text: 'Ã Â·â€žÃ Â·â„¢Ã Â¶Â§ Ã Â¶â€¦Ã Â¶Â´Ã Â·Å¡ Ã Â¶Â´Ã Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â·Å“Ã Â¶Â¢Ã Â·â„¢Ã Â¶Å¡Ã Â·Å Ã Â¶Â§Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡ Ã Â·Æ’Ã Â¶Â¶Ã Â·Å Ã Â¶Â¸Ã Â·â€™Ã Â¶Â§Ã Â·Å  Ã Â¶Å¡Ã Â¶Â»Ã Â¶Â±Ã Â·Å Ã Â¶Â± Ã Â¶â€¢Ã Â¶Â±Ã Â·â€™Ã Â¶Â±Ã Â·Å¡Ã Â¶Â¯?', time: '10:24 AM' },
-            { sender: 'me', text: 'Ã Â¶â€Ã Â·â‚¬Ã Â·Å  Ã Â¶â€Ã Â·â‚¬Ã Â·Å , Ã Â¶Â¸Ã Â¶Â¸ AI Ã Â¶â€˜Ã Â¶Å¡Ã Â·â„¢Ã Â¶Â±Ã Â·Å  Ã Â¶Â©Ã Â·â€™Ã Â·Æ’Ã Â¶ÂºÃ Â·â€™Ã Â¶Â±Ã Â·Å  Ã Â¶â€˜Ã Â¶Å¡ Ã Â·â€žÃ Â¶Â¯Ã Â¶Â½Ã Â·Â Ã Â¶â€°Ã Â·â‚¬Ã Â¶Â» Ã Â¶Å¡Ã Â·â€¦Ã Â·Â!', time: '10:25 AM' },
-            { sender: 'them', text: 'Ã Â·Æ’Ã Â·â€™Ã Â¶Â»Ã Â·ÂÃ Â·â‚¬Ã Â¶Â§Ã Â¶Â¸? Ã Â¶â€™Ã Â¶Å¡ Ã Â¶Â¸Ã Â·ÂÃ Â¶Â» Ã Â¶Â½Ã Â·Æ’Ã Â·Å Ã Â·Æ’Ã Â¶Â±Ã Â¶ÂºÃ Â·â€™Ã Â¶Â±Ã Â·Å¡! Ã Â¶Å¡Ã Â·Å“Ã Â·â€žÃ Â·Å“Ã Â¶Â¸Ã Â¶Â¯ Ã Â¶â€˜Ã Â¶Â Ã Â·Å Ã Â¶Â Ã Â¶Â» Ã Â¶â€°Ã Â¶Å¡Ã Â·Å Ã Â¶Â¸Ã Â¶Â±Ã Â¶Â§ Ã Â¶Å¡Ã Â·â€¦Ã Â·Å¡?', time: '10:25 AM' },
-            { sender: 'me', text: 'CapZone AI Social Kit Ã Â¶â€˜Ã Â¶Å¡Ã Â·â„¢Ã Â¶Â±Ã Â·Å  Ã Â¶Â­Ã Â¶Â­Ã Â·Å Ã Â¶Â´Ã Â¶Â» 10Ã Â¶Â±Ã Â·Å  Ã Â·â€žÃ Â·ÂÃ Â¶Â¯Ã Â·â€Ã Â·â‚¬Ã Â·â„¢!', time: '10:26 AM' }
+            { sender: 'them', text: 'Bro, what about that new project? Did you finish it?', time: '10:24 AM' },
+            { sender: 'me', text: 'Yes yes, I used AI to generate the social media posts! It was so easy!', time: '10:25 AM' },
+            { sender: 'them', text: 'Wow really? That is awesome! Send me a screenshot!', time: '10:25 AM' },
+            { sender: 'me', text: 'CapZone AI Social Kit makes everything 10x faster!', time: '10:26 AM' }
           ]
         });
       } else if (toolKey === 'tiktok_comment') {
         renderMockup('tiktok_comment', {
           username: '@viral_srilanka',
-          comment: 'Ã Â¶Â¸Ã Â·Å¡Ã Â¶Å¡ Ã Â¶Â¯Ã Â·ÂÃ Â¶Å¡Ã Â¶Â½ Ã Â·â€žÃ Â·â€™Ã Â¶Â±Ã Â·ÂÃ Â·â‚¬Ã Â·â„¢Ã Â¶Â½Ã Â·Â Ã Â¶Â´Ã Â¶Â« Ã Â¶Å“Ã Â·â€™Ã Â¶ÂºÃ Â·Â Ã Â¶Â¶Ã Â¶â€š! Ã Â¶â€¦Ã Â¶Â±Ã Â·Å Ã Â¶Â­Ã Â·â€™Ã Â¶Â¸ Ã Â¶Â§Ã Â·â€™Ã Â¶Å¡ Ã Â¶Â±Ã Â¶Â¸Ã Â·Å  Ã Â¶Â´Ã Â·â€™Ã Â·Æ’Ã Â·Å Ã Â·Æ’Ã Â·â€Ã Â·â‚¬Ã Â¶Å¡Ã Â·Å  Ã°Å¸Ëœâ€šÃ°Å¸â€Â¥',
+          comment: 'This is amazing! I have never seen something like this before! Keep it up! 🔥🔥🔥',
           likes: '34.2K',
           time: '2h ago',
           replies: [
-            { username: '@nimal_bro', comment: 'Ã Â·Æ’Ã Â·â€™Ã Â¶Â»Ã Â·ÂÃ Â·â‚¬Ã Â¶Â§Ã Â¶Â¸, Ã Â¶Â¸Ã Â¶Â¸Ã Â¶Â­Ã Â·Å  Ã Â¶Â­Ã Â·â€Ã Â¶Â±Ã Â·Å  Ã Â¶Â´Ã Â·ÂÃ Â¶Â»Ã Â¶Å¡Ã Â·Å  Ã Â¶Â¶Ã Â·ÂÃ Â¶Â½Ã Â·â€Ã Â·â‚¬Ã Â·Â!', likes: '4,520', time: '1h ago' },
-            { username: '@kavindi_99', comment: 'Ã Â¶â€¦Ã Â¶Â±Ã Â·Å¡ Ã Â¶Â¸Ã Â¶Â§Ã Â¶Â­Ã Â·Å  Ã Â¶â€¢Ã Â¶Â± Ã Â¶Â¸Ã Â·Å¡Ã Â¶Å¡ Ã Â¶Â§Ã Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â¶ÂºÃ Â·â€™ Ã Â¶Å¡Ã Â¶Â»Ã Â¶Â±Ã Â·Å Ã Â¶Â±', likes: '1,890', time: '45m ago' }
+            { username: '@nimal_bro', comment: 'Wow, this is really cool! Good job!', likes: '4,520', time: '1h ago' },
+            { username: '@kavindi_99', comment: 'I need to try this right now!', likes: '1,890', time: '45m ago' }
           ]
         });
       } else if (toolKey === 'insta_comment') {
         renderMockup('insta_comment', {
           username: 'wanderlust.lanka',
-          comment: 'Ella vibes are always unmatched! Truly heavenly Ã¢Å“Â¨Ã°Å¸â€¡Â±Ã°Å¸â€¡Â°',
+          comment: 'Ella vibes are always unmatched! Truly heavenly ✨🇱🇰⛰️',
           likes: '18.4K',
           time: '3h',
           replies: [
@@ -3124,19 +3175,19 @@
       } else if (toolKey === 'fb_comment') {
         renderMockup('fb_comment', {
           name: 'Sunil Perera',
-          comment: 'Ã Â¶â€°Ã Â¶Â­Ã Â·ÂÃ Â¶Â¸ Ã Â¶â€¦Ã Â¶Å“Ã Â¶Â±Ã Â·Â Ã Â¶Â±Ã Â·â€™Ã Â¶Â»Ã Â·Å Ã Â¶Â¸Ã Â·ÂÃ Â¶Â«Ã Â¶ÂºÃ Â¶Å¡Ã Â·Å  Ã Â¶Â´Ã Â·â€Ã Â¶Â­Ã Â·Â! Ã Â¶â€°Ã Â¶Â¯Ã Â·â€™Ã Â¶Â»Ã Â·â€™Ã Â¶ÂºÃ Â¶Â§Ã Â¶Â¸ Ã Â¶ÂºÃ Â¶Â±Ã Â·Å Ã Â¶Â± Ã Â·Æ’Ã Â·â€Ã Â¶Â¶ Ã Â¶Â´Ã Â¶Â­Ã Â¶Â±Ã Â·â‚¬Ã Â·Â.',
+          comment: 'This is a very important message for everyone! Thank you for sharing this valuable information. Keep up the good work.',
           reactions: '4.8K',
           time: '4 hrs',
           replies: [
-            { name: 'Kavindu Nirmal', comment: 'Ã Â¶Â¶Ã Â·Å“Ã Â·â€žÃ Â·Å“Ã Â¶Â¸ Ã Â·Æ’Ã Â·Å Ã Â¶Â­Ã Â·â€“Ã Â¶Â­Ã Â·â€™Ã Â¶ÂºÃ Â·â€™ Ã Â¶Â¸Ã Â·ÂÃ Â¶Â¸Ã Â·Å¡ Ã Â¶â€Ã Â¶Â¶Ã Â¶Â­Ã Â·â€Ã Â¶Â¸Ã Â·ÂÃ Â¶Å“Ã Â·Å¡ Ã Â·â‚¬Ã Â¶Â Ã Â¶Â± Ã Â·â‚¬Ã Â¶Â½Ã Â¶Â§! Ã°Å¸â„¢Â', reactions: '320', time: '2 hrs' }
+            { name: 'Kavindu Nirmal', comment: 'I completely agree with you! 🙏', reactions: '320', time: '2 hrs' }
           ]
         });
       } else if (toolKey === 'twitter_post') {
         renderMockup('twitter_post', {
           name: 'Tech Insider LK',
           handle: '@techinsider_lk',
-          tweet: 'AI is not going to replace content creators. Creators who use AI are going to replace creators who don\'t. Adapt or get left behind. Ã°Å¸Å¡â‚¬ #AI #ContentCreation #SriLanka',
-          time: '4:15 PM Ã‚Â· Sep 11, 2026',
+          tweet: 'AI is not going to replace content creators. Creators who use AI are going to replace creators who don\'t. Adapt or get left behind. 🚀 #AI #ContentCreation #SriLanka',
+          time: '4:15 PM · Sep 11, 2026',
           retweets: '18.2K',
           likes: '92.5K',
           views: '1.2M',
@@ -3155,8 +3206,8 @@
       } else if (toolKey === 'text_box') {
         renderMockup('text_box', {
           tag: 'DID YOU KNOW? #1',
-          heading: 'Ã Â¶â€Ã Â¶Â¶ Ã Â¶Â¯Ã Â·ÂÃ Â¶Â± Ã Â·Æ’Ã Â·â€™Ã Â¶Â§Ã Â·â€™Ã Â¶ÂºÃ Â·ÂÃ Â¶Â¯?',
-          caption: 'Ã Â¶Â½Ã Â·ÂÃ Â¶Å¡Ã Â¶ÂºÃ Â·Å¡ Ã Â¶Â´Ã Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â¶Â®Ã Â¶Â¸ Ã Â¶â€¦Ã Â¶Å“Ã Â¶Â¸Ã Â·ÂÃ Â¶Â­Ã Â·â€™Ã Â¶Â±Ã Â·â€™Ã Â¶Âº Ã Â¶Â¶Ã Â·â€™Ã Â·â€žÃ Â·â€™Ã Â·â‚¬Ã Â·â€“Ã Â¶ÂºÃ Â·Å¡ Ã Â·ÂÃ Â·Å Ã¢â‚¬ÂÃ Â¶Â»Ã Â·â€œ Ã Â¶Â½Ã Â¶â€šÃ Â¶Å¡Ã Â·ÂÃ Â·â‚¬Ã Â·â„¢Ã Â¶Â±Ã Â·â€™. 1960 Ã Â¶Â¯Ã Â·â€œ Ã Â·Æ’Ã Â·â€™Ã Â¶Â»Ã Â·â€™Ã Â¶Â¸Ã Â·ÂÃ Â·â‚¬Ã Â·Â Ã Â¶Â¶Ã Â¶Â«Ã Â·Å Ã Â¶Â©Ã Â·ÂÃ Â¶Â»Ã Â¶Â±Ã Â·ÂÃ Â¶ÂºÃ Â¶Å¡ Ã Â¶Â¸Ã Â·ÂÃ Â¶Â­Ã Â·â€™Ã Â¶Â«Ã Â·â€™Ã Â¶Âº Ã Â¶â€˜Ã Â¶Â¸ Ã Â·â‚¬Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â­Ã Â·ÂÃ Â·â‚¬ Ã Â¶Â­Ã Â·ÂÃ Â¶Â¶Ã Â·â€Ã Â·â‚¬Ã Â·ÂÃ Â¶Âº!'
+          heading: 'Do you know about this?',
+          caption: 'Sri Lanka is a beautiful country located in the Indian Ocean. It is known as the Pearl of the Indian Ocean due to its natural beauty and shape.'
         });
       } else if (toolKey === 'receipt') {
         renderMockup('receipt', {
@@ -3174,9 +3225,7 @@
           footer: 'THANK YOU FOR SUPPORTING LOCAL BUSINESS!'
         });
       }
-    }
-
-    function renderMockup(tool, data) {
+    }    function renderMockup(tool, data) {
       const container = document.getElementById('socialMockupCanvas') || document.getElementById('studioMockupWrapper');
       if (!container) return;
       container.innerHTML = '';
@@ -3205,7 +3254,7 @@
             '<div contenteditable="true" class="relative px-4 py-2.5 text-[15px] leading-snug outline-none ' + (m.sender === 'me' ? 'bg-blue-600 text-white rounded-[1.2rem] rounded-br-sm' : 'bg-[#262628] text-white rounded-[1.2rem] rounded-bl-sm') + '">' +
             m.text +
             '</div>' +
-            (m.time ? '<span contenteditable="true" class="text-[9px] text-neutral-500 mt-1 px-1 outline-none">' + m.time + (m.sender === 'me' ? ' Ã‚Â· Delivered' : '') + '</span>' : '') +
+            (m.time ? '<span contenteditable="true" class="text-[9px] text-neutral-500 mt-1 px-1 outline-none">' + m.time + (m.sender === 'me' ? ' · Delivered' : '') + '</span>' : '') +
             '</div>' +
             (m.sender === 'me' ? '<div onclick="document.getElementById(\'socialSenderAvatarInput\').click()" class="w-7 h-7 rounded-full bg-cover bg-center flex-shrink-0 border border-white/10 cursor-pointer" style="background-image: url(\'' + senderAvatar + '\');"></div>' : '') +
             '</div>'
@@ -3239,6 +3288,7 @@
           '<div id="mockupScrollArea" class="flex-1 overflow-y-auto p-3 space-y-2.5 pb-12 relative bg-[#0B141A] custom-scroll transition-all" style="background-image: radial-gradient(circle at 50% 50%, #111b21 0%, #0b141a 100%);">' +
           msgs.map(m =>
             '<div class="flex w-full ' + (m.sender === 'me' ? 'justify-end' : 'justify-start') + ' items-end gap-2">' +
+            (m.sender !== 'me' ? '<div onclick="document.getElementById(\'socialReceiverAvatarInput\').click()" class="w-7 h-7 rounded-full bg-cover bg-center flex-shrink-0 border border-white/10 cursor-pointer" style="background-image: url(\'' + receiverAvatar + '\');"></div>' : '') +
             '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + ' max-w-[80%]">' +
             '<div class="relative px-3 py-1.5 text-[14.5px] leading-snug shadow-sm ' + (m.sender === 'me' ? 'bg-[#005C4B] text-[#E9EDEF] rounded-lg rounded-tr-none' : 'bg-[#202C33] text-[#E9EDEF] rounded-lg rounded-tl-none') + '">' +
             '<span contenteditable="true" class="outline-none break-words">' + m.text + '</span>' +
@@ -3248,6 +3298,7 @@
             '</span>' +
             '</div>' +
             '</div>' +
+            (m.sender === 'me' ? '<div onclick="document.getElementById(\'socialSenderAvatarInput\').click()" class="w-7 h-7 rounded-full bg-cover bg-center flex-shrink-0 border border-white/10 cursor-pointer" style="background-image: url(\'' + senderAvatar + '\');"></div>' : '') +
             '</div>'
           ).join('') +
           '</div>' +
@@ -3378,7 +3429,7 @@
           '</div>' +
           '<p contenteditable="true" class="mt-3 text-[16px] leading-normal text-[#E7E9EA] whitespace-pre-wrap outline-none">' + (data.tweet || 'Post content') + '</p>' +
           '<div class="mt-3 py-3 text-[14px] text-[#71767B] flex gap-1 border-b border-neutral-800">' +
-          '<span contenteditable="true" class="outline-none">' + (data.time || '10:00 AM Ã‚Â· Jan 1, 2026') + '</span><span class="px-1">Ã‚Â·</span>' +
+          '<span contenteditable="true" class="outline-none">' + (data.time || '10:00 AM · Jan 1, 2026') + '</span><span class="px-1">·</span>' +
           '<span contenteditable="true" class="text-[#E7E9EA] font-bold outline-none">' + (data.views || '1.2M') + '</span><span> Views</span>' +
           '</div>' +
           '<div class="py-3 flex justify-between text-[#71767B] text-[14px] border-b border-neutral-800 px-1">' +
@@ -3400,7 +3451,7 @@
           '<div class="flex flex-col">' +
           '<div class="flex items-center gap-1.5"><span contenteditable="true" class="font-bold text-[13px] text-[#D7DADC] outline-none">' + (data.subreddit || 'r/AskReddit') + '</span></div>' +
           '<div class="flex items-center gap-1 text-[11px] text-[#818384]">' +
-          '<span contenteditable="true" class="outline-none">' + (data.author || 'u/User') + '</span><span>Ã¢â‚¬Â¢</span><span contenteditable="true" class="outline-none">' + (data.time || '2h') + '</span>' +
+          '<span contenteditable="true" class="outline-none">' + (data.author || 'u/User') + '</span><span> • </span><span contenteditable="true" class="outline-none">' + (data.time || '2h') + '</span>' +
           '</div>' +
           '</div>' +
           '</div>' +
@@ -3475,9 +3526,9 @@
       if (!node) return;
       const text = node.innerText || '';
       navigator.clipboard.writeText(text).then(() => {
-        showPopup('Mockup Ã Â¶â€˜Ã Â¶Å¡Ã Â·Å¡ Ã Â¶â€¦Ã Â¶Å¡Ã Â·â€Ã Â¶Â»Ã Â·â€ Clipboard Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Copy Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â¶ÂºÃ Â·â€™', 'success');
+      showPopup('Mockup එකේ අකුරු Clipboard එකට Copy විය!', 'සාර්ථකයි', 'success');
       }).catch(() => {
-        showPopup('Copy Ã Â¶Å¡Ã Â·â€™Ã Â¶Â»Ã Â·â€œÃ Â¶Â¸Ã Â¶Â§ Ã Â¶Â±Ã Â·Å“Ã Â·â€žÃ Â·ÂÃ Â¶Å¡Ã Â·â€™ Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº.', 'Ã Â¶Â¯Ã Â·ÂÃ Â·â€šÃ Â¶ÂºÃ Â¶Å¡Ã Â·â€™', 'error');
+      showPopup('Copy කිරීමට අපොහොසත් විය!', 'Error', 'error');
       });
     }
 
@@ -4255,7 +4306,7 @@
           const resArea = document.getElementById('scraperSrtResultArea');
           if (resArea) resArea.style.display = 'block';
         }
-        if (typeof showPopup === 'function') showPopup('Script Ã Â¶â€˜Ã Â¶Å¡ AI Writer Studio Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â·â‚¬ Load Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Studio Active', 'success');
+        if (typeof showPopup === 'function') showPopup('Script එක AI Writer වෙත යවන ලදී!', 'Script Active', 'success');
       } else if (p.type === 'Social') {
         if (typeof openSocialKitModal === 'function') openSocialKitModal();
         else if (typeof openModal === 'function') openModal('socialKitModal');
@@ -4270,7 +4321,7 @@
             renderMockup(payload.tool || 'fake_chat', payload.data);
           }
         }
-        if (typeof showPopup === 'function') showPopup('Social Kit Mockup Ã Â¶â€˜Ã Â¶Å¡ Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â·â‚¬ Studio Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Load Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Studio Active', 'success');
+        if (typeof showPopup === 'function') showPopup('Social Kit Mockup එක Clipboard එකට Copy කළා!', 'Copied', 'success');
       } else if (p.type === 'Subtitle') {
         if (typeof openModal === 'function') openModal('srtModal');
         if (payload && payload.srt) {
@@ -4283,7 +4334,7 @@
           const resArea = document.getElementById('srtResultArea');
           if (resArea) resArea.style.display = 'block';
         }
-        if (typeof showPopup === 'function') showPopup('Subtitles Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â·â‚¬ Subtitle Studio Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Load Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Studio Active', 'success');
+        if (typeof showPopup === 'function') showPopup('Subtitles සාර්ථකව Copy කළා!', 'Copied', 'success');
       } else if (p.type === 'Image') {
         if (typeof openModal === 'function') openModal('bgRemoverModal'); // Image generation or enhancement
         const promptInp = document.getElementById('imagePromptInput');
@@ -4293,14 +4344,14 @@
           const resArea = document.getElementById('imgResultArea');
           if (resArea) resArea.style.display = 'block';
         }
-        if (typeof showPopup === 'function') showPopup('Image Prompt Ã Â¶â€˜Ã Â¶Å¡ Studio Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â·â‚¬ Load Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Studio Active', 'success');
+        if (typeof showPopup === 'function') showPopup('Image Prompt එක Image Generator වෙත යවන ලදී!', 'Prompt Sent', 'success');
       } else if (p.type === 'Background') {
         if (typeof openModal === 'function') openModal('bgRemoverModal');
-        if (typeof showPopup === 'function') showPopup('Background Remover Studio Ã Â¶â€˜Ã Â¶Å¡ Ã Â·â‚¬Ã Â·â€™Ã Â·â‚¬Ã Â·ËœÃ Â¶Â­ Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Studio Active', 'success');
+        if (typeof showPopup === 'function') showPopup('Background Remover Studio එක ක්‍රියාත්මකයි!', 'Studio Active', 'success');
       } else if (p.type === 'Video' || p.type === 'Dubbing') {
         if (p.type === 'Dubbing' && typeof openModal === 'function') openModal('dubModal');
         else if (typeof openModal === 'function') openModal('fbModal');
-        if (typeof showPopup === 'function') showPopup('Video Studio Ã Â·â‚¬Ã Â·â€™Ã Â·â‚¬Ã Â·ËœÃ Â¶Â­ Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Studio Active', 'success');
+        if (typeof showPopup === 'function') showPopup('Video Studio ක්‍රියාත්මකයි!', 'Studio Active', 'success');
       }
     };
 
@@ -4351,7 +4402,7 @@
         a.click();
         document.body.removeChild(a);
       } else {
-        if (typeof showPopup === 'function') showPopup('Ã Â¶Â¶Ã Â·ÂÃ Â¶Å“Ã Â¶Â­ Ã Â¶Å¡Ã Â·â€™Ã Â¶Â»Ã Â·â€œÃ Â¶Â¸Ã Â¶Â§ Media File Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Å¡Ã Â·Å  Ã Â·â€žÃ Â¶Â¸Ã Â·â€ Ã Â¶Â±Ã Â·Å“Ã Â·â‚¬Ã Â·â€œÃ Â¶Âº.', 'Ã Â¶Â­Ã Â·Å“Ã Â¶Â»Ã Â¶Â­Ã Â·â€Ã Â¶Â»Ã Â·â€', 'info');
+        if (typeof showPopup === 'function') showPopup('ගැලරියෙන් Media File එකක් තෝරන්න.', 'තොරතුරු', 'info');
       }
     };
 
@@ -4363,7 +4414,7 @@
 
     window.deleteUserProject = function (projectId) {
       const email = window.currentUserEmail || localStorage.getItem('capzone_user_email');
-      if (!confirm('Ã Â¶Â¸Ã Â·â„¢Ã Â¶Â¸ Project Ã Â¶â€˜Ã Â¶Å¡ Ã Â·Æ’Ã Â·â€ž Cloud Backup Ã Â¶â€˜Ã Â¶Å¡ Ã Â·Æ’Ã Â¶Â¸Ã Â·Å Ã Â¶Â´Ã Â·â€“Ã Â¶Â»Ã Â·Å Ã Â¶Â«Ã Â¶ÂºÃ Â·â„¢Ã Â¶Â±Ã Â·Å Ã Â¶Â¸ Delete Ã Â¶Å¡Ã Â·â€™Ã Â¶Â»Ã Â·â€œÃ Â¶Â¸Ã Â¶Â§ Ã Â¶â€¦Ã Â·â‚¬Ã Â·ÂÃ Â·Å Ã¢â‚¬ÂÃ Â¶ÂºÃ Â¶Â¯?')) return;
+      if (!confirm('මෙම Project එක සහ Cloud Backup එක සහමුලින්ම Delete කිරීමට ඔබට සහතිකද?')) return;
 
       const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
       const tgMsgId = p ? (p.telegram_msg_id || p.tg_msg_id) : null;
@@ -4383,7 +4434,7 @@
           method: 'DELETE',
           headers: { 'x-user-email': email || '' }
         }).then(r => r.json()).then(() => {
-          if (typeof showPopup === 'function') showPopup('Project Ã Â¶â€˜Ã Â¶Å¡ Ã Â·Æ’Ã Â·â€ž Cloud Backup Ã Â¶â€˜Ã Â¶Å¡ Ã Â·Æ’Ã Â·ÂÃ Â¶Â»Ã Â·Å Ã Â¶Â®Ã Â¶Å¡Ã Â·â‚¬ Delete Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Deleted from Cloud', 'success');
+          if (typeof showPopup === 'function') showPopup('Project එක සහ Cloud Backup එකෙන් ඉවත් කරන ලදී!', 'Deleted from Cloud', 'success');
         });
       } catch (e) { }
     };
@@ -4392,7 +4443,7 @@
       const textEl = document.getElementById('projectModalTextContent');
       if (!textEl || !textEl.innerText) return;
       navigator.clipboard.writeText(textEl.innerText).then(() => {
-        if (typeof showPopup === 'function') showPopup('Content Ã Â¶â€˜Ã Â¶Å¡ Clipboard Ã Â¶â€˜Ã Â¶Å¡Ã Â¶Â§ Copy Ã Â·â‚¬Ã Â·â€™Ã Â¶Âº!', 'Copied', 'success');
+        if (typeof showPopup === 'function') showPopup('Content එක සාර්ථකව Copy විය!', 'Copied', 'success');
       });
     };
 
