@@ -698,4 +698,2531 @@
   </main>
 
   <footer
-    class="glass-panel mt-auto py-14 relative z-10 text-center w-full mt-12 border-t border-white/10 bg-black/40 backdrop-blur-md 
+    class="glass-panel mt-auto py-14 relative z-10 text-center w-full mt-12 border-t border-white/10 bg-black/40 backdrop-blur-md overflow-hidden">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col items-center gap-5">
+      <div class="flex items-center gap-3 group">
+        <div
+          class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
+          <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
+        </div>
+        <span class="text-xl font-extrabold text-white tracking-tight drop-shadow-md">CapZone Subtitle Studio</span>
+      </div>
+
+      <p class="text-sm font-medium text-gray-300 drop-shadow-md">
+        Designed & Engineered with ❤️ by <span class="text-blue-400 font-bold text-base">Kaveesha
+          Theekshana</span>
+      </p>
+
+      <a href="https://kaveesha.top" target="_blank" rel="noopener noreferrer"
+        class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/5 border border-white/20 text-white hover:text-blue-300 hover:bg-white/10 hover:border-blue-400/50 font-extrabold text-xs transition-all shadow-xl hover:scale-105 group backdrop-blur-md">
+        <i data-lucide="globe" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
+        Portfolio: kaveesha.top
+        <i data-lucide="external-link" class="w-3 h-3"></i>
+      </a>
+
+      <p class="text-[11px] text-gray-400 mt-2">&copy; 2026 CapZone Subtitle Studio. All rights reserved. Powered by <span class="text-blue-400">KaveezCloud AI Engine</span>.</p>
+    </div>
+  </footer>
+
+  <!-- Modals -->
+
+  <!-- PROFILE MODAL -->
+  <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative">
+      <button onclick="closeModal('profileModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="text-center mb-6">
+        <div
+          class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg mb-3"
+          id="profileInitial">U</div>
+        <h2 class="text-xl font-bold text-fix-heading" id="profileName">User</h2>
+        <p class="text-xs text-fix-sub mt-1" id="profileEmail">user@example.com</p>
+      </div>
+      <div class="space-y-4">
+        <div class="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-3">
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone API Key
+              (Optional)</label>
+            <input type="text" id="userApiKey" autocomplete="off"
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">ElevenLabs API
+              Key</label>
+            <input type="text" id="elevenLabsApiKey" placeholder="sk_..."
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+          <button id="saveApiKeyBtn" type="button"
+            onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
+            class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
+            API Keys</button>
+        </div>
+        <button id="logoutBtn" onclick="handleLogout()"
+          class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FB MODAL -->
+  <div id="qualityModal"
+    class="fixed inset-0 z-[70] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 transition-all duration-300 ease-out"
+    style="display: none; opacity: 0;">
+    <div
+      class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform transition-all duration-300 ease-out scale-75"
+      id="qualityModalContent">
+      <button onclick="closeModal('qualityModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="text-center mb-6 mt-2">
+        <div class="w-12 h-12 mx-auto rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center mb-3">
+          <i id="qualityModalIcon" data-lucide="settings" class="w-6 h-6"></i>
+        </div>
+        <h2 id="qualityModalTitle" class="text-xl font-bold text-white mb-1">Select Quality</h2>
+        <p id="qualityModalDesc" class="text-xs text-slate-400">Choose your preferred download quality.</p>
+      </div>
+      <div class="space-y-3">
+        <button onclick="confirmQuality('standard')"
+          class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-medium text-sm rounded-xl border border-white/10 transition-all flex items-center justify-between px-5 group">
+          <div class="flex items-center gap-3">
+            <i data-lucide="monitor" class="w-4 h-4 text-slate-400 group-hover:text-blue-400 transition-colors"></i>
+            <span id="qualityStandardText">Standard (720p)</span>
+          </div>
+          <span class="text-[10px] bg-slate-700/50 px-2 py-1 rounded text-slate-300">Fastest</span>
+        </button>
+        <button onclick="confirmQuality('max')"
+          class="w-full py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl border border-white/20 shadow-lg shadow-blue-500/20 transition-all flex items-center justify-between px-5 group">
+          <div class="flex items-center gap-3">
+            <i data-lucide="sparkles" class="w-4 h-4 text-blue-200"></i>
+            <span id="qualityMaxText">Max Quality (1080p)</span>
+          </div>
+          <span class="text-[10px] bg-white/20 px-2 py-1 rounded text-white">Best</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div id="fbModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('fbModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-[#1877F2]/20 text-[#1877F2] rounded-xl">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill-rule="evenodd"
+              d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
+              clip-rule="evenodd"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">FB Downloader</h2>
+          <p class="text-[10px] text-slate-300">HD Video & Audio Rip</p>
+        </div>
+      </div>
+      <form id="fbForm" class="space-y-4" onsubmit="handleFbSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Facebook Video Link</label>
+          <input type="url" id="fbUrlInput" required class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="fbSubmitBtn"
+            class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleFbAudioSubmit(event)" id="fbAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
+      </form>
+      <div id="fbProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing Media...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="fbProgressBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-300" style="width: 0%">
+          </div>
+        </div>
+        <div id="fbProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1"></div>
+      </div>
+      <div id="fbResultArea"
+        class="mt-4 p-4 rounded-2xl bg-green-500/10 border border-green-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-green-500"></i>
+        <a id="fbDownloadLink"
+          class="w-full py-2.5 bg-green-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIKTOK MODAL -->
+  <div id="tiktokModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('tiktokModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-gradient-to-tr from-cyan-500 to-pink-500 text-white rounded-xl shadow-lg">
+          <i data-lucide="music" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">TikTok Downloader</h2>
+          <p class="text-[10px] text-slate-300">No Watermark Video & Audio</p>
+        </div>
+      </div>
+      <form id="tiktokForm" class="space-y-4" onsubmit="handleTiktokSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">TikTok Video Link</label>
+          <input type="url" id="tiktokUrlInput" required class="input-fix w-full px-4 py-3 rounded-xl outline-none" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <button type="submit" id="tiktokSubmitBtn"
+            class="w-full py-3.5 bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold text-sm rounded-xl hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="video" class="w-4 h-4"></i> Get Video
+          </button>
+          <button type="button" onclick="handleTiktokAudioSubmit(event)" id="tiktokAudioBtn"
+            class="w-full py-3.5 bg-emerald-600 text-white font-bold text-sm rounded-xl hover:bg-emerald-700 transition-opacity flex items-center justify-center gap-2">
+            <i data-lucide="headphones" class="w-4 h-4"></i> Get MP3
+          </button>
+        </div>
+      </form>
+      <div id="tiktokProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5"
+        style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Processing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="tiktokProgressBar"
+            class="bg-gradient-to-r from-pink-500 to-cyan-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+        <div id="tiktokProgressLog" class="mt-3 text-[10px] text-fix-sub font-mono h-16 overflow-y-auto space-y-1">
+        </div>
+      </div>
+      <div id="tiktokResultArea"
+        class="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="check-circle-2" class="w-8 h-8 text-emerald-500"></i>
+        <a id="tiktokDownloadLink"
+          class="w-full py-2.5 bg-emerald-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download-cloud" class="w-4 h-4"></i> Save File
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI SCRIPT WRITER MODAL (Reused scraperSrtModal ID for simplicity) -->
+  <div id="scraperSrtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('scraperSrtModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-blue-500/10 text-blue-500 rounded-2xl border border-blue-500/20">
+          <i data-lucide="pen-tool" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">AI Script Writer</h2>
+          <p class="text-xs text-fix-sub">Generate highly engaging video scripts using KaveezCloud AI.</p>
+        </div>
+      </div>
+      <form id="scraperSrtForm" class="space-y-4" onsubmit="handleScraperSrtSubmit(event)">
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Video Topic / Idea</label>
+          <textarea id="scriptTopic" required placeholder="e.g. How to make a website in 10 minutes..." rows="3"
+            class="input-fix w-full px-3 py-2.5 rounded-xl outline-none resize-none"></textarea>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-fix-sub mb-2 block">Video Format</label>
+          <select id="scriptFormat" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+            <option value="YouTube Long Form" selected>YouTube Long Form</option>
+            <option value="YouTube Shorts">YouTube Shorts</option>
+            <option value="TikTok / Instagram Reels">TikTok / Instagram Reels</option>
+          </select>
+        </div>
+        <button type="submit" id="scraperSrtSubmitBtn"
+          class="w-full py-3.5 bg-blue-600 text-white font-bold text-sm rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Script
+        </button>
+      </form>
+      <div id="scraperSrtProgressCard" class="mt-6 p-4 rounded-xl bg-black/40 border border-white/10"
+        style="display: none;">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-medium text-slate-300" id="scraperSrtStatusText">Generating...</span>
+        </div>
+        <div class="w-full bg-slate-700/50 rounded-full h-1.5 overflow-hidden">
+          <div id="scraperSrtProgressBar" class="bg-blue-500 h-1.5 rounded-full w-0 transition-all duration-300"></div>
+        </div>
+      </div>
+      <div id="scraperSrtResultArea" class="mt-4 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 flex-col gap-3"
+        style="display: none;">
+        <textarea id="scriptOutputPreview" readonly
+          class="w-full h-40 bg-black/20 text-slate-200 text-sm p-3 rounded-lg outline-none resize-none"
+          placeholder="Script will appear here..."></textarea>
+        <a id="scraperSrtDownloadLink" href="#" download
+          class="w-full py-2.5 bg-blue-500/20 text-blue-300 font-bold text-sm rounded-xl hover:bg-blue-500/30 transition-colors flex items-center justify-center gap-2 mt-2">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Script (.txt)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- SRT MODAL -->
+  <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+      <button onclick="closeModal('srtModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 bg-purple-500/10 text-purple-500 rounded-2xl border border-purple-500/20">
+          <i data-lucide="captions" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-fix-heading">Subtitle Studio</h2>
+          <p class="text-xs text-fix-sub">Generate synced Sinhala & English subtitles.</p>
+        </div>
+      </div>
+      <form id="srtForm" class="space-y-4" onsubmit="handleSrtSubmit(event)">
+        <div>
+          <div
+            class="relative w-full border-2 border-dashed border-purple-500/30 rounded-xl p-4 text-center hover:bg-purple-500/5 transition-colors cursor-pointer"
+            onclick="document.getElementById('srtVideoInput').click()">
+            <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden"
+              onchange="updateSrtFileInfo(this)" />
+            <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-purple-500 mb-2"></i>
+            <p class="text-xs text-fix-heading font-bold" id="srtFileName">Click to Browse Media</p>
+            <p class="text-[10px] text-fix-sub mt-1">MP4, MP3, WAV up to 50MB</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Language</label>
+            <select id="srtLanguage" class="input-fix w-full px-3 py-2.5 rounded-xl outline-none">
+              <option value="si" selected>Sinhala</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-fix-sub mb-2 block">Word Limit / Line</label>
+            <input type="number" id="srtWordsLimit" value="5" min="1" max="8"
+              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
+          </div>
+        </div>
+        <button type="submit" id="srtSubmitBtn"
+          class="w-full py-3.5 bg-purple-600 text-white font-bold text-sm rounded-xl hover:bg-purple-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4"></i> Generate Captions
+        </button>
+      </form>
+      <div id="srtProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p class="text-xs font-bold text-fix-heading mb-2">Analyzing...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="srtProgressBar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%"></div>
+        </div>
+      </div>
+      <div id="srtResultArea"
+        class="mt-4 p-4 rounded-2xl bg-purple-500/10 border border-purple-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <i data-lucide="file-text" class="w-8 h-8 text-purple-500"></i>
+        <a id="srtDownloadLink"
+          class="w-full py-2.5 bg-purple-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download .SRT
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- WALLPAPER MODAL -->
+  <div id="wallpaperModal"
+    class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2.5 sm:p-4 md:p-6"
+    style="display: none;">
+    <div
+      class="glass-card w-full max-w-5xl rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 md:p-8 relative max-h-[94vh] flex flex-col overflow-hidden border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+
+      <!-- Close Button -->
+      <button onclick="closeModal('wallpaperModal', event)"
+        class="absolute top-3 right-3 sm:top-5 sm:right-5 text-slate-400 hover:text-white bg-black/40 hover:bg-black/70 p-2 sm:p-2.5 rounded-full transition-all duration-200 z-10">
+        <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+      </button>
+
+      <!-- Modal Header -->
+      <div class="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-5 flex-shrink-0 pr-8 sm:pr-0">
+        <div
+          class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.5)] flex-shrink-0">
+          <i data-lucide="sparkles" class="w-5 h-5 sm:w-6 sm:h-6 text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-lg sm:text-2xl font-extrabold text-white tracking-wide flex items-center gap-2">
+            4K Dashboard Themes
+            <span
+              class="text-[9px] sm:text-[11px] font-bold uppercase tracking-widest px-2 sm:px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Ultra
+              HD</span>
+          </h2>
+          <p class="text-[11px] sm:text-sm text-slate-300 mt-0.5">Select an aesthetic background for your workspace.</p>
+        </div>
+      </div>
+
+      <!-- Categories Filter Tabs -->
+      <div
+        class="flex items-center gap-1.5 sm:gap-2 mb-3 sm:mb-4 overflow-x-auto pb-1 scrollbar-hide flex-shrink-0 flex-nowrap">
+        <button onclick="filterWallpapers('all', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 whitespace-nowrap flex-shrink-0">All
+          (10)</button>
+        <button onclick="filterWallpapers('abstract', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Abstract</button>
+        <button onclick="filterWallpapers('nature', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Nature
+          4K</button>
+        <button onclick="filterWallpapers('studio', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Studio</button>
+        <button onclick="filterWallpapers('cyberpunk', this)"
+          class="wp-filter-btn px-3 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10 whitespace-nowrap flex-shrink-0">Cyberpunk</button>
+      </div>
+
+      <!-- Wallpapers Scrollable Grid -->
+      <div class="overflow-y-auto pr-1 flex-1 custom-scroll">
+        <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3.5" id="wallpaperGrid">
+          <!-- Populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Footer Info -->
+      <div
+        class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs text-slate-400 flex-shrink-0">
+        <span class="flex items-center gap-1 sm:gap-1.5">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400"></i> Auto-saved
+        </span>
+        <button onclick="resetDefaultWallpaper()"
+          class="text-[11px] sm:text-xs text-indigo-400 hover:text-indigo-300 font-semibold underline underline-offset-2 transition-colors">
+          Reset Default
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BG REMOVER MODAL -->
+  <div id="bgRemoverModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <button onclick="closeModal('bgRemoverModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-20">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex items-center gap-3 mb-6 mt-2">
+        <div class="p-2.5 bg-amber-500/20 text-amber-500 rounded-xl shadow-lg">
+          <i data-lucide="image-minus" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h2 class="text-xl font-bold text-white">Background Remover</h2>
+          <p class="text-[10px] text-slate-300">Remove background from any image</p>
+        </div>
+      </div>
+
+      <!-- Enhance Form -->
+      <form id="imageEnhanceForm" class="space-y-4" onsubmit="handleImageEnhanceSubmit(event)">
+        <div
+          class="border-2 border-dashed border-white/20 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/5 transition-colors relative"
+          onclick="document.getElementById('enhanceImageInput').click()">
+          <input type="file" id="enhanceImageInput" accept="image/*" required class="hidden"
+            onchange="document.getElementById('enhanceFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Upload Image'" />
+          <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-amber-500 mb-2"></i>
+          <p class="text-xs text-white font-bold" id="enhanceFileName">Click to Upload Image to Remove BG</p>
+        </div>
+        <button type="submit" id="imageEnhanceBtn"
+          class="w-full py-3.5 bg-amber-600 text-white font-bold text-sm rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
+          <i data-lucide="scissors" class="w-4 h-4"></i> Remove Background
+        </button>
+      </form>
+
+      <div id="imgProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
+        <p id="imgStatusText" class="text-xs font-bold text-white mb-2">Processing (May take up to 2 mins)...</p>
+        <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
+          <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
+            style="width: 0%">
+          </div>
+        </div>
+      </div>
+
+      <div id="imgResultArea"
+        class="mt-4 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col items-center gap-3"
+        style="display: none;">
+        <img id="imgResultPreview" class="w-full rounded-xl object-contain bg-black/20 max-h-48" src="" />
+        <a id="imgDownloadLink"
+          class="w-full py-2.5 bg-amber-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center"
+          target="_blank">
+          <i data-lucide="download" class="w-4 h-4"></i> Download Result
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastNotification"
+    class="fixed bottom-6 right-6 z-50 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-4">
+    <div class="glass-card px-4 py-3 rounded-xl flex items-center gap-3 shadow-2xl border border-white/20">
+      <div id="toastIconContainer"><i data-lucide="info" class="w-5 h-5 text-indigo-500"></i></div>
+      <span id="toastMessage" class="text-xs font-bold text-fix-heading">Notification Message</span>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
+    });
+
+    window.pendingToolModal = null;
+
+    function openModal(modalId, event) {
+      if (event) {
+        if (event.preventDefault) event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+      if (typeof window.openModal === 'function') {
+        window.openModal(modalId, event);
+      } else {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.classList.remove('hidden');
+          document.body.classList.add('overflow-hidden');
+        }
+      }
+    }
+
+    function closeModal(modalId, event) {
+      if (event) {
+        if (event.preventDefault) event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+      if (typeof window.closeModal === 'function') {
+        window.closeModal(modalId, event);
+      } else {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.style.display = 'none';
+          modal.classList.add('hidden');
+          document.body.classList.remove('overflow-hidden');
+        }
+      }
+    }
+
+    window.openToolWithIntercept = function (modalId, event) {
+      if (event) {
+        if (event.preventDefault) event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+
+      // Non-AI media tools NEVER trigger API popup
+      if (['fbModal', 'tiktokModal', 'bgRemoverModal', 'wallpaperModal', 'qualityModal'].includes(modalId)) {
+        openModal(modalId, event);
+        return;
+      }
+
+      const apiType = localStorage.getItem('capzone_api_type') || 'server';
+      if (apiType) {
+        openModal(modalId, event);
+        return;
+      }
+
+      window.pendingToolModal = modalId;
+      showApiModal();
+    };
+
+    function checkApiConfiguration() {
+      // Kept for backward-compatibility but does not force popup on page load
+      const apiType = localStorage.getItem('capzone_api_type');
+      if (!apiType) {
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+    }
+
+    function showApiModal() {
+      const modal = document.getElementById('apiConfigModal');
+      const content = document.getElementById('apiConfigContent');
+      if (!modal || !content) return;
+
+      const ownSection = document.getElementById('ownApiSection');
+      const optionsList = document.getElementById('apiOptionsList');
+      if (ownSection) ownSection.classList.add('hidden');
+      if (optionsList) optionsList.classList.remove('hidden');
+
+      modal.style.display = 'flex';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      setTimeout(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      }, 10);
+    }
+
+    function selectApiOption(type) {
+      if (type === 'server') {
+        localStorage.setItem('capzone_api_type', 'server');
+        if (typeof window.updateApiToggleUI === 'function') window.updateApiToggleUI();
+        closeApiModal();
+      } else if (type === 'own') {
+        const optionsList = document.getElementById('apiOptionsList');
+        if (optionsList) optionsList.classList.add('hidden');
+        const ownSection = document.getElementById('ownApiSection');
+        if (ownSection) ownSection.classList.remove('hidden');
+        document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.add('hidden'));
+        const currentKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
+        const keyInput = document.getElementById('geminiApiKeyInput');
+        if (keyInput) {
+          if (currentKey) keyInput.value = currentKey;
+          setTimeout(() => {
+            keyInput.focus();
+            keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 150);
+        }
+      }
+    }
+
+    function backToOptions() {
+      const ownSection = document.getElementById('ownApiSection');
+      if (ownSection) ownSection.classList.add('hidden');
+      const optionsList = document.getElementById('apiOptionsList');
+      if (optionsList) optionsList.classList.remove('hidden');
+      document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.remove('hidden'));
+    }
+
+    function cancelApiModal() {
+      if (!localStorage.getItem('capzone_api_type')) {
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+      closeApiModal();
+    }
+
+    function saveApiKey() {
+      const keyInput = document.getElementById('geminiApiKeyInput');
+      if (!keyInput) return;
+      const key = keyInput.value.trim();
+      if (!key) {
+        if (typeof showPopup === 'function') {
+          showPopup('\u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0DC0\u0DBD\u0D82\u0D9C\u0DD4 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', '\u0D85\u0DC0\u0DC0\u0DCF\u0DAF\u0DBF\u0DBA\u0DD2', 'warning');
+        } else {
+          alert('Please enter a valid API key.');
+        }
+        return;
+      }
+      localStorage.setItem('capzone_api_type', 'own');
+      localStorage.setItem('capzone_gemini_key', key);
+      localStorage.setItem('gemini_api_key', key);
+
+      const profileInput = document.getElementById('userApiKey');
+      if (profileInput) {
+        profileInput.value = key;
+      }
+
+      if (typeof window.updateApiToggleUI === 'function') {
+        window.updateApiToggleUI();
+      }
+
+      closeApiModal();
+      if (typeof showPopup === 'function') {
+        showPopup('Private API Key \u0D91\u0D9A \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 \u0DC3\u0DD4\u0DBB\u0D87\u0D9A\u0DD2\u0DAB\u0DD2. \u0DAF\u0DB8\u0DCA Custom API Mode \u0DC3\u0D9A\u0DCA\u0DBB\u0DD3\u0DBA\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+      }
+    }
+
+    function closeApiModal() {
+      const modal = document.getElementById('apiConfigModal');
+      const content = document.getElementById('apiConfigContent');
+      if (!modal || !content) return;
+
+      if (!localStorage.getItem('capzone_api_type')) {
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+
+      content.classList.remove('scale-100', 'opacity-100');
+      content.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.body.classList.remove('overflow-hidden');
+        if (window.pendingToolModal) {
+          if (typeof window.openModal === 'function') window.openModal(window.pendingToolModal);
+          window.pendingToolModal = null;
+        }
+      }, 300);
+    }
+
+    window.openModal = function (modalId, event) {
+      if (event) {
+        event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'flex';
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      }
+    };
+
+    window.closeModal = function (modalId, event) {
+      if (event) {
+        event.preventDefault();
+        if (event.stopPropagation) event.stopPropagation();
+      }
+      const modal = document.getElementById(modalId);
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        // Auto-reset forms and specific UI states on close
+        const forms = modal.querySelectorAll('form');
+        forms.forEach(f => f.reset());
+        const fileLabels = modal.querySelectorAll('p[id$="FileName"]');
+        fileLabels.forEach(l => {
+          if (l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
+          if (l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image to Remove BG';
+          if (l.id === 'dubFileName') l.textContent = 'Click to Browse Video';
+        });
+        const progressCards = modal.querySelectorAll('[id$="ProgressCard"]');
+        progressCards.forEach(c => c.style.display = 'none');
+        const resultAreas = modal.querySelectorAll('[id$="ResultArea"]');
+        resultAreas.forEach(c => c.style.display = 'none');
+        // Re-enable submit buttons just in case
+        const buttons = modal.querySelectorAll('button[type="submit"]');
+        buttons.forEach(b => b.disabled = false);
+      }
+    };
+    function showPopup(message, title = 'Notice', type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      const msg = document.getElementById('toastMessage');
+      const iconContainer = document.getElementById('toastIconContainer');
+      if (!toast || !msg) return;
+
+      let displayMsg = message || 'Notice';
+      const lower = String(displayMsg).toLowerCase();
+
+      // Normalize any system/AI/backend error message to the exact developer prompt requested
+      if (type === 'error' || lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('weda na') || lower.includes('gemini') || lower.includes('quota') || lower.includes('timeout') || lower.includes('contact developer')) {
+        type = 'warning';
+        displayMsg = 'System Error, please contact developer';
+      }
+
+      if (type === 'error') {
+        msg.innerHTML = `<span class="text-red-400 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>';
+      } else if (type === 'warning') {
+        msg.innerHTML = `<span class="text-amber-300 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="alert-circle" class="w-5 h-5 text-amber-400"></i>';
+      } else if (type === 'info') {
+        msg.innerHTML = `<span class="text-cyan-300 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="info" class="w-5 h-5 text-cyan-400"></i>';
+      } else {
+        msg.innerHTML = `<span class="text-emerald-300 text-xs font-semibold">${displayMsg}</span>`;
+        if (iconContainer) iconContainer.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-400"></i>';
+      }
+
+      try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
+
+      toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      if (window._popupTimeout) clearTimeout(window._popupTimeout);
+      window._popupTimeout = setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+      }, 5000);
+    }
+
+    // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
+    const API_BASE_URL = window.API_BASE_URL;
+
+    function setupProgressTracker(clientId, stepsPrefix, barId) {
+      const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
+      let originalMsg = 'Processing';
+      let dots = 0;
+      const animInterval = setInterval(() => {
+        const statusEl = document.getElementById(stepsPrefix + 'StatusText');
+        if (statusEl) {
+          let suffix = '';
+          for (let i = 0; i < dots; i++) suffix += '.';
+          statusEl.innerText = originalMsg + suffix;
+          dots = (dots + 1) % 4;
+        }
+      }, 500);
+
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+
+          if (data.status === 'interactive_question') {
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            document.getElementById(stepsPrefix + 'InteractiveArea').style.display = 'block';
+            document.getElementById(stepsPrefix + 'QuestionText').innerText = data.data.question;
+          } else if (data.status === 'completed' && data.data) {
+            document.getElementById(barId).style.width = '100%';
+
+            // For Images
+            if (data.data.url && stepsPrefix === 'img') {
+              let finalUrl = data.data.url;
+              if (!finalUrl.startsWith('http')) {
+                finalUrl = `${API_BASE_URL}${data.data.url}`;
+              }
+              document.getElementById('imgResultPreview').src = finalUrl;
+              document.getElementById('imgDownloadLink').href = finalUrl;
+
+              if (!window._imgLogged) {
+                let isBgRemover = !!document.getElementById('enhanceImageInput')?.files?.length && !document.getElementById('imagePromptInput')?.value;
+                let title = isBgRemover ? (document.getElementById('enhanceImageInput').files[0].name || 'Removed Background') : (document.getElementById('imagePromptInput')?.value || 'AI Generated Image');
+                let type = isBgRemover ? 'Background' : 'Image';
+                window.saveToRecentProjects({
+                  type: type,
+                  title: title,
+                  metadata: '1080p AI Processed',
+                  media_url: finalUrl,
+                  payload: {
+                    prompt: document.getElementById('imagePromptInput')?.value || '',
+                    isBgRemover: isBgRemover,
+                    url: finalUrl
+                  }
+                });
+                window._imgLogged = true;
+                setTimeout(() => window._imgLogged = false, 1000);
+              }
+            }
+            // For AI Script Writer
+            if (data.data.scriptText && stepsPrefix === 'scraperSrt') {
+              const topic = document.getElementById('scriptTopic') ? document.getElementById('scriptTopic').value : 'AI Script';
+              if (!window._scriptLogged) {
+                window.saveToRecentProjects({
+                  type: 'Script',
+                  title: topic,
+                  metadata: `Length: ${data.data.scriptText.length} chars`,
+                  payload: {
+                    topic: topic,
+                    scriptText: data.data.scriptText
+                  }
+                });
+                window._scriptLogged = true;
+                setTimeout(() => window._scriptLogged = false, 1000);
+              }
+              document.getElementById('scriptOutputPreview').value = data.data.scriptText;
+              const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
+              document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
+              document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
+            }
+
+            document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+
+            const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
+            if (submitBtn) submitBtn.disabled = false;
+
+            if (stepsPrefix === 'img') {
+              document.getElementById('imageEnhanceBtn').disabled = false;
+              window.isImageTaskRunning = false;
+            }
+            clearInterval(animInterval);
+            eventSource.close();
+          } else if (data.status === 'error') {
+            showPopup(data.message || 'Failed', 'Error', 'error');
+            document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+            const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
+            if (submitBtn) submitBtn.disabled = false;
+            if (stepsPrefix === 'img') {
+              document.getElementById('imageEnhanceBtn').disabled = false;
+              window.isImageTaskRunning = false;
+            }
+            clearInterval(animInterval);
+            eventSource.close();
+          } else if (data.message) {
+            const bar = document.getElementById(barId);
+            if (bar) bar.style.width = '80%';
+
+            // Dynamic status text update
+            originalMsg = data.message;
+          }
+        } catch (e) { }
+      };
+      return eventSource;
+    }
+
+    async function sendImageReply() {
+      const reply = document.getElementById('imgReplyInput').value;
+      if (!reply || !window.currentImageClientId) return;
+
+      document.getElementById('imgInteractiveArea').style.display = 'none';
+      document.getElementById('imgProgressCard').style.display = 'block';
+      document.getElementById('imgReplyInput').value = '';
+
+      try {
+        await fetch(`${API_BASE_URL}/api/reply-image`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ clientId: window.currentImageClientId, reply })
+        });
+      } catch (err) {
+        showPopup(err.message, 'Error', 'error');
+      }
+    }
+
+    window.syncApiKeys = function (key) {
+      if (!key) return;
+      localStorage.setItem('capzone_api_key', key);
+      localStorage.setItem('capzone_gemini_key', key);
+      localStorage.setItem('gemini_api_key', key);
+      localStorage.setItem('capzone_api_type', 'custom');
+
+      const userApiKey = document.getElementById('userApiKey');
+      const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
+
+      if (userApiKey) userApiKey.value = key;
+      if (geminiApiKeyInput) geminiApiKeyInput.value = key;
+
+      if (typeof window.updateApiToggleUI === 'function') {
+        window.updateApiToggleUI();
+      }
+    };
+
+    function saveApiKeys() {
+      const geminiKey = document.getElementById('userApiKey')?.value?.trim() || document.getElementById('geminiApiKeyInput')?.value?.trim();
+      const elevenLabsKey = document.getElementById('elevenLabsApiKey')?.value?.trim();
+
+      if (geminiKey) {
+        window.syncApiKeys(geminiKey);
+
+        if (window.currentUserEmail) {
+          fetch(`${window.API_BASE_URL || ''}/api/save-api-key`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: window.currentUserEmail, api_key: geminiKey })
+          }).catch(e => console.error("Could not save API key to cloud", e));
+        }
+      }
+      if (elevenLabsKey) localStorage.setItem('elevenlabs_api_key', elevenLabsKey);
+    }
+
+    let currentSrtFile = null;
+    function updateSrtFileInfo(input) {
+      if (input.files && input.files[0]) {
+        currentSrtFile = input.files[0];
+        document.getElementById('srtFileName').textContent = input.files[0].name;
+      }
+    }
+
+    async function handleScraperSrtSubmit(e) {
+      e.preventDefault();
+      const topic = document.getElementById('scriptTopic').value;
+      if (!topic) { showPopup('Please enter a video topic!', 'Error', 'error'); return; }
+
+      const submitBtn = document.getElementById('scraperSrtSubmitBtn');
+      const progressCard = document.getElementById('scraperSrtProgressCard');
+      const resultArea = document.getElementById('scraperSrtResultArea');
+      const modalBox = document.querySelector('#scraperSrtModal .glass-card');
+
+      submitBtn.disabled = true;
+      progressCard.style.display = 'block';
+      resultArea.style.display = 'none';
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
+
+      const apiType = localStorage.getItem('capzone_api_type');
+      const apiKey = localStorage.getItem('capzone_gemini_key');
+      const format = document.getElementById('scriptFormat').value;
+
+      let prompt = `Act as an expert YouTube scriptwriter and produce a highly engaging, super advanced viral video script about '${topic}'. Format: ${format}. CRITICAL INSTRUCTIONS: 1. The script MUST be 100% in natural Sinhala (සිංහල Unicode). 2. Write in PLAIN TEXT ONLY. DO NOT use ANY Markdown formatting (no **, no ##, no bullets). Provide a clean text output. 3. Include a catchy HOOK, a detailed INTRO, a comprehensive BODY with creative visual scene descriptions (B-Roll ideas), and a strong CALL-TO-ACTION OUTRO. 4. Ensure paragraphs are well-separated with blank lines for readability. Make the language highly compelling and professional for content creators.`;
+
+      try {
+        let scriptText = '';
+
+        if (apiType === 'own' && apiKey) {
+          try {
+            // Direct call using modern gemini-3.6-flash model
+            const candidateModels = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-3.5-flash'];
+            for (const model of candidateModels) {
+              try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+                const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
+
+                document.getElementById('scraperSrtProgressBar').style.width = '50%';
+                const response = await fetch(url, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(requestBody)
+                });
+
+                const data = await response.json();
+                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
+                  scriptText = data.candidates[0].content.parts[0].text;
+                  break;
+                }
+              } catch (mErr) { }
+            }
+          } catch (eDirect) {
+            console.warn('Direct AI key error:', eDirect);
+          }
+        }
+
+        if (!scriptText) {
+          // Server proxy call
+          try {
+            const clientId = 'scraper_' + Date.now();
+            const res = await fetch(`${API_BASE_URL}/api/generate-script`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ topic, format, clientId })
+            });
+            if (res.ok) {
+              const resData = await res.json();
+              if (resData.script && !resData.script.includes('[SYSTEM DOWN]')) {
+                scriptText = resData.script;
+              }
+            }
+          } catch (eServer) {
+            console.warn('Server script call notice:', eServer);
+          }
+        }
+
+        if (!scriptText) {
+          showPopup('System Error, please contact developer', 'System Error', 'error');
+          submitBtn.disabled = false;
+          progressCard.style.display = 'none';
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+          return;
+        }
+
+        // Finalize
+        document.getElementById('scraperSrtProgressBar').style.width = '100%';
+        setTimeout(() => {
+          progressCard.style.display = 'none';
+          resultArea.style.display = 'block';
+          document.getElementById('scriptOutputPreview').value = scriptText;
+          submitBtn.disabled = false;
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+          showPopup('Script generated successfully with KaveezCloud AI!', 'Success', 'success');
+
+          if (typeof window.saveToRecentProjects === 'function') {
+            window.saveToRecentProjects({
+              type: 'Script',
+              title: topic,
+              metadata: format,
+              payload: { topic, format, scriptText }
+            });
+          }
+        }, 400);
+
+      } catch (err) {
+        showPopup('System Error, please contact developer', 'System Error', 'error');
+        submitBtn.disabled = false;
+        progressCard.style.display = 'none';
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
+    }
+
+    // Convert AudioBuffer to 16kHz mono WAV Blob
+    function audioBufferToWavBlob(buffer, targetSampleRate = 16000) {
+      const channelData = buffer.getChannelData(0);
+      const numSamples = channelData.length;
+      const bitDepth = 16;
+      const bytesPerSample = bitDepth / 8;
+      const blockAlign = 1 * bytesPerSample;
+      const byteRate = targetSampleRate * blockAlign;
+      const dataSize = numSamples * bytesPerSample;
+      const totalSize = 44 + dataSize;
+      const arrayBuffer = new ArrayBuffer(totalSize);
+      const view = new DataView(arrayBuffer);
+
+      function writeStr(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      }
+
+      writeStr(0, 'RIFF');
+      view.setUint32(4, totalSize - 8, true);
+      writeStr(8, 'WAVE');
+      writeStr(12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true); // PCM
+      view.setUint16(22, 1, true); // Mono
+      view.setUint32(24, targetSampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitDepth, true);
+      writeStr(36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      let offset = 44;
+      for (let i = 0; i < numSamples; i++) {
+        let sample = Math.max(-1, Math.min(1, channelData[i]));
+        view.setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+        offset += 2;
+      }
+      return new Blob([view], { type: 'audio/wav' });
+    }
+
+    // Fast In-Browser Audio Extractor (Transforms 100MB video into 1-2MB lightweight audio)
+    async function extractOptimizedAudio(file) {
+      if (!file || file.type.startsWith('audio/')) return file;
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return file;
+        const arrayBuf = await file.arrayBuffer();
+        const ctx = new AudioContextClass();
+        const decoded = await ctx.decodeAudioData(arrayBuf);
+
+        // Render downsampled 16kHz mono using OfflineAudioContext
+        const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
+        const source = offlineCtx.createBufferSource();
+        source.buffer = decoded;
+        source.connect(offlineCtx.destination);
+        source.start(0);
+        const resampled = await offlineCtx.startRendering();
+        const wavBlob = audioBufferToWavBlob(resampled, 16000);
+        return new File([wavBlob], `${file.name.replace(/\.[^/.]+$/, "")}.wav`, { type: 'audio/wav' });
+      } catch (err) {
+        console.warn('In-browser audio extraction notice, fallback to original:', err);
+        return file;
+      }
+    }
+
+    async function handleSrtSubmit(e) {
+      e.preventDefault();
+      if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
+      if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+
+      document.getElementById('srtSubmitBtn').disabled = true;
+      document.getElementById('srtProgressCard').style.display = 'block';
+      document.getElementById('srtResultArea').style.display = 'none';
+      const srtStatus = document.getElementById('srtStatusText');
+      if (srtStatus) srtStatus.innerText = 'Optimizing media for instant upload...';
+      const modalBox = e.target.closest('.glass-card');
+      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
+      const clientId = 'srt_' + Date.now();
+      const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
+
+      let fileToUpload = currentSrtFile;
+      try {
+        fileToUpload = await extractOptimizedAudio(currentSrtFile);
+      } catch (eOpt) {
+        console.warn('Audio extraction fallback:', eOpt);
+      }
+
+      const formData = new FormData();
+      formData.append('video', fileToUpload);
+      formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
+
+      const customApiKeySrt = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
+      if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+        es.close();
+        if (data.srt) {
+          const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
+          const lang = document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala';
+          window.saveToRecentProjects({
+            type: 'Subtitle',
+            title: srtName,
+            metadata: `${lang} Subtitles`,
+            media_url: data.downloadUrl ? `${API_BASE_URL}${data.downloadUrl}` : '',
+            payload: {
+              srt: data.srt,
+              language: lang,
+              filename: `${srtName.replace(/\.[^/.]+$/, "")}.srt`
+            }
+          });
+          const blob = new Blob([data.srt], { type: 'text/plain' });
+          document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
+          document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
+          document.getElementById('srtProgressBar').style.width = '100%';
+          document.getElementById('srtResultArea').style.display = 'flex';
+        } else { showPopup('System Error, please contact developer', 'System Error', 'error'); }
+      } catch (err) { es.close(); showPopup('System Error, please contact developer', 'System Error', 'error'); }
+      finally {
+        document.getElementById('srtSubmitBtn').disabled = false;
+        const modalBox = e.target.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
+    }
+
+    // Quality Selection State
+    let pendingDownload = null;
+
+    function openQualityModal(type, url, format) {
+      pendingDownload = { type, url, format };
+
+      const title = document.getElementById('qualityModalTitle');
+      const desc = document.getElementById('qualityModalDesc');
+      const stdText = document.getElementById('qualityStandardText');
+      const maxText = document.getElementById('qualityMaxText');
+      const icon = document.getElementById('qualityModalIcon');
+
+      if (format === 'audio') {
+        title.textContent = "Select Audio Quality";
+        desc.textContent = "Higher bitrate means better sound.";
+        stdText.textContent = "Standard Bitrate";
+        maxText.textContent = "Highest Quality (320kbps)";
+        icon.setAttribute('data-lucide', 'headphones');
+      } else {
+        title.textContent = "Select Video Quality";
+        desc.textContent = "Choose resolution for download.";
+        stdText.textContent = "Standard (720p HD)";
+        maxText.textContent = "Max Quality (1080p HD)";
+        icon.setAttribute('data-lucide', 'video');
+      }
+      lucide.createIcons();
+
+      const modal = document.getElementById('qualityModal');
+      const content = document.getElementById('qualityModalContent');
+      modal.style.display = 'flex';
+      // Small delay to allow display block to apply before animating opacity
+      setTimeout(() => {
+        modal.style.opacity = '1';
+        content.classList.remove('scale-75');
+        content.classList.add('scale-100');
+      }, 10);
+    }
+
+    function confirmQuality(qualityLevel) {
+      if (!pendingDownload) return;
+
+      const modal = document.getElementById('qualityModal');
+      const content = document.getElementById('qualityModalContent');
+      modal.style.opacity = '0';
+      content.classList.remove('scale-100');
+      content.classList.add('scale-75');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        handleSocialSubmit(pendingDownload.type, pendingDownload.url, pendingDownload.format, qualityLevel);
+        pendingDownload = null;
+      }, 300);
+    }
+
+    async function handleFbSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value, 'video');
+    }
+    async function handleFbAudioSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('fb', document.getElementById('fbUrlInput').value, 'audio');
+    }
+    async function handleTiktokSubmit(e) {
+      e.preventDefault();
+      // Only TikTok Video shows the popup
+      openQualityModal('tiktok', document.getElementById('tiktokUrlInput').value, 'video');
+    }
+    async function handleTiktokAudioSubmit(e) {
+      e.preventDefault();
+      handleSocialSubmit('tiktok', document.getElementById('tiktokUrlInput').value, 'audio');
+    }
+
+    async function handleSocialSubmit(type, url, format = 'video', qualityLevel = 'max') {
+      const btnId = type + 'SubmitBtn';
+      const progId = type + 'ProgressCard';
+      const resId = type + 'ResultArea';
+      const barId = type + 'ProgressBar';
+      const linkId = type + 'DownloadLink';
+
+      document.getElementById(btnId).disabled = true;
+      document.getElementById(progId).style.display = 'block';
+      document.getElementById(resId).style.display = 'none';
+
+      const clientId = type + '_' + Date.now();
+      const es = setupProgressTracker(clientId, type, barId);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/${type === 'fb' ? 'facebook-download' : 'tiktok-download'}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, clientId, format, qualityLevel })
+        });
+        const data = await res.json();
+        es.close();
+        if (data.downloadUrl) {
+          const finalDlUrl = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          if (!window._dlLogged) {
+            const isAudioFormat = (format === 'audio');
+            const mediaType = isAudioFormat ? 'Audio' : 'Video';
+            const platformName = (type === 'fb' ? 'Facebook' : 'TikTok');
+            const projectTitle = `${platformName} ${isAudioFormat ? 'Audio' : 'Video'}${data.filename ? ' (' + data.filename + ')' : ''}`;
+            
+            window.saveToRecentProjects({
+              type: mediaType,
+              title: projectTitle,
+              metadata: `${isAudioFormat ? 'Audio MP3' : 'Video MP4'} - ${qualityLevel || 'HD'}`,
+              media_url: finalDlUrl,
+              payload: {
+                url: url,
+                downloadUrl: finalDlUrl,
+                filename: data.filename,
+                type: type,
+                format: format,
+                qualityLevel: qualityLevel
+              }
+            });
+            window._dlLogged = true;
+            setTimeout(() => window._dlLogged = false, 1000);
+          }
+          document.getElementById(barId).style.width = '100%';
+          document.getElementById(linkId).href = finalDlUrl;
+          document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
+          document.getElementById(resId).style.display = 'flex';
+        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
+      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
+      finally { document.getElementById(btnId).disabled = false; }
+    }
+
+    function switchImageTab(tab) {
+      if (window.isImageTaskRunning) {
+        showPopup('කරුණාකර වීඩියෝවක් තෝරන්න', 'Warning', 'warning');
+        return;
+      }
+      document.getElementById('imageGenerateForm').style.display = tab === 'generate' ? 'block' : 'none';
+      document.getElementById('imageEnhanceForm').style.display = tab === 'enhance' ? 'block' : 'none';
+      document.getElementById('tabGenerate').className = tab === 'generate' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
+      document.getElementById('tabEnhance').className = tab === 'enhance' ? 'px-4 py-2 text-sm font-bold text-amber-400 border-b-2 border-amber-400' : 'px-4 py-2 text-sm font-bold text-gray-400';
+      document.getElementById('imgResultArea').style.display = 'none';
+    }
+
+    async function handleImageGenerateSubmit(e) {
+      e.preventDefault();
+      const prompt = document.getElementById('imagePromptInput').value;
+      if (!prompt) return;
+
+      document.getElementById('imageGenerateBtn').disabled = true;
+      document.getElementById('imgProgressCard').style.display = 'block';
+      const statusEl = document.getElementById('imgStatusText');
+      if (statusEl) statusEl.innerText = 'Initializing...';
+      document.getElementById('imgResultArea').style.display = 'none';
+
+      const clientId = 'img_' + Date.now();
+      const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      window.isImageTaskRunning = true;
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/generate-image`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, clientId })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          window.currentImageClientId = clientId;
+        } else {
+          showPopup(data.error || 'Failed', 'Error', 'error');
+          es.close();
+          document.getElementById('imageGenerateBtn').disabled = false;
+          window.isImageTaskRunning = false;
+        }
+      } catch (err) {
+        es.close();
+        showPopup(err.message, 'Error', 'error');
+        document.getElementById('imageGenerateBtn').disabled = false;
+        window.isImageTaskRunning = false;
+      }
+    }
+
+    async function handleImageEnhanceSubmit(e) {
+      e.preventDefault();
+      const fileInput = document.getElementById('enhanceImageInput');
+      if (!fileInput.files[0]) { showPopup('Upload an image', 'Error', 'error'); return; }
+      if (fileInput.files[0].size > 20 * 1024 * 1024) { showPopup('කරුණාකර 20MB ට වඩා කුඩා ඡායාරූපයක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+
+      document.getElementById('imageEnhanceBtn').disabled = true;
+      document.getElementById('imgProgressCard').style.display = 'block';
+      const statusEl = document.getElementById('imgStatusText');
+      if (statusEl) statusEl.innerText = 'Initializing...';
+      document.getElementById('imgResultArea').style.display = 'none';
+
+      const clientId = 'img_' + Date.now();
+      const es = setupProgressTracker(clientId, 'img', 'imgProgressBar');
+      window.isImageTaskRunning = true;
+      const formData = new FormData();
+      formData.append('image', fileInput.files[0]);
+
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/remove-bg?clientId=${clientId}`, { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (data.success) {
+          window.currentImageClientId = clientId;
+        } else {
+          showPopup('System Error, please contact developer', 'System Error', 'error');
+          es.close();
+          document.getElementById('imageEnhanceBtn').disabled = false;
+          window.isImageTaskRunning = false;
+        }
+      } catch (err) {
+        es.close();
+        showPopup('System Error, please contact developer', 'System Error', 'error');
+        document.getElementById('imageEnhanceBtn').disabled = false;
+        window.isImageTaskRunning = false;
+      }
+    }
+
+    // Enhanced 4K Wallpapers Collection
+    const wallpapers = [
+      { id: 'w1', name: 'Dark Nebula Waves', category: 'abstract', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w2', name: 'Misty Mountain Peaks', category: 'nature', url: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w3', name: 'Emerald Forest Lake', category: 'nature', url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w4', name: 'Cyberpunk Neon Alley', category: 'cyberpunk', url: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w5', name: 'Video Creator Studio', category: 'studio', url: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w6', name: 'Minimal Audio Desk', category: 'studio', url: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w7', name: 'Tokyo Rain Night', category: 'cyberpunk', url: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w8', name: 'Deep Space Galaxy', category: 'nature', url: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1462331940025-496dfbfc7564?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w9', name: 'Dark Obsidian Geometry', category: 'abstract', url: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=500&auto=format&fit=crop' },
+      { id: 'w10', name: 'Golden Sunset Beach', category: 'nature', url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2560&auto=format&fit=crop', thumb: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop' }
+    ];
+
+    let currentActiveFilter = 'all';
+
+    function initWallpapers() {
+      const saved = localStorage.getItem('capzone_wallpaper') || wallpapers[0].url;
+      setWallpaper(saved);
+      renderWallpaperGrid();
+    }
+
+    function renderWallpaperGrid() {
+      const grid = document.getElementById('wallpaperGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      const currentUrl = localStorage.getItem('capzone_wallpaper') || wallpapers[0].url;
+      const filtered = currentActiveFilter === 'all'
+        ? wallpapers
+        : wallpapers.filter(w => w.category === currentActiveFilter);
+
+      const fallback = 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=500&auto=format&fit=crop';
+
+      filtered.forEach((w) => {
+        const isSelected = currentUrl === w.url;
+        const card = document.createElement('div');
+        card.className = 'group relative rounded-xl sm:rounded-2xl overflow-hidden cursor-pointer border-2 transition-all duration-300 hover:scale-[1.02] aspect-[16/10] bg-slate-900 shadow-md sm:shadow-lg ' +
+          (isSelected
+            ? 'border-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.5)] ring-2 ring-indigo-500/50'
+            : 'border-white/10 hover:border-indigo-400/80 hover:shadow-indigo-500/20');
+
+        card.onclick = () => {
+          setWallpaper(w.url);
+          renderWallpaperGrid();
+          if (typeof showPopup === 'function') {
+            showPopup('Applied theme: ' + w.name, 'success');
+          }
+        };
+
+        card.innerHTML =
+          '<img src="' + w.thumb + '" onerror="this.onerror=null;this.src=\'' + fallback + '\'" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" loading="lazy" alt="' + w.name + '">' +
+          '<div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-between p-2 sm:p-3">' +
+          '<div class="flex items-center justify-between">' +
+          '<span class="text-[8px] sm:text-[10px] font-extrabold uppercase px-1.5 sm:px-2 py-0.5 rounded-full bg-black/60 text-indigo-300 border border-white/10 backdrop-blur-sm">' + w.category + '</span>' +
+          (isSelected
+            ? '<div class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 flex items-center justify-center text-white shadow-lg"><i data-lucide="check" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></div>'
+            : '<div class="opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white"><i data-lucide="arrow-up-right" class="w-3 h-3 sm:w-3.5 sm:h-3.5"></i></div>') +
+          '</div>' +
+          '<div>' +
+          '<h4 class="text-[10px] sm:text-xs font-bold text-white tracking-wide truncate">' + w.name + '</h4>' +
+          '<div class="flex items-center justify-between mt-0.5">' +
+          '<span class="text-[8px] sm:text-[10px] text-slate-300 font-medium">4K Ultra HD</span>' +
+          '<span class="text-[8px] sm:text-[10px] ' + (isSelected ? 'text-indigo-400 font-bold' : 'text-slate-400 group-hover:text-indigo-300') + '">' + (isSelected ? 'Active' : 'Apply') + '</span>' +
+          '</div>' +
+          '</div>' +
+          '</div>';
+
+        grid.appendChild(card);
+      });
+
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function filterWallpapers(cat, btn) {
+      currentActiveFilter = cat;
+      document.querySelectorAll('.wp-filter-btn').forEach(b => {
+        b.className = 'wp-filter-btn px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 glass-input text-gray-300 hover:text-white hover:bg-white/10';
+      });
+      if (btn) {
+        btn.className = 'wp-filter-btn px-4 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 bg-indigo-600 text-white shadow-lg shadow-indigo-600/30';
+      }
+      renderWallpaperGrid();
+    }
+
+    function setWallpaper(url) {
+      const bgDiv = document.getElementById('dashboardBackground');
+      if (bgDiv) {
+        bgDiv.style.backgroundImage = 'url("' + url + '")';
+      }
+      localStorage.setItem('capzone_wallpaper', url);
+    }
+
+    function resetDefaultWallpaper() {
+      setWallpaper(wallpapers[0].url);
+      renderWallpaperGrid();
+      if (typeof showPopup === 'function') {
+        showPopup('Theme reset to default', 'success');
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWallpapers);
+    } else {
+      initWallpapers();
+    }
+  </script>
+
+
+
+  <!-- MOBILE BOTTOM FLOATING NAVIGATION BAR -->
+  <div
+    class="fixed bottom-3 inset-x-3 z-40 sm:hidden glass-panel rounded-2xl px-3 py-2 flex items-center justify-around border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.8)] backdrop-blur-xl bg-[#0b0f19]/85">
+    <a href="dashboard.html" class="flex flex-col items-center gap-0.5 text-indigo-400">
+      <i data-lucide="layout-grid" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Home</span>
+    </a>
+    <button onclick="openToolWithIntercept('srtModal', event)"
+      class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="file-text" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Subtitles</span>
+    </button>
+    <a href="editor.html" class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="film" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Editor</span>
+    </a>
+    <button onclick="openModal('wallpaperModal', event)"
+      class="flex flex-col items-center gap-0.5 text-gray-300 hover:text-white">
+      <i data-lucide="palette" class="w-5 h-5"></i>
+      <span class="text-[9px] font-bold">Theme</span>
+    </button>
+  </div>
+
+  <!-- API Configuration Modal -->
+  <div id="apiConfigModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" id="apiConfigBackdrop"
+      onclick="cancelApiModal()"></div>
+    <div
+      class="glass-card w-full max-w-lg rounded-2xl p-6 lg:p-8 relative z-10 transform scale-95 opacity-0 transition-all duration-300"
+      id="apiConfigContent">
+
+      <div class="flex items-center gap-4 mb-6 relative">
+        <div
+          class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+          <i data-lucide="cpu" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-black text-white tracking-wide">KaveezCloud AI Engine Setup</h2>
+          <p class="text-sm text-indigo-300">Configure high-speed KaveezCloud AI processing</p>
+        </div>
+        <!-- Close button for API Modal -->
+        <button onclick="cancelApiModal()"
+          class="absolute top-0 right-0 p-2 text-gray-400 hover:text-white transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div id="apiOptionsList" class="space-y-4 mt-8">
+        <!-- Option 1: Own API -->
+        <button onclick="selectApiOption('own')"
+          class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-indigo-400 transition-all group flex items-start gap-4">
+          <div class="mt-1 flex-shrink-0">
+            <i data-lucide="key" class="w-5 h-5 text-indigo-400 group-hover:text-indigo-300"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1">Connect Custom AI Key</h3>
+            <p class="text-xs text-gray-400">100% Free key from Google AI Studio. Unlimited requests & highest speed.
+            </p>
+          </div>
+        </button>
+
+        <!-- Option 2: Server API -->
+        <button onclick="selectApiOption('server')"
+          class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-purple-400 transition-all group flex items-start gap-4">
+          <div class="mt-1 flex-shrink-0">
+            <i data-lucide="server" class="w-5 h-5 text-purple-400 group-hover:text-purple-300"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white mb-1">Use KaveezCloud Server Cloud</h3>
+            <p class="text-xs text-gray-400">Default cloud processing. Ready out of the box, no API key required.</p>
+          </div>
+        </button>
+
+        <!-- Option 3: Cancel / Continue Free -->
+        <button onclick="cancelApiModal()"
+          class="w-full text-center py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white text-xs font-semibold transition-colors">
+          Cancel & Continue with KaveezCloud Cloud
+        </button>
+      </div>
+
+      <!-- Own API Key Input Section (Hidden by default) -->
+      <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
+        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your AI Key
+          (KaveezCloud Engine)</label>
+        <input type="text" id="geminiApiKeyInput" autocomplete="off"
+          style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
+          class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2"
+          placeholder="Paste AI key here (AIzaSy...)">
+        <p class="text-[10px] text-gray-400 mb-4">Get your free key from Google AI Studio.</p>
+
+        <a href="https://aistudio.google.com/app/apikey" target="_blank"
+          class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 transition-colors text-sm font-bold">
+          Get Free Key (Google AI Studio)
+        </a>
+
+        <div class="flex justify-between items-center gap-3">
+          <button onclick="cancelApiModal()"
+            class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-colors">Cancel</button>
+          <div class="flex items-center gap-2">
+            <button onclick="backToOptions()"
+              class="px-4 py-2 rounded-lg text-sm font-bold text-gray-300 hover:text-white transition-colors">Back</button>
+            <button onclick="saveApiKey()"
+              class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all">Save
+              & Continue</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- Intelligent Project Details & Studio Modal -->
+  <div id="projectDetailModal"
+    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden transition-all duration-300 opacity-0"
+    style="display: none;">
+    <div id="projectDetailContent"
+      class="glass-panel w-full max-w-2xl rounded-3xl p-6 lg:p-8 border border-white/20 shadow-2xl bg-slate-900/95 max-h-[90vh] flex flex-col transform scale-95 transition-all duration-300">
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between pb-4 border-b border-white/10 mb-5 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <div id="projectModalIconBox"
+            class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shadow-lg">
+            <i id="projectModalIcon" data-lucide="folder" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="projectModalTitle"
+                class="text-lg font-bold text-white tracking-wide truncate max-w-[240px] sm:max-w-md">Project Title</h3>
+              <span id="projectModalTypeBadge"
+                class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">IMAGE</span>
+            </div>
+            <p id="projectModalDate" class="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
+              <i data-lucide="clock" class="w-3 h-3"></i> <span>Just now</span>
+            </p>
+          </div>
+        </div>
+        <button onclick="window.closeProjectDetailModal()"
+          class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Body (Preview & Details) -->
+      <div class="flex-1 overflow-y-auto space-y-4 pr-1 hide-scrollbar">
+        <!-- Media Preview Area (Images / Videos / Audios) -->
+        <div id="projectModalMediaArea"
+          class="hidden rounded-2xl overflow-hidden bg-black/50 border border-white/10 flex flex-col items-center justify-center p-3 relative">
+          
+          <!-- Image Preview -->
+          <img id="projectModalImage" src="" alt="Project Preview"
+            class="hidden max-h-72 w-auto object-contain rounded-xl shadow-lg transition-transform">
+          
+          <!-- Video Preview Box -->
+          <div id="projectModalVideoBox" class="hidden w-full flex flex-col items-center">
+            <video id="projectModalVideo" controls playsinline preload="metadata"
+              class="max-h-72 w-full rounded-xl bg-black shadow-lg"></video>
+            <div class="w-full flex items-center justify-between text-[11px] text-slate-400 mt-2 px-1">
+              <span class="flex items-center gap-1"><i data-lucide="film" class="w-3.5 h-3.5 text-indigo-400"></i> Video Stream Preview</span>
+              <a id="projectModalVideoDirectLink" href="#" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+                <span>Direct Open</span> <i data-lucide="external-link" class="w-3 h-3"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Audio Preview Box -->
+          <div id="projectModalAudioBox" class="hidden w-full p-4 flex flex-col items-center gap-3 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-black rounded-xl border border-emerald-500/20 shadow-inner">
+            <div class="flex items-center gap-3 w-full">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
+                <i data-lucide="headphones" class="w-6 h-6"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 id="projectModalAudioTitle" class="text-sm font-bold text-white truncate">Audio Track</h4>
+                <p id="projectModalAudioSub" class="text-[11px] text-emerald-300/80 font-mono">High Quality MP3 • Ready to Play</p>
+              </div>
+            </div>
+            <audio id="projectModalAudio" controls class="w-full mt-1"></audio>
+          </div>
+        </div>
+
+        <!-- Text / Script / Subtitle / Data Content Area -->
+        <div id="projectModalTextArea" class="hidden">
+          <div class="flex items-center justify-between mb-2">
+            <label id="projectModalTextLabel" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Project Content</label>
+            <div class="flex items-center gap-2">
+              <span id="projectModalTextMeta" class="text-[11px] text-slate-400 font-mono"></span>
+              <button onclick="window.copyProjectText()"
+                class="px-2.5 py-1 rounded-lg bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-500/30 text-[11px] text-indigo-300 flex items-center gap-1 font-semibold transition-colors">
+                <i data-lucide="copy" class="w-3.5 h-3.5"></i> Copy Text
+              </button>
+            </div>
+          </div>
+          <div id="projectModalTextContent"
+            class="w-full rounded-2xl p-4 bg-black/50 border border-white/10 text-xs sm:text-sm text-slate-200 font-mono whitespace-pre-wrap max-h-64 overflow-y-auto leading-relaxed shadow-inner">
+          </div>
+        </div>
+
+        <!-- Metadata Info Grid (100% Clean - No Telegram) -->
+        <div class="p-4 rounded-2xl bg-white/5 border border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+          <div>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Status</span>
+            <span class="text-emerald-400 font-semibold flex items-center gap-1 mt-0.5">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Saved & Active
+            </span>
+          </div>
+          <div>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Cloud Storage</span>
+            <span class="text-sky-400 font-semibold flex items-center gap-1 mt-0.5">
+              <i data-lucide="cloud" class="w-3.5 h-3.5"></i> Synced & Secured
+            </span>
+          </div>
+          <div class="col-span-2 sm:col-span-1">
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Format / Quality</span>
+            <span id="projectModalFormatText" class="text-slate-300 font-mono text-[11px] mt-0.5 block truncate">HD Quality</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Footer (Re-Edit, Download, Delete) -->
+      <div class="flex items-center justify-between pt-4 border-t border-white/10 mt-5 flex-shrink-0 gap-3">
+        <button onclick="window.deleteActiveProjectModal()"
+          class="px-4 py-2.5 rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/20 text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5">
+          <i data-lucide="trash-2" class="w-4 h-4"></i> Delete
+        </button>
+        <div class="flex items-center gap-2">
+          <button id="projectModalDownloadBtn" onclick="window.downloadActiveProjectMedia()"
+            class="px-4 py-2.5 rounded-xl border border-white/20 hover:bg-white/10 text-white text-xs sm:text-sm font-semibold transition-colors flex items-center gap-1.5">
+            <i data-lucide="download" class="w-4 h-4"></i> Download
+          </button>
+          <button id="projectModalReEditBtn" onclick="window.reEditActiveProject()"
+            class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs sm:text-sm font-bold shadow-[0_0_20px_rgba(99,102,241,0.4)] transition-all flex items-center gap-1.5">
+            <i data-lucide="pen-tool" class="w-4 h-4"></i> Re-Edit in Studio
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+          window.allProjects = [];
+          window.activeProjectFilter = 'all';
+          window.activeModalProject = null;
+
+          // Helper to format relative time nicely
+          function formatTimeAgo(dateStr) {
+            if (!dateStr) return 'Just now';
+            const diffMs = Date.now() - new Date(dateStr).getTime();
+            const diffMins = Math.floor(diffMs / 60000);
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours < 24) return `${diffHours}h ago`;
+            return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
+          }
+
+          // Save project universally to fast-cache and SQLite DB
+          window.saveToRecentProjects = function (typeOrObj, title, metadata, fileId = null) {
+            let project = {};
+            if (typeof typeOrObj === 'object' && typeOrObj !== null) {
+              project = Object.assign({}, typeOrObj);
+            } else {
+              let metaStr = metadata;
+              if (fileId) {
+                metaStr = typeof metadata === 'object' ? JSON.stringify(metadata) : metadata;
+              }
+              project = {
+                type: typeOrObj,
+                title: title || 'Untitled Project',
+                metadata: metaStr || '',
+                media_url: typeof fileId === 'string' && (fileId.startsWith('http') || fileId.startsWith('/')) ? fileId : ''
+              };
+            }
+
+            // Always ensure valid user email with fallback
+            project.email = project.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+            project.date = project.date || new Date().toISOString();
+            if (!project.id) project.id = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4);
+
+            // 1. Instant Fast-Cache in localStorage
+            const cacheKey = 'capzone_projects_' + project.email;
+            let cached = [];
+            try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
+            cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && p.title === project.title && Math.abs(new Date(p.date || 0) - new Date(project.date || 0)) < 15000));
+            cached.unshift(project);
+            if (cached.length > 50) cached.pop();
+            localStorage.setItem(cacheKey, JSON.stringify(cached));
+            window.allProjects = cached;
+            window.renderRecentProjects();
+
+            // 2. Persist to Backend Server
+            try {
+              fetch(`${API_BASE_URL}/api/user-projects`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-user-email': project.email
+                },
+                body: JSON.stringify(project)
+              }).then(res => res.json()).then(data => {
+                if (data && data.success) {
+                  project.id = data.id || project.id;
+                  localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+                }
+              }).catch(err => console.warn('Sync project error:', err));
+            } catch (e) {
+              console.error('Save project error:', e);
+            }
+          };
+
+          // Filter projects by category chip
+          window.filterProjects = function (category) {
+            window.activeProjectFilter = category;
+            document.querySelectorAll('.project-filter-btn').forEach(btn => {
+              if (btn.getAttribute('data-filter') === category) {
+                btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-md';
+              } else {
+                btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all';
+              }
+            });
+            window.renderRecentProjects();
+          };
+
+          // Load projects from fast-cache and backend server
+          window.loadAndRenderProjects = async function (forceRefresh = false) {
+            const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+            const cacheKey = 'capzone_projects_' + email;
+            if (!forceRefresh) {
+              try {
+                const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+                if (cached && cached.length > 0) {
+                  window.allProjects = cached;
+                  window.renderRecentProjects();
+                }
+              } catch (e) { }
+            }
+
+            try {
+              const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(email), {
+                headers: { 'x-user-email': email }
+              });
+              if (res.ok) {
+                const serverProjects = await res.json();
+                if (Array.isArray(serverProjects)) {
+                  window.allProjects = serverProjects;
+                  localStorage.setItem(cacheKey, JSON.stringify(serverProjects));
+                  window.renderRecentProjects();
+                }
+              }
+            } catch (e) {
+              console.warn('Could not fetch projects from server:', e);
+            }
+          };
+
+          // Render projects list in sidebar with rich preview cards & action buttons
+          window.renderRecentProjects = function (listToRender) {
+            const container = document.getElementById('recentProjectsContainer');
+            if (!container) return;
+
+            const projects = listToRender || window.allProjects || [];
+            const badge = document.getElementById('projectCountBadge');
+            if (badge) badge.innerText = projects.length;
+            const dockBadge = document.getElementById('mobileDockBadge');
+            if (dockBadge) {
+              dockBadge.innerText = projects.length;
+              dockBadge.style.display = projects.length > 0 ? 'flex' : 'none';
+            }
+
+            // Filter by active category
+            let filtered = projects;
+            if (window.activeProjectFilter && window.activeProjectFilter !== 'all') {
+              const cat = window.activeProjectFilter;
+              filtered = projects.filter(p => {
+                if (cat === 'Image') return p.type === 'Image' || p.type === 'Background';
+                if (cat === 'Video') return p.type === 'Video' && p.type !== 'Audio' && !(p.metadata && p.metadata.includes('MP3'));
+                if (cat === 'Audio') return p.type === 'Audio' || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio')));
+                if (cat === 'Subtitle') return p.type === 'Subtitle';
+                if (cat === 'Script') return p.type === 'Script';
+                return p.type === cat;
+              });
+            }
+
+            // Deduplicate consecutive or identical projects (by type + title)
+            const uniqueList = [];
+            const seenMap = new Map();
+            for (const p of filtered) {
+              const key = `${p.type || ''}_${(p.title || '').trim().toLowerCase()}`;
+              if (!seenMap.has(key)) {
+                seenMap.set(key, true);
+                uniqueList.push(p);
+              }
+            }
+            filtered = uniqueList;
+
+            if (!filtered || filtered.length === 0) {
+              container.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
+            <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/10 border-dashed">
+              <i data-lucide="folder-open" class="w-7 h-7 text-indigo-400"></i>
+            </div>
+            <p class="text-slate-300 text-sm font-semibold">No active projects</p>
+            <p class="text-[11px] text-slate-500 mt-1 text-center">Generated media & scripts save here automatically.</p>
+          </div>`;
+              if (window.lucide) window.lucide.createIcons();
+              return;
+            }
+
+            const icons = {
+              'Subtitle': 'subtitles',
+              'Script': 'file-text',
+              'Image': 'image',
+              'Video': 'video',
+              'Audio': 'headphones',
+              'Background': 'image-minus'
+            };
+            const colors = {
+              'Subtitle': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+              'Script': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+              'Image': 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+              'Video': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+              'Audio': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+              'Background': 'bg-teal-500/20 text-teal-400 border-teal-500/30'
+            };
+
+            let htmlOut = '';
+            filtered.forEach(p => {
+              const isAudio = p.type === 'Audio' || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio')));
+              const displayType = isAudio ? 'Audio' : (p.type || 'Media');
+              const icon = icons[displayType] || 'folder';
+              const colorClass = colors[displayType] || 'bg-slate-500/20 text-slate-300 border-slate-500/30';
+              const timeStr = formatTimeAgo(p.date);
+              const hasThumb = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+
+              let thumbnailHtml = '';
+              if (hasThumb) {
+                thumbnailHtml = `
+            <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/40 border border-white/15 flex-shrink-0 shadow-md relative flex items-center justify-center">
+              <img src="${p.media_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'">
+            </div>`;
+              } else {
+                thumbnailHtml = `
+            <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-md ${colorClass} border flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
+              <i data-lucide="${icon}" class="w-5 h-5"></i>
+            </div>`;
+              }
+
+              // Preview hint tag
+              let previewHint = '';
+              if (displayType === 'Video') previewHint = '<span class="text-[10px] text-blue-300 flex items-center gap-1 font-semibold"><i data-lucide="play" class="w-2.5 h-2.5"></i> Video</span>';
+              else if (displayType === 'Audio') previewHint = '<span class="text-[10px] text-emerald-300 flex items-center gap-1 font-semibold"><i data-lucide="music" class="w-2.5 h-2.5"></i> MP3</span>';
+              else if (displayType === 'Script') previewHint = '<span class="text-[10px] text-amber-300 flex items-center gap-1 font-semibold"><i data-lucide="file-text" class="w-2.5 h-2.5"></i> Script</span>';
+              else if (displayType === 'Subtitle') previewHint = '<span class="text-[10px] text-purple-300 flex items-center gap-1 font-semibold"><i data-lucide="subtitles" class="w-2.5 h-2.5"></i> SRT</span>';
+              else previewHint = '<span class="text-[10px] text-sky-300 flex items-center gap-1 font-semibold"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Image</span>';
+
+              htmlOut += `
+          <div class="project-3d-card w-full group relative p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/50 transition-all duration-200 backdrop-blur-md overflow-hidden cursor-pointer shadow-md hover:shadow-indigo-500/15 active:scale-[0.99] flex items-center justify-between gap-3 min-h-[66px]" onclick="window.openProjectDetailsModal('${p.id}')">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              ${thumbnailHtml}
+              <div class="flex-1 min-w-0">
+                <h4 class="text-white text-xs sm:text-[13px] font-bold truncate group-hover:text-indigo-300 transition-colors leading-tight">${p.title || 'Untitled Project'}</h4>
+                <div class="flex items-center gap-2 mt-1 flex-wrap">
+                  <span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded leading-none ${colorClass}">${displayType}</span>
+                  ${previewHint}
+                  <span class="text-[10px] text-slate-400 flex items-center gap-1 leading-none"><i data-lucide="clock" class="w-2.5 h-2.5"></i> ${timeStr}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons (Visible for quick preview & actions) -->
+            <div class="flex items-center gap-1 flex-shrink-0">
+              <button onclick="event.stopPropagation(); window.openProjectDetailsModal('${p.id}')" title="Preview Project" class="p-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-300 hover:text-white transition-colors active:scale-90" aria-label="Preview">
+                <i data-lucide="eye" class="w-4 h-4"></i>
+              </button>
+              <button onclick="event.stopPropagation(); window.reEditProject('${p.id}')" title="Re-Edit in Studio" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors active:scale-90 hidden sm:inline-flex">
+                <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
+              </button>
+              <button onclick="event.stopPropagation(); window.deleteUserProject('${p.id}')" title="Delete Project" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition-colors active:scale-90">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>`;
+            });
+
+            container.innerHTML = htmlOut;
+            if (window.lucide) window.lucide.createIcons();
+          };
+
+          // Switch between AI Studios and Projects History on Mobile
+          window.currentMobileView = 'studio';
+          window.switchMobileView = function (view) {
+            window.currentMobileView = view;
+            const aside = document.getElementById('projectsSidebar');
+            const studioArea = document.getElementById('studioMainArea');
+            const btnStudio = document.getElementById('mobileTabStudioBtn');
+            const btnProjects = document.getElementById('mobileTabProjectsBtn');
+            const dockStudio = document.getElementById('mobileDockStudio');
+            const dockProjects = document.getElementById('mobileDockProjects');
+
+            if (view === 'projects') {
+              if (aside) {
+                aside.classList.remove('hidden');
+                aside.classList.add('block');
+              }
+              if (studioArea) {
+                studioArea.classList.add('hidden');
+                studioArea.classList.remove('flex');
+              }
+              if (btnProjects) {
+                btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
+              }
+              if (btnStudio) {
+                btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
+              }
+              if (dockProjects) {
+                dockProjects.classList.add('text-indigo-400');
+                dockProjects.classList.remove('text-gray-400');
+              }
+              if (dockStudio) {
+                dockStudio.classList.remove('text-indigo-400');
+                dockStudio.classList.add('text-gray-400');
+              }
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+              if (aside) {
+                aside.classList.add('hidden');
+                aside.classList.remove('block');
+              }
+              if (studioArea) {
+                studioArea.classList.remove('hidden');
+                studioArea.classList.add('flex');
+              }
+              if (btnStudio) {
+                btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
+              }
+              if (btnProjects) {
+                btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
+              }
+              if (dockStudio) {
+                dockStudio.classList.add('text-indigo-400');
+                dockStudio.classList.remove('text-gray-400');
+              }
+              if (dockProjects) {
+                dockProjects.classList.remove('text-indigo-400');
+                dockProjects.classList.add('text-gray-400');
+              }
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            if (window.lucide) lucide.createIcons();
+          };
+
+          // Open Project Details & Studio Modal with Rich Previews
+          window.openProjectDetailsModal = function (projectId) {
+            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+            if (!p) return;
+            window.activeModalProject = p;
+
+            const modal = document.getElementById('projectDetailModal');
+            const content = document.getElementById('projectDetailContent');
+            if (!modal || !content) return;
+
+            const isAudio = (p.type === 'Audio') || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio'))) || (p.media_url && p.media_url.endsWith('.mp3'));
+            const displayType = isAudio ? 'AUDIO' : (p.type || 'PROJECT').toUpperCase();
+
+            document.getElementById('projectModalTitle').innerText = p.title || 'Untitled Project';
+            document.getElementById('projectModalTypeBadge').innerText = displayType;
+            document.getElementById('projectModalDate').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> ${new Date(p.date || Date.now()).toLocaleString()}`;
+
+            const formatEl = document.getElementById('projectModalFormatText');
+            if (formatEl) formatEl.innerText = p.metadata || (isAudio ? 'MP3 Audio' : 'HD Processed');
+
+            // Handle preview areas
+            const mediaArea = document.getElementById('projectModalMediaArea');
+            const imgEl = document.getElementById('projectModalImage');
+            const vidBox = document.getElementById('projectModalVideoBox');
+            const vidEl = document.getElementById('projectModalVideo');
+            const directLink = document.getElementById('projectModalVideoDirectLink');
+            const audBox = document.getElementById('projectModalAudioBox');
+            const audEl = document.getElementById('projectModalAudio');
+            const audTitle = document.getElementById('projectModalAudioTitle');
+            const textArea = document.getElementById('projectModalTextArea');
+            const textContent = document.getElementById('projectModalTextContent');
+            const textLabel = document.getElementById('projectModalTextLabel');
+            const textMeta = document.getElementById('projectModalTextMeta');
+
+            if (mediaArea) mediaArea.classList.add('hidden');
+            if (imgEl) imgEl.classList.add('hidden');
+            if (vidBox) vidBox.classList.add('hidden');
+            if (audBox) audBox.classList.add('hidden');
+            if (textArea) textArea.classList.add('hidden');
+
+            const isImage = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+            const isVideo = (p.type === 'Video') && p.media_url && !isAudio;
+
+            if (isImage && imgEl && mediaArea) {
+              imgEl.src = p.media_url;
+              imgEl.classList.remove('hidden');
+              mediaArea.classList.remove('hidden');
+            } else if (isAudio && audBox && audEl && mediaArea) {
+              audEl.src = p.media_url;
+              if (audTitle) audTitle.innerText = p.title || 'Audio Recording';
+              audBox.classList.remove('hidden');
+              mediaArea.classList.remove('hidden');
+            } else if (isVideo && vidBox && vidEl && mediaArea) {
+              vidEl.src = p.media_url;
+              if (directLink) directLink.href = p.media_url;
+              vidBox.classList.remove('hidden');
+              mediaArea.classList.remove('hidden');
+            }
+
+            // Format readable text for scripts or subtitles
+            let readableText = '';
+            let parsedPayload = null;
+            if (p.payload) {
+              try { parsedPayload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+            }
+
+            if (parsedPayload && parsedPayload.scriptText) {
+              readableText = parsedPayload.scriptText;
+              if (textLabel) textLabel.innerText = 'AI Generated Script (Sinhala)';
+              if (textMeta) textMeta.innerText = `${readableText.length} characters`;
+            } else if (parsedPayload && parsedPayload.srt) {
+              readableText = parsedPayload.srt;
+              if (textLabel) textLabel.innerText = 'Subtitles Content (.SRT)';
+              const linesCount = readableText.split('\n').filter(l => l.trim()).length;
+              if (textMeta) textMeta.innerText = `${linesCount} lines`;
+            } else if (parsedPayload && parsedPayload.data) {
+              readableText = JSON.stringify(parsedPayload.data, null, 2);
+              if (textLabel) textLabel.innerText = 'Project Data';
+            } else if (p.metadata && p.metadata !== 'Processed successfully' && !p.metadata.includes('MP3') && !p.metadata.includes('MP4')) {
+              readableText = p.metadata;
+              if (textLabel) textLabel.innerText = 'Project Details';
+            }
+
+            if (readableText && textContent && textArea) {
+              textContent.innerText = readableText;
+              textArea.classList.remove('hidden');
+            }
+
+            modal.style.display = 'flex';
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.classList.add('overflow-hidden');
+            setTimeout(() => {
+              modal.classList.remove('opacity-0');
+              content.classList.remove('scale-95');
+              content.classList.add('scale-100');
+              if (window.lucide) window.lucide.createIcons();
+            }, 10);
+          };
+
+          window.closeProjectDetailModal = function () {
+            const modal = document.getElementById('projectDetailModal');
+            const content = document.getElementById('projectDetailContent');
+            if (!modal || !content) return;
+
+            modal.classList.add('opacity-0');
+            content.classList.remove('scale-100');
+            content.classList.add('scale-95');
+            setTimeout(() => {
+              modal.classList.remove('flex');
+              modal.classList.add('hidden');
+              modal.style.display = 'none';
+              document.body.classList.remove('overflow-hidden');
+              
+              // Pause audio/video cleanly
+              const vidEl = document.getElementById('projectModalVideo');
+              if (vidEl) { vidEl.pause(); vidEl.removeAttribute('src'); vidEl.load(); }
+              const audEl = document.getElementById('projectModalAudio');
+              if (audEl) { audEl.pause(); audEl.removeAttribute('src'); audEl.load(); }
+            }, 250);
+          };
+
+          // Re-Edit Project in its corresponding Studio
+          window.reEditActiveProject = function () {
+            if (!window.activeModalProject) return;
+            window.reEditProject(window.activeModalProject.id);
+          };
+
+          window.reEditProject = function (projectId) {
+            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+            if (!p) return;
+
+            window.closeProjectDetailModal();
+            let payload = null;
+            if (p.payload) {
+              try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+            }
+
+            if (p.type === 'Script') {
+              if (typeof openModal === 'function') openModal('scraperSrtModal');
+              const topicInp = document.getElementById('scriptTopic');
+              const previewEl = document.getElementById('scriptOutputPreview');
+              if (topicInp) topicInp.value = (payload && payload.topic) ? payload.topic : p.title;
+              if (previewEl && payload && payload.scriptText) {
+                previewEl.value = payload.scriptText;
+                const resArea = document.getElementById('scraperSrtResultArea');
+                if (resArea) resArea.style.display = 'block';
+              }
+              if (typeof showPopup === 'function') showPopup('Script එක AI Writer වෙත යවන ලදී!', 'Script Active', 'success');
+            } else if (p.type === 'Subtitle') {
+              if (typeof openModal === 'function') openModal('srtModal');
+              if (payload && payload.srt) {
+                const blob = new Blob([payload.srt], { type: 'text/plain' });
+                const dlLink = document.getElementById('srtDownloadLink');
+                if (dlLink) {
+                  dlLink.href = URL.createObjectURL(blob);
+                  dlLink.download = `${p.title || 'subtitles'}.srt`;
+                }
+                const resArea = document.getElementById('srtResultArea');
+                if (resArea) resArea.style.display = 'block';
+              }
+              if (typeof showPopup === 'function') showPopup('Subtitles සාර්ථකව Copy කළා!', 'Copied', 'success');
+            } else if (p.type === 'Image' || p.type === 'Background') {
+              if (typeof openModal === 'function') openModal('bgRemoverModal');
+              if (typeof showPopup === 'function') showPopup('Background Remover Studio එක ක්‍රියාත්මකයි!', 'Studio Active', 'success');
+            } else if (p.type === 'Video' || p.type === 'Audio') {
+              if (payload && payload.type === 'tiktok') {
+                if (typeof openModal === 'function') openModal('tiktokModal');
+                if (payload.url && document.getElementById('tiktokUrlInput')) document.getElementById('tiktokUrlInput').value = payload.url;
+              } else {
+                if (typeof openModal === 'function') openModal('fbModal');
+                if (payload && payload.url && document.getElementById('fbUrlInput')) document.getElementById('fbUrlInput').value = payload.url;
+              }
+              if (typeof showPopup === 'function') showPopup('Media Downloader Studio ක්‍රියාත්මකයි!', 'Studio Active', 'success');
+            }
+          };
+
+          // Download Active Project Media
+          window.downloadActiveProjectMedia = function () {
+            if (!window.activeModalProject) return;
+            window.downloadProjectMedia(window.activeModalProject.id);
+          };
+
+          window.downloadProjectMedia = function (projectId) {
+            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+            if (!p) return;
+
+            let payload = null;
+            if (p.payload) {
+              try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+            }
+
+            if (p.media_url) {
+              const a = document.createElement('a');
+              a.href = p.media_url;
+              a.download = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            } else if (payload && payload.scriptText) {
+              const blob = new Blob([payload.scriptText], { type: 'text/plain' });
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = `${(p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            } else if (payload && payload.srt) {
+              const blob = new Blob([payload.srt], { type: 'text/plain' });
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(blob);
+              a.download = `${(p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_')}.srt`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            } else {
+              if (typeof showPopup === 'function') showPopup('බාගත කිරීමට File එකක් නොමැත.', 'තොරතුරු', 'info');
+            }
+          };
+
+          // Delete User Project
+          window.deleteActiveProjectModal = function () {
+            if (!window.activeModalProject) return;
+            window.deleteUserProject(window.activeModalProject.id);
+          };
+
+          window.deleteUserProject = function (projectId) {
+            const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+            if (!confirm('මෙම Project එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍ය බව තහවුරු කරන්න.')) return;
+
+            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+            window.allProjects = (window.allProjects || []).filter(item => String(item.id) !== String(projectId));
+
+            const cacheKey = 'capzone_projects_' + email;
+            localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+            window.renderRecentProjects();
+            window.closeProjectDetailModal();
+
+            try {
+              fetch(`${API_BASE_URL}/api/user-projects`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'x-user-email': email
+                },
+                body: JSON.stringify({ id: projectId, email: email })
+              }).catch(e => console.warn('Could not delete project from cloud DB:', e));
+            } catch (e) { }
+
+            if (typeof showPopup === 'function') showPopup('Project එක සාර්ථකව ඉවත් කරන ලදී!', 'Project Deleted', 'success');
+          };
+
+          window.copyProjectText = function () {
+            const textEl = document.getElementById('projectModalTextContent');
+            if (!textEl || !textEl.innerText) return;
+            navigator.clipboard.writeText(textEl.innerText).then(() => {
+              if (typeof showPopup === 'function') showPopup('Content එක සාර්ථකව Copy විය!', 'Copied', 'success');
+            });
+          };
+
+          window.toggleApi = function (type) {
+            if (type === 'own') {
+              const existingKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
+              if (!existingKey) {
+                // If private key is not entered: guide user directly to the private key input
+                if (typeof showPopup === 'function') {
+                  showPopup('\u0D94\u0DB6 \u0DAD\u0DC0\u0DB8 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB \u0DB1\u0DDC\u0DB8\u0DD0\u0DAD. \u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0D94\u0DB6\u0DDA Private Key \u0D91\u0D9A \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', 'Private Key \u0D85\u0DC0\u0DC1\u0DDF\u0DBA\u0DD2', 'info');
+                }
+                if (typeof showApiModal === 'function') {
+                  showApiModal();
+                  if (typeof selectApiOption === 'function') {
+                    selectApiOption('own');
+                  }
+                  setTimeout(() => {
+                    const keyInput = document.getElementById('geminiApiKeyInput');
+                    if (keyInput) {
+                      keyInput.focus();
+                      keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                  }, 200);
+                }
+                return;
+              } else {
+                // Private key already entered: auto-switch smoothly!
+                localStorage.setItem('capzone_api_type', 'own');
+                updateApiToggleUI();
+                if (typeof showPopup === 'function') {
+                  showPopup('Private Key \u0D91\u0D9A \u0DC4\u0DB3\u0DD4\u0DB1\u0DCF\u0D9C\u0DD0\u0DB1\u0DD2\u0DAB\u0DD2. \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 Custom API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+                }
+                return;
+              }
+            }
+
+            // Switch to Server Cloud API
+            localStorage.setItem('capzone_api_type', 'server');
+            updateApiToggleUI();
+            if (typeof showPopup === 'function') {
+              showPopup('KaveezCloud Server Cloud API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+            }
+          };
+
+          window.updateApiToggleUI = function () {
+            const currentType = localStorage.getItem('capzone_api_type') || 'server';
+            const isServer = currentType === 'server';
+
+            // Desktop Toggle
+            const btnServer = document.getElementById('btnApiServer');
+            const btnOwn = document.getElementById('btnApiOwn');
+            if (btnServer && btnOwn) {
+              if (isServer) {
+                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+              } else {
+                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+              }
+            }
+
+            // Mobile Toggle & Badge
+            const btnServerMob = document.getElementById('btnApiServerMobile');
+            const btnOwnMob = document.getElementById('btnApiOwnMobile');
+            const statusBadge = document.getElementById('mobileApiStatusBadge');
+            if (btnServerMob && btnOwnMob) {
+              if (isServer) {
+                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+                if (statusBadge) {
+                  statusBadge.innerText = "Cloud Active";
+                  statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
+                }
+              } else {
+                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+                if (statusBadge) {
+                  statusBadge.innerText = "Custom Active";
+                  statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
+                }
+              }
+            }
+          };
+
+          document.addEventListener('DOMContentLoaded', () => {
+            updateApiToggleUI();
+            const currentEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+            const storageKey = 'capzone_projects_' + currentEmail;
+            if (!localStorage.getItem(storageKey)) {
+              const testList = [
+                { id: 101, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
+                { id: 102, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
+                { id: 103, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
+                { id: 104, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
+                { id: 105, type: 'Subtitle', title: 'Generated Media', date: new Date(Date.now() - 3600000).toISOString() },
+                { id: 106, type: 'Subtitle', title: 'IMG_0190.MOV', date: new Date(Date.now() - 3600000).toISOString() }
+              ];
+              localStorage.setItem(storageKey, JSON.stringify(testList));
+            }
+            if (typeof window.loadAndRenderProjects === 'function') {
+              window.loadAndRenderProjects();
+            }
+            setInterval(() => {
+              if (window.currentUserEmail && typeof window.loadAndRenderProjects === 'function') {
+                window.loadAndRenderProjects();
+              }
+            }, 15000);
+          });
+  </script>
+
+  <!-- Ultra-Modern Mobile Glass Bottom Dock (CapZone iOS/Android App Style) -->
+  <nav class="fixed bottom-3 left-3 right-3 z-50 block lg:hidden pointer-events-auto">
+    <div
+      class="px-2 py-2 rounded-2xl glass-panel border border-white/20 bg-neutral-950/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9)] flex items-center justify-around">
+      <button onclick="window.switchMobileView('studio')" id="mobileDockStudio"
+        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-indigo-400 transition-all active:scale-95">
+        <i data-lucide="sparkles" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Studios</span>
+      </button>
+      <button onclick="window.switchMobileView('projects')" id="mobileDockProjects"
+        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95 relative">
+        <i data-lucide="folder-kanban" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Projects</span>
+        <span id="mobileDockBadge"
+          class="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-neutral-950 shadow-lg" style="display: none;">0</span>
+      </button>
+      <button
+        onclick="document.getElementById('mobileMenuOverlay').classList.remove('hidden'); document.getElementById('mobileMenuOverlay').classList.add('flex'); if(window.lucide) lucide.createIcons();"
+        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="grid-2x2" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Menu</span>
+      </button>
+      <button onclick="showApiModal()"
+        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="cpu" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">AI Setup</span>
+      </button>
+      <button onclick="openModal('profileModal')"
+        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        <i data-lucide="user" class="w-5 h-5"></i>
+        <span class="text-[10px] font-bold tracking-wide">Profile</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Mobile Menu Overlay -->
+  <div id="mobileMenuOverlay"
+    class="fixed inset-0 bg-black/95 backdrop-blur-2xl z-[60] hidden flex-col transition-all duration-300">
+    <div class="flex justify-between items-center p-5 border-b border-white/10">
+      <h2 class="text-xl font-bold text-white tracking-wide">Kaveez<span class="text-indigo-400">Cloud</span></h2>
+      <button
+        onclick="document.getElementById('mobileMenuOverlay').classList.remove('flex'); document.getElementById('mobileMenuOverlay').classList.add('hidden');"
+        class="text-gray-400 hover:text-white transition-colors p-2 bg-white/5 rounded-full">
+        <i data-lucide="x" class="w-6 h-6"></i>
+      </button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-5 pb-20 space-y-3 custom-scroll">
+      <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 pl-1">Tools & Features</div>
+
+      <button
+        onclick="switchTab('subtitles'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');"
+        class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20">
+          <i data-lucide="subtitles" class="w-5 h-5"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm">Subtitle Studio</h3>
+          <p class="text-gray-400 text-xs">AI Auto Captions</p>
+        </div>
+      </button>
+
+      <button
+        onclick="switchTab('script'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');"
+        class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
+          <i data-lucide="scroll-text" class="w-5 h-5"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm">AI Script Writer</h3>
+          <p class="text-gray-400 text-xs">Viral Scripts</p>
+        </div>
+      </button>
+
+      <button
+        onclick="switchTab('image'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');"
+        class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
+          <i data-lucide="image-plus" class="w-5 h-5"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm">Image Gen</h3>
+          <p class="text-gray-400 text-xs">AI Text to Image</p>
+        </div>
+      </button>
+
+      <button
+        onclick="switchTab('bgremover'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');"
+        class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center border border-cyan-500/20">
+          <i data-lucide="eraser" class="w-5 h-5"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm">Remove BG</h3>
+          <p class="text-gray-400 text-xs">AI Cutout</p>
+        </div>
+      </button>
+
+      <button
+        onclick="switchTab('downloader'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex'); window.switchMobileView('studio');"
+        class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20">
+          <i data-lucide="download" class="w-5 h-5"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm">Media Downloader</h3>
+          <p class="text-gray-400 text-xs">TikTok/FB/Insta</p>
+        </div>
+      </button>
+
+      <div class="w-full h-px bg-white/10 my-5"></div>
+
+      <button
+        onclick="openModal('wallpaperModal'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex');"
+        class="w-full flex items-center gap-4 bg-[#141416] p-3.5 rounded-2xl hover:bg-white/10 transition-all border border-white/5 shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-yellow-500/10 text-yellow-400 flex items-center justify-center border border-yellow-500/20">
+          <i data-lucide="palette" class="w-5 h-5"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm">Themes</h3>
+          <p class="text-gray-400 text-xs">Customize Workspace</p>
+        </div>
+      </button>
+    </div>
+  </div>
+
+</body>
+
+</html>
