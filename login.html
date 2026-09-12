@@ -443,6 +443,7 @@
 
         async function notifyBackend(user, method, password = '') {
             try {
+                localStorage.setItem('capzone_login_timestamp', Date.now());
                 const res = await fetch(`${API_BASE_URL}/api/save-user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
