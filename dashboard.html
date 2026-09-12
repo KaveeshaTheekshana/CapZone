@@ -359,7 +359,7 @@
 </head>
 
 <body
-  class="min-h-screen text-gray-100 font-sans antialiased overflow-x-hidden selection:bg-brand-purple selection:text-white relative">
+  class="min-h-screen text-gray-100 font-sans antialiased overflow-x-hidden selection:bg-brand-purple selection:text-white relative pb-24 lg:pb-0">
   <!-- Hardware Accelerated Fixed Background (Optimized for Mobile Scroll) -->
   <div id="dashboardBackground"
     class="fixed inset-0 -z-10 h-full w-full bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center pointer-events-none"
@@ -1382,20 +1382,22 @@
               style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
               placeholder="Enter topic or scenario (e.g., 'Funny conversation between boss and employee')...">
             <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              <!-- Custom Avatar Upload -->
-              <input type="file" id="socialAvatarInput" accept="image/*" onchange="handleSocialAvatarUpload(event)"
-                class="hidden">
-              <button onclick="document.getElementById('socialAvatarInput').click()" type="button"
-                class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-white transition-all group flex-shrink-0 shadow-sm"
-                title="Upload Profile Photo for Screenshot Mockups">
-                <div
-                  class="w-6 h-6 rounded-full overflow-hidden border border-white/30 flex items-center justify-center bg-indigo-500/30 group-hover:scale-105 transition-transform">
-                  <img id="socialAvatarPreview"
-                    src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop"
-                    class="w-full h-full object-cover">
+              <!-- Sender Avatar Upload -->
+              <input type="file" id="socialSenderAvatarInput" accept="image/*" onchange="handleSocialSenderUpload(event)" class="hidden">
+              <button onclick="document.getElementById('socialSenderAvatarInput').click()" type="button" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-xs font-semibold text-white transition-all group flex-shrink-0 shadow-sm" title="Upload My (Sender) Photo">
+                <div class="w-6 h-6 rounded-full overflow-hidden border border-white/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <img id="socialSenderPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop" class="w-full h-full object-cover">
                 </div>
-                <span class="text-[11px] font-bold tracking-wide">Avatar</span>
-                <i data-lucide="upload" class="w-3.5 h-3.5 text-indigo-300"></i>
+                <span class="text-[11px] font-bold tracking-wide">Me</span>
+              </button>
+              
+              <!-- Receiver Avatar Upload -->
+              <input type="file" id="socialReceiverAvatarInput" accept="image/*" onchange="handleSocialReceiverUpload(event)" class="hidden">
+              <button onclick="document.getElementById('socialReceiverAvatarInput').click()" type="button" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-semibold text-white transition-all group flex-shrink-0 shadow-sm" title="Upload Their (Receiver) Photo">
+                <div class="w-6 h-6 rounded-full overflow-hidden border border-white/30 flex items-center justify-center group-hover:scale-105 transition-transform">
+                  <img id="socialReceiverPreview" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop" class="w-full h-full object-cover">
+                </div>
+                <span class="text-[11px] font-bold tracking-wide">Them</span>
               </button>
 
               <select id="socialLangSelect"
@@ -1450,7 +1452,7 @@
             </div>
           </div>
 
-          <div id="socialMockupCanvas" class="w-full max-w-sm transition-all duration-300">
+          <div id="socialMockupCanvas" class="w-full max-w-sm transition-all duration-300 transform scale-[0.85] sm:scale-100 origin-top">
             <!-- Dynamically populated mockup -->
           </div>
         </div>
@@ -2073,7 +2075,7 @@
       const apiKey = localStorage.getItem('capzone_gemini_key');
       const format = document.getElementById('scriptFormat').value;
 
-      let prompt = `Write a YouTube video script about: ${topic}. Format: ${format}. Please provide ONLY the script text without markdown markdown code blocks if possible.`;
+      let prompt = `Act as an expert YouTube scriptwriter and produce a highly engaging, super advanced viral video script about '${topic}'. Format: ${format}. CRITICAL INSTRUCTIONS: 1. The script MUST be 100% in natural Sinhala (සිංහල Unicode). 2. Write in PLAIN TEXT ONLY. DO NOT use ANY Markdown formatting (no **, no ##, no bullets). Provide a clean text output. 3. Include a catchy HOOK, a detailed INTRO, a comprehensive BODY with creative visual scene descriptions (B-Roll ideas), and a strong CALL-TO-ACTION OUTRO. 4. Ensure paragraphs are well-separated with blank lines for readability. Make the language highly compelling and professional for content creators.`;
 
       try {
         let scriptText = '';
@@ -2663,11 +2665,17 @@
         if (e.stopPropagation) e.stopPropagation();
       }
       backToSocialKitOverview();
-      const savedAv = window.currentSocialAvatar || localStorage.getItem('capzone_social_avatar');
-      if (savedAv) {
-        window.currentSocialAvatar = savedAv;
-        const preview = document.getElementById('socialAvatarPreview');
-        if (preview) preview.src = savedAv;
+      const savedSender = window.currentSocialSenderAvatar || localStorage.getItem('capzone_social_sender');
+      if (savedSender) {
+        window.currentSocialSenderAvatar = savedSender;
+        const preview = document.getElementById('socialSenderPreview');
+        if (preview) preview.src = savedSender;
+      }
+      const savedReceiver = window.currentSocialReceiverAvatar || localStorage.getItem('capzone_social_receiver');
+      if (savedReceiver) {
+        window.currentSocialReceiverAvatar = savedReceiver;
+        const preview = document.getElementById('socialReceiverPreview');
+        if (preview) preview.src = savedReceiver;
       }
       openModal('socialKitModal', e);
     }
@@ -3006,18 +3014,25 @@
     // ==========================================
     // CAPZONE SOCIAL KIT - AVATAR & FULL EXPORT ENGINE (2026 DARK UI)
     // ==========================================
-    window.currentSocialAvatar = localStorage.getItem('capzone_social_avatar') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
+    window.currentSocialSenderAvatar = localStorage.getItem('capzone_social_sender') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
+    window.currentSocialReceiverAvatar = localStorage.getItem('capzone_social_receiver') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
 
     document.addEventListener('DOMContentLoaded', () => {
-      const savedAv = localStorage.getItem('capzone_social_avatar');
-      if (savedAv) {
-        window.currentSocialAvatar = savedAv;
-        const preview = document.getElementById('socialAvatarPreview');
-        if (preview) preview.src = savedAv;
+      const savedSender = localStorage.getItem('capzone_social_sender');
+      if (savedSender) {
+        window.currentSocialSenderAvatar = savedSender;
+        const preview = document.getElementById('socialSenderPreview');
+        if (preview) preview.src = savedSender;
+      }
+      const savedReceiver = localStorage.getItem('capzone_social_receiver');
+      if (savedReceiver) {
+        window.currentSocialReceiverAvatar = savedReceiver;
+        const preview = document.getElementById('socialReceiverPreview');
+        if (preview) preview.src = savedReceiver;
       }
     });
 
-    function handleSocialAvatarUpload(event) {
+    function handleSocialSenderUpload(event) {
       const file = event && event.target && event.target.files && event.target.files[0];
       if (!file) return;
       if (!file.type.startsWith('image/')) {
@@ -3027,20 +3042,32 @@
       const reader = new FileReader();
       reader.onload = function (e) {
         const dataUrl = e.target.result;
-        window.currentSocialAvatar = dataUrl;
-        try {
-          localStorage.setItem('capzone_social_avatar', dataUrl);
-        } catch (err) {
-          console.warn('LocalStorage limit for avatar:', err);
-        }
-        const preview = document.getElementById('socialAvatarPreview');
+        window.currentSocialSenderAvatar = dataUrl;
+        try { localStorage.setItem('capzone_social_sender', dataUrl); } catch (err) {}
+        const preview = document.getElementById('socialSenderPreview');
         if (preview) preview.src = dataUrl;
-        showPopup('Profile පින්තූරය සාර්ථකව Upload විය! Mockup එකට එක් කෙරිණි.', 'සාර්ථකයි', 'success');
-        if (currentSocialData) {
-          renderMockup(currentSocialTool, currentSocialData);
-        } else {
-          renderDefaultSampleMockup(currentSocialTool);
-        }
+        if (currentSocialData) renderMockup(currentSocialTool, currentSocialData);
+        else renderDefaultSampleMockup(currentSocialTool);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleSocialReceiverUpload(event) {
+      const file = event && event.target && event.target.files && event.target.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) {
+        showPopup('කරුණාකර වලංගු Image (පින්තූර) එකක් තෝරන්න.', 'අවවාදයයි', 'warning');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const dataUrl = e.target.result;
+        window.currentSocialReceiverAvatar = dataUrl;
+        try { localStorage.setItem('capzone_social_receiver', dataUrl); } catch (err) {}
+        const preview = document.getElementById('socialReceiverPreview');
+        if (preview) preview.src = dataUrl;
+        if (currentSocialData) renderMockup(currentSocialTool, currentSocialData);
+        else renderDefaultSampleMockup(currentSocialTool);
       };
       reader.readAsDataURL(file);
     }
@@ -3187,7 +3214,8 @@
       if (!container) return;
       container.innerHTML = '';
 
-      const avatarUrl = window.currentSocialAvatar || localStorage.getItem('capzone_social_avatar') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
+      const senderAvatar = window.currentSocialSenderAvatar || localStorage.getItem('capzone_social_sender') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
+      const receiverAvatar = window.currentSocialReceiverAvatar || localStorage.getItem('capzone_social_receiver') || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop';
 
       if (tool === 'fake_chat') {
         const msgs = data.messages || [];
@@ -3196,20 +3224,24 @@
           '<div class="absolute top-0 inset-x-0 h-6 bg-black z-20 flex justify-center"><div class="w-32 h-5 bg-black rounded-b-3xl"></div></div>' +
           '<div class="pt-6 pb-2.5 px-3 flex items-center justify-between border-b border-white/10 bg-neutral-900/90 backdrop-blur-xl z-10 sticky top-0 flex-shrink-0">' +
           '<div class="flex items-center gap-3">' +
-          '<div onclick="document.getElementById(\'socialAvatarInput\').click()" title="Click to change profile picture" class="w-9 h-9 rounded-full overflow-hidden border border-white/20 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all">' +
-          '<img src="' + avatarUrl + '" class="w-full h-full object-cover">' +
+          '<div onclick="document.getElementById(\'socialReceiverAvatarInput\').click()" title="Click to change profile picture" class="w-9 h-9 rounded-full overflow-hidden border border-white/20 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-blue-400 transition-all">' +
+          '<img src="' + receiverAvatar + '" class="w-full h-full object-cover">' +
           '</div>' +
           '<div><h3 contenteditable="true" class="font-semibold text-[15px] leading-tight outline-none focus:border-b focus:border-blue-400">' + (data.personName || 'Contact') + '</h3><p class="text-[10px] text-neutral-400">iMessage</p></div>' +
           '</div>' +
           '<div class="flex gap-4 text-blue-400"><i data-lucide="video" class="w-5 h-5 cursor-pointer"></i><i data-lucide="phone" class="w-5 h-5 cursor-pointer"></i></div>' +
           '</div>' +
-          '<div id="mockupScrollArea" class="flex-1 overflow-y-auto p-3 space-y-2.5 pb-3 custom-scroll bg-black transition-all">' +
+          '<div id="mockupScrollArea" class="flex-1 overflow-y-auto p-3 space-y-2.5 pb-12 custom-scroll bg-black transition-all">' +
           msgs.map(m =>
-            '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + ' w-full">' +
-            '<div contenteditable="true" class="relative max-w-[80%] px-4 py-2.5 text-[15px] leading-snug outline-none ' + (m.sender === 'me' ? 'bg-blue-600 text-white rounded-[1.2rem] rounded-br-sm' : 'bg-[#262628] text-white rounded-[1.2rem] rounded-bl-sm') + '">' +
+            '<div class="flex w-full ' + (m.sender === 'me' ? 'justify-end' : 'justify-start') + ' items-end gap-2">' +
+            (m.sender !== 'me' ? '<div onclick="document.getElementById(\'socialReceiverAvatarInput\').click()" class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-white/10 cursor-pointer"><img src="' + receiverAvatar + '" class="w-full h-full object-cover"></div>' : '') +
+            '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + ' max-w-[75%]">' +
+            '<div contenteditable="true" class="relative px-4 py-2.5 text-[15px] leading-snug outline-none ' + (m.sender === 'me' ? 'bg-blue-600 text-white rounded-[1.2rem] rounded-br-sm' : 'bg-[#262628] text-white rounded-[1.2rem] rounded-bl-sm') + '">' +
             m.text +
             '</div>' +
             (m.time ? '<span contenteditable="true" class="text-[9px] text-neutral-500 mt-1 px-1 outline-none">' + m.time + (m.sender === 'me' ? ' · Delivered' : '') + '</span>' : '') +
+            '</div>' +
+            (m.sender === 'me' ? '<div onclick="document.getElementById(\'socialSenderAvatarInput\').click()" class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-white/10 cursor-pointer"><img src="' + senderAvatar + '" class="w-full h-full object-cover"></div>' : '') +
             '</div>'
           ).join('') +
           '</div>' +
@@ -3228,8 +3260,8 @@
           '<div class="pt-6 pb-2 px-3 flex items-center justify-between bg-[#202C33] z-10 sticky top-0 shadow-md border-b border-[#2A3942] flex-shrink-0">' +
           '<div class="flex items-center gap-2.5 min-w-0">' +
           '<i data-lucide="arrow-left" class="w-5 h-5 text-white flex-shrink-0 cursor-pointer"></i>' +
-          '<div onclick="document.getElementById(\'socialAvatarInput\').click()" title="Click to change profile picture" class="w-9 h-9 rounded-full overflow-hidden border border-white/20 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-[#00A884] transition-all">' +
-          '<img src="' + avatarUrl + '" class="w-full h-full object-cover">' +
+          '<div onclick="document.getElementById(\'socialReceiverAvatarInput\').click()" title="Click to change profile picture" class="w-9 h-9 rounded-full overflow-hidden border border-white/20 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-[#00A884] transition-all">' +
+          '<img src="' + receiverAvatar + '" class="w-full h-full object-cover">' +
           '</div>' +
           '<div class="min-w-0"><h3 contenteditable="true" class="font-medium text-[15px] text-[#E9EDEF] leading-tight outline-none truncate focus:border-b focus:border-[#00A884]">' + (data.contactName || 'Contact') + '</h3><p contenteditable="true" class="text-[11px] text-[#25D366] leading-none mt-0.5 outline-none">' + (data.isOnline ? 'online' : 'last seen recently') + '</p></div>' +
           '</div>' +
@@ -3239,16 +3271,20 @@
           '<i data-lucide="more-vertical" class="w-5 h-5 cursor-pointer hover:text-white"></i>' +
           '</div>' +
           '</div>' +
-          '<div id="mockupScrollArea" class="flex-1 overflow-y-auto p-3 space-y-2.5 pb-3 relative bg-[#0B141A] custom-scroll transition-all" style="background-image: radial-gradient(circle at 50% 50%, #111b21 0%, #0b141a 100%);">' +
+          '<div id="mockupScrollArea" class="flex-1 overflow-y-auto p-3 space-y-2.5 pb-12 relative bg-[#0B141A] custom-scroll transition-all" style="background-image: radial-gradient(circle at 50% 50%, #111b21 0%, #0b141a 100%);">' +
           msgs.map(m =>
-            '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + ' w-full">' +
-            '<div class="relative max-w-[85%] px-3 py-1.5 text-[14.5px] leading-snug shadow-sm ' + (m.sender === 'me' ? 'bg-[#005C4B] text-[#E9EDEF] rounded-lg rounded-tr-none' : 'bg-[#202C33] text-[#E9EDEF] rounded-lg rounded-tl-none') + '">' +
+            '<div class="flex w-full ' + (m.sender === 'me' ? 'justify-end' : 'justify-start') + ' items-end gap-2">' +
+            (m.sender !== 'me' ? '<div onclick="document.getElementById(\'socialReceiverAvatarInput\').click()" class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-white/10 cursor-pointer"><img src="' + receiverAvatar + '" class="w-full h-full object-cover"></div>' : '') +
+            '<div class="flex flex-col ' + (m.sender === 'me' ? 'items-end' : 'items-start') + ' max-w-[80%]">' +
+            '<div class="relative px-3 py-1.5 text-[14.5px] leading-snug shadow-sm ' + (m.sender === 'me' ? 'bg-[#005C4B] text-[#E9EDEF] rounded-lg rounded-tr-none' : 'bg-[#202C33] text-[#E9EDEF] rounded-lg rounded-tl-none') + '">' +
             '<span contenteditable="true" class="outline-none break-words">' + m.text + '</span>' +
             '<span class="inline-flex items-center justify-end gap-1 float-right mt-1.5 ml-3 text-[10px] text-neutral-400 select-none">' +
             '<span contenteditable="true" class="outline-none">' + (m.time || '10:00 AM') + '</span>' +
             (m.sender === 'me' ? (m.status === 'read' ? '<svg viewBox="0 0 16 15" width="16" height="15" class="inline"><path fill="#53bdeb" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"/></svg>' : '<svg viewBox="0 0 16 15" width="16" height="15" class="inline"><path fill="#8696a0" d="M15.01 3.316l-.478-.372a.365.365 0 0 0-.51.063L8.666 9.879a.32.32 0 0 1-.484.033l-.358-.325a.319.319 0 0 0-.484.032l-.378.483a.418.418 0 0 0 .036.541l1.32 1.266c.143.14.361.125.484-.033l6.272-8.048a.366.366 0 0 0-.064-.512zm-4.1 0l-.478-.372a.365.365 0 0 0-.51.063L4.566 9.879a.32.32 0 0 1-.484.033L1.891 7.769a.366.366 0 0 0-.515.006l-.423.433a.364.364 0 0 0 .006.514l3.258 3.185c.143.14.361.125.484-.033l6.272-8.048a.365.365 0 0 0-.063-.51z"/></svg>') : '') +
             '</span>' +
             '</div>' +
+            '</div>' +
+            (m.sender === 'me' ? '<div onclick="document.getElementById(\'socialSenderAvatarInput\').click()" class="w-7 h-7 rounded-full overflow-hidden flex-shrink-0 border border-white/10 cursor-pointer"><img src="' + senderAvatar + '" class="w-full h-full object-cover"></div>' : '') +
             '</div>'
           ).join('') +
           '</div>' +
@@ -3559,8 +3595,12 @@
       });
 
       // 6. Ensure any images inside clone have crossOrigin set to anonymous
+      // 6. Ensure any images inside clone have crossOrigin set to anonymous and fix rounded borders for html2canvas
       clone.querySelectorAll('img').forEach(img => {
         img.crossOrigin = 'anonymous';
+      });
+      clone.querySelectorAll('.rounded-full img').forEach(img => {
+        img.style.borderRadius = '50%';
       });
 
       // 7. Append clone to document.body for layout calculation
@@ -3816,7 +3856,7 @@
             </span>
           </div>
           <div>
-            <span class="text-slate-400 text-[10px] uppercase font-bold block">Telegram Cloud</span>
+            <span class="text-slate-400 text-[10px] uppercase font-bold block">Cloud Backup</span>
             <span class="text-sky-400 font-semibold flex items-center gap-1 mt-0.5" title="Channel ID: -1004498616218">
               <i data-lucide="cloud" class="w-3 h-3"></i> Backed Up
             </span>
@@ -4364,7 +4404,7 @@
 
     window.deleteUserProject = function (projectId) {
       const email = window.currentUserEmail || localStorage.getItem('capzone_user_email');
-      if (!confirm('මෙම Project එක සහ Telegram Cloud Backup එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍යද?')) return;
+      if (!confirm('මෙම Project එක සහ Cloud Backup එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍යද?')) return;
 
       const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
       const tgMsgId = p ? (p.telegram_msg_id || p.tg_msg_id) : null;
@@ -4384,7 +4424,7 @@
           method: 'DELETE',
           headers: { 'x-user-email': email || '' }
         }).then(r => r.json()).then(() => {
-          if (typeof showPopup === 'function') showPopup('Project එක සහ Telegram Backup එක සාර්ථකව Delete විය!', 'Deleted from Cloud', 'success');
+          if (typeof showPopup === 'function') showPopup('Project එක සහ Cloud Backup එක සාර්ථකව Delete විය!', 'Deleted from Cloud', 'success');
         });
       } catch (e) { }
     };
@@ -4589,3 +4629,4 @@
 </body>
 
 </html>
+
