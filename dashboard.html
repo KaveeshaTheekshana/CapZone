@@ -1065,7 +1065,7 @@
   <!-- SRT MODAL -->
   <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto" style="scrollbar-width: none;">
       <button onclick="closeModal('srtModal', event)"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
         <i data-lucide="x" class="w-4 h-4"></i>
@@ -2082,7 +2082,13 @@
           document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
           document.getElementById('srtProgressBar').style.width = '100%';
           document.getElementById('srtResultArea').style.display = 'flex';
-        } else { showPopup('System Error, please contact developer', 'System Error', 'error'); }
+        } else if (data.error === 'NO_SUBSCRIPTION_ACTIVE') {
+          showPopup('You must activate a subscription package to generate subtitles.', 'Subscription Required', 'error');
+          setTimeout(() => {
+            const modal = document.getElementById('subscriptionModal');
+            if(modal) { modal.style.display = 'flex'; modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; }
+          }, 1500);
+        } else { showPopup(data.error || 'System Error, please contact developer', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup('System Error, please contact developer', 'System Error', 'error'); }
       finally {
         document.getElementById('srtSubmitBtn').disabled = false;
