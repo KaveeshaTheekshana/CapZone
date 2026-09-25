@@ -385,15 +385,18 @@
 
 <body
   class="min-h-screen text-gray-100 font-sans antialiased overflow-x-hidden selection:bg-brand-purple selection:text-white relative pb-24 lg:pb-0 bg-[#06080F]">
-  
+
   <!-- Hardware Accelerated Fixed Background (Optimized for Mobile) -->
-  <div id="dashboardBackground"
-    class="fixed inset-0 -z-10 h-full w-full pointer-events-none overflow-hidden"
+  <div id="dashboardBackground" class="fixed inset-0 -z-10 h-full w-full pointer-events-none overflow-hidden"
     style="transform: translate3d(0, 0, 0); backface-visibility: hidden;">
     <div class="absolute inset-0 bg-gradient-to-br from-[#0B0F19] via-[#0f172a] to-[#05070D]"></div>
     <!-- Abstract gradient orbs for modern professional look (CSS only, no images) -->
-    <div class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-indigo-600/10 blur-[100px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite]"></div>
+    <div
+      class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-indigo-600/10 blur-[100px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]">
+    </div>
+    <div
+      class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite]">
+    </div>
   </div>
 
 
@@ -446,7 +449,8 @@
       <button onclick="openToolWithIntercept('subscriptionModal', event)"
         class="flex items-center gap-1.5 sm:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-amber-500/15 border border-amber-500/30 hover:border-amber-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] group"
         title="View Pricing Plans">
-        <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+        <div
+          class="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
           <i data-lucide="zap" class="w-3.5 h-3.5 text-white"></i>
         </div>
         <span class="text-xs font-bold text-amber-100 hidden sm:inline tracking-wider uppercase">Plans</span>
@@ -551,20 +555,29 @@
           <div
             class="w-full relative p-10 lg:p-16 flex flex-col justify-center items-center text-center bg-[url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=100&w=1500&auto=format&fit=crop')] bg-cover bg-center group/sub overflow-hidden">
             <!-- Animated gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/95 via-purple-900/90 to-black/95 group-hover/sub:via-purple-800/85 transition-all duration-700"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-br from-indigo-900/95 via-purple-900/90 to-black/95 group-hover/sub:via-purple-800/85 transition-all duration-700">
+            </div>
             <!-- Floating orbs animation -->
-            <div class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[80px] animate-[pulse_6s_ease-in-out_infinite]"></div>
-            <div class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 blur-[80px] animate-[pulse_8s_ease-in-out_infinite]"></div>
+            <div
+              class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[80px] animate-[pulse_6s_ease-in-out_infinite]">
+            </div>
+            <div
+              class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 blur-[80px] animate-[pulse_8s_ease-in-out_infinite]">
+            </div>
 
             <div class="relative z-10 flex flex-col items-center">
-              <span class="px-5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-wider text-purple-200 mb-5 backdrop-blur-md animate-[pulse_3s_ease-in-out_infinite]">
+              <span
+                class="px-5 py-1.5 rounded-full bg-white/10 border border-white/20 text-xs font-bold uppercase tracking-wider text-purple-200 mb-5 backdrop-blur-md animate-[pulse_3s_ease-in-out_infinite]">
                 Featured Pro Tool
               </span>
-              <h2 class="text-3xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-indigo-200 mb-5 drop-shadow-2xl">
+              <h2
+                class="text-3xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-purple-100 to-indigo-200 mb-5 drop-shadow-2xl">
                 AI Subtitle Studio
               </h2>
               <p class="text-gray-300 text-sm lg:text-base leading-relaxed mb-8 max-w-2xl font-medium drop-shadow-md">
-                Generate perfectly synced Sinhala & English subtitles from any audio using advanced AI models. Lightning fast, highly accurate, and completely automated.
+                Generate perfectly synced Sinhala & English subtitles from any audio using advanced AI models. Lightning
+                fast, highly accurate, and completely automated.
               </p>
               <button onclick="openToolWithIntercept('srtModal', event)"
                 class="px-8 py-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-2xl text-white text-lg font-bold shadow-[0_0_30px_rgba(168,85,247,0.4)] hover:shadow-[0_0_50px_rgba(168,85,247,0.6)] hover:scale-[1.03] active:scale-95 transition-all duration-300 flex items-center gap-3 ring-1 ring-white/20">
@@ -593,10 +606,13 @@
                   d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10.05 10.05 0 008.44-9.9c0-5.54-4.5-10.02-10-10.02z" />
               </svg>
             </div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30">HD 4K + MP3</span>
+            <span
+              class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/15 text-blue-300 border border-blue-500/30">HD
+              4K + MP3</span>
           </div>
 
-          <h3 class="text-lg lg:text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">Facebook Video<br />Downloader</h3>
+          <h3 class="text-lg lg:text-xl font-bold text-white mb-2 group-hover:text-blue-300 transition-colors">Facebook
+            Video<br />Downloader</h3>
 
           <div class="mb-6 flex-1">
             <p class="text-xs text-gray-300/90 leading-relaxed font-normal">
@@ -616,17 +632,21 @@
           class="glass-panel h-full rounded-3xl p-6 flex flex-col hover:border-purple-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/10 shadow-lg hover:shadow-[0_15px_35px_rgba(168,85,247,0.2)] hover:-translate-y-1.5 active:scale-[0.98]"
           onclick="openToolWithIntercept('tiktokModal', event)">
           <!-- Top Ambient Glow Line -->
-          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400"></div>
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-500 via-purple-400 to-cyan-400">
+          </div>
 
           <div class="flex items-center justify-between mb-5">
             <div
               class="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/10 border border-purple-500/30 flex items-center justify-center shadow-[0_0_25px_rgba(168,85,247,0.2)] group-hover:scale-110 group-hover:shadow-[0_0_35px_rgba(168,85,247,0.4)] transition-all duration-300">
               <i data-lucide="music" class="w-7 h-7 text-purple-400"></i>
             </div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">NO WATERMARK</span>
+            <span
+              class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/30">NO
+              WATERMARK</span>
           </div>
 
-          <h3 class="text-lg lg:text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">TikTok Video<br />Downloader</h3>
+          <h3 class="text-lg lg:text-xl font-bold text-white mb-2 group-hover:text-purple-300 transition-colors">TikTok
+            Video<br />Downloader</h3>
 
           <div class="mb-6 flex-1">
             <p class="text-xs text-gray-300/90 leading-relaxed font-normal">
@@ -646,17 +666,21 @@
           class="glass-panel h-full rounded-3xl p-6 flex flex-col hover:border-emerald-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/10 shadow-lg hover:shadow-[0_15px_35px_rgba(16,185,129,0.2)] hover:-translate-y-1.5 active:scale-[0.98]"
           onclick="openToolWithIntercept('bgRemoverModal', event)">
           <!-- Top Ambient Glow Line -->
-          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 via-emerald-400 to-green-300"></div>
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 via-emerald-400 to-green-300">
+          </div>
 
           <div class="flex items-center justify-between mb-5">
             <div
               class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center shadow-[0_0_25px_rgba(16,185,129,0.2)] group-hover:scale-110 group-hover:shadow-[0_0_35px_rgba(16,185,129,0.4)] transition-all duration-300">
               <i data-lucide="image-minus" class="w-7 h-7 text-emerald-400"></i>
             </div>
-            <span class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">SMART CUTOUT</span>
+            <span
+              class="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">SMART
+              CUTOUT</span>
           </div>
 
-          <h3 class="text-lg lg:text-xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">Background<br />Remover</h3>
+          <h3 class="text-lg lg:text-xl font-bold text-white mb-2 group-hover:text-emerald-300 transition-colors">
+            Background<br />Remover</h3>
 
           <div class="mb-6 flex-1">
             <p class="text-xs text-gray-300/90 leading-relaxed font-normal">
@@ -700,62 +724,88 @@
 
       <!-- Policy Links -->
       <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400 mt-4 mb-2">
-        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer" onclick="openModal('termsModal', event)">Terms & Conditions</a>
-        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer" onclick="openModal('privacyModal', event)">Privacy Policy</a>
-        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer" onclick="openModal('returnModal', event)">Return Policy</a>
+        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer"
+          onclick="openModal('termsModal', event)">Terms & Conditions</a>
+        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer"
+          onclick="openModal('privacyModal', event)">Privacy Policy</a>
+        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer"
+          onclick="openModal('returnModal', event)">Return Policy</a>
       </div>
 
-      <p class="text-[11px] text-gray-400">&copy; 2026 CapZone Subtitle Studio. All rights reserved. Powered by <span class="text-blue-400">KaveezCloud AI Engine</span>.</p>
+      <p class="text-[11px] text-gray-400">&copy; 2026 CapZone Subtitle Studio. All rights reserved. Powered by <span
+          class="text-blue-400">KaveezCloud AI Engine</span>.</p>
     </div>
   </footer>
 
   <!-- Modals -->
-  
+
   <!-- TERMS MODAL -->
-  <div id="termsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+  <div id="termsModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
     <div class="glass-card w-full max-w-2xl rounded-3xl p-6 relative max-h-[80vh] flex flex-col">
-      <button onclick="closeModal('termsModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
+      <button onclick="closeModal('termsModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
       <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700/50 pb-2">Terms & Conditions</h3>
       <div class="overflow-y-auto pr-2 space-y-4 text-sm text-slate-300">
-        <p><strong>1. Introduction</strong><br>Welcome to CapZone Subtitle Studio. By accessing our website, you agree to these Terms and Conditions.</p>
-        <p><strong>2. Services</strong><br>We provide an AI-powered service for generating Sinhala subtitles from video and audio files. We do not guarantee 100% accuracy and users must review generated subtitles.</p>
-        <p><strong>3. User Accounts</strong><br>Users must provide accurate information when registering. You are responsible for maintaining the security of your account and API keys.</p>
-        <p><strong>4. Payments & Subscriptions</strong><br>Payments are processed securely via PayHere. Subscriptions grant you a specific minute quota per month. Pay-per-video credits are valid until consumed.</p>
-        <p><strong>5. Acceptable Use</strong><br>You may not use our service to process illegal, copyrighted (without permission), or explicit content. We reserve the right to suspend accounts violating these terms.</p>
+        <p><strong>1. Introduction</strong><br>Welcome to CapZone Subtitle Studio. By accessing our website, you agree
+          to these Terms and Conditions.</p>
+        <p><strong>2. Services</strong><br>We provide an AI-powered service for generating Sinhala subtitles from video
+          and audio files. We do not guarantee 100% accuracy and users must review generated subtitles.</p>
+        <p><strong>3. User Accounts</strong><br>Users must provide accurate information when registering. You are
+          responsible for maintaining the security of your account and API keys.</p>
+        <p><strong>4. Payments & Subscriptions</strong><br>Payments are processed securely via PayHere. Subscriptions
+          grant you a specific minute quota per month. Pay-per-video credits are valid until consumed.</p>
+        <p><strong>5. Acceptable Use</strong><br>You may not use our service to process illegal, copyrighted (without
+          permission), or explicit content. We reserve the right to suspend accounts violating these terms.</p>
       </div>
     </div>
   </div>
 
   <!-- PRIVACY MODAL -->
-  <div id="privacyModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+  <div id="privacyModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
     <div class="glass-card w-full max-w-2xl rounded-3xl p-6 relative max-h-[80vh] flex flex-col">
-      <button onclick="closeModal('privacyModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
+      <button onclick="closeModal('privacyModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
       <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700/50 pb-2">Privacy Policy</h3>
       <div class="overflow-y-auto pr-2 space-y-4 text-sm text-slate-300">
-        <p><strong>1. Data Collection</strong><br>We collect your email address for account creation and basic analytics data to improve our service. We do not store your credit card information directly; all payments are handled securely by PayHere.</p>
-        <p><strong>2. Media Processing</strong><br>The videos and audio files you upload are temporarily processed by our servers to generate subtitles. Files are automatically deleted from our main servers after processing is complete.</p>
-        <p><strong>3. Third-Party Services</strong><br>We use third-party APIs (like Google Gemini) for processing audio. Your audio data is transmitted securely for transcription purposes only.</p>
-        <p><strong>4. Data Security</strong><br>We implement industry-standard security measures to protect your personal information against unauthorized access.</p>
+        <p><strong>1. Data Collection</strong><br>We collect your email address for account creation and basic analytics
+          data to improve our service. We do not store your credit card information directly; all payments are handled
+          securely by PayHere.</p>
+        <p><strong>2. Media Processing</strong><br>The videos and audio files you upload are temporarily processed by
+          our servers to generate subtitles. Files are automatically deleted from our main servers after processing is
+          complete.</p>
+        <p><strong>3. Third-Party Services</strong><br>We use third-party APIs (like Google Gemini) for processing
+          audio. Your audio data is transmitted securely for transcription purposes only.</p>
+        <p><strong>4. Data Security</strong><br>We implement industry-standard security measures to protect your
+          personal information against unauthorized access.</p>
       </div>
     </div>
   </div>
 
   <!-- RETURN MODAL -->
-  <div id="returnModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
+  <div id="returnModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
     <div class="glass-card w-full max-w-2xl rounded-3xl p-6 relative max-h-[80vh] flex flex-col">
-      <button onclick="closeModal('returnModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
+      <button onclick="closeModal('returnModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
       <h3 class="text-xl font-bold text-white mb-4 border-b border-slate-700/50 pb-2">Return & Refund Policy</h3>
       <div class="overflow-y-auto pr-2 space-y-4 text-sm text-slate-300">
-        <p><strong>1. Refund Eligibility</strong><br>As CapZone provides a digital service (AI processing), we generally do not offer refunds once credits are consumed or a subscription is activated.</p>
-        <p><strong>2. Technical Failures</strong><br>If a technical error on our platform prevents your video from being processed successfully, and credits are deducted, please contact our support. We will manually review the issue and restore your credits if our system was at fault.</p>
-        <p><strong>3. Subscription Cancellations</strong><br>You may cancel your monthly subscription at any time. Cancellations will stop future billing, but no prorated refunds are provided for the current active month.</p>
-        <p><strong>4. Contact Support</strong><br>For any billing inquiries or refund requests due to system errors, please contact us via our official Telegram support channel.</p>
+        <p><strong>1. Refund Eligibility</strong><br>As CapZone provides a digital service (AI processing), we generally
+          do not offer refunds once credits are consumed or a subscription is activated.</p>
+        <p><strong>2. Technical Failures</strong><br>If a technical error on our platform prevents your video from being
+          processed successfully, and credits are deducted, please contact our support. We will manually review the
+          issue and restore your credits if our system was at fault.</p>
+        <p><strong>3. Subscription Cancellations</strong><br>You may cancel your monthly subscription at any time.
+          Cancellations will stop future billing, but no prorated refunds are provided for the current active month.</p>
+        <p><strong>4. Contact Support</strong><br>For any billing inquiries or refund requests due to system errors,
+          please contact us via our official Telegram support channel.</p>
       </div>
     </div>
   </div>
@@ -1037,18 +1087,20 @@
             onclick="document.getElementById('srtVideoInput').click()">
             <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden"
               onchange="updateSrtFileInfo(this)" />
-            <div class="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+            <div
+              class="w-16 h-16 bg-purple-500/10 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <i data-lucide="upload-cloud" class="w-8 h-8 text-purple-500"></i>
             </div>
             <p class="text-sm text-white font-bold" id="srtFileName">Click to Browse Media (MP4, MKV, MP3)</p>
             <p class="text-xs text-slate-400 mt-2">Maximum duration: 60 minutes</p>
           </div>
         </div>
-        
+
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="text-xs font-bold text-slate-300 mb-2 block">Target Language</label>
-            <select id="srtLanguage" class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:border-purple-500 transition-colors">
+            <select id="srtLanguage"
+              class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:border-purple-500 transition-colors">
               <option value="si" selected>Sinhala</option>
               <option value="en">English</option>
             </select>
@@ -1066,12 +1118,14 @@
         </button>
       </form>
 
-      <div id="srtProgressCard" class="mt-6 p-6 rounded-2xl bg-black/40 border border-purple-500/20" style="display: none;">
+      <div id="srtProgressCard" class="mt-6 p-6 rounded-2xl bg-black/40 border border-purple-500/20"
+        style="display: none;">
         <p class="text-sm font-bold text-purple-400 mb-3 flex items-center gap-2">
           <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> <span id="srtStatusText">Analyzing...</span>
         </p>
         <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-          <div id="srtProgressBar" class="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full transition-all duration-300 relative"
+          <div id="srtProgressBar"
+            class="bg-gradient-to-r from-purple-500 to-blue-500 h-full rounded-full transition-all duration-300 relative"
             style="width: 0%">
             <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
           </div>
@@ -1098,9 +1152,13 @@
   </div>
 
   <!-- SUBSCRIPTION MODAL -->
-  <div id="subscriptionModal" class="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
-    <div class="glass-card w-full max-w-5xl rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto" style="scrollbar-width: none;">
-      <button onclick="closeModal('subscriptionModal', event)" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
+  <div id="subscriptionModal"
+    class="fixed inset-0 z-[110] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-5xl rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
+      style="scrollbar-width: none;">
+      <button onclick="closeModal('subscriptionModal', event)"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
@@ -1109,19 +1167,23 @@
           <i data-lucide="credit-card" class="w-8 h-8 text-amber-500"></i>
         </div>
         <h2 class="text-3xl font-black text-white tracking-tight uppercase">Choose How You Want To Pay</h2>
-        <p class="text-sm text-slate-400 mt-2 max-w-lg mx-auto">Get access to faster generation times, longer video processing, and priority support.</p>
+        <p class="text-sm text-slate-400 mt-2 max-w-lg mx-auto">Get access to faster generation times, longer video
+          processing, and priority support.</p>
       </div>
 
       <!-- Tab Navigation -->
       <div class="flex justify-center mb-8">
         <div class="inline-flex p-1 bg-slate-800/80 rounded-full border border-slate-700/50">
-          <button onclick="document.getElementById('payPerVideoTab').style.display='block'; document.getElementById('monthlyPacksTab').style.display='none'; this.classList.add('bg-purple-500','text-white'); this.classList.remove('text-slate-400'); this.nextElementSibling.classList.remove('bg-amber-500','text-white'); this.nextElementSibling.classList.add('text-slate-400');" 
+          <button
+            onclick="document.getElementById('payPerVideoTab').style.display='block'; document.getElementById('monthlyPacksTab').style.display='none'; this.classList.add('bg-purple-500','text-white'); this.classList.remove('text-slate-400'); this.nextElementSibling.classList.remove('bg-amber-500','text-white'); this.nextElementSibling.classList.add('text-slate-400');"
             class="px-6 py-2.5 rounded-full text-sm font-bold bg-purple-500 text-white transition-all shadow-md">
             Pay-Per-Video (One-Time)
           </button>
-          <button onclick="document.getElementById('monthlyPacksTab').style.display='block'; document.getElementById('payPerVideoTab').style.display='none'; this.classList.add('bg-amber-500','text-white'); this.classList.remove('text-slate-400'); this.previousElementSibling.classList.remove('bg-purple-500','text-white'); this.previousElementSibling.classList.add('text-slate-400');" 
+          <button
+            onclick="document.getElementById('monthlyPacksTab').style.display='block'; document.getElementById('payPerVideoTab').style.display='none'; this.classList.add('bg-amber-500','text-white'); this.classList.remove('text-slate-400'); this.previousElementSibling.classList.remove('bg-purple-500','text-white'); this.previousElementSibling.classList.add('text-slate-400');"
             class="px-6 py-2.5 rounded-full text-sm font-bold text-slate-400 transition-all hover:text-white">
-            Monthly Packs <span class="ml-2 text-[9px] bg-red-500 text-white px-2 py-0.5 rounded-full uppercase">Best Value</span>
+            Monthly Packs <span class="ml-2 text-[9px] bg-red-500 text-white px-2 py-0.5 rounded-full uppercase">Best
+              Value</span>
           </button>
         </div>
       </div>
@@ -1130,12 +1192,14 @@
       <div id="payPerVideoTab" class="animate-fade-in">
         <div class="text-center mb-6">
           <h3 class="text-xl font-bold text-white">No Monthly Commitment</h3>
-          <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30 minutes per video)</p>
+          <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30
+            minutes per video)</p>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
           <!-- Mini Clip -->
-          <div class="glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-colors relative flex flex-col group text-center">
+          <div
+            class="glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-colors relative flex flex-col group text-center">
             <h3 class="text-lg font-bold text-slate-300 mb-2">Mini Clip</h3>
             <div class="text-3xl font-black text-white mb-1">Rs. 100</div>
             <p class="text-[10px] text-slate-400 mb-6 uppercase tracking-wider font-semibold">Per Video</p>
@@ -1143,24 +1207,34 @@
               <p class="text-sm font-bold text-purple-400">Up to 10 mins</p>
               <p class="text-xs text-slate-400 mt-1">Quick social media clips</p>
             </div>
-            <button onclick="startPayHere('balance_100', 100, 'Mini Clip - Top Up')" class="w-full py-3 rounded-xl border border-purple-500/50 text-purple-400 font-bold hover:bg-purple-500 hover:text-white transition-colors">Top Up Credits</button>
+            <button onclick="startPayHere('balance_100', 100, 'Mini Clip - Top Up')"
+              class="w-full py-3 rounded-xl border border-purple-500/50 text-purple-400 font-bold hover:bg-purple-500 hover:text-white transition-colors">Top
+              Up Credits</button>
           </div>
 
           <!-- Standard Video -->
-          <div class="glass-card rounded-2xl p-6 border-2 border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.15)] relative flex flex-col bg-slate-800/80 text-center transform md:-translate-y-4">
-            <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">Standard</div>
+          <div
+            class="glass-card rounded-2xl p-6 border-2 border-purple-500 shadow-[0_0_30px_rgba(168,85,247,0.15)] relative flex flex-col bg-slate-800/80 text-center transform md:-translate-y-4">
+            <div
+              class="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-[10px] font-black px-4 py-1.5 rounded-full uppercase tracking-widest shadow-lg">
+              Standard</div>
             <h3 class="text-lg font-bold text-slate-200 mb-2 mt-2">Standard Video</h3>
-            <div class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-1">Rs. 250</div>
+            <div
+              class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-1">
+              Rs. 250</div>
             <p class="text-[10px] text-slate-400 mb-6 uppercase tracking-wider font-semibold">Per Video</p>
             <div class="flex-1 bg-black/20 rounded-xl p-4 mb-6">
               <p class="text-sm font-bold text-white">10 to 20 mins</p>
               <p class="text-xs text-slate-400 mt-1">Perfect for YouTube</p>
             </div>
-            <button onclick="startPayHere('balance_250', 250, 'Standard Video - Top Up')" class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all">Top Up Credits</button>
+            <button onclick="startPayHere('balance_250', 250, 'Standard Video - Top Up')"
+              class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all">Top
+              Up Credits</button>
           </div>
 
           <!-- Extended Video -->
-          <div class="glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors relative flex flex-col group text-center">
+          <div
+            class="glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-blue-500/50 transition-colors relative flex flex-col group text-center">
             <h3 class="text-lg font-bold text-slate-300 mb-2">Extended Video</h3>
             <div class="text-3xl font-black text-white mb-1">Rs. 500</div>
             <p class="text-[10px] text-slate-400 mb-6 uppercase tracking-wider font-semibold">Per Video</p>
@@ -1168,7 +1242,9 @@
               <p class="text-sm font-bold text-blue-400">20 to 30 mins</p>
               <p class="text-xs text-slate-400 mt-1">Podcasts & Lectures</p>
             </div>
-            <button onclick="startPayHere('balance_500', 500, 'Extended Video - Top Up')" class="w-full py-3 rounded-xl border border-blue-500/50 text-blue-400 font-bold hover:bg-blue-500 hover:text-white transition-colors">Top Up Credits</button>
+            <button onclick="startPayHere('balance_500', 500, 'Extended Video - Top Up')"
+              class="w-full py-3 rounded-xl border border-blue-500/50 text-blue-400 font-bold hover:bg-blue-500 hover:text-white transition-colors">Top
+              Up Credits</button>
           </div>
         </div>
       </div>
@@ -1179,55 +1255,76 @@
           <h3 class="text-xl font-bold text-white">Monthly Subscription Packs</h3>
           <p class="text-xs text-slate-400 mt-1">Best value for active creators. Save money with a monthly quota.</p>
         </div>
-        
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
           <!-- Creator Monthly -->
-          <div class="glass-card rounded-2xl p-8 border border-amber-500/30 hover:border-amber-500 transition-colors relative flex flex-col group bg-gradient-to-b from-slate-800 to-slate-900/50">
+          <div
+            class="glass-card rounded-2xl p-8 border border-amber-500/30 hover:border-amber-500 transition-colors relative flex flex-col group bg-gradient-to-b from-slate-800 to-slate-900/50">
             <h3 class="text-2xl font-black text-white mb-2">Creator Monthly</h3>
             <div class="flex items-end gap-2 mb-6">
-              <span class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Rs. 2500</span>
+              <span
+                class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Rs.
+                2500</span>
               <span class="text-sm text-slate-400 mb-2 font-bold uppercase">/ month</span>
             </div>
-            
+
             <ul class="space-y-4 text-sm text-slate-300 mb-8 flex-1">
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i> <span class="font-bold text-white">120 Minutes</span> total quota per month</li>
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i> Up to 30 mins max per single video</li>
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i> Priority Processing</li>
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-amber-500 shrink-0"></i> Instant .srt Download</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-amber-500 shrink-0"></i> <span class="font-bold text-white">120 Minutes</span>
+                total quota per month</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-amber-500 shrink-0"></i> Up to 30 mins max per single video</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-amber-500 shrink-0"></i> Priority Processing</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-amber-500 shrink-0"></i> Instant .srt Download</li>
             </ul>
-            
-            <button onclick="startPayHere('creator_sub', 2500, 'Creator Monthly Subscription')" class="w-full py-4 rounded-xl border-2 border-amber-500 text-amber-400 font-bold hover:bg-amber-500 hover:text-white transition-colors uppercase tracking-widest text-xs">
+
+            <button onclick="startPayHere('creator_sub', 2500, 'Creator Monthly Subscription')"
+              class="w-full py-4 rounded-xl border-2 border-amber-500 text-amber-400 font-bold hover:bg-amber-500 hover:text-white transition-colors uppercase tracking-widest text-xs">
               Subscribe Now
             </button>
           </div>
 
           <!-- Pro Monthly -->
-          <div class="glass-card rounded-2xl p-8 border border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.15)] relative flex flex-col bg-gradient-to-b from-slate-800 to-slate-900/50 overflow-hidden transform md:-translate-y-4">
-            <div class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black px-8 py-1.5 rotate-45 translate-x-6 translate-y-3 shadow-lg uppercase tracking-widest">Pro Value</div>
-            
+          <div
+            class="glass-card rounded-2xl p-8 border border-emerald-500/50 shadow-[0_0_40px_rgba(16,185,129,0.15)] relative flex flex-col bg-gradient-to-b from-slate-800 to-slate-900/50 overflow-hidden transform md:-translate-y-4">
+            <div
+              class="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black px-8 py-1.5 rotate-45 translate-x-6 translate-y-3 shadow-lg uppercase tracking-widest">
+              Pro Value</div>
+
             <h3 class="text-2xl font-black text-white mb-2">Pro Monthly</h3>
             <div class="flex items-end gap-2 mb-6">
-              <span class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Rs. 5000</span>
+              <span
+                class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Rs.
+                5000</span>
               <span class="text-sm text-slate-400 mb-2 font-bold uppercase">/ month</span>
             </div>
-            
+
             <ul class="space-y-4 text-sm text-slate-300 mb-8 flex-1">
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 shrink-0"></i> <span class="font-bold text-white">300 Minutes</span> total quota per month</li>
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 shrink-0"></i> Up to 30 mins max per single video</li>
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 shrink-0"></i> Highest Priority Processing</li>
-              <li class="flex items-start gap-3"><i data-lucide="check-circle" class="w-5 h-5 text-emerald-500 shrink-0"></i> Instant .srt Download</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-emerald-500 shrink-0"></i> <span class="font-bold text-white">300 Minutes</span>
+                total quota per month</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-emerald-500 shrink-0"></i> Up to 30 mins max per single video</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-emerald-500 shrink-0"></i> Highest Priority Processing</li>
+              <li class="flex items-start gap-3"><i data-lucide="check-circle"
+                  class="w-5 h-5 text-emerald-500 shrink-0"></i> Instant .srt Download</li>
             </ul>
-            
-            <button onclick="startPayHere('pro_sub', 5000, 'Pro Monthly Subscription')" class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all uppercase tracking-widest text-xs">
+
+            <button onclick="startPayHere('pro_sub', 5000, 'Pro Monthly Subscription')"
+              class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all uppercase tracking-widest text-xs">
               Subscribe Now
             </button>
           </div>
         </div>
       </div>
-      
+
       <div class="mt-8 text-center text-xs text-slate-500">
-        All plans are subject to Fair Use Policy.<br/>
-        Need unlimited enterprise access? <a href="https://t.me/kaveesha_g" target="_blank" class="text-purple-400 hover:underline">Contact Admin</a>
+        All plans are subject to Fair Use Policy.<br />
+        Need unlimited enterprise access? <a href="https://t.me/kaveesha_g" target="_blank"
+          class="text-purple-400 hover:underline">Contact Admin</a>
       </div>
     </div>
   </div>
@@ -1822,7 +1919,7 @@
 
         // Finalize
         document.getElementById('scraperSrtProgressBar').style.width = '100%';
-        
+
         if (typeof window.saveToRecentProjects === 'function') {
           window.saveToRecentProjects({
             type: 'Script',
@@ -1959,8 +2056,8 @@
       try {
         const userEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
         const headers = { 'x-user-email': userEmail };
-        const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, { 
-          method: 'POST', 
+        const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, {
+          method: 'POST',
           body: formData,
           headers: headers
         });
@@ -2092,7 +2189,7 @@
             const mediaType = isAudioFormat ? 'Audio' : 'Video';
             const platformName = (type === 'fb' ? 'Facebook' : 'TikTok');
             const projectTitle = `${platformName} ${isAudioFormat ? 'Audio' : 'Video'}${data.filename ? ' (' + data.filename + ')' : ''}`;
-            
+
             window.saveToRecentProjects({
               type: mediaType,
               title: projectTitle,
@@ -2435,7 +2532,8 @@
     <div id="projectDetailContent"
       class="glass-panel w-full max-w-2xl rounded-3xl p-6 lg:p-8 border border-white/20 shadow-2xl bg-slate-900/95 max-h-[90vh] flex flex-col transform scale-95 transition-all duration-300">
       <!-- Modal Header -->
-      <div class="flex items-start sm:items-center justify-between pb-4 border-b border-white/10 mb-5 flex-shrink-0 gap-3">
+      <div
+        class="flex items-start sm:items-center justify-between pb-4 border-b border-white/10 mb-5 flex-shrink-0 gap-3">
         <div class="flex items-center gap-3 min-w-0 flex-1">
           <div id="projectModalIconBox"
             class="w-10 h-10 rounded-2xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 flex items-center justify-center shadow-lg flex-shrink-0">
@@ -2443,12 +2541,13 @@
           </div>
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              <h3 id="projectModalTitle"
-                class="text-base sm:text-lg font-bold text-white tracking-wide truncate">Project Title</h3>
+              <h3 id="projectModalTitle" class="text-base sm:text-lg font-bold text-white tracking-wide truncate">
+                Project Title</h3>
               <span id="projectModalTypeBadge"
                 class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 flex-shrink-0">IMAGE</span>
             </div>
-            <p id="projectModalDate" class="text-[10px] sm:text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 truncate">
+            <p id="projectModalDate"
+              class="text-[10px] sm:text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 truncate">
               <i data-lucide="clock" class="w-3 h-3 flex-shrink-0"></i> <span class="truncate">Just now</span>
             </p>
           </div>
@@ -2464,32 +2563,37 @@
         <!-- Media Preview Area (Images / Videos / Audios) -->
         <div id="projectModalMediaArea"
           class="hidden rounded-2xl overflow-hidden bg-black/50 border border-white/10 flex flex-col items-center justify-center p-3 relative">
-          
+
           <!-- Image Preview -->
           <img id="projectModalImage" src="" alt="Project Preview"
             class="hidden max-h-72 w-auto object-contain rounded-xl shadow-lg transition-transform">
-          
+
           <!-- Video Preview Box -->
           <div id="projectModalVideoBox" class="hidden w-full flex flex-col items-center">
             <video id="projectModalVideo" controls playsinline preload="metadata"
               class="max-h-72 w-full rounded-xl bg-black shadow-lg"></video>
             <div class="w-full flex items-center justify-between text-[11px] text-slate-400 mt-2 px-1">
-              <span class="flex items-center gap-1"><i data-lucide="film" class="w-3.5 h-3.5 text-indigo-400"></i> Video Stream Preview</span>
-              <a id="projectModalVideoDirectLink" href="#" target="_blank" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
+              <span class="flex items-center gap-1"><i data-lucide="film" class="w-3.5 h-3.5 text-indigo-400"></i> Video
+                Stream Preview</span>
+              <a id="projectModalVideoDirectLink" href="#" target="_blank"
+                class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-semibold">
                 <span>Direct Open</span> <i data-lucide="external-link" class="w-3 h-3"></i>
               </a>
             </div>
           </div>
 
           <!-- Audio Preview Box -->
-          <div id="projectModalAudioBox" class="hidden w-full p-4 flex flex-col items-center gap-3 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-black rounded-xl border border-emerald-500/20 shadow-inner">
+          <div id="projectModalAudioBox"
+            class="hidden w-full p-4 flex flex-col items-center gap-3 bg-gradient-to-r from-emerald-950/40 via-slate-900 to-black rounded-xl border border-emerald-500/20 shadow-inner">
             <div class="flex items-center gap-3 w-full">
-              <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
+              <div
+                class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-md">
                 <i data-lucide="headphones" class="w-6 h-6"></i>
               </div>
               <div class="flex-1 min-w-0">
                 <h4 id="projectModalAudioTitle" class="text-sm font-bold text-white truncate">Audio Track</h4>
-                <p id="projectModalAudioSub" class="text-[11px] text-emerald-300/80 font-mono">High Quality MP3 • Ready to Play</p>
+                <p id="projectModalAudioSub" class="text-[11px] text-emerald-300/80 font-mono">High Quality MP3 • Ready
+                  to Play</p>
               </div>
             </div>
             <audio id="projectModalAudio" controls class="w-full mt-1"></audio>
@@ -2499,7 +2603,8 @@
         <!-- Text / Script / Subtitle / Data Content Area -->
         <div id="projectModalTextArea" class="hidden">
           <div class="flex items-center justify-between mb-2">
-            <label id="projectModalTextLabel" class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Project Content</label>
+            <label id="projectModalTextLabel"
+              class="block text-xs font-bold text-gray-300 uppercase tracking-wider">Project Content</label>
             <div class="flex items-center gap-2">
               <span id="projectModalTextMeta" class="text-[11px] text-slate-400 font-mono"></span>
               <button onclick="window.copyProjectText()"
@@ -2529,7 +2634,8 @@
           </div>
           <div class="col-span-2 sm:col-span-1">
             <span class="text-slate-400 text-[10px] uppercase font-bold block">Format / Quality</span>
-            <span id="projectModalFormatText" class="text-slate-300 font-mono text-[11px] mt-0.5 block truncate">HD Quality</span>
+            <span id="projectModalFormatText" class="text-slate-300 font-mono text-[11px] mt-0.5 block truncate">HD
+              Quality</span>
           </div>
         </div>
       </div>
@@ -2555,170 +2661,170 @@
   </div>
 
   <script>
-          window.allProjects = [];
-          window.activeProjectFilter = 'all';
-          window.activeModalProject = null;
+    window.allProjects = [];
+    window.activeProjectFilter = 'all';
+    window.activeModalProject = null;
 
-          // Helper to format relative time nicely
-          function formatTimeAgo(dateStr) {
-            if (!dateStr) return 'Just now';
-            const diffMs = Date.now() - new Date(dateStr).getTime();
-            const diffMins = Math.floor(diffMs / 60000);
-            if (diffMins < 1) return 'Just now';
-            if (diffMins < 60) return `${diffMins}m ago`;
-            const diffHours = Math.floor(diffMins / 60);
-            if (diffHours < 24) return `${diffHours}h ago`;
-            return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    // Helper to format relative time nicely
+    function formatTimeAgo(dateStr) {
+      if (!dateStr) return 'Just now';
+      const diffMs = Date.now() - new Date(dateStr).getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      if (diffMins < 1) return 'Just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      const diffHours = Math.floor(diffMins / 60);
+      if (diffHours < 24) return `${diffHours}h ago`;
+      return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }
+
+    // Save project universally to fast-cache and SQLite DB
+    window.saveToRecentProjects = function (typeOrObj, title, metadata, fileId = null) {
+      let project = {};
+      if (typeof typeOrObj === 'object' && typeOrObj !== null) {
+        project = Object.assign({}, typeOrObj);
+      } else {
+        let metaStr = metadata;
+        if (fileId) {
+          metaStr = typeof metadata === 'object' ? JSON.stringify(metadata) : metadata;
+        }
+        project = {
+          type: typeOrObj,
+          title: title || 'Untitled Project',
+          metadata: metaStr || '',
+          media_url: typeof fileId === 'string' && (fileId.startsWith('http') || fileId.startsWith('/')) ? fileId : ''
+        };
+      }
+
+      // Always ensure valid user email with fallback
+      project.email = project.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+      project.date = project.date || new Date().toISOString();
+      if (!project.id) project.id = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4);
+
+      // 1. Instant Fast-Cache in localStorage
+      const cacheKey = 'capzone_projects_' + project.email;
+      let cached = [];
+      try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
+      cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && p.title === project.title && Math.abs(new Date(p.date || 0) - new Date(project.date || 0)) < 15000));
+      cached.unshift(project);
+      if (cached.length > 50) cached.pop();
+      localStorage.setItem(cacheKey, JSON.stringify(cached));
+      window.allProjects = cached;
+      window.renderRecentProjects();
+
+      // 2. Persist to Backend Server
+      try {
+        fetch(`${API_BASE_URL}/api/user-projects`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-email': project.email
+          },
+          body: JSON.stringify(project)
+        }).then(res => res.json()).then(data => {
+          if (data && data.success) {
+            project.id = data.id || project.id;
+            localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
           }
+        }).catch(err => console.warn('Sync project error:', err));
+      } catch (e) {
+        console.error('Save project error:', e);
+      }
+    };
 
-          // Save project universally to fast-cache and SQLite DB
-          window.saveToRecentProjects = function (typeOrObj, title, metadata, fileId = null) {
-            let project = {};
-            if (typeof typeOrObj === 'object' && typeOrObj !== null) {
-              project = Object.assign({}, typeOrObj);
-            } else {
-              let metaStr = metadata;
-              if (fileId) {
-                metaStr = typeof metadata === 'object' ? JSON.stringify(metadata) : metadata;
-              }
-              project = {
-                type: typeOrObj,
-                title: title || 'Untitled Project',
-                metadata: metaStr || '',
-                media_url: typeof fileId === 'string' && (fileId.startsWith('http') || fileId.startsWith('/')) ? fileId : ''
-              };
-            }
+    // Filter projects by category chip
+    window.filterProjects = function (category) {
+      window.activeProjectFilter = category;
+      document.querySelectorAll('.project-filter-btn').forEach(btn => {
+        if (btn.getAttribute('data-filter') === category) {
+          btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-md';
+        } else {
+          btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all';
+        }
+      });
+      window.renderRecentProjects();
+    };
 
-            // Always ensure valid user email with fallback
-            project.email = project.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
-            project.date = project.date || new Date().toISOString();
-            if (!project.id) project.id = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4);
-
-            // 1. Instant Fast-Cache in localStorage
-            const cacheKey = 'capzone_projects_' + project.email;
-            let cached = [];
-            try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
-            cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && p.title === project.title && Math.abs(new Date(p.date || 0) - new Date(project.date || 0)) < 15000));
-            cached.unshift(project);
-            if (cached.length > 50) cached.pop();
-            localStorage.setItem(cacheKey, JSON.stringify(cached));
+    // Load projects from fast-cache and backend server
+    window.loadAndRenderProjects = async function (forceRefresh = false) {
+      const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+      const cacheKey = 'capzone_projects_' + email;
+      if (!forceRefresh) {
+        try {
+          const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+          if (cached && cached.length > 0) {
             window.allProjects = cached;
             window.renderRecentProjects();
+          }
+        } catch (e) { }
+      }
 
-            // 2. Persist to Backend Server
-            try {
-              fetch(`${API_BASE_URL}/api/user-projects`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'x-user-email': project.email
-                },
-                body: JSON.stringify(project)
-              }).then(res => res.json()).then(data => {
-                if (data && data.success) {
-                  project.id = data.id || project.id;
-                  localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
-                }
-              }).catch(err => console.warn('Sync project error:', err));
-            } catch (e) {
-              console.error('Save project error:', e);
-            }
-          };
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(email), {
+          headers: { 'x-user-email': email }
+        });
+        if (res.ok) {
+          const serverProjects = await res.json();
+          const fetchedProjects = Array.isArray(serverProjects) ? serverProjects : (serverProjects.projects || []);
 
-          // Filter projects by category chip
-          window.filterProjects = function (category) {
-            window.activeProjectFilter = category;
-            document.querySelectorAll('.project-filter-btn').forEach(btn => {
-              if (btn.getAttribute('data-filter') === category) {
-                btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-md';
-              } else {
-                btn.className = 'project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all';
-              }
-            });
-            window.renderRecentProjects();
-          };
+          let localCached = [];
+          try { localCached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
 
-          // Load projects from fast-cache and backend server
-          window.loadAndRenderProjects = async function (forceRefresh = false) {
-            const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
-            const cacheKey = 'capzone_projects_' + email;
-            if (!forceRefresh) {
-              try {
-                const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
-                if (cached && cached.length > 0) {
-                  window.allProjects = cached;
-                  window.renderRecentProjects();
-                }
-              } catch (e) { }
-            }
+          const mergedMap = new Map();
+          localCached.forEach(p => mergedMap.set(p.id, p));
+          fetchedProjects.forEach(p => mergedMap.set(p.id, p));
 
-            try {
-              const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(email), {
-                headers: { 'x-user-email': email }
-              });
-              if (res.ok) {
-                const serverProjects = await res.json();
-                const fetchedProjects = Array.isArray(serverProjects) ? serverProjects : (serverProjects.projects || []);
-                
-                let localCached = [];
-                try { localCached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch(e) {}
-                
-                const mergedMap = new Map();
-                localCached.forEach(p => mergedMap.set(p.id, p));
-                fetchedProjects.forEach(p => mergedMap.set(p.id, p));
-                
-                window.allProjects = Array.from(mergedMap.values()).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-                
-                localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
-                window.renderRecentProjects();
-              }
-            } catch (e) {
-              console.warn('Could not fetch projects from server:', e);
-            }
-          };
+          window.allProjects = Array.from(mergedMap.values()).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
-          // Render projects list in sidebar with rich preview cards & action buttons
-          window.renderRecentProjects = function (listToRender) {
-            const container = document.getElementById('recentProjectsContainer');
-            if (!container) return;
+          localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+          window.renderRecentProjects();
+        }
+      } catch (e) {
+        console.warn('Could not fetch projects from server:', e);
+      }
+    };
 
-            const projects = listToRender || window.allProjects || [];
-            const badge = document.getElementById('projectCountBadge');
-            if (badge) badge.innerText = projects.length;
-            const dockBadge = document.getElementById('mobileDockBadge');
-            if (dockBadge) {
-              dockBadge.innerText = projects.length;
-              dockBadge.style.display = projects.length > 0 ? 'flex' : 'none';
-            }
+    // Render projects list in sidebar with rich preview cards & action buttons
+    window.renderRecentProjects = function (listToRender) {
+      const container = document.getElementById('recentProjectsContainer');
+      if (!container) return;
 
-            // Filter by active category
-            let filtered = projects;
-            if (window.activeProjectFilter && window.activeProjectFilter !== 'all') {
-              const cat = window.activeProjectFilter;
-              filtered = projects.filter(p => {
-                if (cat === 'Image') return p.type === 'Image' || p.type === 'Background';
-                if (cat === 'Video') return p.type === 'Video' && p.type !== 'Audio' && !(p.metadata && p.metadata.includes('MP3'));
-                if (cat === 'Audio') return p.type === 'Audio' || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio')));
-                if (cat === 'Subtitle') return p.type === 'Subtitle';
-                if (cat === 'Script') return p.type === 'Script';
-                return p.type === cat;
-              });
-            }
+      const projects = listToRender || window.allProjects || [];
+      const badge = document.getElementById('projectCountBadge');
+      if (badge) badge.innerText = projects.length;
+      const dockBadge = document.getElementById('mobileDockBadge');
+      if (dockBadge) {
+        dockBadge.innerText = projects.length;
+        dockBadge.style.display = projects.length > 0 ? 'flex' : 'none';
+      }
 
-            // Deduplicate consecutive or identical projects (by type + title)
-            const uniqueList = [];
-            const seenMap = new Map();
-            for (const p of filtered) {
-              const key = `${p.type || ''}_${(p.title || '').trim().toLowerCase()}`;
-              if (!seenMap.has(key)) {
-                seenMap.set(key, true);
-                uniqueList.push(p);
-              }
-            }
-            filtered = uniqueList;
+      // Filter by active category
+      let filtered = projects;
+      if (window.activeProjectFilter && window.activeProjectFilter !== 'all') {
+        const cat = window.activeProjectFilter;
+        filtered = projects.filter(p => {
+          if (cat === 'Image') return p.type === 'Image' || p.type === 'Background';
+          if (cat === 'Video') return p.type === 'Video' && p.type !== 'Audio' && !(p.metadata && p.metadata.includes('MP3'));
+          if (cat === 'Audio') return p.type === 'Audio' || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio')));
+          if (cat === 'Subtitle') return p.type === 'Subtitle';
+          if (cat === 'Script') return p.type === 'Script';
+          return p.type === cat;
+        });
+      }
 
-            if (!filtered || filtered.length === 0) {
-              container.innerHTML = `
+      // Deduplicate consecutive or identical projects (by type + title)
+      const uniqueList = [];
+      const seenMap = new Map();
+      for (const p of filtered) {
+        const key = `${p.type || ''}_${(p.title || '').trim().toLowerCase()}`;
+        if (!seenMap.has(key)) {
+          seenMap.set(key, true);
+          uniqueList.push(p);
+        }
+      }
+      filtered = uniqueList;
+
+      if (!filtered || filtered.length === 0) {
+        container.innerHTML = `
           <div class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
             <div class="w-14 h-14 bg-white/5 rounded-2xl flex items-center justify-center mb-3 border border-white/10 border-dashed">
               <i data-lucide="folder-open" class="w-7 h-7 text-indigo-400"></i>
@@ -2726,64 +2832,64 @@
             <p class="text-slate-300 text-sm font-semibold">No active projects</p>
             <p class="text-[11px] text-slate-500 mt-1 text-center">Generated media & scripts save here automatically.</p>
           </div>`;
-              if (window.lucide) window.lucide.createIcons();
-              return;
-            }
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
 
-            const icons = {
-              'Subtitle': 'subtitles',
-              'Script': 'file-text',
-              'Image': 'image',
-              'Video': 'video',
-              'Audio': 'headphones',
-              'Background': 'image-minus'
-            };
-            const colors = {
-              'Subtitle': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-              'Script': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-              'Image': 'bg-sky-500/20 text-sky-400 border-sky-500/30',
-              'Video': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-              'Audio': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-              'Background': 'bg-teal-500/20 text-teal-400 border-teal-500/30'
-            };
+      const icons = {
+        'Subtitle': 'subtitles',
+        'Script': 'file-text',
+        'Image': 'image',
+        'Video': 'video',
+        'Audio': 'headphones',
+        'Background': 'image-minus'
+      };
+      const colors = {
+        'Subtitle': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+        'Script': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+        'Image': 'bg-sky-500/20 text-sky-400 border-sky-500/30',
+        'Video': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        'Audio': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+        'Background': 'bg-teal-500/20 text-teal-400 border-teal-500/30'
+      };
 
-            let htmlOut = '';
-            filtered.forEach(p => {
-              const isAudio = p.type === 'Audio' || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio')));
-              const displayType = isAudio ? 'Audio' : (p.type || 'Media');
-              const icon = icons[displayType] || 'folder';
-              const colorClass = colors[displayType] || 'bg-slate-500/20 text-slate-300 border-slate-500/30';
-              const timeStr = formatTimeAgo(p.date);
-              const hasThumb = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+      let htmlOut = '';
+      filtered.forEach(p => {
+        const isAudio = p.type === 'Audio' || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio')));
+        const displayType = isAudio ? 'Audio' : (p.type || 'Media');
+        const icon = icons[displayType] || 'folder';
+        const colorClass = colors[displayType] || 'bg-slate-500/20 text-slate-300 border-slate-500/30';
+        const timeStr = formatTimeAgo(p.date);
+        const hasThumb = (p.type === 'Image' || p.type === 'Background') && p.media_url;
 
-              let thumbnailHtml = '';
-              if (hasThumb) {
-                thumbnailHtml = `
+        let thumbnailHtml = '';
+        if (hasThumb) {
+          thumbnailHtml = `
             <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/40 border border-white/15 flex-shrink-0 shadow-md relative flex items-center justify-center">
               <img src="${p.media_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'">
             </div>`;
-              } else if (displayType === 'Video' && p.media_url) {
-                thumbnailHtml = `
+        } else if (displayType === 'Video' && p.media_url) {
+          thumbnailHtml = `
             <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/60 border border-blue-500/30 flex-shrink-0 shadow-md relative flex items-center justify-center group">
               <video src="${p.media_url}" preload="metadata" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"></video>
               <i data-lucide="play" class="w-4 h-4 text-white absolute z-10 drop-shadow-lg"></i>
             </div>`;
-              } else {
-                thumbnailHtml = `
+        } else {
+          thumbnailHtml = `
             <div class="w-11 h-11 rounded-xl flex items-center justify-center shadow-md ${colorClass} border flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
               <i data-lucide="${icon}" class="w-5 h-5"></i>
             </div>`;
-              }
+        }
 
-              // Preview hint tag
-              let previewHint = '';
-              if (displayType === 'Video') previewHint = '<span class="text-[10px] text-blue-300 flex items-center gap-1 font-semibold"><i data-lucide="play" class="w-2.5 h-2.5"></i> Video</span>';
-              else if (displayType === 'Audio') previewHint = '<span class="text-[10px] text-emerald-300 flex items-center gap-1 font-semibold"><i data-lucide="music" class="w-2.5 h-2.5"></i> MP3</span>';
-              else if (displayType === 'Script') previewHint = '<span class="text-[10px] text-amber-300 flex items-center gap-1 font-semibold"><i data-lucide="file-text" class="w-2.5 h-2.5"></i> Script</span>';
-              else if (displayType === 'Subtitle') previewHint = '<span class="text-[10px] text-purple-300 flex items-center gap-1 font-semibold"><i data-lucide="subtitles" class="w-2.5 h-2.5"></i> SRT</span>';
-              else previewHint = '<span class="text-[10px] text-sky-300 flex items-center gap-1 font-semibold"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Image</span>';
+        // Preview hint tag
+        let previewHint = '';
+        if (displayType === 'Video') previewHint = '<span class="text-[10px] text-blue-300 flex items-center gap-1 font-semibold"><i data-lucide="play" class="w-2.5 h-2.5"></i> Video</span>';
+        else if (displayType === 'Audio') previewHint = '<span class="text-[10px] text-emerald-300 flex items-center gap-1 font-semibold"><i data-lucide="music" class="w-2.5 h-2.5"></i> MP3</span>';
+        else if (displayType === 'Script') previewHint = '<span class="text-[10px] text-amber-300 flex items-center gap-1 font-semibold"><i data-lucide="file-text" class="w-2.5 h-2.5"></i> Script</span>';
+        else if (displayType === 'Subtitle') previewHint = '<span class="text-[10px] text-purple-300 flex items-center gap-1 font-semibold"><i data-lucide="subtitles" class="w-2.5 h-2.5"></i> SRT</span>';
+        else previewHint = '<span class="text-[10px] text-sky-300 flex items-center gap-1 font-semibold"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Image</span>';
 
-              htmlOut += `
+        htmlOut += `
           <div class="project-3d-card w-full group relative p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/50 transition-all duration-200 backdrop-blur-md overflow-hidden cursor-pointer shadow-md hover:shadow-indigo-500/15 active:scale-[0.99] flex items-center justify-between gap-3 min-h-[66px]" onclick="window.openProjectDetailsModal('${p.id}')">
             <div class="flex items-center gap-3 min-w-0 flex-1">
               ${thumbnailHtml}
@@ -2810,440 +2916,440 @@
               </button>
             </div>
           </div>`;
-            });
+      });
 
-            container.innerHTML = htmlOut;
-            if (window.lucide) window.lucide.createIcons();
-          };
+      container.innerHTML = htmlOut;
+      if (window.lucide) window.lucide.createIcons();
+    };
 
-          // Switch between AI Studios and Projects History on Mobile
-          window.currentMobileView = 'studio';
-          window.switchMobileView = function (view) {
-            window.currentMobileView = view;
-            const aside = document.getElementById('projectsSidebar');
-            const studioArea = document.getElementById('studioMainArea');
-            const btnStudio = document.getElementById('mobileTabStudioBtn');
-            const btnProjects = document.getElementById('mobileTabProjectsBtn');
-            const dockStudio = document.getElementById('mobileDockStudio');
-            const dockProjects = document.getElementById('mobileDockProjects');
+    // Switch between AI Studios and Projects History on Mobile
+    window.currentMobileView = 'studio';
+    window.switchMobileView = function (view) {
+      window.currentMobileView = view;
+      const aside = document.getElementById('projectsSidebar');
+      const studioArea = document.getElementById('studioMainArea');
+      const btnStudio = document.getElementById('mobileTabStudioBtn');
+      const btnProjects = document.getElementById('mobileTabProjectsBtn');
+      const dockStudio = document.getElementById('mobileDockStudio');
+      const dockProjects = document.getElementById('mobileDockProjects');
 
-            if (view === 'projects') {
-              if (aside) {
-                aside.classList.remove('hidden');
-                aside.classList.add('block');
-              }
-              if (studioArea) {
-                studioArea.classList.add('hidden');
-                studioArea.classList.remove('flex');
-              }
-              if (btnProjects) {
-                btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
-              }
-              if (btnStudio) {
-                btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
-              }
-              if (dockProjects) {
-                dockProjects.classList.add('text-indigo-400');
-                dockProjects.classList.remove('text-gray-400');
-              }
-              if (dockStudio) {
-                dockStudio.classList.remove('text-indigo-400');
-                dockStudio.classList.add('text-gray-400');
-              }
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-              if (aside) {
-                aside.classList.add('hidden');
-                aside.classList.remove('block');
-              }
-              if (studioArea) {
-                studioArea.classList.remove('hidden');
-                studioArea.classList.add('flex');
-              }
-              if (btnStudio) {
-                btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
-              }
-              if (btnProjects) {
-                btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
-              }
-              if (dockStudio) {
-                dockStudio.classList.add('text-indigo-400');
-                dockStudio.classList.remove('text-gray-400');
-              }
-              if (dockProjects) {
-                dockProjects.classList.remove('text-indigo-400');
-                dockProjects.classList.add('text-gray-400');
-              }
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (view === 'projects') {
+        if (aside) {
+          aside.classList.remove('hidden');
+          aside.classList.add('block');
+        }
+        if (studioArea) {
+          studioArea.classList.add('hidden');
+          studioArea.classList.remove('flex');
+        }
+        if (btnProjects) {
+          btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
+        }
+        if (btnStudio) {
+          btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
+        }
+        if (dockProjects) {
+          dockProjects.classList.add('text-indigo-400');
+          dockProjects.classList.remove('text-gray-400');
+        }
+        if (dockStudio) {
+          dockStudio.classList.remove('text-indigo-400');
+          dockStudio.classList.add('text-gray-400');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        if (aside) {
+          aside.classList.add('hidden');
+          aside.classList.remove('block');
+        }
+        if (studioArea) {
+          studioArea.classList.remove('hidden');
+          studioArea.classList.add('flex');
+        }
+        if (btnStudio) {
+          btnStudio.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_20px_rgba(99,102,241,0.5)] active:scale-95";
+        }
+        if (btnProjects) {
+          btnProjects.className = "py-3 px-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 text-gray-300 hover:text-white hover:bg-white/5 active:scale-95";
+        }
+        if (dockStudio) {
+          dockStudio.classList.add('text-indigo-400');
+          dockStudio.classList.remove('text-gray-400');
+        }
+        if (dockProjects) {
+          dockProjects.classList.remove('text-indigo-400');
+          dockProjects.classList.add('text-gray-400');
+        }
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      if (window.lucide) lucide.createIcons();
+    };
+
+    // Open Project Details & Studio Modal with Rich Previews
+    window.openProjectDetailsModal = function (projectId) {
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      if (!p) return;
+      window.activeModalProject = p;
+
+      const modal = document.getElementById('projectDetailModal');
+      const content = document.getElementById('projectDetailContent');
+      if (!modal || !content) return;
+
+      const isAudio = (p.type === 'Audio') || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio'))) || (p.media_url && p.media_url.endsWith('.mp3'));
+      const displayType = isAudio ? 'AUDIO' : (p.type || 'PROJECT').toUpperCase();
+
+      document.getElementById('projectModalTitle').innerText = p.title || 'Untitled Project';
+      document.getElementById('projectModalTypeBadge').innerText = displayType;
+      document.getElementById('projectModalDate').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> ${new Date(p.date || Date.now()).toLocaleString()}`;
+
+      const formatEl = document.getElementById('projectModalFormatText');
+      if (formatEl) formatEl.innerText = p.metadata || (isAudio ? 'MP3 Audio' : 'HD Processed');
+
+      // Handle preview areas
+      const mediaArea = document.getElementById('projectModalMediaArea');
+      const imgEl = document.getElementById('projectModalImage');
+      const vidBox = document.getElementById('projectModalVideoBox');
+      const vidEl = document.getElementById('projectModalVideo');
+      const directLink = document.getElementById('projectModalVideoDirectLink');
+      const audBox = document.getElementById('projectModalAudioBox');
+      const audEl = document.getElementById('projectModalAudio');
+      const audTitle = document.getElementById('projectModalAudioTitle');
+      const textArea = document.getElementById('projectModalTextArea');
+      const textContent = document.getElementById('projectModalTextContent');
+      const textLabel = document.getElementById('projectModalTextLabel');
+      const textMeta = document.getElementById('projectModalTextMeta');
+
+      if (mediaArea) mediaArea.classList.add('hidden');
+      if (imgEl) imgEl.classList.add('hidden');
+      if (vidBox) vidBox.classList.add('hidden');
+      if (audBox) audBox.classList.add('hidden');
+      if (textArea) textArea.classList.add('hidden');
+
+      const isImage = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+      const isVideo = (p.type === 'Video') && p.media_url && !isAudio;
+
+      if (isImage && imgEl && mediaArea) {
+        imgEl.src = p.media_url;
+        imgEl.classList.remove('hidden');
+        mediaArea.classList.remove('hidden');
+      } else if (isAudio && audBox && audEl && mediaArea) {
+        audEl.src = p.media_url;
+        if (audTitle) audTitle.innerText = p.title || 'Audio Recording';
+        audBox.classList.remove('hidden');
+        mediaArea.classList.remove('hidden');
+      } else if (isVideo && vidBox && vidEl && mediaArea) {
+        vidEl.src = p.media_url;
+        if (directLink) directLink.href = p.media_url;
+        vidBox.classList.remove('hidden');
+        mediaArea.classList.remove('hidden');
+      }
+
+      // Format readable text for scripts or subtitles
+      let readableText = '';
+      let parsedPayload = null;
+      if (p.payload) {
+        try { parsedPayload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+      }
+
+      if (parsedPayload && parsedPayload.scriptText) {
+        readableText = parsedPayload.scriptText;
+        if (textLabel) textLabel.innerText = 'AI Generated Script (Sinhala)';
+        if (textMeta) textMeta.innerText = `${readableText.length} characters`;
+      } else if (parsedPayload && parsedPayload.srt) {
+        readableText = parsedPayload.srt;
+        if (textLabel) textLabel.innerText = 'Subtitles Content (.SRT)';
+        const linesCount = readableText.split('\n').filter(l => l.trim()).length;
+        if (textMeta) textMeta.innerText = `${linesCount} lines`;
+      } else if (parsedPayload && parsedPayload.data) {
+        readableText = JSON.stringify(parsedPayload.data, null, 2);
+        if (textLabel) textLabel.innerText = 'Project Data';
+      } else if (p.metadata && p.metadata !== 'Processed successfully' && !p.metadata.includes('MP3') && !p.metadata.includes('MP4')) {
+        readableText = p.metadata;
+        if (textLabel) textLabel.innerText = 'Project Details';
+      }
+
+      if (readableText && textContent && textArea) {
+        textContent.innerText = readableText;
+        textArea.classList.remove('hidden');
+      }
+
+      modal.style.display = 'flex';
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+        if (window.lucide) window.lucide.createIcons();
+      }, 10);
+    };
+
+    window.closeProjectDetailModal = function () {
+      const modal = document.getElementById('projectDetailModal');
+      const content = document.getElementById('projectDetailContent');
+      if (!modal || !content) return;
+
+      modal.classList.add('opacity-0');
+      content.classList.remove('scale-100');
+      content.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+        modal.style.display = 'none';
+        document.body.classList.remove('overflow-hidden');
+
+        // Pause audio/video cleanly
+        const vidEl = document.getElementById('projectModalVideo');
+        if (vidEl) { vidEl.pause(); vidEl.removeAttribute('src'); vidEl.load(); }
+        const audEl = document.getElementById('projectModalAudio');
+        if (audEl) { audEl.pause(); audEl.removeAttribute('src'); audEl.load(); }
+      }, 250);
+    };
+
+    // Re-Edit Project in its corresponding Studio
+    window.reEditActiveProject = function () {
+      if (!window.activeModalProject) return;
+      window.reEditProject(window.activeModalProject.id);
+    };
+
+    window.reEditProject = function (projectId) {
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      if (!p) return;
+
+      window.closeProjectDetailModal();
+      let payload = null;
+      if (p.payload) {
+        try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+      }
+
+      if (p.type === 'Script') {
+        if (typeof openModal === 'function') openModal('scraperSrtModal');
+        const topicInp = document.getElementById('scriptTopic');
+        const previewEl = document.getElementById('scriptOutputPreview');
+        if (topicInp) topicInp.value = (payload && payload.topic) ? payload.topic : p.title;
+        if (previewEl && payload && payload.scriptText) {
+          previewEl.value = payload.scriptText;
+          const resArea = document.getElementById('scraperSrtResultArea');
+          if (resArea) resArea.style.display = 'block';
+        }
+        if (typeof showPopup === 'function') showPopup('Script එක AI Writer වෙත යවන ලදී!', 'Script Active', 'success');
+      } else if (p.type === 'Subtitle') {
+        if (typeof openModal === 'function') openModal('srtModal');
+        if (payload && payload.srt) {
+          const blob = new Blob([payload.srt], { type: 'text/plain' });
+          const dlLink = document.getElementById('srtDownloadLink');
+          if (dlLink) {
+            dlLink.href = URL.createObjectURL(blob);
+            dlLink.download = `${p.title || 'subtitles'}.srt`;
+          }
+          const resArea = document.getElementById('srtResultArea');
+          if (resArea) resArea.style.display = 'block';
+        }
+        if (typeof showPopup === 'function') showPopup('Subtitles සාර්ථකව Copy කළා!', 'Copied', 'success');
+      } else if (p.type === 'Image' || p.type === 'Background') {
+        if (typeof openModal === 'function') openModal('bgRemoverModal');
+        if (typeof showPopup === 'function') showPopup('Background Remover Studio එක ක්‍රියාත්මකයි!', 'Studio Active', 'success');
+      } else if (p.type === 'Video' || p.type === 'Audio') {
+        if (payload && payload.type === 'tiktok') {
+          if (typeof openModal === 'function') openModal('tiktokModal');
+          if (payload.url && document.getElementById('tiktokUrlInput')) document.getElementById('tiktokUrlInput').value = payload.url;
+        } else {
+          if (typeof openModal === 'function') openModal('fbModal');
+          if (payload && payload.url && document.getElementById('fbUrlInput')) document.getElementById('fbUrlInput').value = payload.url;
+        }
+        if (typeof showPopup === 'function') showPopup('Media Downloader Studio ක්‍රියාත්මකයි!', 'Studio Active', 'success');
+      }
+    };
+
+    // Download Active Project Media
+    window.downloadActiveProjectMedia = function () {
+      if (!window.activeModalProject) return;
+      window.downloadProjectMedia(window.activeModalProject.id);
+    };
+
+    window.downloadProjectMedia = function (projectId) {
+      const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+      if (!p) return;
+
+      let payload = null;
+      if (p.payload) {
+        try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
+      }
+
+      if (p.media_url) {
+        const a = document.createElement('a');
+        a.href = p.media_url;
+        a.download = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else if (payload && payload.scriptText) {
+        const blob = new Blob([payload.scriptText], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else if (payload && payload.srt) {
+        const blob = new Blob([payload.srt], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `${(p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_')}.srt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } else {
+        if (typeof showPopup === 'function') showPopup('බාගත කිරීමට File එකක් නොමැත.', 'තොරතුරු', 'info');
+      }
+    };
+
+    // Delete User Project
+    window.deleteActiveProjectModal = function () {
+      if (!window.activeModalProject) return;
+      window.deleteUserProject(window.activeModalProject.id);
+    };
+
+    window.deleteUserProject = function (projectId) {
+      const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+      window.customConfirm('මෙම Project එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍ය බව තහවුරු කරන්න.', () => {
+        const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
+        window.allProjects = (window.allProjects || []).filter(item => String(item.id) !== String(projectId));
+
+        const cacheKey = 'capzone_projects_' + email;
+        localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+        window.renderRecentProjects();
+        window.closeProjectDetailModal();
+
+        try {
+          fetch(`${API_BASE_URL}/api/user-projects`, {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-email': email
+            },
+            body: JSON.stringify({ id: projectId, email: email })
+          }).catch(e => console.warn('Could not delete project from cloud DB:', e));
+        } catch (e) { }
+
+        if (typeof showPopup === 'function') showPopup('Project එක සාර්ථකව ඉවත් කරන ලදී!', 'Project Deleted', 'success');
+      });
+    };
+
+    window.copyProjectText = function () {
+      const textEl = document.getElementById('projectModalTextContent');
+      if (!textEl || !textEl.innerText) return;
+      navigator.clipboard.writeText(textEl.innerText).then(() => {
+        if (typeof showPopup === 'function') showPopup('Content එක සාර්ථකව Copy විය!', 'Copied', 'success');
+      });
+    };
+
+    window.toggleApi = function (type) {
+      if (type === 'own') {
+        const existingKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
+        if (!existingKey) {
+          // If private key is not entered: guide user directly to the private key input
+          if (typeof showPopup === 'function') {
+            showPopup('\u0D94\u0DB6 \u0DAD\u0DC0\u0DB8 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB \u0DB1\u0DDC\u0DB8\u0DD0\u0DAD. \u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0D94\u0DB6\u0DDA Private Key \u0D91\u0D9A \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', 'Private Key \u0D85\u0DC0\u0DC1\u0DDF\u0DBA\u0DD2', 'info');
+          }
+          if (typeof showApiModal === 'function') {
+            showApiModal();
+            if (typeof selectApiOption === 'function') {
+              selectApiOption('own');
             }
-            if (window.lucide) lucide.createIcons();
-          };
-
-          // Open Project Details & Studio Modal with Rich Previews
-          window.openProjectDetailsModal = function (projectId) {
-            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
-            if (!p) return;
-            window.activeModalProject = p;
-
-            const modal = document.getElementById('projectDetailModal');
-            const content = document.getElementById('projectDetailContent');
-            if (!modal || !content) return;
-
-            const isAudio = (p.type === 'Audio') || (p.metadata && (p.metadata.includes('MP3') || p.metadata.includes('Audio'))) || (p.media_url && p.media_url.endsWith('.mp3'));
-            const displayType = isAudio ? 'AUDIO' : (p.type || 'PROJECT').toUpperCase();
-
-            document.getElementById('projectModalTitle').innerText = p.title || 'Untitled Project';
-            document.getElementById('projectModalTypeBadge').innerText = displayType;
-            document.getElementById('projectModalDate').innerHTML = `<i data-lucide="clock" class="w-3 h-3"></i> ${new Date(p.date || Date.now()).toLocaleString()}`;
-
-            const formatEl = document.getElementById('projectModalFormatText');
-            if (formatEl) formatEl.innerText = p.metadata || (isAudio ? 'MP3 Audio' : 'HD Processed');
-
-            // Handle preview areas
-            const mediaArea = document.getElementById('projectModalMediaArea');
-            const imgEl = document.getElementById('projectModalImage');
-            const vidBox = document.getElementById('projectModalVideoBox');
-            const vidEl = document.getElementById('projectModalVideo');
-            const directLink = document.getElementById('projectModalVideoDirectLink');
-            const audBox = document.getElementById('projectModalAudioBox');
-            const audEl = document.getElementById('projectModalAudio');
-            const audTitle = document.getElementById('projectModalAudioTitle');
-            const textArea = document.getElementById('projectModalTextArea');
-            const textContent = document.getElementById('projectModalTextContent');
-            const textLabel = document.getElementById('projectModalTextLabel');
-            const textMeta = document.getElementById('projectModalTextMeta');
-
-            if (mediaArea) mediaArea.classList.add('hidden');
-            if (imgEl) imgEl.classList.add('hidden');
-            if (vidBox) vidBox.classList.add('hidden');
-            if (audBox) audBox.classList.add('hidden');
-            if (textArea) textArea.classList.add('hidden');
-
-            const isImage = (p.type === 'Image' || p.type === 'Background') && p.media_url;
-            const isVideo = (p.type === 'Video') && p.media_url && !isAudio;
-
-            if (isImage && imgEl && mediaArea) {
-              imgEl.src = p.media_url;
-              imgEl.classList.remove('hidden');
-              mediaArea.classList.remove('hidden');
-            } else if (isAudio && audBox && audEl && mediaArea) {
-              audEl.src = p.media_url;
-              if (audTitle) audTitle.innerText = p.title || 'Audio Recording';
-              audBox.classList.remove('hidden');
-              mediaArea.classList.remove('hidden');
-            } else if (isVideo && vidBox && vidEl && mediaArea) {
-              vidEl.src = p.media_url;
-              if (directLink) directLink.href = p.media_url;
-              vidBox.classList.remove('hidden');
-              mediaArea.classList.remove('hidden');
-            }
-
-            // Format readable text for scripts or subtitles
-            let readableText = '';
-            let parsedPayload = null;
-            if (p.payload) {
-              try { parsedPayload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
-            }
-
-            if (parsedPayload && parsedPayload.scriptText) {
-              readableText = parsedPayload.scriptText;
-              if (textLabel) textLabel.innerText = 'AI Generated Script (Sinhala)';
-              if (textMeta) textMeta.innerText = `${readableText.length} characters`;
-            } else if (parsedPayload && parsedPayload.srt) {
-              readableText = parsedPayload.srt;
-              if (textLabel) textLabel.innerText = 'Subtitles Content (.SRT)';
-              const linesCount = readableText.split('\n').filter(l => l.trim()).length;
-              if (textMeta) textMeta.innerText = `${linesCount} lines`;
-            } else if (parsedPayload && parsedPayload.data) {
-              readableText = JSON.stringify(parsedPayload.data, null, 2);
-              if (textLabel) textLabel.innerText = 'Project Data';
-            } else if (p.metadata && p.metadata !== 'Processed successfully' && !p.metadata.includes('MP3') && !p.metadata.includes('MP4')) {
-              readableText = p.metadata;
-              if (textLabel) textLabel.innerText = 'Project Details';
-            }
-
-            if (readableText && textContent && textArea) {
-              textContent.innerText = readableText;
-              textArea.classList.remove('hidden');
-            }
-
-            modal.style.display = 'flex';
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            document.body.classList.add('overflow-hidden');
             setTimeout(() => {
-              modal.classList.remove('opacity-0');
-              content.classList.remove('scale-95');
-              content.classList.add('scale-100');
-              if (window.lucide) window.lucide.createIcons();
-            }, 10);
-          };
-
-          window.closeProjectDetailModal = function () {
-            const modal = document.getElementById('projectDetailModal');
-            const content = document.getElementById('projectDetailContent');
-            if (!modal || !content) return;
-
-            modal.classList.add('opacity-0');
-            content.classList.remove('scale-100');
-            content.classList.add('scale-95');
-            setTimeout(() => {
-              modal.classList.remove('flex');
-              modal.classList.add('hidden');
-              modal.style.display = 'none';
-              document.body.classList.remove('overflow-hidden');
-              
-              // Pause audio/video cleanly
-              const vidEl = document.getElementById('projectModalVideo');
-              if (vidEl) { vidEl.pause(); vidEl.removeAttribute('src'); vidEl.load(); }
-              const audEl = document.getElementById('projectModalAudio');
-              if (audEl) { audEl.pause(); audEl.removeAttribute('src'); audEl.load(); }
-            }, 250);
-          };
-
-          // Re-Edit Project in its corresponding Studio
-          window.reEditActiveProject = function () {
-            if (!window.activeModalProject) return;
-            window.reEditProject(window.activeModalProject.id);
-          };
-
-          window.reEditProject = function (projectId) {
-            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
-            if (!p) return;
-
-            window.closeProjectDetailModal();
-            let payload = null;
-            if (p.payload) {
-              try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
-            }
-
-            if (p.type === 'Script') {
-              if (typeof openModal === 'function') openModal('scraperSrtModal');
-              const topicInp = document.getElementById('scriptTopic');
-              const previewEl = document.getElementById('scriptOutputPreview');
-              if (topicInp) topicInp.value = (payload && payload.topic) ? payload.topic : p.title;
-              if (previewEl && payload && payload.scriptText) {
-                previewEl.value = payload.scriptText;
-                const resArea = document.getElementById('scraperSrtResultArea');
-                if (resArea) resArea.style.display = 'block';
+              const keyInput = document.getElementById('geminiApiKeyInput');
+              if (keyInput) {
+                keyInput.focus();
+                keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
               }
-              if (typeof showPopup === 'function') showPopup('Script එක AI Writer වෙත යවන ලදී!', 'Script Active', 'success');
-            } else if (p.type === 'Subtitle') {
-              if (typeof openModal === 'function') openModal('srtModal');
-              if (payload && payload.srt) {
-                const blob = new Blob([payload.srt], { type: 'text/plain' });
-                const dlLink = document.getElementById('srtDownloadLink');
-                if (dlLink) {
-                  dlLink.href = URL.createObjectURL(blob);
-                  dlLink.download = `${p.title || 'subtitles'}.srt`;
-                }
-                const resArea = document.getElementById('srtResultArea');
-                if (resArea) resArea.style.display = 'block';
-              }
-              if (typeof showPopup === 'function') showPopup('Subtitles සාර්ථකව Copy කළා!', 'Copied', 'success');
-            } else if (p.type === 'Image' || p.type === 'Background') {
-              if (typeof openModal === 'function') openModal('bgRemoverModal');
-              if (typeof showPopup === 'function') showPopup('Background Remover Studio එක ක්‍රියාත්මකයි!', 'Studio Active', 'success');
-            } else if (p.type === 'Video' || p.type === 'Audio') {
-              if (payload && payload.type === 'tiktok') {
-                if (typeof openModal === 'function') openModal('tiktokModal');
-                if (payload.url && document.getElementById('tiktokUrlInput')) document.getElementById('tiktokUrlInput').value = payload.url;
-              } else {
-                if (typeof openModal === 'function') openModal('fbModal');
-                if (payload && payload.url && document.getElementById('fbUrlInput')) document.getElementById('fbUrlInput').value = payload.url;
-              }
-              if (typeof showPopup === 'function') showPopup('Media Downloader Studio ක්‍රියාත්මකයි!', 'Studio Active', 'success');
-            }
-          };
+            }, 200);
+          }
+          return;
+        } else {
+          // Private key already entered: auto-switch smoothly!
+          localStorage.setItem('capzone_api_type', 'own');
+          updateApiToggleUI();
+          if (typeof showPopup === 'function') {
+            showPopup('Private Key \u0D91\u0D9A \u0DC4\u0DB3\u0DD4\u0DB1\u0DCF\u0D9C\u0DD0\u0DB1\u0DD2\u0DAB\u0DD2. \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 Custom API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+          }
+          return;
+        }
+      }
 
-          // Download Active Project Media
-          window.downloadActiveProjectMedia = function () {
-            if (!window.activeModalProject) return;
-            window.downloadProjectMedia(window.activeModalProject.id);
-          };
+      // Switch to Server Cloud API
+      localStorage.setItem('capzone_api_type', 'server');
+      updateApiToggleUI();
+      if (typeof showPopup === 'function') {
+        showPopup('KaveezCloud Server Cloud API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
+      }
+    };
 
-          window.downloadProjectMedia = function (projectId) {
-            const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
-            if (!p) return;
+    window.updateApiToggleUI = function () {
+      const currentType = localStorage.getItem('capzone_api_type') || 'server';
+      const isServer = currentType === 'server';
 
-            let payload = null;
-            if (p.payload) {
-              try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
-            }
+      // Desktop Toggle
+      const btnServer = document.getElementById('btnApiServer');
+      const btnOwn = document.getElementById('btnApiOwn');
+      if (btnServer && btnOwn) {
+        if (isServer) {
+          btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+          btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+        } else {
+          btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+          btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+        }
+      }
 
-            if (p.media_url) {
-              const a = document.createElement('a');
-              a.href = p.media_url;
-              a.download = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            } else if (payload && payload.scriptText) {
-              const blob = new Blob([payload.scriptText], { type: 'text/plain' });
-              const a = document.createElement('a');
-              a.href = URL.createObjectURL(blob);
-              a.download = `${(p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            } else if (payload && payload.srt) {
-              const blob = new Blob([payload.srt], { type: 'text/plain' });
-              const a = document.createElement('a');
-              a.href = URL.createObjectURL(blob);
-              a.download = `${(p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_')}.srt`;
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-            } else {
-              if (typeof showPopup === 'function') showPopup('බාගත කිරීමට File එකක් නොමැත.', 'තොරතුරු', 'info');
-            }
-          };
+      // Mobile Toggle & Badge
+      const btnServerMob = document.getElementById('btnApiServerMobile');
+      const btnOwnMob = document.getElementById('btnApiOwnMobile');
+      const statusBadge = document.getElementById('mobileApiStatusBadge');
+      if (btnServerMob && btnOwnMob) {
+        if (isServer) {
+          btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
+          btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+          if (statusBadge) {
+            statusBadge.innerText = "Cloud Active";
+            statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
+          }
+        } else {
+          btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
+          btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
+          if (statusBadge) {
+            statusBadge.innerText = "Custom Active";
+            statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
+          }
+        }
+      }
+    };
 
-          // Delete User Project
-          window.deleteActiveProjectModal = function () {
-            if (!window.activeModalProject) return;
-            window.deleteUserProject(window.activeModalProject.id);
-          };
-
-          window.deleteUserProject = function (projectId) {
-            const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
-            window.customConfirm('මෙම Project එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍ය බව තහවුරු කරන්න.', () => {
-              const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
-              window.allProjects = (window.allProjects || []).filter(item => String(item.id) !== String(projectId));
-
-              const cacheKey = 'capzone_projects_' + email;
-              localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
-              window.renderRecentProjects();
-              window.closeProjectDetailModal();
-
-              try {
-                fetch(`${API_BASE_URL}/api/user-projects`, {
-                  method: 'DELETE',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'x-user-email': email
-                  },
-                  body: JSON.stringify({ id: projectId, email: email })
-                }).catch(e => console.warn('Could not delete project from cloud DB:', e));
-              } catch (e) { }
-
-              if (typeof showPopup === 'function') showPopup('Project එක සාර්ථකව ඉවත් කරන ලදී!', 'Project Deleted', 'success');
-            });
-          };
-
-          window.copyProjectText = function () {
-            const textEl = document.getElementById('projectModalTextContent');
-            if (!textEl || !textEl.innerText) return;
-            navigator.clipboard.writeText(textEl.innerText).then(() => {
-              if (typeof showPopup === 'function') showPopup('Content එක සාර්ථකව Copy විය!', 'Copied', 'success');
-            });
-          };
-
-          window.toggleApi = function (type) {
-            if (type === 'own') {
-              const existingKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
-              if (!existingKey) {
-                // If private key is not entered: guide user directly to the private key input
-                if (typeof showPopup === 'function') {
-                  showPopup('\u0D94\u0DB6 \u0DAD\u0DC0\u0DB8 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB \u0DB1\u0DDC\u0DB8\u0DD0\u0DAD. \u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0D94\u0DB6\u0DDA Private Key \u0D91\u0D9A \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', 'Private Key \u0D85\u0DC0\u0DC1\u0DDF\u0DBA\u0DD2', 'info');
-                }
-                if (typeof showApiModal === 'function') {
-                  showApiModal();
-                  if (typeof selectApiOption === 'function') {
-                    selectApiOption('own');
-                  }
-                  setTimeout(() => {
-                    const keyInput = document.getElementById('geminiApiKeyInput');
-                    if (keyInput) {
-                      keyInput.focus();
-                      keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                  }, 200);
-                }
-                return;
-              } else {
-                // Private key already entered: auto-switch smoothly!
-                localStorage.setItem('capzone_api_type', 'own');
-                updateApiToggleUI();
-                if (typeof showPopup === 'function') {
-                  showPopup('Private Key \u0D91\u0D9A \u0DC4\u0DB3\u0DD4\u0DB1\u0DCF\u0D9C\u0DD0\u0DB1\u0DD2\u0DAB\u0DD2. \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 Custom API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
-                }
-                return;
-              }
-            }
-
-            // Switch to Server Cloud API
-            localStorage.setItem('capzone_api_type', 'server');
-            updateApiToggleUI();
-            if (typeof showPopup === 'function') {
-              showPopup('KaveezCloud Server Cloud API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
-            }
-          };
-
-          window.updateApiToggleUI = function () {
-            const currentType = localStorage.getItem('capzone_api_type') || 'server';
-            const isServer = currentType === 'server';
-
-            // Desktop Toggle
-            const btnServer = document.getElementById('btnApiServer');
-            const btnOwn = document.getElementById('btnApiOwn');
-            if (btnServer && btnOwn) {
-              if (isServer) {
-                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-              } else {
-                btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-                btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-              }
-            }
-
-            // Mobile Toggle & Badge
-            const btnServerMob = document.getElementById('btnApiServerMobile');
-            const btnOwnMob = document.getElementById('btnApiOwnMobile');
-            const statusBadge = document.getElementById('mobileApiStatusBadge');
-            if (btnServerMob && btnOwnMob) {
-              if (isServer) {
-                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-                if (statusBadge) {
-                  statusBadge.innerText = "Cloud Active";
-                  statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
-                }
-              } else {
-                btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-                btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-                if (statusBadge) {
-                  statusBadge.innerText = "Custom Active";
-                  statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
-                }
-              }
-            }
-          };
-
-          document.addEventListener('DOMContentLoaded', () => {
-            updateApiToggleUI();
-            const currentEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
-            const storageKey = 'capzone_projects_' + currentEmail;
-            if (!localStorage.getItem(storageKey)) {
-              const testList = [
-                { id: 101, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
-                { id: 102, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
-                { id: 103, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
-                { id: 104, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
-                { id: 105, type: 'Subtitle', title: 'Generated Media', date: new Date(Date.now() - 3600000).toISOString() },
-                { id: 106, type: 'Subtitle', title: 'IMG_0190.MOV', date: new Date(Date.now() - 3600000).toISOString() }
-              ];
-              localStorage.setItem(storageKey, JSON.stringify(testList));
-            }
-            if (typeof window.loadAndRenderProjects === 'function') {
-              window.loadAndRenderProjects();
-            }
-            setInterval(() => {
-              if (window.currentUserEmail && typeof window.loadAndRenderProjects === 'function') {
-                window.loadAndRenderProjects();
-              }
-            }, 15000);
-          });
+    document.addEventListener('DOMContentLoaded', () => {
+      updateApiToggleUI();
+      const currentEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+      const storageKey = 'capzone_projects_' + currentEmail;
+      if (!localStorage.getItem(storageKey)) {
+        const testList = [
+          { id: 101, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 102, type: 'Social', title: 'CapZone kiayana subtiitel...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 103, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 104, type: 'Social', title: 'CapZone eka gena market...', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 105, type: 'Subtitle', title: 'Generated Media', date: new Date(Date.now() - 3600000).toISOString() },
+          { id: 106, type: 'Subtitle', title: 'IMG_0190.MOV', date: new Date(Date.now() - 3600000).toISOString() }
+        ];
+        localStorage.setItem(storageKey, JSON.stringify(testList));
+      }
+      if (typeof window.loadAndRenderProjects === 'function') {
+        window.loadAndRenderProjects();
+      }
+      setInterval(() => {
+        if (window.currentUserEmail && typeof window.loadAndRenderProjects === 'function') {
+          window.loadAndRenderProjects();
+        }
+      }, 15000);
+    });
   </script>
 
   <!-- Ultra-Modern Mobile Glass Bottom Dock (CapZone iOS/Android App Style) -->
@@ -3260,7 +3366,8 @@
         <i data-lucide="folder-kanban" class="w-5 h-5"></i>
         <span class="text-[10px] font-bold tracking-wide">Projects</span>
         <span id="mobileDockBadge"
-          class="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-neutral-950 shadow-lg" style="display: none;">0</span>
+          class="absolute top-0.5 right-1 min-w-[16px] h-4 px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border-2 border-neutral-950 shadow-lg"
+          style="display: none;">0</span>
       </button>
       <button
         onclick="document.getElementById('mobileMenuOverlay').classList.remove('hidden'); document.getElementById('mobileMenuOverlay').classList.add('flex'); if(window.lucide) lucide.createIcons();"
@@ -3383,19 +3490,25 @@
   <!-- CUSTOM ALERT/CONFIRM MODAL -->
   <div id="customDialogModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4">
     <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0" id="customDialogBackdrop"></div>
-    
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity duration-300 opacity-0"
+      id="customDialogBackdrop"></div>
+
     <!-- Modal Content -->
-    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform scale-95 opacity-0 transition-all duration-300 shadow-2xl border border-white/20 flex flex-col items-center text-center" id="customDialogContent">
-      <div id="customDialogIcon" class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center mb-4 shadow-lg shadow-amber-500/30">
+    <div
+      class="glass-card w-full max-w-sm rounded-3xl p-6 relative transform scale-95 opacity-0 transition-all duration-300 shadow-2xl border border-white/20 flex flex-col items-center text-center"
+      id="customDialogContent">
+      <div id="customDialogIcon"
+        class="w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center mb-4 shadow-lg shadow-amber-500/30">
         <i data-lucide="alert-triangle" class="w-8 h-8 text-white"></i>
       </div>
       <h3 class="text-xl font-bold text-white mb-2" id="customDialogTitle">Confirm</h3>
       <p class="text-sm text-gray-300 mb-6 font-medium" id="customDialogMessage"></p>
-      
+
       <div class="flex gap-3 w-full" id="customDialogButtons">
-        <button id="customDialogCancelBtn" class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors hidden">Cancel</button>
-        <button id="customDialogConfirmBtn" class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold shadow-lg transition-colors">Confirm</button>
+        <button id="customDialogCancelBtn"
+          class="flex-1 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors hidden">Cancel</button>
+        <button id="customDialogConfirmBtn"
+          class="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-bold shadow-lg transition-colors">Confirm</button>
       </div>
     </div>
   </div>
@@ -3443,7 +3556,7 @@
       const modal = document.getElementById('customDialogModal');
       const backdrop = document.getElementById('customDialogBackdrop');
       const content = document.getElementById('customDialogContent');
-      
+
       backdrop.classList.add('opacity-0');
       content.classList.add('scale-95', 'opacity-0');
       setTimeout(() => {
@@ -3469,9 +3582,9 @@
         showPopup('Please login first to make a payment', 'error');
         return;
       }
-      
+
       const order_id = packageType + "_" + Date.now();
-      
+
       // 1. Fetch Hash from Backend
       fetch(`${window.API_BASE_URL}/api/payhere-hash`, {
         method: 'POST',
@@ -3482,15 +3595,15 @@
           currency: 'LKR'
         })
       })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          showPopup('Payment init failed: ' + data.error, 'error');
-          return;
-        }
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            showPopup('Payment init failed: ' + data.error, 'error');
+            return;
+          }
 
-        // 2. Setup PayHere JS Object
-        var payment = {
+          // 2. Setup PayHere JS Object
+          var payment = {
             "sandbox": true, // Change to false for Live
             "merchant_id": data.merchant_id, // Comes from backend
             "return_url": window.location.href,
@@ -3510,15 +3623,15 @@
             "country": "Sri Lanka",
             "custom_1": uEmail,    // Very important: Passed to Webhook to identify user
             "custom_2": packageType   // Identify package in Webhook
-        };
+          };
 
-        // 3. Start Payment Popup
-        payhere.startPayment(payment);
-      })
-      .catch(err => {
-        console.error(err);
-        showPopup('Error initializing payment. Check console.', 'error');
-      });
+          // 3. Start Payment Popup
+          payhere.startPayment(payment);
+        })
+        .catch(err => {
+          console.error(err);
+          showPopup('Error initializing payment. Check console.', 'error');
+        });
     }
 
     payhere.onCompleted = function onCompleted(orderId) {
@@ -3533,9 +3646,10 @@
     };
 
     payhere.onError = function onError(error) {
-      console.log("Error:"  + error);
+      console.log("Error:" + error);
       showPopup('Payment failed: ' + error, 'error');
     };
   </script>
 </body>
+
 </html>
