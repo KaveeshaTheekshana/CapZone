@@ -109,7 +109,7 @@
 
       if (!user) {
         // [DEV MODE] Temporarily bypassing login redirect
-        //window.location.href = 'login.html';
+        window.location.href = 'login.html';
         console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
         const savedEmail = localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
         window.currentUserEmail = savedEmail;
@@ -3464,7 +3464,8 @@
   <script>
     // PayHere Payment Integration
     function startPayHere(packageType, amount, description) {
-      if (!userEmail) {
+      const uEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.local';
+      if (!uEmail) {
         showPopup('Please login first to make a payment', 'error');
         return;
       }
@@ -3472,7 +3473,7 @@
       const order_id = packageType + "_" + Date.now();
       
       // 1. Fetch Hash from Backend
-      fetch('/api/payhere-hash', {
+      fetch(`${window.API_BASE_URL}/api/payhere-hash`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -3492,8 +3493,8 @@
         var payment = {
             "sandbox": true, // Change to false for Live
             "merchant_id": data.merchant_id, // Comes from backend
-            "return_url": "http://127.0.0.1:5502/dashboard.html",
-            "cancel_url": "http://127.0.0.1:5502/dashboard.html",
+            "return_url": window.location.href,
+            "cancel_url": window.location.href,
             "notify_url": "https://capzone.kaveez.top/api/payhere-notify",
             "order_id": order_id,
             "items": description,
@@ -3502,12 +3503,12 @@
             "hash": data.hash, // MD5 Hash from backend
             "first_name": "CapZone",
             "last_name": "User",
-            "email": userEmail,
+            "email": uEmail,
             "phone": "0771234567",
             "address": "No.1, Colombo",
             "city": "Colombo",
             "country": "Sri Lanka",
-            "custom_1": userEmail,    // Very important: Passed to Webhook to identify user
+            "custom_1": uEmail,    // Very important: Passed to Webhook to identify user
             "custom_2": packageType   // Identify package in Webhook
         };
 
@@ -3516,7 +3517,7 @@
       })
       .catch(err => {
         console.error(err);
-        showPopup('Error initializing payment', 'error');
+        showPopup('Error initializing payment. Check console.', 'error');
       });
     }
 
