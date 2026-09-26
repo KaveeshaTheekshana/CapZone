@@ -114,6 +114,7 @@
         const savedEmail = localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
         window.currentUserEmail = savedEmail;
         if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+        if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile(savedEmail);
       } else {
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
@@ -127,6 +128,7 @@
         if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
         if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
         if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+        if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile(user.email);
 
         // Fetch saved API key from backend
         fetch(`${window.API_BASE_URL || ''}/api/save-user`, {
@@ -140,6 +142,97 @@
         }).catch(e => console.error("Could not fetch API key", e));
       }
     });
+
+    window.currentUserData = null;
+    window.fetchUserProfile = async function(email) {
+      const uEmail = email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+      if (!uEmail) return;
+      try {
+        const res = await fetch(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}`);
+        if (!res.ok) return;
+        const data = await res.json();
+        window.currentUserData = data;
+        window.updateUserProfileUI(data);
+      } catch (err) {
+        console.warn("Could not fetch user profile info:", err);
+      }
+    };
+
+    window.updateUserProfileUI = function(data) {
+      if (!data) return;
+      const balance = typeof data.balance === 'number' ? data.balance : 0;
+      const subType = data.subscription_type || 'none';
+      const quotaUsed = data.quota_used || 0;
+      const quotaLimit = data.quota_limit || 0;
+      const remainingQuota = Math.max(0, quotaLimit - quotaUsed);
+
+      // 1. Header live wallet badge
+      const navWalletText = document.getElementById('navWalletText');
+      if (navWalletText) navWalletText.innerText = `Rs. ${balance.toFixed(2)}`;
+      const navPlanTag = document.getElementById('navPlanTag');
+      if (navPlanTag) {
+        if (subType === 'creator') {
+          navPlanTag.innerText = `Creator (${remainingQuota}m left)`;
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1";
+        } else if (subType === 'pro') {
+          navPlanTag.innerText = `Pro (${remainingQuota}m left)`;
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1";
+        } else {
+          navPlanTag.innerText = 'Pay-Per-Video';
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1";
+        }
+      }
+
+      // 2. Profile Modal elements
+      const profileBalance = document.getElementById('profileBalance');
+      if (profileBalance) profileBalance.innerText = balance.toFixed(2);
+      const modalCurrentBalance = document.getElementById('modalCurrentBalance');
+      if (modalCurrentBalance) modalCurrentBalance.innerText = balance.toFixed(2);
+
+      const profilePlanBadge = document.getElementById('profilePlanBadge');
+      if (profilePlanBadge) {
+        if (subType === 'creator') profilePlanBadge.innerHTML = `<span class="px-2.5 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full font-bold text-xs uppercase tracking-wider">Creator Monthly</span>`;
+        else if (subType === 'pro') profilePlanBadge.innerHTML = `<span class="px-2.5 py-1 bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 rounded-full font-bold text-xs uppercase tracking-wider">Pro Monthly</span>`;
+        else profilePlanBadge.innerHTML = `<span class="px-2.5 py-1 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full font-bold text-xs uppercase tracking-wider">Pay-Per-Video</span>`;
+      }
+
+      const profileMonthlySection = document.getElementById('profileMonthlySection');
+      const profilePayPerVideoSection = document.getElementById('profilePayPerVideoSection');
+      if (subType === 'creator' || subType === 'pro') {
+        if (profileMonthlySection) profileMonthlySection.style.display = 'block';
+        if (profilePayPerVideoSection) profilePayPerVideoSection.style.display = 'none';
+
+        const profileQuotaUsed = document.getElementById('profileQuotaUsed');
+        if (profileQuotaUsed) profileQuotaUsed.innerText = `${quotaUsed} Mins`;
+        const profileQuotaLimit = document.getElementById('profileQuotaLimit');
+        if (profileQuotaLimit) profileQuotaLimit.innerText = `${quotaLimit} Mins`;
+        const profileQuotaRemaining = document.getElementById('profileQuotaRemaining');
+        if (profileQuotaRemaining) profileQuotaRemaining.innerText = `${remainingQuota} Mins Left`;
+
+        const pct = quotaLimit > 0 ? Math.min(100, Math.round((quotaUsed / quotaLimit) * 100)) : 0;
+        const profileQuotaBar = document.getElementById('profileQuotaBar');
+        if (profileQuotaBar) profileQuotaBar.style.width = `${pct}%`;
+
+        const profileQuotaReset = document.getElementById('profileQuotaReset');
+        if (profileQuotaReset && data.quota_reset_date) {
+          profileQuotaReset.innerText = new Date(data.quota_reset_date).toLocaleDateString();
+        }
+      } else {
+        if (profileMonthlySection) profileMonthlySection.style.display = 'none';
+        if (profilePayPerVideoSection) profilePayPerVideoSection.style.display = 'block';
+      }
+
+      const profileSrtCount = document.getElementById('profileSrtCount');
+      if (profileSrtCount) profileSrtCount.innerText = data.srt_count || 0;
+
+      // Re-validate video if one is currently selected in SRT modal
+      if (window.currentMediaDuration !== undefined && window.currentMediaDuration !== null && typeof validateAndDisplayVideoDetails === 'function') {
+        validateAndDisplayVideoDetails(window.currentMediaDuration, currentSrtFile ? currentSrtFile.size : 0);
+      }
+
+      if (window.lucide) window.lucide.createIcons();
+    };
+
     window.handleLogout = () => {
       signOut(auth).then(() => {
         window.location.href = 'login.html';
@@ -445,6 +538,17 @@
           class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom
           API</button>
       </div>
+      <!-- Live Wallet Balance & Plan Badge -->
+      <button onclick="openModal('profileModal', event)" id="navWalletBtn"
+        class="flex items-center gap-1.5 sm:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-emerald-500/15 border border-emerald-500/30 hover:border-emerald-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.15)] group"
+        title="View Wallet Balance & Plan">
+        <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+          <i data-lucide="wallet" class="w-3.5 h-3.5 text-white"></i>
+        </div>
+        <span class="text-xs font-bold text-emerald-300 tracking-wider" id="navWalletText">Rs. 0.00</span>
+        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider hidden md:inline" id="navPlanTag">Pay-Per-Video</span>
+      </button>
+
       <!-- Plans / Subscription Button -->
       <button onclick="openToolWithIntercept('subscriptionModal', event)"
         class="flex items-center gap-1.5 sm:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-amber-500/15 border border-amber-500/30 hover:border-amber-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] group"
@@ -813,39 +917,137 @@
   <!-- PROFILE MODAL -->
   <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-sm rounded-3xl p-6 relative">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto" style="scrollbar-width: none;">
       <button onclick="closeModal('profileModal', event)"
-        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
-      <div class="text-center mb-6">
+
+      <!-- User Header -->
+      <div class="text-center mb-5">
         <div
           class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg mb-3"
           id="profileInitial">U</div>
-        <h2 class="text-xl font-bold text-fix-heading" id="profileName">User</h2>
-        <p class="text-xs text-fix-sub mt-1" id="profileEmail">user@example.com</p>
-      </div>
-      <div class="space-y-4">
-        <div class="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-3">
-          <div>
-            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">CapZone API Key
-              (Optional)</label>
-            <input type="text" id="userApiKey" autocomplete="off"
-              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
-          </div>
-          <div>
-            <label class="text-[10px] font-bold text-fix-sub uppercase tracking-wider mb-2 block">ElevenLabs API
-              Key</label>
-            <input type="text" id="elevenLabsApiKey" placeholder="sk_..."
-              class="input-fix w-full px-3 py-2.5 rounded-xl outline-none" />
-          </div>
-          <button id="saveApiKeyBtn" type="button"
-            onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
-            class="mt-2 w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">Save
-            API Keys</button>
+        <div class="flex items-center justify-center gap-2">
+          <h2 class="text-xl font-bold text-white" id="profileName">User</h2>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
         </div>
+        <p class="text-xs text-slate-400 mt-0.5" id="profileEmail">user@example.com</p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- 1. Wallet Balance Card (ගිණුමේ ඇති මුදල) -->
+        <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border border-emerald-500/30 relative overflow-hidden shadow-lg">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="wallet" class="w-4 h-4"></i> ගිණුමේ ඇති මුදල / Wallet Balance
+            </span>
+            <span class="text-[10px] text-slate-400">Available Funds</span>
+          </div>
+          <div class="flex items-baseline justify-between mt-2">
+            <div class="text-3xl font-black text-white tracking-tight">
+              Rs. <span id="profileBalance" class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">0.00</span>
+            </div>
+            <button onclick="closeModal('profileModal', event); openToolWithIntercept('subscriptionModal', event);"
+              class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Top Up
+            </button>
+          </div>
+          <p class="text-[10px] text-slate-400 mt-2">
+            💡 Pay-Per-Video වීඩියෝ සඳහා ඔබේ මුදල් මෙහි සුරැකී පවතී.
+          </p>
+        </div>
+
+        <!-- 2. Active Package & Monthly Minutes Tracker -->
+        <div class="p-4 rounded-2xl bg-black/40 border border-white/10 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Package</span>
+            <div id="profilePlanBadge">
+              <span class="px-2.5 py-1 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full font-bold text-xs uppercase tracking-wider">Pay-Per-Video</span>
+            </div>
+          </div>
+
+          <!-- Monthly Quota Details (Shown only for Creator / Pro subscribers) -->
+          <div id="profileMonthlySection" style="display: none;" class="pt-2 border-t border-white/5 space-y-2">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-slate-400">Monthly Quota:</span>
+              <span class="font-bold text-white"><span id="profileQuotaUsed">0</span> / <span id="profileQuotaLimit">0</span> Mins</span>
+            </div>
+            <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+              <div id="profileQuotaBar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px]">
+              <span id="profileQuotaRemaining" class="text-emerald-400 font-bold">0 Mins Remaining</span>
+              <span class="text-slate-500">Resets: <span id="profileQuotaReset">-</span></span>
+            </div>
+          </div>
+
+          <!-- Pay-Per-Video Info (Shown for users without monthly subscription) -->
+          <div id="profilePayPerVideoSection" class="pt-2 border-t border-white/5 text-[11px] text-slate-400 space-y-1">
+            <p class="font-semibold text-slate-300">One-Time Video Rates:</p>
+            <div class="grid grid-cols-3 gap-1.5 text-center mt-1">
+              <div class="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                <p class="text-[10px] text-purple-300 font-bold">Mini Clip</p>
+                <p class="text-[9px] text-slate-400">0s - 1 min</p>
+                <p class="text-xs font-bold text-white">Rs. 100</p>
+              </div>
+              <div class="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                <p class="text-[10px] text-blue-300 font-bold">Standard</p>
+                <p class="text-[9px] text-slate-400">1 - 10 mins</p>
+                <p class="text-xs font-bold text-white">Rs. 250</p>
+              </div>
+              <div class="p-1.5 rounded-lg bg-white/5 border border-white/5">
+                <p class="text-[10px] text-indigo-300 font-bold">Extended</p>
+                <p class="text-[9px] text-slate-400">10 - 30 mins</p>
+                <p class="text-xs font-bold text-white">Rs. 500</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. System Limits Notice -->
+        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300/90 text-xs flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-amber-400"></i>
+            <div>
+              <p class="font-bold text-[11px]">System Platform Limits</p>
+              <p class="text-[10px] text-amber-200/80">Max Video Duration: 30 Mins | Max Upload Size: 500 MB (Gemini AI limit)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Account Statistics -->
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-black/30 border border-white/5 text-xs text-slate-300">
+          <span class="flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i> Total SRTs Generated</span>
+          <span class="font-bold text-white" id="profileSrtCount">0</span>
+        </div>
+
+        <!-- 5. API Keys (Collapsible / Advanced) -->
+        <details class="group p-3 rounded-2xl bg-black/30 border border-white/5 text-xs">
+          <summary class="font-bold text-slate-300 cursor-pointer list-none flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><i data-lucide="key" class="w-4 h-4 text-slate-400"></i> Custom API Keys (Optional)</span>
+            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform group-open:rotate-180 text-slate-400"></i>
+          </summary>
+          <div class="mt-3 space-y-3 pt-3 border-t border-white/5">
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">CapZone / Gemini API Key</label>
+              <input type="text" id="userApiKey" autocomplete="off" placeholder="AIzaSy..." class="input-fix w-full px-3 py-2 rounded-xl text-xs outline-none" />
+            </div>
+            <div>
+              <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">ElevenLabs API Key</label>
+              <input type="text" id="elevenLabsApiKey" placeholder="sk_..." class="input-fix w-full px-3 py-2 rounded-xl text-xs outline-none" />
+            </div>
+            <button id="saveApiKeyBtn" type="button"
+              onclick="saveApiKeys(); showPopup('API Keys saved successfully!'); closeModal('profileModal')"
+              class="w-full py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md">
+              Save API Keys
+            </button>
+          </div>
+        </details>
+
+        <!-- 6. Sign Out Button -->
         <button id="logoutBtn" onclick="handleLogout()"
-          class="w-full py-3 bg-red-500/10 text-red-500 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
+          class="w-full py-3 bg-red-500/10 text-red-400 border border-red-500/20 font-bold text-xs rounded-xl hover:bg-red-500 hover:text-white transition-colors flex items-center justify-center gap-2">
           <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
         </button>
       </div>
@@ -1092,23 +1294,55 @@
               <i data-lucide="upload-cloud" class="w-8 h-8 text-purple-500"></i>
             </div>
             <p class="text-sm text-white font-bold" id="srtFileName">Click to Browse Media (MP4, MKV, MP3)</p>
-            <p class="text-xs text-slate-400 mt-2">Maximum duration: 60 minutes</p>
+            <p class="text-xs text-slate-400 mt-2">⚡ System Limits: Max duration 30 minutes | Max upload 500 MB (Gemini AI optimized)</p>
+          </div>
+        </div>
+
+        <!-- Dynamic Pre-check & Validation Status Card -->
+        <div id="srtValidationCard" class="p-4 rounded-2xl bg-black/50 border border-purple-500/30 space-y-2.5" style="display: none;">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-purple-400"></i> Video Duration:</span>
+            <span class="font-bold text-white font-mono" id="srtDetectedDuration">-</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5 text-blue-400"></i> Package Tier:</span>
+            <span class="font-bold text-purple-300" id="srtMatchedTier">-</span>
+          </div>
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="wallet" class="w-3.5 h-3.5 text-emerald-400"></i> Account Status:</span>
+            <span class="font-bold text-slate-200" id="srtAccountStatus">-</span>
+          </div>
+
+          <!-- Alert / Validation Banner -->
+          <div id="srtValidationAlert" class="p-3 rounded-xl text-xs flex items-start gap-2.5">
+            <!-- Dynamic Message injected here -->
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs font-bold text-slate-300 mb-2 block">Target Language</label>
-            <select id="srtLanguage"
+            <label class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
+              <span>Target Language</span>
+              <span id="srtLangBadge" class="text-[10px] text-purple-400 font-semibold bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">Auto Translate</span>
+            </label>
+            <select id="srtLanguage" onchange="updateSrtLangInfo()"
               class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:border-purple-500 transition-colors">
-              <option value="si" selected>Sinhala</option>
-              <option value="en">English</option>
+              <option value="si" selected>Sinhala (Legacy FM-Abhaya)</option>
+              <option value="en">English (Standard Subtitles)</option>
             </select>
+            <p id="srtLangHint" class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5">
+              <i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i>
+              <span>Any video language &rarr; Translated to Sinhala (FM-Abhaya Font)</span>
+            </p>
           </div>
           <div>
             <label class="text-xs font-bold text-slate-300 mb-2 block">Word Limit / Line</label>
             <input type="number" id="srtWordsLimit" value="5" min="1" max="8"
               class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:border-purple-500 transition-colors" />
+            <p class="text-[11px] text-slate-400 mt-1.5 flex items-center gap-1.5">
+              <i data-lucide="sliders" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i>
+              <span>Words per block (1 - 8)</span>
+            </p>
           </div>
         </div>
 
@@ -1140,13 +1374,19 @@
         </div>
         <div class="text-center">
           <h4 class="text-lg font-bold text-white mb-1">Subtitles Ready!</h4>
-          <p class="text-xs text-slate-400">Your .srt file has been successfully generated.</p>
+          <p class="text-xs text-slate-400" id="srtResultSubtext">Your .srt file has been successfully generated.</p>
         </div>
-        <a id="srtDownloadLink"
-          class="w-full py-3 bg-emerald-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/50"
-          target="_blank">
-          <i data-lucide="download" class="w-5 h-5"></i> Download .SRT File
-        </a>
+        <div class="w-full flex flex-col sm:flex-row gap-3">
+          <a id="srtDownloadLink"
+            class="flex-1 py-3 bg-emerald-600 text-white font-bold text-sm rounded-xl flex items-center justify-center gap-2 hover:bg-emerald-500 transition-colors shadow-lg shadow-emerald-900/50"
+            target="_blank">
+            <i data-lucide="download" class="w-5 h-5"></i> Download .SRT File
+          </a>
+          <button type="button" id="srtCopyBtn" onclick="copyGeneratedSrt()"
+            class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-sm rounded-xl flex items-center justify-center gap-2 transition-all">
+            <i data-lucide="copy" class="w-4 h-4"></i> Copy SRT
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -1192,8 +1432,11 @@
       <div id="payPerVideoTab" class="animate-fade-in">
         <div class="text-center mb-6">
           <h3 class="text-xl font-bold text-white">No Monthly Commitment</h3>
-          <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30
-            minutes per video)</p>
+          <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30 minutes per video | Max file size: 500 MB)</p>
+          <div class="inline-flex items-center gap-2 mt-3 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-bold">
+            <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
+            Current Wallet Balance: Rs. <span id="modalCurrentBalance">0.00</span>
+          </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -1204,8 +1447,8 @@
             <div class="text-3xl font-black text-white mb-1">Rs. 100</div>
             <p class="text-[10px] text-slate-400 mb-6 uppercase tracking-wider font-semibold">Per Video</p>
             <div class="flex-1 bg-black/20 rounded-xl p-4 mb-6">
-              <p class="text-sm font-bold text-purple-400">Up to 10 mins</p>
-              <p class="text-xs text-slate-400 mt-1">Quick social media clips</p>
+              <p class="text-sm font-bold text-purple-400">0s to 1 min</p>
+              <p class="text-xs text-slate-400 mt-1">Shorts, Reels, TikTok clips</p>
             </div>
             <button onclick="startPayHere('balance_100', 100, 'Mini Clip - Top Up')"
               class="w-full py-3 rounded-xl border border-purple-500/50 text-purple-400 font-bold hover:bg-purple-500 hover:text-white transition-colors">Top
@@ -1224,8 +1467,8 @@
               Rs. 250</div>
             <p class="text-[10px] text-slate-400 mb-6 uppercase tracking-wider font-semibold">Per Video</p>
             <div class="flex-1 bg-black/20 rounded-xl p-4 mb-6">
-              <p class="text-sm font-bold text-white">10 to 20 mins</p>
-              <p class="text-xs text-slate-400 mt-1">Perfect for YouTube</p>
+              <p class="text-sm font-bold text-white">1 to 10 mins</p>
+              <p class="text-xs text-slate-400 mt-1">Perfect for YouTube & Social</p>
             </div>
             <button onclick="startPayHere('balance_250', 250, 'Standard Video - Top Up')"
               class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all">Top
@@ -1239,12 +1482,45 @@
             <div class="text-3xl font-black text-white mb-1">Rs. 500</div>
             <p class="text-[10px] text-slate-400 mb-6 uppercase tracking-wider font-semibold">Per Video</p>
             <div class="flex-1 bg-black/20 rounded-xl p-4 mb-6">
-              <p class="text-sm font-bold text-blue-400">20 to 30 mins</p>
-              <p class="text-xs text-slate-400 mt-1">Podcasts & Lectures</p>
+              <p class="text-sm font-bold text-blue-400">10 to 30 mins</p>
+              <p class="text-xs text-slate-400 mt-1">Podcasts & Long Lectures</p>
             </div>
             <button onclick="startPayHere('balance_500', 500, 'Extended Video - Top Up')"
               class="w-full py-3 rounded-xl border border-blue-500/50 text-blue-400 font-bold hover:bg-blue-500 hover:text-white transition-colors">Top
               Up Credits</button>
+          </div>
+        </div>
+
+        <!-- Wallet Top Up & Credit Saver -->
+        <div class="mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800/90 border border-emerald-500/30 max-w-4xl mx-auto shadow-xl">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl"><i data-lucide="wallet" class="w-5 h-5"></i></span>
+                <h4 class="text-base font-bold text-white">Direct Wallet Top-Up (ගිණුමට මුදල් දැමීම)</h4>
+              </div>
+              <p class="text-xs text-slate-300 mt-1 max-w-md">
+                ඔබට කැමති ඕනෑම මුදලක් ගිණුමට එකතු කරගත හැක. උදා: රු. 200ක් දැමූ විට රු. 100 Mini Clip සාදා ඉතිරි මුදල ගිණුමේ සුරැකිව තබාගත හැක.
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+              <!-- Quick Amount Pills -->
+              <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 100" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs. 100</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 200" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-bold text-emerald-300 border border-emerald-500/30">Rs. 200</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 250" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs. 250</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 500" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs. 500</button>
+              </div>
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <div class="relative flex-1 sm:w-32">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold">Rs.</span>
+                  <input type="number" id="customTopupAmount" placeholder="200" min="50" step="10" class="w-full pl-8 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:border-emerald-500" />
+                </div>
+                <button type="button" onclick="handleCustomTopUp()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
+                  Top Up
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -1588,6 +1864,8 @@
         modal.style.display = 'flex';
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
+        if (typeof updateSrtLangInfo === 'function' && modalId === 'srtModal') updateSrtLangInfo();
+        if (window.lucide) lucide.createIcons();
       }
     };
 
@@ -1830,11 +2108,205 @@
     }
 
     let currentSrtFile = null;
+    window.currentMediaDuration = null;
+
+    function formatTimeSec(seconds) {
+      if (isNaN(seconds) || seconds < 0) return '0s';
+      const m = Math.floor(seconds / 60);
+      const s = Math.floor(seconds % 60);
+      if (m > 0) return `${m}m ${s}s`;
+      return `${s}s`;
+    }
+
     function updateSrtFileInfo(input) {
-      if (input.files && input.files[0]) {
-        currentSrtFile = input.files[0];
-        document.getElementById('srtFileName').textContent = input.files[0].name;
+      if (!input.files || !input.files[0]) return;
+      currentSrtFile = input.files[0];
+      const fileNameEl = document.getElementById('srtFileName');
+      if (fileNameEl) fileNameEl.textContent = currentSrtFile.name;
+
+      const validationCard = document.getElementById('srtValidationCard');
+      const submitBtn = document.getElementById('srtSubmitBtn');
+      const alertEl = document.getElementById('srtValidationAlert');
+      const durationEl = document.getElementById('srtDetectedDuration');
+      const tierEl = document.getElementById('srtMatchedTier');
+      const statusEl = document.getElementById('srtAccountStatus');
+
+      if (validationCard) validationCard.style.display = 'block';
+
+      // 1. File size check (500MB max upload limit)
+      if (currentSrtFile.size > 500 * 1024 * 1024) {
+        if (durationEl) durationEl.innerText = '-';
+        if (tierEl) tierEl.innerText = 'Exceeds 500MB Limit';
+        if (statusEl) statusEl.innerText = 'Rejected';
+        if (alertEl) {
+          alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/15 border border-red-500/30 text-red-300 flex items-start gap-2.5';
+          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024*1024)).toFixed(1)} MB) exceeds 500 MB upload limit (Gemini AI limit). Video rejected.</div>`;
+        }
+        if (submitBtn) submitBtn.disabled = true;
+        if (window.lucide) window.lucide.createIcons();
+        return;
       }
+
+      // 2. Pre-extract duration using HTML5 media element
+      if (durationEl) durationEl.innerText = 'Calculating duration...';
+      if (tierEl) tierEl.innerText = 'Analyzing...';
+      if (statusEl) statusEl.innerText = 'Checking...';
+      if (alertEl) {
+        alertEl.className = 'p-3 rounded-xl text-xs bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-2';
+        alertEl.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-purple-400 shrink-0"></i> <span>Reading video metadata before processing...</span>`;
+      }
+      if (window.lucide) window.lucide.createIcons();
+
+      const tempMedia = document.createElement(currentSrtFile.type.startsWith('audio') ? 'audio' : 'video');
+      tempMedia.preload = 'metadata';
+      const objUrl = URL.createObjectURL(currentSrtFile);
+      tempMedia.src = objUrl;
+
+      tempMedia.onloadedmetadata = () => {
+        URL.revokeObjectURL(objUrl);
+        const durationSecs = tempMedia.duration;
+        window.currentMediaDuration = durationSecs;
+        validateAndDisplayVideoDetails(durationSecs, currentSrtFile.size);
+      };
+
+      tempMedia.onerror = () => {
+        URL.revokeObjectURL(objUrl);
+        window.currentMediaDuration = null;
+        if (durationEl) durationEl.innerText = 'Server (FFmpeg) Detection';
+        if (tierEl) tierEl.innerText = 'Calculated on upload';
+        if (alertEl) {
+          alertEl.className = 'p-3 rounded-xl text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-start gap-2';
+          alertEl.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <div>Duration & pricing tier will be inspected by server FFmpeg before SRT generation starts.</div>`;
+        }
+        if (submitBtn) submitBtn.disabled = false;
+        if (window.lucide) window.lucide.createIcons();
+      };
+    }
+
+    function validateAndDisplayVideoDetails(durationSecs, fileSize) {
+      const validationCard = document.getElementById('srtValidationCard');
+      const submitBtn = document.getElementById('srtSubmitBtn');
+      const alertEl = document.getElementById('srtValidationAlert');
+      const durationEl = document.getElementById('srtDetectedDuration');
+      const tierEl = document.getElementById('srtMatchedTier');
+      const statusEl = document.getElementById('srtAccountStatus');
+
+      if (!validationCard) return;
+      validationCard.style.display = 'block';
+
+      const durationFormatted = formatTimeSec(durationSecs);
+      if (durationEl) durationEl.innerText = `${durationFormatted} (${(fileSize / (1024*1024)).toFixed(1)} MB)`;
+
+      // A. Duration Check: Max 30 minutes (1800 seconds)
+      if (durationSecs > 1800) {
+        if (tierEl) tierEl.innerHTML = `<span class="text-red-400 font-bold">Exceeds 30 Min Limit</span>`;
+        if (statusEl) statusEl.innerHTML = `<span class="text-red-400 font-bold">Rejected</span>`;
+        if (alertEl) {
+          alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/20 border border-red-500/40 text-red-300 flex items-start gap-2.5';
+          alertEl.innerHTML = `<i data-lucide="x-circle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>System Limit Exceeded:</strong> Video is ${durationFormatted}! Maximum allowed video duration is 30 minutes. Video rejected. Please trim your video to under 30 minutes.</div>`;
+        }
+        if (submitBtn) submitBtn.disabled = true;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      // B. Determine Package Tier & Cost
+      let tierName = '';
+      let tierCost = 0;
+      if (durationSecs <= 60) {
+        tierName = 'Mini Clip (0-1 min)';
+        tierCost = 100;
+      } else if (durationSecs <= 600) {
+        tierName = 'Standard Video (1-10 min)';
+        tierCost = 250;
+      } else {
+        tierName = 'Extended Video (10-30 min)';
+        tierCost = 500;
+      }
+
+      if (tierEl) tierEl.innerHTML = `<span class="text-purple-300 font-bold">${tierName}</span> <span class="text-white bg-purple-500/20 px-2 py-0.5 rounded-full text-[10px] ml-1">Rs. ${tierCost}</span>`;
+
+      // C. Account Balance & Quota Check
+      const u = window.currentUserData || { balance: 0, subscription_type: 'none', quota_used: 0, quota_limit: 0 };
+      const durationMinsForQuota = Math.ceil(durationSecs / 60) || 1;
+      const isSub = (u.subscription_type === 'creator' || u.subscription_type === 'pro') && (u.quota_limit > 0);
+      const remainingQuota = isSub ? Math.max(0, u.quota_limit - (u.quota_used || 0)) : 0;
+      const balance = typeof u.balance === 'number' ? u.balance : 0;
+
+      if (isSub) {
+        if (remainingQuota >= durationMinsForQuota) {
+          // Covered by monthly quota
+          if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400 font-bold">${remainingQuota} Mins Quota Available</span>`;
+          if (alertEl) {
+            alertEl.className = 'p-3 rounded-xl text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-start gap-2.5';
+            alertEl.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <div><strong>Covered by Monthly Quota:</strong> ${durationMinsForQuota} minute(s) will be deducted from your ${remainingQuota} remaining monthly minutes.</div>`;
+          }
+          if (submitBtn) submitBtn.disabled = false;
+        } else {
+          // Monthly quota exceeded: check wallet balance
+          if (balance >= tierCost) {
+            if (statusEl) statusEl.innerHTML = `<span class="text-amber-300 font-bold">Quota Exceeded (Using Wallet: Rs. ${balance.toFixed(2)})</span>`;
+            if (alertEl) {
+              alertEl.className = 'p-3 rounded-xl text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-start gap-2.5';
+              alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <div>Monthly quota has only ${remainingQuota} mins left (video requires ${durationMinsForQuota} mins). Rs. ${tierCost} will be deducted from your wallet balance (Rs. ${balance.toFixed(2)}). Leftover balance: Rs. ${(balance - tierCost).toFixed(2)}.</div>`;
+            }
+            if (submitBtn) submitBtn.disabled = false;
+          } else {
+            if (statusEl) statusEl.innerHTML = `<span class="text-red-400 font-bold">Quota & Balance Exceeded</span>`;
+            if (alertEl) {
+              alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/20 border border-red-500/40 text-red-300 flex flex-col gap-2';
+              alertEl.innerHTML = `
+                <div class="flex items-start gap-2.5">
+                  <i data-lucide="alert-circle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+                  <div><strong>Monthly Quota Exceeded:</strong> You have only ${remainingQuota} mins remaining (video is ${durationMinsForQuota} mins). Wallet balance is Rs. ${balance.toFixed(2)} (requires Rs. ${tierCost}).</div>
+                </div>
+                <div class="flex justify-end pt-1">
+                  <button type="button" onclick="closeModal('srtModal'); openToolWithIntercept('subscriptionModal', event);" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white font-bold text-xs hover:bg-emerald-600 transition-all flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Top Up Wallet / Upgrade
+                  </button>
+                </div>`;
+            }
+            if (submitBtn) submitBtn.disabled = true;
+          }
+        }
+      } else {
+        // Pay-Per-Video user
+        if (balance >= tierCost) {
+          if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400 font-bold">Wallet: Rs. ${balance.toFixed(2)}</span>`;
+          if (alertEl) {
+            alertEl.className = 'p-3 rounded-xl text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-start gap-2.5';
+            alertEl.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <div><strong>Ready to Process:</strong> Rs. ${tierCost} will be deducted for ${tierName}. Leftover balance: <strong>Rs. ${(balance - tierCost).toFixed(2)}</strong> will remain safely saved in your account.</div>`;
+          }
+          if (submitBtn) submitBtn.disabled = false;
+        } else {
+          // Insufficient balance!
+          const deficit = tierCost - balance;
+          if (statusEl) statusEl.innerHTML = `<span class="text-red-400 font-bold">Wallet: Rs. ${balance.toFixed(2)} (Deficit: Rs. ${deficit.toFixed(2)})</span>`;
+          if (alertEl) {
+            alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/20 border border-red-500/40 text-red-300 flex flex-col gap-2';
+            let alternativeHint = '';
+            if (balance >= 100 && durationSecs > 60) {
+              alternativeHint = `<div class="text-[11px] text-amber-300/90 mt-1">💡 Note: Your current balance (Rs. ${balance.toFixed(2)}) is sufficient to generate a Mini Clip (0-1 min - Rs. 100), or you can top up to process this video.</div>`;
+            }
+            alertEl.innerHTML = `
+              <div class="flex items-start gap-2.5">
+                <i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i>
+                <div>
+                  <strong>Insufficient Balance:</strong> This video is <strong>${tierName}</strong> which requires <strong>Rs. ${tierCost}</strong>, but your wallet balance is only <strong>Rs. ${balance.toFixed(2)}</strong>.
+                  ${alternativeHint}
+                </div>
+              </div>
+              <div class="flex items-center justify-between pt-1 border-t border-red-500/20">
+                <span class="text-[11px] text-slate-300">Top-Up required: Rs. ${deficit.toFixed(2)}</span>
+                <button type="button" onclick="closeModal('srtModal'); openToolWithIntercept('subscriptionModal', event);" class="px-3 py-1.5 rounded-lg bg-emerald-500 text-white font-bold text-xs hover:bg-emerald-600 transition-all flex items-center gap-1.5">
+                  <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Top Up Wallet Now
+                </button>
+              </div>`;
+          }
+          if (submitBtn) submitBtn.disabled = true;
+        }
+      }
+      if (window.lucide) window.lucide.createIcons();
     }
 
     async function handleScraperSrtSubmit(e) {
@@ -2027,7 +2499,14 @@
     async function handleSrtSubmit(e) {
       e.preventDefault();
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
-      if (currentSrtFile.size > 99 * 1024 * 1024) { showPopup('කරුණාකර 100MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න.', 'File Too Large', 'error'); return; }
+      if (currentSrtFile.size > 500 * 1024 * 1024) { 
+        showPopup('කරුණාකර 500MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න. (Max 500MB Gemini upload limit)', 'File Too Large', 'error'); 
+        return; 
+      }
+      if (window.currentMediaDuration && window.currentMediaDuration > 1800) {
+        showPopup('Video exceeds maximum 30-minute system limit. System only supports up to 30 minutes.', 'Limit Exceeded', 'error');
+        return;
+      }
 
       document.getElementById('srtSubmitBtn').disabled = true;
       document.getElementById('srtProgressCard').style.display = 'block';
@@ -2049,6 +2528,7 @@
       const formData = new FormData();
       formData.append('video', fileToUpload);
       formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
+      formData.append('wordsLimit', document.getElementById('srtWordsLimit')?.value || '5');
 
       const customApiKeySrt = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
       if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
@@ -2065,7 +2545,8 @@
         es.close();
         if (data.srt) {
           const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
-          const lang = document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala';
+          const lang = (data.language || (document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala'));
+          window.lastGeneratedSrtContent = data.srt;
           window.saveToRecentProjects({
             type: 'Subtitle',
             title: srtName,
@@ -2077,13 +2558,32 @@
               filename: `${srtName.replace(/\.[^/.]+$/, "")}.srt`
             }
           });
-          const blob = new Blob([data.srt], { type: 'text/plain' });
+          const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
           document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
-          document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}.srt`;
+          document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
+          
+          const resultSubtext = document.getElementById('srtResultSubtext');
+          if (resultSubtext) {
+            if (lang === 'English') {
+              resultSubtext.textContent = 'English subtitles generated successfully in standard UTF-8 format.';
+            } else {
+              resultSubtext.textContent = 'Sinhala subtitles generated successfully in FM-Abhaya legacy font format.';
+            }
+          }
+
           document.getElementById('srtProgressBar').style.width = '100%';
           document.getElementById('srtResultArea').style.display = 'flex';
-        } else if (data.error === 'NO_SUBSCRIPTION_ACTIVE') {
-          showPopup('You must activate a subscription package to generate subtitles.', 'Subscription Required', 'error');
+          if (window.lucide) lucide.createIcons();
+
+          // Update user balance and quota live across dashboard
+          if (data.user) {
+            window.currentUserData = data.user;
+            window.updateUserProfileUI(data.user);
+          } else if (typeof window.fetchUserProfile === 'function') {
+            window.fetchUserProfile();
+          }
+        } else if (data.code === 'INSUFFICIENT_BALANCE' || data.code === 'QUOTA_EXCEEDED' || data.error === 'NO_SUBSCRIPTION_ACTIVE') {
+          showPopup(data.error || 'Payment or subscription required.', 'Account Balance Notice', 'warning');
           setTimeout(() => {
             const modal = document.getElementById('subscriptionModal');
             if(modal) { modal.style.display = 'flex'; modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; }
@@ -2094,6 +2594,28 @@
         document.getElementById('srtSubmitBtn').disabled = false;
         const modalBox = e.target.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      }
+    }
+
+    function updateSrtLangInfo() {
+      const lang = document.getElementById('srtLanguage')?.value;
+      const hint = document.getElementById('srtLangHint');
+      if (!hint) return;
+      if (lang === 'en') {
+        hint.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i><span>Any video language &rarr; Translated to English (Standard UTF-8)</span>';
+      } else {
+        hint.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i><span>Any video language &rarr; Translated to Sinhala (FM-Abhaya Font)</span>';
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function copyGeneratedSrt() {
+      if (window.lastGeneratedSrtContent) {
+        navigator.clipboard.writeText(window.lastGeneratedSrtContent).then(() => {
+          if (typeof showPopup === 'function') showPopup('SRT Subtitles copied to clipboard!', 'Copied', 'success');
+        }).catch(() => {
+          if (typeof showPopup === 'function') showPopup('Failed to copy SRT', 'Error', 'error');
+        });
       }
     }
 
@@ -3640,10 +4162,23 @@
         });
     }
 
+    window.handleCustomTopUp = function() {
+      const amtInput = document.getElementById('customTopupAmount');
+      const amount = parseFloat(amtInput ? amtInput.value : 0);
+      if (!amount || amount < 50) {
+        showPopup('Please enter a valid top-up amount (minimum Rs. 50)', 'Invalid Amount', 'warning');
+        return;
+      }
+      startPayHere('balance_' + Math.round(amount), amount, `Wallet Top-Up (Rs. ${amount.toFixed(2)})`);
+    };
+
     payhere.onCompleted = function onCompleted(orderId) {
       console.log("Payment completed. OrderID:" + orderId);
       closeModal('subscriptionModal');
       showPopup('Payment Successful! Processing balance...', 'success');
+      if (typeof window.fetchUserProfile === 'function') {
+        window.fetchUserProfile();
+      }
       setTimeout(() => window.location.reload(), 2000); // Reload to fetch new balance
     };
 
