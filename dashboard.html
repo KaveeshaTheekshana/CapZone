@@ -12,20 +12,19 @@
       ? (window.location.port === '6039' ? window.location.origin : 'http://localhost:6039')
       : (window.location.origin && window.location.origin.startsWith('http') ? window.location.origin : 'https://capzone.kaveez.top');
 
-    const originalFetch = window.fetch;
+    const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
       let [resource, config] = arguments;
       if (typeof resource === 'string' && resource.includes('/api/')) {
         config = config || {};
 
-        // If body is FormData, we can append email
         if (window.currentUserEmail) {
           if (config.body && config.body instanceof FormData) {
-            config.body.append('email', window.currentUserEmail);
+            if (!config.body.has('email')) config.body.append('email', window.currentUserEmail);
           } else if (config.body && typeof config.body === 'string') {
             try {
               let parsed = JSON.parse(config.body);
-              if (typeof parsed === 'object' && parsed !== null) {
+              if (typeof parsed === 'object' && parsed !== null && !parsed.email) {
                 parsed.email = window.currentUserEmail;
                 config.body = JSON.stringify(parsed);
               }
@@ -35,13 +34,13 @@
 
         // Add headers
         config.headers = config.headers || {};
-        let customApiKey = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : '';
+        let customApiKey = localStorage.getItem('capzone_api_type') === 'own' ? (localStorage.getItem('capzone_gemini_key') || '') : '';
         if (config.headers instanceof Headers) {
-          if (window.currentUserEmail) config.headers.append('x-user-email', window.currentUserEmail);
-          if (customApiKey) config.headers.append('x-api-key', customApiKey);
+          if (window.currentUserEmail && !config.headers.has('x-user-email')) config.headers.append('x-user-email', window.currentUserEmail);
+          if (customApiKey && !config.headers.has('x-api-key')) config.headers.append('x-api-key', customApiKey);
         } else {
-          if (window.currentUserEmail) config.headers['x-user-email'] = window.currentUserEmail;
-          if (customApiKey) config.headers['x-api-key'] = customApiKey;
+          if (window.currentUserEmail && !config.headers['x-user-email']) config.headers['x-user-email'] = window.currentUserEmail;
+          if (customApiKey && !config.headers['x-api-key']) config.headers['x-api-key'] = customApiKey;
         }
       }
       return originalFetch(resource, config);
@@ -95,95 +94,13 @@
     }
   </script>
 
-  <!-- Firebase Auth Protection -->
+  <!-- Firebase Auth Protection & Real-Time Sync Engine -->
   <script type="module">
     import { auth, onAuthStateChanged, signOut } from './firebase-config.js';
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Enforce 10-day login session
-        const loginTimestamp = localStorage.getItem('capzone_login_timestamp');
-        if (loginTimestamp && (Date.now() - parseInt(loginTimestamp)) > 10 * 24 * 60 * 60 * 1000) {
-          console.warn("Session expired after 10 days.");
-          signOut(auth).then(() => {
-            localStorage.removeItem('capzone_login_timestamp');
-            window.location.href = 'login.html';
-          });
-          return;
-        }
-      }
-
-      // Purge old 'default' dummy key or invalid email from localStorage
-      if (localStorage.getItem('capzone_gemini_key') === 'default' || localStorage.getItem('capzone_api_key') === 'default') {
-        localStorage.removeItem('capzone_gemini_key');
-        localStorage.removeItem('capzone_api_key');
-        localStorage.removeItem('gemini_api_key');
-        localStorage.setItem('capzone_api_type', 'server');
-      }
-      let curStoredEmail = localStorage.getItem('capzone_user_email');
-      if (!curStoredEmail || curStoredEmail === 'creator@capzone.ai' || curStoredEmail === 'creator@capzone.local') {
-        localStorage.setItem('capzone_user_email', 'kaveeshatd@gmail.com');
-      }
-
-      if (!user) {
-        // [DEV MODE] Temporarily bypassing login redirect
-        window.location.href = 'login.html';
-        console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
-        let savedEmail = localStorage.getItem('capzone_user_email') || 'kaveeshatd@gmail.com';
-        window.currentUserEmail = savedEmail;
-        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
-        if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile(savedEmail);
-      } else {
-        const profileName = document.getElementById('profileName');
-        const profileEmail = document.getElementById('profileEmail');
-        const profileInitial = document.getElementById('profileInitial');
-        const navProfileName = document.getElementById('navProfileName');
-
-        window.currentUserEmail = user.email;
-        localStorage.setItem('capzone_user_email', user.email);
-        if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
-        if (profileEmail) profileEmail.textContent = user.email;
-        if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-        if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
-        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
-        if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile(user.email);
-
-        // Fetch saved API key from backend
-        fetch(`${window.API_BASE_URL || ''}/api/save-user`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: user.email })
-        }).then(res => res.json()).then(data => {
-          if (data.api_key && data.api_key !== 'default') {
-            syncApiKeys(data.api_key);
-          } else {
-            const userApiKey = document.getElementById('userApiKey');
-            const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-            if (userApiKey) userApiKey.value = '';
-            if (geminiApiKeyInput) geminiApiKeyInput.value = '';
-          }
-        }).catch(e => console.error("Could not fetch API key", e));
-      }
-    });
 
     window.currentUserData = null;
-    window.fetchUserProfile = async function(email) {
-      let uEmail = email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
-      if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
-        uEmail = 'kaveeshatd@gmail.com';
-        localStorage.setItem('capzone_user_email', uEmail);
-      }
-      window.currentUserEmail = uEmail;
-      try {
-        const res = await fetch(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}`);
-        if (!res.ok) return;
-        const data = await res.json();
-        window.currentUserData = data;
-        window.updateUserProfileUI(data);
-      } catch (err) {
-        console.warn("Could not fetch user profile info:", err);
-      }
-    };
 
+    // 1. Function to update all Dashboard UI elements with live user balance & subscription data
     window.updateUserProfileUI = function(data) {
       if (!data) return;
       const balance = typeof data.balance === 'number' ? data.balance : 0;
@@ -217,6 +134,17 @@
       if (profileBalance) profileBalance.innerText = balance.toFixed(2);
       const modalCurrentBalance = document.getElementById('modalCurrentBalance');
       if (modalCurrentBalance) modalCurrentBalance.innerText = balance.toFixed(2);
+
+      const profileStatusBadge = document.getElementById('profileStatusBadge');
+      if (profileStatusBadge) {
+        if (data.active === false) {
+          profileStatusBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/20 text-red-400 border border-red-500/30";
+          profileStatusBadge.innerText = "Deactivated";
+        } else {
+          profileStatusBadge.className = "px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+          profileStatusBadge.innerText = "Active";
+        }
+      }
 
       const profilePlanBadge = document.getElementById('profilePlanBadge');
       if (profilePlanBadge) {
@@ -263,12 +191,45 @@
       if (window.lucide) window.lucide.createIcons();
     };
 
-    // Real-Time Synchronization Engine
-    setInterval(() => {
-      if (typeof window.fetchUserProfile === 'function') {
-        window.fetchUserProfile();
+    // 2. Function to fetch live user profile from server (immune to cache)
+    window.fetchUserProfile = async function(email) {
+      let uEmail = email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
+      if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
+        uEmail = 'kaveeshatd@gmail.com';
+        localStorage.setItem('capzone_user_email', uEmail);
       }
-    }, 3000);
+      window.currentUserEmail = uEmail;
+      try {
+        const fetchFn = window.originalFetch || window.fetch;
+        const res = await fetchFn(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache', 'x-user-email': uEmail }
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        window.currentUserData = data;
+        window.updateUserProfileUI(data);
+      } catch (err) {
+        console.warn("Could not fetch user profile info:", err);
+      }
+    };
+
+    // 3. Setup BroadcastChannel & Storage events for Real-Time synchronization with Admin panel
+    try {
+      const syncChannel = new BroadcastChannel('capzone_realtime_sync');
+      syncChannel.onmessage = (event) => {
+        console.log('⚡ Real-time sync update received from Admin:', event.data);
+        if (typeof window.fetchUserProfile === 'function') {
+          window.fetchUserProfile();
+        }
+      };
+    } catch (e) { }
+
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'capzone_admin_sync' || e.key === 'capzone_balance_update') {
+        if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile();
+      }
+    });
 
     window.addEventListener('focus', () => {
       if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile();
@@ -280,9 +241,80 @@
       }
     });
 
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'capzone_admin_sync' || e.key === 'capzone_balance_update') {
-        if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile();
+    // Fast Polling engine: Checks server every 2 seconds
+    setInterval(() => {
+      if (typeof window.fetchUserProfile === 'function') {
+        window.fetchUserProfile();
+      }
+    }, 2000);
+
+    // Initial immediate fetch on page boot
+    window.fetchUserProfile();
+
+    // 4. Firebase Auth listener
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const loginTimestamp = localStorage.getItem('capzone_login_timestamp');
+        if (loginTimestamp && (Date.now() - parseInt(loginTimestamp)) > 10 * 24 * 60 * 60 * 1000) {
+          console.warn("Session expired after 10 days.");
+          signOut(auth).then(() => {
+            localStorage.removeItem('capzone_login_timestamp');
+            window.location.href = 'login.html';
+          });
+          return;
+        }
+      }
+
+      // Purge old 'default' dummy key or invalid email from localStorage
+      if (localStorage.getItem('capzone_gemini_key') === 'default' || localStorage.getItem('capzone_api_key') === 'default') {
+        localStorage.removeItem('capzone_gemini_key');
+        localStorage.removeItem('capzone_api_key');
+        localStorage.removeItem('gemini_api_key');
+        localStorage.setItem('capzone_api_type', 'server');
+      }
+      let curStoredEmail = localStorage.getItem('capzone_user_email');
+      if (!curStoredEmail || curStoredEmail === 'creator@capzone.ai' || curStoredEmail === 'creator@capzone.local') {
+        localStorage.setItem('capzone_user_email', 'kaveeshatd@gmail.com');
+      }
+
+      if (!user) {
+        // [DEV MODE] Temporarily bypassing login redirect
+        window.location.href = 'login.html';
+        console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
+        let savedEmail = localStorage.getItem('capzone_user_email') || 'kaveeshatd@gmail.com';
+        window.currentUserEmail = savedEmail;
+        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+        window.fetchUserProfile(savedEmail);
+      } else {
+        const profileName = document.getElementById('profileName');
+        const profileEmail = document.getElementById('profileEmail');
+        const profileInitial = document.getElementById('profileInitial');
+        const navProfileName = document.getElementById('navProfileName');
+
+        window.currentUserEmail = user.email;
+        localStorage.setItem('capzone_user_email', user.email);
+        if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+        if (profileEmail) profileEmail.textContent = user.email;
+        if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+        if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
+        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+        window.fetchUserProfile(user.email);
+
+        // Fetch saved API key from backend
+        fetch(`${window.API_BASE_URL || ''}/api/save-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: user.email })
+        }).then(res => res.json()).then(data => {
+          if (data.api_key && data.api_key !== 'default') {
+            if (typeof window.syncApiKeys === 'function') window.syncApiKeys(data.api_key);
+          } else {
+            const userApiKey = document.getElementById('userApiKey');
+            const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
+            if (userApiKey) userApiKey.value = '';
+            if (geminiApiKeyInput) geminiApiKeyInput.value = '';
+          }
+        }).catch(e => console.error("Could not fetch API key", e));
       }
     });
 
@@ -1921,6 +1953,9 @@
         modal.style.display = 'flex';
         modal.classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
+        if (modalId === 'profileModal' || modalId === 'subscriptionModal' || modalId === 'srtModal') {
+          if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile();
+        }
         if (typeof updateSrtLangInfo === 'function' && modalId === 'srtModal') updateSrtLangInfo();
         if (window.lucide) lucide.createIcons();
       }
