@@ -439,7 +439,13 @@
         import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
         import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
-        const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
+        const isLiveServerOrFile = window.location.protocol === 'file:' || 
+                                   window.location.port === '5500' || 
+                                   window.location.port === '3000' || 
+                                   window.location.port === '5000';
+        const API_BASE_URL = isLiveServerOrFile 
+          ? 'http://localhost:6039' 
+          : (window.location.origin && window.location.origin.startsWith('http') ? window.location.origin : 'https://capzone.kaveez.top');
 
         async function notifyBackend(user, method, password = '') {
             try {
@@ -613,8 +619,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
