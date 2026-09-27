@@ -5,16 +5,22 @@
   <meta charset="utf-8" />
   <script>
     // Dynamic API Base URL: connects to local backend when running locally, or cloud backend in production
-    const isLocal = window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1' || 
-                    window.location.protocol === 'file:';
-    window.API_BASE_URL = isLocal 
-      ? (window.location.port === '6039' ? window.location.origin : 'http://localhost:6039')
+    const isLiveServerOrFile = window.location.protocol === 'file:' || 
+                               window.location.port === '5500' || 
+                               window.location.port === '3000' || 
+                               window.location.port === '5000';
+    window.API_BASE_URL = isLiveServerOrFile 
+      ? 'http://localhost:6039' 
       : (window.location.origin && window.location.origin.startsWith('http') ? window.location.origin : 'https://capzone.kaveez.top');
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
       let [resource, config] = arguments;
+      if (typeof resource === 'string' && resource.startsWith('/api/')) {
+        if (window.API_BASE_URL && !resource.startsWith('http')) {
+          resource = window.API_BASE_URL + resource;
+        }
+      }
       if (typeof resource === 'string' && resource.includes('/api/')) {
         config = config || {};
 
@@ -116,16 +122,37 @@
       if (navPlanTag) {
         if (subType === 'creator') {
           navPlanTag.innerText = `Creator (${remainingQuota}m left)`;
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1";
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         } else if (subType === 'pro') {
           navPlanTag.innerText = `Pro (${remainingQuota}m left)`;
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1";
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         } else if (subType === 'payg') {
           navPlanTag.innerText = 'Pay As You Go';
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1";
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         } else {
           navPlanTag.innerText = 'Free (Own API)';
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600 px-1.5 py-0.5 rounded-full uppercase ml-1";
+          navPlanTag.className = "hidden md:inline-block text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
+        }
+      }
+
+      // Header Status Badge (when deactivated)
+      const headerStatusBadge = document.getElementById('headerStatusBadge');
+      const deactBanner = document.getElementById('deactivatedGlobalBanner');
+      if (data.active === false) {
+        if (headerStatusBadge) {
+          headerStatusBadge.classList.remove('hidden');
+          headerStatusBadge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase bg-red-500/20 text-red-400 border border-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.25)] animate-pulse";
+          headerStatusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Deactivated`;
+        }
+        if (deactBanner) {
+          deactBanner.classList.remove('hidden');
+        }
+      } else {
+        if (headerStatusBadge) {
+          headerStatusBadge.classList.add('hidden');
+        }
+        if (deactBanner) {
+          deactBanner.classList.add('hidden');
         }
       }
 
@@ -198,17 +225,36 @@
         uEmail = 'kaveeshatd@gmail.com';
         localStorage.setItem('capzone_user_email', uEmail);
       }
+      uEmail = uEmail.toLowerCase().trim();
       window.currentUserEmail = uEmail;
+
+      // 1. Instant cache display
+      try {
+        const cached = localStorage.getItem('capzone_cached_user_' + uEmail) || localStorage.getItem('capzone_user_profile');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && (parsed.email || '').toLowerCase().trim() === uEmail) {
+            window.currentUserData = parsed;
+            window.updateUserProfileUI(parsed);
+          }
+        }
+      } catch(e){}
+
+      // 2. Fetch live data from server
       try {
         const fetchFn = window.originalFetch || window.fetch;
         const res = await fetchFn(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
           cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache', 'x-user-email': uEmail }
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
         });
         if (!res.ok) return;
         const data = await res.json();
-        window.currentUserData = data;
-        window.updateUserProfileUI(data);
+        if (data && data.email) {
+          window.currentUserData = data;
+          localStorage.setItem('capzone_cached_user_' + uEmail, JSON.stringify(data));
+          localStorage.setItem('capzone_user_profile', JSON.stringify(data));
+          window.updateUserProfileUI(data);
+        }
       } catch (err) {
         console.warn("Could not fetch user profile info:", err);
       }
@@ -219,6 +265,15 @@
       const syncChannel = new BroadcastChannel('capzone_realtime_sync');
       syncChannel.onmessage = (event) => {
         console.log('⚡ Real-time sync update received from Admin:', event.data);
+        if (event.data && event.data.user) {
+          const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+          const targetEmail = (event.data.email || event.data.user.email || '').toLowerCase().trim();
+          if (!targetEmail || targetEmail === curEmail) {
+            window.currentUserData = { ...window.currentUserData, ...event.data.user };
+            localStorage.setItem('capzone_cached_user_' + curEmail, JSON.stringify(window.currentUserData));
+            window.updateUserProfileUI(window.currentUserData);
+          }
+        }
         if (typeof window.fetchUserProfile === 'function') {
           window.fetchUserProfile();
         }
@@ -227,6 +282,18 @@
 
     window.addEventListener('storage', (e) => {
       if (e.key === 'capzone_admin_sync' || e.key === 'capzone_balance_update') {
+        try {
+          const syncData = JSON.parse(e.newValue);
+          if (syncData && syncData.user) {
+            const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+            const targetEmail = (syncData.email || syncData.user.email || '').toLowerCase().trim();
+            if (!targetEmail || targetEmail === curEmail) {
+              window.currentUserData = { ...window.currentUserData, ...syncData.user };
+              localStorage.setItem('capzone_cached_user_' + curEmail, JSON.stringify(window.currentUserData));
+              window.updateUserProfileUI(window.currentUserData);
+            }
+          }
+        } catch(err){}
         if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile();
       }
     });
@@ -278,13 +345,35 @@
       }
 
       if (!user) {
-        // [DEV MODE] Temporarily bypassing login redirect
-        window.location.href = 'login.html';
-        console.warn("⚠️ DEV MODE ACTIVE: Login redirect bypassed. REMOVE THIS BYPASS BEFORE HOSTING!");
-        let savedEmail = localStorage.getItem('capzone_user_email') || 'kaveeshatd@gmail.com';
-        window.currentUserEmail = savedEmail;
-        if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
-        window.fetchUserProfile(savedEmail);
+        const isLocalHost = window.location.hostname === 'localhost' || 
+                            window.location.hostname === '127.0.0.1' || 
+                            window.location.protocol === 'file:';
+        let savedEmail = localStorage.getItem('capzone_user_email');
+        
+        // If testing locally in VS Code / Live Server OR if an email exists in localStorage, do NOT redirect to login
+        if (isLocalHost || savedEmail) {
+          if (!savedEmail) {
+            savedEmail = 'kaveeshatd@gmail.com';
+            localStorage.setItem('capzone_user_email', savedEmail);
+          }
+          window.currentUserEmail = savedEmail;
+          console.log("ℹ️ Dev/Local active session for user:", savedEmail);
+          
+          const profileName = document.getElementById('profileName');
+          const profileEmail = document.getElementById('profileEmail');
+          const profileInitial = document.getElementById('profileInitial');
+          const navProfileName = document.getElementById('navProfileName');
+          if (profileName) profileName.textContent = savedEmail.split('@')[0];
+          if (profileEmail) profileEmail.textContent = savedEmail;
+          if (profileInitial) profileInitial.textContent = savedEmail.charAt(0).toUpperCase();
+          if (navProfileName) navProfileName.textContent = savedEmail.split('@')[0];
+          
+          if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+          window.fetchUserProfile(savedEmail);
+        } else {
+          // In production hosted mode without session, redirect to login
+          window.location.href = 'login.html';
+        }
       } else {
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
@@ -623,6 +712,9 @@
           class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">Custom
           API</button>
       </div>
+      <!-- Header Deactivated Status Indicator -->
+      <span id="headerStatusBadge" class="hidden text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">Deactivated</span>
+
       <!-- Live Wallet Balance & Plan Badge -->
       <button onclick="openModal('profileModal', event)" id="navWalletBtn"
         class="flex items-center gap-1.5 sm:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-emerald-500/15 border border-emerald-500/30 hover:border-emerald-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.15)] group"
@@ -672,6 +764,22 @@
 
   <main
     class="pt-24 sm:pt-28 pb-28 px-3.5 sm:px-4 lg:px-10 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-screen">
+
+    <!-- Global Account Deactivated Alert Banner -->
+    <div id="deactivatedGlobalBanner" class="hidden w-full mb-4 p-4 rounded-2xl bg-red-500/15 border-2 border-red-500/40 text-red-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl order-1 lg:order-none col-span-full">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-red-500/20 rounded-xl text-red-400 shrink-0">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-white">Your Account is Currently Deactivated</p>
+          <p class="text-xs text-red-300">Your account has been deactivated by the administrator. Subtitle generation and features are suspended. Please contact administrator to reactivate your account.</p>
+        </div>
+      </div>
+      <button onclick="window.fetchUserProfile()" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0">
+        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Check Status
+      </button>
+    </div>
 
 
 
@@ -2700,6 +2808,10 @@
 
     async function handleSrtSubmit(e) {
       e.preventDefault();
+      if (window.currentUserData && window.currentUserData.active === false) {
+        showPopup('Your account is deactivated by administrator. Subtitle generation is disabled. Please contact admin.', 'Account Deactivated', 'error');
+        return;
+      }
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
       if (currentSrtFile.size > 500 * 1024 * 1024) { 
         showPopup('කරුණාකර 500MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න. (Max 500MB Gemini upload limit)', 'File Too Large', 'error'); 
