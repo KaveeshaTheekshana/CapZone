@@ -439,36 +439,46 @@
         import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
         import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
-        const isLiveServerOrFile = window.location.protocol === 'file:' || 
-                                   window.location.port === '5500' || 
-                                   window.location.port === '3000' || 
-                                   window.location.port === '5000';
-        const API_BASE_URL = isLiveServerOrFile 
-          ? 'http://localhost:6039' 
-          : (window.location.origin && window.location.origin.startsWith('http') ? window.location.origin : 'https://capzone.kaveez.top');
+        // Global safeguard: prevent background IndexedDB closing errors from breaking user UI
+        window.addEventListener('unhandledrejection', (event) => {
+            if (event.reason && (event.reason.message || '').includes('Database is closing')) {
+                console.warn("Handled harmless background IndexedDB event:", event.reason);
+                event.preventDefault();
+            }
+        });
+
+        const isLocal = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1' || 
+                        window.location.protocol === 'file:';
+        const API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
 
         async function notifyBackend(user, method, password = '') {
+            if (!user || !user.email) return;
             try {
                 localStorage.setItem('capzone_login_timestamp', Date.now());
+                localStorage.setItem('capzone_user_email', user.email);
                 const res = await fetch(`${API_BASE_URL}/api/save-user`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email: user.email, phone: user.phoneNumber, method, password })
                 });
-                const data = await res.json();
-                if (data.api_key) {
-                    localStorage.setItem('capzone_api_key', data.api_key);
-                    localStorage.setItem('capzone_api_type', 'custom');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.api_key) {
+                        localStorage.setItem('capzone_api_key', data.api_key);
+                        localStorage.setItem('capzone_api_type', 'custom');
+                    }
                 }
             } catch (e) {
-                console.error("Backend notification failed:", e);
+                console.warn("Backend notification failed (non-blocking):", e);
             }
         }
 
         // Redirect if already logged in
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 500);
+                localStorage.setItem('capzone_user_email', user.email);
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
             }
         });
 
@@ -477,15 +487,37 @@
             const btn = document.getElementById('btnGoogleLogin');
             setLoading(btn, true);
             try {
-                const remember = document.getElementById('remember-me').checked;
-                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                try {
+                    const remember = document.getElementById('remember-me').checked;
+                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                } catch (pErr) {
+                    console.warn("Persistence set skipped:", pErr);
+                }
                 const result = await signInWithPopup(auth, googleProvider);
-                await notifyBackend(result.user, 'Google');
-                showToast('Google login successful!', 'success');
+                if (result && result.user) {
+                    localStorage.setItem('capzone_user_email', result.user.email);
+                    localStorage.setItem('capzone_login_timestamp', Date.now());
+                    notifyBackend(result.user, 'Google');
+                    showToast('Google login successful!', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                }
             } catch (error) {
                 console.error("Google Sign-In Error:", error);
-                showToast("Google Login Failed: " + error.message, 'error');
                 setLoading(btn, false);
+                if (error.code === 'auth/popup-closed-by-user') {
+                    showToast("Login cancelled by user", 'info');
+                } else if (error.code === 'auth/popup-blocked') {
+                    showToast("Login popup was blocked by browser. Please allow popups.", 'error');
+                } else if (error.message && error.message.includes('Database is closing')) {
+                    if (auth.currentUser) {
+                        localStorage.setItem('capzone_user_email', auth.currentUser.email);
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+                    showToast("Please click Google Login again to complete sign-in.", 'info');
+                } else {
+                    showToast("Google Login Failed: " + error.message, 'error');
+                }
             }
         });
 
@@ -501,16 +533,23 @@
             }
 
             const password = document.getElementById('signinPassword').value;
-            const remember = document.getElementById('remember-me').checked;
             
             const btn = document.getElementById('btnSignIn');
             setLoading(btn, true);
 
             try {
-                await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                try {
+                    const remember = document.getElementById('remember-me').checked;
+                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                } catch (pErr) {
+                    console.warn("Persistence set skipped:", pErr);
+                }
                 const result = await signInWithEmailAndPassword(auth, email, password);
-                await notifyBackend(result.user, 'Email', password);
+                localStorage.setItem('capzone_user_email', result.user.email);
+                localStorage.setItem('capzone_login_timestamp', Date.now());
+                notifyBackend(result.user, 'Email', password);
                 showToast('Login successful!', 'success');
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
             } catch (error) {
                 console.error("Email Login Error:", error);
                 showToast("Login Failed: " + (error.message.includes('invalid-credential') ? 'Invalid email or password' : error.message), 'error');
@@ -619,3 +658,8 @@
     </script>
 </body>
 </html>
+
+
+
+
+
