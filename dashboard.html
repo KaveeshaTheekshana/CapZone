@@ -5,13 +5,10 @@
   <meta charset="utf-8" />
   <script>
     // Dynamic API Base URL: connects to local backend when running locally, or cloud backend in production
-    const isLiveServerOrFile = window.location.protocol === 'file:' || 
-                               window.location.port === '5500' || 
-                               window.location.port === '3000' || 
-                               window.location.port === '5000';
-    window.API_BASE_URL = isLiveServerOrFile 
-      ? 'http://localhost:6039' 
-      : (window.location.origin && window.location.origin.startsWith('http') ? window.location.origin : 'https://capzone.kaveez.top');
+    const isLocal = window.location.hostname === 'localhost' || 
+                    window.location.hostname === '127.0.0.1' || 
+                    window.location.protocol === 'file:';
+    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
@@ -394,8 +391,11 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: user.email })
-        }).then(res => res.json()).then(data => {
-          if (data.api_key && data.api_key !== 'default') {
+        }).then(res => {
+          if (!res.ok) throw new Error('HTTP ' + res.status);
+          return res.json();
+        }).then(data => {
+          if (data && data.api_key && data.api_key !== 'default') {
             if (typeof window.syncApiKeys === 'function') window.syncApiKeys(data.api_key);
           } else {
             const userApiKey = document.getElementById('userApiKey');
@@ -403,7 +403,7 @@
             if (userApiKey) userApiKey.value = '';
             if (geminiApiKeyInput) geminiApiKeyInput.value = '';
           }
-        }).catch(e => console.error("Could not fetch API key", e));
+        }).catch(e => console.warn("Could not fetch API key (safe non-blocking):", e));
       }
     });
 
