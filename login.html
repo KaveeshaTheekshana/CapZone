@@ -462,7 +462,7 @@
             browserLocalPersistence, 
             browserSessionPersistence, 
             onAuthStateChanged 
-        } from './firebase-config.js';
+        } from './firebase-config.js?v=2.5';
 
         // Global safeguard: prevent background IndexedDB closing errors from breaking user UI
         window.addEventListener('unhandledrejection', (event) => {
@@ -475,7 +475,7 @@
         const isLocal = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
                         window.location.protocol === 'file:';
-        const API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://kaveesha.top';
+        const API_BASE_URL = isLocal ? 'http://localhost:6039' : window.location.origin;
 
         async function notifyBackend(user, method, password = '') {
             if (!user || !user.email) return;
@@ -692,7 +692,7 @@
         });
     </script>
     <!-- Universal Bilingual Policy Modal Script -->
-    <script src="policies-modal.js" onerror="this.onerror=null;this.src='public/policies-modal.js';"></script>
+    <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
 </body>
 </html>
 
