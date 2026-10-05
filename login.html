@@ -452,8 +452,17 @@
 
     <!-- Firebase Authentication Logic -->
     <script type="module">
-        import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
-        import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { 
+            auth, 
+            loginWithGoogle, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            sendPasswordResetEmail, 
+            setPersistence, 
+            browserLocalPersistence, 
+            browserSessionPersistence, 
+            onAuthStateChanged 
+        } from './firebase-config.js';
 
         // Global safeguard: prevent background IndexedDB closing errors from breaking user UI
         window.addEventListener('unhandledrejection', (event) => {
@@ -519,7 +528,7 @@
                 } catch (pErr) {
                     console.warn("Persistence set skipped:", pErr);
                 }
-                const result = await signInWithPopup(auth, googleProvider);
+                const result = await loginWithGoogle();
                 if (result && result.user) {
                     localStorage.setItem('capzone_user_email', result.user.email);
                     localStorage.setItem('capzone_login_timestamp', Date.now());
@@ -683,7 +692,7 @@
         });
     </script>
     <!-- Universal Bilingual Policy Modal Script -->
-    <script src="public/policies-modal.js"></script>
+    <script src="policies-modal.js" onerror="this.onerror=null;this.src='public/policies-modal.js';"></script>
 </body>
 </html>
 
