@@ -5,10 +5,10 @@
   <meta charset="utf-8" />
   <script>
     // Dynamic API Base URL: connects to local backend when running locally, or cloud backend in production
-    const isLocal = window.location.hostname === 'localhost' || 
-                    window.location.hostname === '127.0.0.1' || 
-                    window.location.protocol === 'file:';
-    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
+    const isLocal = window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.protocol === 'file:';
+    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.top';
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
@@ -104,7 +104,7 @@
     window.currentUserData = null;
 
     // 1. Function to update all Dashboard UI elements with live user balance & subscription data
-    window.updateUserProfileUI = function(data) {
+    window.updateUserProfileUI = function (data) {
       if (!data) return;
       const balance = typeof data.balance === 'number' ? data.balance : 0;
       const subType = data.subscription_type || 'none';
@@ -216,7 +216,7 @@
     };
 
     // 2. Function to fetch live user profile from server (immune to cache)
-    window.fetchUserProfile = async function(email) {
+    window.fetchUserProfile = async function (email) {
       if (window._isFetchingProfile) return;
       window._isFetchingProfile = true;
       try {
@@ -238,7 +238,7 @@
               window.updateUserProfileUI(parsed);
             }
           }
-        } catch(e){}
+        } catch (e) { }
 
         // 2. Fetch live data from server
         try {
@@ -249,8 +249,8 @@
           }).catch(() => null);
 
           // If local backend is unreachable or returned non-200, fallback to cloud backend
-          if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
-            res = await fetchFn(`https://capzone.kaveez.top/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
+          if ((!res || !res.ok) && window.API_BASE_URL !== 'https://kaveesha.top') {
+            res = await fetchFn(`https://kaveesha.top/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
               cache: 'no-store',
               headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
             }).catch(() => null);
@@ -311,7 +311,7 @@
               window.updateUserProfileUI(window.currentUserData);
             }
           }
-        } catch(err){}
+        } catch (err) { }
         if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile();
       }
     });
@@ -363,11 +363,11 @@
       }
 
       if (!user) {
-        const isLocalHost = window.location.hostname === 'localhost' || 
-                            window.location.hostname === '127.0.0.1' || 
-                            window.location.protocol === 'file:';
+        const isLocalHost = window.location.hostname === 'localhost' ||
+          window.location.hostname === '127.0.0.1' ||
+          window.location.protocol === 'file:';
         let savedEmail = localStorage.getItem('capzone_user_email');
-        
+
         // If testing locally in VS Code / Live Server OR if an email exists in localStorage, do NOT redirect to login
         if (isLocalHost || savedEmail) {
           if (!savedEmail) {
@@ -376,7 +376,7 @@
           }
           window.currentUserEmail = savedEmail;
           console.log("ℹ️ Dev/Local active session for user:", savedEmail);
-          
+
           const profileName = document.getElementById('profileName');
           const profileEmail = document.getElementById('profileEmail');
           const profileInitial = document.getElementById('profileInitial');
@@ -385,7 +385,7 @@
           if (profileEmail) profileEmail.textContent = savedEmail;
           if (profileInitial) profileInitial.textContent = savedEmail.charAt(0).toUpperCase();
           if (navProfileName) navProfileName.textContent = savedEmail.split('@')[0];
-          
+
           if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
           window.fetchUserProfile(savedEmail);
         } else {
@@ -673,13 +673,16 @@
       .blur-\[100px\] {
         filter: blur(35px) !important;
       }
+
       .mix-blend-screen {
         mix-blend-mode: normal !important;
       }
+
       .animate-\[pulse_8s_ease-in-out_infinite\],
       .animate-\[pulse_10s_ease-in-out_infinite\] {
         animation: none !important;
       }
+
       * {
         -webkit-tap-highlight-color: transparent;
       }
@@ -753,17 +756,21 @@
           API</button>
       </div>
       <!-- Header Deactivated Status Indicator -->
-      <span id="headerStatusBadge" class="hidden text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">Deactivated</span>
+      <span id="headerStatusBadge"
+        class="hidden text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30">Deactivated</span>
 
       <!-- Live Wallet Balance & Plan Badge -->
       <button onclick="openModal('profileModal', event)" id="navWalletBtn"
         class="flex items-center gap-1.5 sm:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-emerald-500/15 border border-emerald-500/30 hover:border-emerald-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.15)] group"
         title="View Wallet Balance & Plan">
-        <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+        <div
+          class="w-6 h-6 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
           <i data-lucide="wallet" class="w-3.5 h-3.5 text-white"></i>
         </div>
         <span class="text-xs font-bold text-emerald-300 tracking-wider" id="navWalletText">Rs. 0.00</span>
-        <span class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider hidden md:inline" id="navPlanTag">Pay-Per-Video</span>
+        <span
+          class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider hidden md:inline"
+          id="navPlanTag">Pay-Per-Video</span>
       </button>
 
       <!-- Plans / Subscription Button -->
@@ -806,17 +813,20 @@
     class="pt-24 sm:pt-28 pb-28 px-3.5 sm:px-4 lg:px-10 max-w-[1600px] mx-auto flex flex-col lg:flex-row gap-6 lg:gap-8 min-h-screen">
 
     <!-- Global Account Deactivated Alert Banner -->
-    <div id="deactivatedGlobalBanner" class="hidden w-full mb-4 p-4 rounded-2xl bg-red-500/15 border-2 border-red-500/40 text-red-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl order-1 lg:order-none col-span-full">
+    <div id="deactivatedGlobalBanner"
+      class="hidden w-full mb-4 p-4 rounded-2xl bg-red-500/15 border-2 border-red-500/40 text-red-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl order-1 lg:order-none col-span-full">
       <div class="flex items-center gap-3">
         <div class="p-2.5 bg-red-500/20 rounded-xl text-red-400 shrink-0">
           <i data-lucide="alert-triangle" class="w-5 h-5"></i>
         </div>
         <div>
           <p class="text-sm font-bold text-white">Your Account is Currently Deactivated</p>
-          <p class="text-xs text-red-300">Your account has been deactivated by the administrator. Subtitle generation and features are suspended. Please contact administrator to reactivate your account.</p>
+          <p class="text-xs text-red-300">Your account has been deactivated by the administrator. Subtitle generation
+            and features are suspended. Please contact administrator to reactivate your account.</p>
         </div>
       </div>
-      <button onclick="window.fetchUserProfile()" class="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0">
+      <button onclick="window.fetchUserProfile()"
+        class="px-3.5 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0">
         <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Check Status
       </button>
     </div>
@@ -1061,11 +1071,14 @@
 
       <!-- Policy Links (PayHere Merchant Compliant Bilingual Modals) -->
       <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400 mt-4 mb-2">
-        <button type="button" class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
+        <button type="button"
+          class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
           onclick="openPolicyModal('terms')">Terms &amp; Conditions (කොන්දේසි)</button>
-        <button type="button" class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
+        <button type="button"
+          class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
           onclick="openPolicyModal('privacy')">Privacy Policy (පෞද්ගලිකත්වය)</button>
-        <button type="button" class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
+        <button type="button"
+          class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
           onclick="openPolicyModal('refund')">Return Policy (මුදල් ආපසු ගෙවීම)</button>
       </div>
 
@@ -1150,7 +1163,8 @@
   <!-- PROFILE MODAL -->
   <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto" style="scrollbar-width: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto"
+      style="scrollbar-width: none;">
       <button onclick="closeModal('profileModal', event)"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
@@ -1163,14 +1177,16 @@
           id="profileInitial">U</div>
         <div class="flex items-center justify-center gap-2">
           <h2 class="text-xl font-bold text-white" id="profileName">User</h2>
-          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
+          <span
+            class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
         </div>
         <p class="text-xs text-slate-400 mt-0.5" id="profileEmail">user@example.com</p>
       </div>
 
       <div class="space-y-4">
         <!-- 1. Wallet Balance Card (ගිණුමේ ඇති මුදල) -->
-        <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border border-emerald-500/30 relative overflow-hidden shadow-lg">
+        <div
+          class="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/60 to-slate-900 border border-emerald-500/30 relative overflow-hidden shadow-lg">
           <div class="flex items-center justify-between mb-1">
             <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
               <i data-lucide="wallet" class="w-4 h-4"></i> ගිණුමේ ඇති මුදල / Wallet Balance
@@ -1179,7 +1195,8 @@
           </div>
           <div class="flex items-baseline justify-between mt-2">
             <div class="text-3xl font-black text-white tracking-tight">
-              Rs. <span id="profileBalance" class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">0.00</span>
+              Rs. <span id="profileBalance"
+                class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">0.00</span>
             </div>
             <button onclick="closeModal('profileModal', event); openToolWithIntercept('subscriptionModal', event);"
               class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs shadow-md shadow-emerald-500/20 transition-all flex items-center gap-1.5">
@@ -1196,7 +1213,8 @@
           <div class="flex items-center justify-between">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Active Package</span>
             <div id="profilePlanBadge">
-              <span class="px-2.5 py-1 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full font-bold text-xs uppercase tracking-wider">Pay-Per-Video</span>
+              <span
+                class="px-2.5 py-1 bg-slate-700/50 text-slate-300 border border-slate-600 rounded-full font-bold text-xs uppercase tracking-wider">Pay-Per-Video</span>
             </div>
           </div>
 
@@ -1204,10 +1222,13 @@
           <div id="profileMonthlySection" style="display: none;" class="pt-2 border-t border-white/5 space-y-2">
             <div class="flex items-center justify-between text-xs">
               <span class="text-slate-400">Monthly Quota:</span>
-              <span class="font-bold text-white"><span id="profileQuotaUsed">0</span> / <span id="profileQuotaLimit">0</span> Mins</span>
+              <span class="font-bold text-white"><span id="profileQuotaUsed">0</span> / <span
+                  id="profileQuotaLimit">0</span> Mins</span>
             </div>
             <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
-              <div id="profileQuotaBar" class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+              <div id="profileQuotaBar"
+                class="bg-gradient-to-r from-amber-500 to-emerald-500 h-full rounded-full transition-all duration-300"
+                style="width: 0%"></div>
             </div>
             <div class="flex items-center justify-between text-[11px]">
               <span id="profileQuotaRemaining" class="text-emerald-400 font-bold">0 Mins Remaining</span>
@@ -1239,33 +1260,42 @@
         </div>
 
         <!-- 3. System Limits Notice -->
-        <div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300/90 text-xs flex items-center justify-between">
+        <div
+          class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300/90 text-xs flex items-center justify-between">
           <div class="flex items-center gap-2">
             <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-amber-400"></i>
             <div>
               <p class="font-bold text-[11px]">System Platform Limits</p>
-              <p class="text-[10px] text-amber-200/80">Max Video Duration: 30 Mins | Max Upload Size: 500 MB (Gemini AI limit)</p>
+              <p class="text-[10px] text-amber-200/80">Max Video Duration: 30 Mins | Max Upload Size: 500 MB (Gemini AI
+                limit)</p>
             </div>
           </div>
         </div>
 
         <!-- 4. Account Statistics -->
-        <div class="flex items-center justify-between p-3 rounded-2xl bg-black/30 border border-white/5 text-xs text-slate-300">
-          <span class="flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i> Total SRTs Generated</span>
+        <div
+          class="flex items-center justify-between p-3 rounded-2xl bg-black/30 border border-white/5 text-xs text-slate-300">
+          <span class="flex items-center gap-1.5"><i data-lucide="file-text" class="w-4 h-4 text-purple-400"></i> Total
+            SRTs Generated</span>
           <span class="font-bold text-white" id="profileSrtCount">0</span>
         </div>
 
         <!-- 5. API Keys (Collapsible / Advanced) -->
         <details class="group p-3 rounded-2xl bg-black/30 border border-white/5 text-xs">
           <summary class="font-bold text-slate-300 cursor-pointer list-none flex items-center justify-between">
-            <span class="flex items-center gap-1.5"><i data-lucide="key" class="w-4 h-4 text-purple-400"></i> Personal Gemini API Key (Free Subtitles)</span>
+            <span class="flex items-center gap-1.5"><i data-lucide="key" class="w-4 h-4 text-purple-400"></i> Personal
+              Gemini API Key (Free Subtitles)</span>
             <i data-lucide="chevron-down" class="w-4 h-4 transition-transform group-open:rotate-180 text-slate-400"></i>
           </summary>
           <div class="mt-3 space-y-3 pt-3 border-t border-white/5">
             <div>
-              <label class="text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1 block">Google Gemini API Key</label>
-              <input type="text" id="userApiKey" autocomplete="off" placeholder="Paste your Gemini API key (AIzaSy...)" class="input-fix w-full px-3 py-2 rounded-xl text-xs outline-none bg-slate-900 border border-slate-700 text-white font-mono" />
-              <p class="text-[10px] text-slate-400 mt-1">Get your free key from <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 underline">Google AI Studio</a>. Subtitles will be 100% free!</p>
+              <label class="text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1 block">Google Gemini API
+                Key</label>
+              <input type="text" id="userApiKey" autocomplete="off" placeholder="Paste your Gemini API key (AIzaSy...)"
+                class="input-fix w-full px-3 py-2 rounded-xl text-xs outline-none bg-slate-900 border border-slate-700 text-white font-mono" />
+              <p class="text-[10px] text-slate-400 mt-1">Get your free key from <a
+                  href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 underline">Google
+                  AI Studio</a>. Subtitles will be 100% free!</p>
             </div>
             <div class="flex gap-2">
               <button id="saveApiKeyBtn" type="button"
@@ -1273,8 +1303,7 @@
                 class="flex-1 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md hover:from-indigo-600 hover:to-purple-600 transition-all">
                 Save API Key
               </button>
-              <button id="clearApiKeyBtn" type="button"
-                onclick="clearUserApiKey()"
+              <button id="clearApiKeyBtn" type="button" onclick="clearUserApiKey()"
                 class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
                 Clear
               </button>
@@ -1504,7 +1533,8 @@
   <!-- SRT MODAL -->
   <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto" style="scrollbar-width: none;">
+    <div class="glass-card w-full max-w-xl rounded-3xl p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
+      style="scrollbar-width: none;">
       <button onclick="closeModal('srtModal', event)"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-black/20 p-2 rounded-full transition-colors">
         <i data-lucide="x" class="w-4 h-4"></i>
@@ -1531,22 +1561,27 @@
               <i data-lucide="upload-cloud" class="w-8 h-8 text-purple-500"></i>
             </div>
             <p class="text-sm text-white font-bold" id="srtFileName">Click to Browse Media (MP4, MKV, MP3)</p>
-            <p class="text-xs text-slate-400 mt-2">⚡ System Limits: Max duration 30 minutes | Max upload 500 MB (Gemini AI optimized)</p>
+            <p class="text-xs text-slate-400 mt-2">⚡ System Limits: Max duration 30 minutes | Max upload 500 MB (Gemini
+              AI optimized)</p>
           </div>
         </div>
 
         <!-- Dynamic Pre-check & Validation Status Card -->
-        <div id="srtValidationCard" class="p-4 rounded-2xl bg-black/50 border border-purple-500/30 space-y-2.5" style="display: none;">
+        <div id="srtValidationCard" class="p-4 rounded-2xl bg-black/50 border border-purple-500/30 space-y-2.5"
+          style="display: none;">
           <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="clock" class="w-3.5 h-3.5 text-purple-400"></i> Video Duration:</span>
+            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="clock"
+                class="w-3.5 h-3.5 text-purple-400"></i> Video Duration:</span>
             <span class="font-bold text-white font-mono" id="srtDetectedDuration">-</span>
           </div>
           <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="layers" class="w-3.5 h-3.5 text-blue-400"></i> Package Tier:</span>
+            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="layers"
+                class="w-3.5 h-3.5 text-blue-400"></i> Package Tier:</span>
             <span class="font-bold text-purple-300" id="srtMatchedTier">-</span>
           </div>
           <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="wallet" class="w-3.5 h-3.5 text-emerald-400"></i> Account Status:</span>
+            <span class="text-slate-400 flex items-center gap-1.5"><i data-lucide="wallet"
+                class="w-3.5 h-3.5 text-emerald-400"></i> Account Status:</span>
             <span class="font-bold text-slate-200" id="srtAccountStatus">-</span>
           </div>
 
@@ -1560,7 +1595,9 @@
           <div>
             <label class="text-xs font-bold text-slate-300 mb-2 flex items-center justify-between">
               <span>Target Language</span>
-              <span id="srtLangBadge" class="text-[10px] text-purple-400 font-semibold bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">Auto Translate</span>
+              <span id="srtLangBadge"
+                class="text-[10px] text-purple-400 font-semibold bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">Auto
+                Translate</span>
             </label>
             <select id="srtLanguage" onchange="updateSrtLangInfo()"
               class="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white outline-none focus:border-purple-500 transition-colors">
@@ -1671,8 +1708,10 @@
       <div id="payPerVideoTab" class="animate-fade-in">
         <div class="text-center mb-6">
           <h3 class="text-xl font-bold text-white">No Monthly Commitment</h3>
-          <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30 minutes per video | Max file size: 500 MB)</p>
-          <div class="inline-flex items-center gap-2 mt-3 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-bold">
+          <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30
+            minutes per video | Max file size: 500 MB)</p>
+          <div
+            class="inline-flex items-center gap-2 mt-3 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-bold">
             <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
             Current Wallet Balance: Rs. <span id="modalCurrentBalance">0.00</span>
           </div>
@@ -1752,34 +1791,48 @@
         </div>
 
         <!-- Wallet Top Up & Credit Saver -->
-        <div class="mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800/90 border border-emerald-500/30 max-w-4xl mx-auto shadow-xl">
+        <div
+          class="mt-8 p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800/90 border border-emerald-500/30 max-w-4xl mx-auto shadow-xl">
           <div class="flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
               <div class="flex items-center gap-2">
-                <span class="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl"><i data-lucide="wallet" class="w-5 h-5"></i></span>
+                <span class="p-2 bg-emerald-500/20 text-emerald-400 rounded-xl"><i data-lucide="wallet"
+                    class="w-5 h-5"></i></span>
                 <h4 class="text-base font-bold text-white">Direct Wallet Top-Up (ගිණුමට මුදල් දැමීම)</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1 max-w-md">
-                ඔබට කැමති ඕනෑම මුදලක් ගිණුමට එකතු කරගත හැක. උදා: රු. 200ක් දැමූ විට රු. 100 Mini Clip සාදා ඉතිරි මුදල ගිණුමේ සුරැකිව තබාගත හැක.
+                ඔබට කැමති ඕනෑම මුදලක් ගිණුමට එකතු කරගත හැක. උදා: රු. 200ක් දැමූ විට රු. 100 Mini Clip සාදා ඉතිරි මුදල
+                ගිණුමේ සුරැකිව තබාගත හැක.
               </p>
             </div>
             <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
               <!-- Quick Amount Pills -->
               <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-                <button type="button" onclick="document.getElementById('customTopupAmount').value = 100" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs. 100</button>
-                <button type="button" onclick="document.getElementById('customTopupAmount').value = 200" class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-bold text-emerald-300 border border-emerald-500/30">Rs. 200</button>
-                <button type="button" onclick="document.getElementById('customTopupAmount').value = 250" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs. 250</button>
-                <button type="button" onclick="document.getElementById('customTopupAmount').value = 500" class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs. 500</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 100"
+                  class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs.
+                  100</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 200"
+                  class="px-2.5 py-1 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-xs font-bold text-emerald-300 border border-emerald-500/30">Rs.
+                  200</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 250"
+                  class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs.
+                  250</button>
+                <button type="button" onclick="document.getElementById('customTopupAmount').value = 500"
+                  class="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-slate-300 border border-white/10">Rs.
+                  500</button>
               </div>
               <div class="flex items-center gap-2 w-full sm:w-auto">
                 <div class="relative flex-1 sm:w-32">
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold">Rs.</span>
-                  <input type="number" id="customTopupAmount" placeholder="200" min="50" step="10" class="w-full pl-8 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:border-emerald-500" />
+                  <input type="number" id="customTopupAmount" placeholder="200" min="50" step="10"
+                    class="w-full pl-8 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:border-emerald-500" />
                 </div>
-                <button type="button" onclick="handleCustomTopUp('online')" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
+                <button type="button" onclick="handleCustomTopUp('online')"
+                  class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
                   <i data-lucide="credit-card" class="w-3.5 h-3.5 inline mr-1"></i> Online
                 </button>
-                <button type="button" onclick="handleCustomTopUp('whatsapp')" class="px-4 py-2 bg-green-600/20 hover:bg-green-600 border border-green-500/30 text-green-400 hover:text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
+                <button type="button" onclick="handleCustomTopUp('whatsapp')"
+                  class="px-4 py-2 bg-green-600/20 hover:bg-green-600 border border-green-500/30 text-green-400 hover:text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
                   <i data-lucide="message-circle" class="w-3.5 h-3.5 inline mr-1"></i> WhatsApp
                 </button>
               </div>
@@ -1879,12 +1932,19 @@
       </div>
 
       <!-- PayHere Required Bilingual Policy Links -->
-      <div class="mt-6 pt-4 border-t border-slate-700/50 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-400">
-        <button type="button" onclick="openPolicyModal('terms')" class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Terms &amp; Conditions (කොන්දේසි)</button>
+      <div
+        class="mt-6 pt-4 border-t border-slate-700/50 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-400">
+        <button type="button" onclick="openPolicyModal('terms')"
+          class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Terms
+          &amp; Conditions (කොන්දේසි)</button>
         <span class="text-slate-600">•</span>
-        <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Privacy Policy (පෞද්ගලිකත්වය)</button>
+        <button type="button" onclick="openPolicyModal('privacy')"
+          class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Privacy
+          Policy (පෞද්ගලිකත්වය)</button>
         <span class="text-slate-600">•</span>
-        <button type="button" onclick="openPolicyModal('refund')" class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Return Policy (මුදල් ආපසු ගෙවීම)</button>
+        <button type="button" onclick="openPolicyModal('refund')"
+          class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Return
+          Policy (මුදල් ආපසු ගෙවීම)</button>
       </div>
     </div>
   </div>
@@ -2433,7 +2493,7 @@
       }
     }
 
-    window.openApiKeySettings = function(event) {
+    window.openApiKeySettings = function (event) {
       if (typeof openModal === 'function') {
         openModal('profileModal', event);
       }
@@ -2482,7 +2542,7 @@
         if (statusEl) statusEl.innerText = 'Rejected';
         if (alertEl) {
           alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/15 border border-red-500/30 text-red-300 flex items-start gap-2.5';
-          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024*1024)).toFixed(1)} MB) exceeds 500 MB upload limit (Gemini AI limit). Video rejected.</div>`;
+          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 500 MB upload limit (Gemini AI limit). Video rejected.</div>`;
         }
         if (submitBtn) submitBtn.disabled = true;
         if (window.lucide) window.lucide.createIcons();
@@ -2537,7 +2597,7 @@
       validationCard.style.display = 'block';
 
       const durationFormatted = formatTimeSec(durationSecs);
-      if (durationEl) durationEl.innerText = `${durationFormatted} (${(fileSize / (1024*1024)).toFixed(1)} MB)`;
+      if (durationEl) durationEl.innerText = `${durationFormatted} (${(fileSize / (1024 * 1024)).toFixed(1)} MB)`;
 
       // A. Duration Check: Max 30 minutes (1800 seconds)
       if (durationSecs > 1800) {
@@ -2900,9 +2960,9 @@
         return;
       }
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
-      if (currentSrtFile.size > 500 * 1024 * 1024) { 
-        showPopup('කරුණාකර 500MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න. (Max 500MB Gemini upload limit)', 'File Too Large', 'error'); 
-        return; 
+      if (currentSrtFile.size > 500 * 1024 * 1024) {
+        showPopup('කරුණාකර 500MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න. (Max 500MB Gemini upload limit)', 'File Too Large', 'error');
+        return;
       }
       if (window.currentMediaDuration && window.currentMediaDuration > 1800) {
         showPopup('Video exceeds maximum 30-minute system limit. System only supports up to 30 minutes.', 'Limit Exceeded', 'error');
@@ -2962,7 +3022,7 @@
           const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
           document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
           document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
-          
+
           const resultSubtext = document.getElementById('srtResultSubtext');
           if (resultSubtext) {
             if (lang === 'English') {
@@ -2987,7 +3047,7 @@
           showPopup(data.error || 'Payment or subscription required.', 'Subscription Notice', 'warning');
           setTimeout(() => {
             const modal = document.getElementById('subscriptionModal');
-            if(modal) { modal.style.display = 'flex'; modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; }
+            if (modal) { modal.style.display = 'flex'; modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; }
           }, 1500);
         } else if (data.code === 'ACCOUNT_DEACTIVATED') {
           showPopup(data.error || 'Your account is deactivated by administrator.', 'Account Blocked', 'error');
@@ -4532,8 +4592,8 @@
           body: JSON.stringify(payload)
         }).catch(() => null);
 
-        if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
-          res = await fetchFn(`https://capzone.kaveez.top/api/payhere-confirm`, {
+        if ((!res || !res.ok) && window.API_BASE_URL !== 'https://kaveesha.top') {
+          res = await fetchFn(`https://kaveesha.top/api/payhere-confirm`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-user-email': email },
             body: JSON.stringify(payload)
@@ -4559,7 +4619,7 @@
                 order_id: payload.order_id,
                 user: result.user
               });
-            } catch(e) {}
+            } catch (e) { }
 
             if (typeof window.updateUserProfileUI === 'function') {
               window.updateUserProfileUI(result.user);
@@ -4567,9 +4627,9 @@
 
             closeModal('subscriptionModal');
             showPopup(
-              isDemo 
-                ? `Demo Payment Successful! (Rs. ${amount} added to Database & synced to Admin Panel)` 
-                : `Payment Verified! Your balance has been updated (+Rs. ${amount}).`, 
+              isDemo
+                ? `Demo Payment Successful! (Rs. ${amount} added to Database & synced to Admin Panel)`
+                : `Payment Verified! Your balance has been updated (+Rs. ${amount}).`,
               'success'
             );
             return true;
@@ -4584,9 +4644,9 @@
     }
 
     // Sandbox Demo Payment Tester (Instant Database & Admin Panel Verification)
-    window.testDemoPayment = function(packageType = 'balance_250', amount = 250, description = 'Standard Video (Demo Sandbox Test)') {
+    window.testDemoPayment = function (packageType = 'balance_250', amount = 250, description = 'Standard Video (Demo Sandbox Test)') {
       const uEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'kaveeshatd@gmail.com').toLowerCase().trim();
-      
+
       const confirmAction = () => {
         showPopup('Processing Sandbox Demo payment...', 'info');
         confirmPaymentWithBackend(uEmail, packageType, amount, 'DEMO_' + Date.now(), true, description);
@@ -4676,7 +4736,7 @@
         });
     }
 
-    window.payViaWhatsApp = function(description, amount) {
+    window.payViaWhatsApp = function (description, amount) {
       const uEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
       if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
         showPopup('Please log in with a valid account before making a payment.', 'error');
@@ -4688,7 +4748,7 @@
       window.open(waUrl, '_blank');
     };
 
-    window.handleCustomTopUp = function(method = 'online') {
+    window.handleCustomTopUp = function (method = 'online') {
       const amtInput = document.getElementById('customTopupAmount');
       const amount = parseFloat(amtInput ? amtInput.value : 0);
       if (!amount || amount < 50) {
