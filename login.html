@@ -40,6 +40,13 @@
             background-color: #131722;
             color: #ffffff;
         }
+        @media (max-width: 768px) {
+            * {
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                mix-blend-mode: normal !important;
+            }
+        }
         .tab-content {
             display: none;
             opacity: 0;
@@ -459,7 +466,7 @@
         const isLocal = window.location.hostname === 'localhost' || 
                         window.location.hostname === '127.0.0.1' || 
                         window.location.protocol === 'file:';
-        const API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
+        const API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://kaveesha.top';
 
         async function notifyBackend(user, method, password = '') {
             if (!user || !user.email) return;
@@ -498,6 +505,11 @@
             try {
                 if (window.location.protocol === 'file:') {
                     showToast('Google Sign-In requires a web server. Please open via http://localhost:6039', 'error');
+                    setLoading(btn, false);
+                    return;
+                }
+                if (!auth) {
+                    showToast('Authentication module failed to initialize. Please check your browser settings or disable adblockers.', 'error');
                     setLoading(btn, false);
                     return;
                 }
