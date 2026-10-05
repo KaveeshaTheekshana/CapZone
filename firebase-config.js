@@ -3,11 +3,16 @@ import {
   initializeAuth, 
   getAuth, 
   browserLocalPersistence, 
+  browserSessionPersistence,
   indexedDBLocalPersistence, 
   inMemoryPersistence, 
+  browserPopupRedirectResolver,
   GoogleAuthProvider, 
   signInWithPopup, 
   signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  setPersistence,
   onAuthStateChanged, 
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -25,11 +30,12 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth with multi-layer persistence fallback (prioritizing localStorage so IndexedDB closing errors never break login)
+// Initialize Auth with browserPopupRedirectResolver and multi-layer persistence
 let auth;
 try {
   auth = initializeAuth(app, {
-    persistence: [browserLocalPersistence, indexedDBLocalPersistence, inMemoryPersistence]
+    persistence: [browserLocalPersistence, indexedDBLocalPersistence, inMemoryPersistence],
+    popupRedirectResolver: browserPopupRedirectResolver
   });
 } catch (e) {
   try {
@@ -37,7 +43,10 @@ try {
   } catch (e2) {
     console.warn("Auth init failed, falling back to inMemory:", e2);
     try {
-      auth = initializeAuth(app, { persistence: inMemoryPersistence });
+      auth = initializeAuth(app, { 
+        persistence: inMemoryPersistence,
+        popupRedirectResolver: browserPopupRedirectResolver 
+      });
     } catch (e3) {
       console.error("Critical Auth Init Failure:", e3);
     }
@@ -47,4 +56,25 @@ try {
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-export { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut };
+// Reliable Google Login Helper that explicitly passes browserPopupRedirectResolver
+async function loginWithGoogle() {
+  if (!auth) throw new Error("Authentication module failed to initialize. Please check network/adblocker.");
+  return await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+}
+
+export { 
+  app,
+  auth, 
+  googleProvider, 
+  loginWithGoogle,
+  signInWithPopup, 
+  signInWithEmailAndPassword, 
+  createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
+  setPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  browserPopupRedirectResolver,
+  onAuthStateChanged, 
+  signOut 
+};
