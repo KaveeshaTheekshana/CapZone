@@ -217,43 +217,64 @@
 
     // 2. Function to fetch live user profile from server (immune to cache)
     window.fetchUserProfile = async function(email) {
-      let uEmail = email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
-      if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
-        uEmail = 'kaveeshatd@gmail.com';
-        localStorage.setItem('capzone_user_email', uEmail);
-      }
-      uEmail = uEmail.toLowerCase().trim();
-      window.currentUserEmail = uEmail;
-
-      // 1. Instant cache display
+      if (window._isFetchingProfile) return;
+      window._isFetchingProfile = true;
       try {
-        const cached = localStorage.getItem('capzone_cached_user_' + uEmail) || localStorage.getItem('capzone_user_profile');
-        if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && (parsed.email || '').toLowerCase().trim() === uEmail) {
-            window.currentUserData = parsed;
-            window.updateUserProfileUI(parsed);
+        let uEmail = email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
+        if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
+          uEmail = 'kaveeshatd@gmail.com';
+          localStorage.setItem('capzone_user_email', uEmail);
+        }
+        uEmail = uEmail.toLowerCase().trim();
+        window.currentUserEmail = uEmail;
+
+        // 1. Instant cache display
+        try {
+          const cached = localStorage.getItem('capzone_cached_user_' + uEmail) || localStorage.getItem('capzone_user_profile');
+          if (cached && !window.currentUserData) {
+            const parsed = JSON.parse(cached);
+            if (parsed && (parsed.email || '').toLowerCase().trim() === uEmail) {
+              window.currentUserData = parsed;
+              window.updateUserProfileUI(parsed);
+            }
           }
-        }
-      } catch(e){}
+        } catch(e){}
 
-      // 2. Fetch live data from server
-      try {
-        const fetchFn = window.originalFetch || window.fetch;
-        const res = await fetchFn(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
-          cache: 'no-store',
-          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data && data.email) {
-          window.currentUserData = data;
-          localStorage.setItem('capzone_cached_user_' + uEmail, JSON.stringify(data));
-          localStorage.setItem('capzone_user_profile', JSON.stringify(data));
-          window.updateUserProfileUI(data);
+        // 2. Fetch live data from server
+        try {
+          const fetchFn = window.originalFetch || window.fetch;
+          let res = await fetchFn(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
+            cache: 'no-store',
+            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
+          }).catch(() => null);
+
+          // If local backend is unreachable or returned non-200, fallback to cloud backend
+          if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
+            res = await fetchFn(`https://capzone.kaveez.top/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
+              cache: 'no-store',
+              headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
+            }).catch(() => null);
+          }
+
+          if (res && res.ok) {
+            const data = await res.json();
+            if (data && data.email) {
+              const dataStr = JSON.stringify(data);
+              const hasChanged = window._lastRenderedUserData !== dataStr;
+              window.currentUserData = data;
+              localStorage.setItem('capzone_cached_user_' + uEmail, dataStr);
+              localStorage.setItem('capzone_user_profile', dataStr);
+              if (hasChanged) {
+                window._lastRenderedUserData = dataStr;
+                window.updateUserProfileUI(data);
+              }
+            }
+          }
+        } catch (err) {
+          console.warn("Could not fetch user profile info:", err);
         }
-      } catch (err) {
-        console.warn("Could not fetch user profile info:", err);
+      } finally {
+        window._isFetchingProfile = false;
       }
     };
 
@@ -278,7 +299,7 @@
     } catch (e) { }
 
     window.addEventListener('storage', (e) => {
-      if (e.key === 'capzone_admin_sync' || e.key === 'capzone_balance_update') {
+      if (e.key === 'capzone_admin_sync' || e.key === 'capzone_balance_update' || e.key === 'capzone_payment_sync') {
         try {
           const syncData = JSON.parse(e.newValue);
           if (syncData && syncData.user) {
@@ -305,12 +326,12 @@
       }
     });
 
-    // Fast Polling engine: Checks server every 2 seconds
+    // Polling engine: Checks server every 12 seconds with visibility guard
     setInterval(() => {
-      if (typeof window.fetchUserProfile === 'function') {
+      if (document.visibilityState === 'visible' && typeof window.fetchUserProfile === 'function') {
         window.fetchUserProfile();
       }
-    }, 2000);
+    }, 12000);
 
     // Initial immediate fetch on page boot
     window.fetchUserProfile();
@@ -646,8 +667,27 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
+
+    /* Mobile Performance & Smooth Scrolling Enhancements */
+    @media (max-width: 768px) {
+      .blur-\[100px\] {
+        filter: blur(35px) !important;
+      }
+      .mix-blend-screen {
+        mix-blend-mode: normal !important;
+      }
+      .animate-\[pulse_8s_ease-in-out_infinite\],
+      .animate-\[pulse_10s_ease-in-out_infinite\] {
+        animation: none !important;
+      }
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+    }
   </style>
   <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
+  <!-- Universal Bilingual Policy Modal Script (PayHere Compliant) -->
+  <script src="public/policies-modal.js"></script>
 </head>
 
 <body
@@ -659,10 +699,10 @@
     <div class="absolute inset-0 bg-gradient-to-br from-[#0B0F19] via-[#0f172a] to-[#05070D]"></div>
     <!-- Abstract gradient orbs for modern professional look (CSS only, no images) -->
     <div
-      class="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-indigo-600/10 blur-[100px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]">
+      class="hidden md:block absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-indigo-600/10 blur-[100px] mix-blend-screen animate-[pulse_8s_ease-in-out_infinite]">
     </div>
     <div
-      class="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite]">
+      class="hidden md:block absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-blue-600/10 blur-[100px] mix-blend-screen animate-[pulse_10s_ease-in-out_infinite]">
     </div>
   </div>
 
@@ -857,10 +897,10 @@
             </div>
             <!-- Floating orbs animation -->
             <div
-              class="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[80px] animate-[pulse_6s_ease-in-out_infinite]">
+              class="hidden md:block absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-500/20 blur-[80px] animate-[pulse_6s_ease-in-out_infinite]">
             </div>
             <div
-              class="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 blur-[80px] animate-[pulse_8s_ease-in-out_infinite]">
+              class="hidden md:block absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-500/20 blur-[80px] animate-[pulse_8s_ease-in-out_infinite]">
             </div>
 
             <div class="relative z-10 flex flex-col items-center">
@@ -1019,14 +1059,14 @@
         <i data-lucide="external-link" class="w-3 h-3"></i>
       </a>
 
-      <!-- Policy Links -->
+      <!-- Policy Links (PayHere Merchant Compliant Bilingual Modals) -->
       <div class="flex flex-wrap justify-center gap-6 text-sm font-medium text-slate-400 mt-4 mb-2">
-        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer"
-          onclick="openModal('termsModal', event)">Terms & Conditions</a>
-        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer"
-          onclick="openModal('privacyModal', event)">Privacy Policy</a>
-        <a href="#" class="hover:text-blue-400 transition-colors cursor-pointer"
-          onclick="openModal('returnModal', event)">Return Policy</a>
+        <button type="button" class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
+          onclick="openPolicyModal('terms')">Terms &amp; Conditions (කොන්දේසි)</button>
+        <button type="button" class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
+          onclick="openPolicyModal('privacy')">Privacy Policy (පෞද්ගලිකත්වය)</button>
+        <button type="button" class="hover:text-blue-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-sm font-medium"
+          onclick="openPolicyModal('refund')">Return Policy (මුදල් ආපසු ගෙවීම)</button>
       </div>
 
       <p class="text-[11px] text-gray-400">&copy; 2026 CapZone Subtitle Studio. All rights reserved. Powered by <span
@@ -1608,6 +1648,8 @@
           processing, and priority support.</p>
       </div>
 
+
+
       <!-- Tab Navigation -->
       <div class="flex justify-center mb-8">
         <div class="inline-flex p-1 bg-slate-800/80 rounded-full border border-slate-700/50">
@@ -1647,9 +1689,16 @@
               <p class="text-sm font-bold text-purple-400">0s to 1 min</p>
               <p class="text-xs text-slate-400 mt-1">Shorts, Reels, TikTok clips</p>
             </div>
-            <button onclick="startPayHere('balance_100', 100, 'Mini Clip - Top Up')"
-              class="w-full py-3 rounded-xl border border-purple-500/50 text-purple-400 font-bold hover:bg-purple-500 hover:text-white transition-colors">Top
-              Up Credits</button>
+            <div class="space-y-2 mt-auto">
+              <button onclick="startPayHere('balance_100', 100, 'Mini Clip - Top Up')"
+                class="w-full py-2.5 rounded-xl border border-purple-500/50 text-purple-400 font-bold hover:bg-purple-500 hover:text-white transition-colors text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> Pay Online
+              </button>
+              <button onclick="payViaWhatsApp('Mini Clip - Top Up', 100)"
+                class="w-full py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 font-bold hover:bg-green-600 hover:text-white transition-colors text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+              </button>
+            </div>
           </div>
 
           <!-- Standard Video -->
@@ -1667,9 +1716,16 @@
               <p class="text-sm font-bold text-white">1 to 10 mins</p>
               <p class="text-xs text-slate-400 mt-1">Perfect for YouTube & Social</p>
             </div>
-            <button onclick="startPayHere('balance_250', 250, 'Standard Video - Top Up')"
-              class="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all">Top
-              Up Credits</button>
+            <div class="space-y-2 mt-auto">
+              <button onclick="startPayHere('balance_250', 250, 'Standard Video - Top Up')"
+                class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold hover:shadow-lg hover:shadow-purple-500/25 transition-all text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> Pay Online
+              </button>
+              <button onclick="payViaWhatsApp('Standard Video - Top Up', 250)"
+                class="w-full py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 font-bold hover:bg-green-600 hover:text-white transition-colors text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+              </button>
+            </div>
           </div>
 
           <!-- Extended Video -->
@@ -1682,9 +1738,16 @@
               <p class="text-sm font-bold text-blue-400">10 to 30 mins</p>
               <p class="text-xs text-slate-400 mt-1">Podcasts & Long Lectures</p>
             </div>
-            <button onclick="startPayHere('balance_500', 500, 'Extended Video - Top Up')"
-              class="w-full py-3 rounded-xl border border-blue-500/50 text-blue-400 font-bold hover:bg-blue-500 hover:text-white transition-colors">Top
-              Up Credits</button>
+            <div class="space-y-2 mt-auto">
+              <button onclick="startPayHere('balance_500', 500, 'Extended Video - Top Up')"
+                class="w-full py-2.5 rounded-xl border border-blue-500/50 text-blue-400 font-bold hover:bg-blue-500 hover:text-white transition-colors text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> Pay Online
+              </button>
+              <button onclick="payViaWhatsApp('Extended Video - Top Up', 500)"
+                class="w-full py-2.5 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400 font-bold hover:bg-green-600 hover:text-white transition-colors text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1713,8 +1776,11 @@
                   <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-bold">Rs.</span>
                   <input type="number" id="customTopupAmount" placeholder="200" min="50" step="10" class="w-full pl-8 pr-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:border-emerald-500" />
                 </div>
-                <button type="button" onclick="handleCustomTopUp()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
-                  Top Up
+                <button type="button" onclick="handleCustomTopUp('online')" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
+                  <i data-lucide="credit-card" class="w-3.5 h-3.5 inline mr-1"></i> Online
+                </button>
+                <button type="button" onclick="handleCustomTopUp('whatsapp')" class="px-4 py-2 bg-green-600/20 hover:bg-green-600 border border-green-500/30 text-green-400 hover:text-white font-bold text-xs rounded-xl shadow-md transition-all whitespace-nowrap">
+                  <i data-lucide="message-circle" class="w-3.5 h-3.5 inline mr-1"></i> WhatsApp
                 </button>
               </div>
             </div>
@@ -1753,10 +1819,16 @@
                   class="w-5 h-5 text-amber-500 shrink-0"></i> Instant .srt Download</li>
             </ul>
 
-            <button onclick="startPayHere('creator_sub', 2500, 'Creator Monthly Subscription')"
-              class="w-full py-4 rounded-xl border-2 border-amber-500 text-amber-400 font-bold hover:bg-amber-500 hover:text-white transition-colors uppercase tracking-widest text-xs">
-              Subscribe Now
-            </button>
+            <div class="space-y-2 mt-auto">
+              <button onclick="startPayHere('creator_sub', 2500, 'Creator Monthly Subscription')"
+                class="w-full py-3 rounded-xl border-2 border-amber-500 text-amber-400 font-bold hover:bg-amber-500 hover:text-white transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> Pay Online
+              </button>
+              <button onclick="payViaWhatsApp('Creator Monthly Subscription', 2500)"
+                class="w-full py-3 rounded-xl border-2 border-green-500/50 bg-green-500/10 text-green-400 font-bold hover:bg-green-500 hover:text-white transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+              </button>
+            </div>
           </div>
 
           <!-- Pro Monthly -->
@@ -1786,18 +1858,33 @@
                   class="w-5 h-5 text-emerald-500 shrink-0"></i> Instant .srt Download</li>
             </ul>
 
-            <button onclick="startPayHere('pro_sub', 5000, 'Pro Monthly Subscription')"
-              class="w-full py-4 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all uppercase tracking-widest text-xs">
-              Subscribe Now
-            </button>
+            <div class="space-y-2 mt-auto">
+              <button onclick="startPayHere('pro_sub', 5000, 'Pro Monthly Subscription')"
+                class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-white font-bold hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="credit-card" class="w-4 h-4"></i> Pay Online
+              </button>
+              <button onclick="payViaWhatsApp('Pro Monthly Subscription', 5000)"
+                class="w-full py-3 rounded-xl border-2 border-green-500/50 bg-green-500/10 text-green-400 font-bold hover:bg-green-500 hover:text-white transition-colors uppercase tracking-widest text-xs flex items-center justify-center gap-1.5">
+                <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="mt-8 text-center text-xs text-slate-500">
         All plans are subject to Fair Use Policy.<br />
-        Need unlimited enterprise access? <a href="https://t.me/kaveesha_g" target="_blank"
-          class="text-purple-400 hover:underline">Contact Admin</a>
+        Need unlimited enterprise access? <a href="https://wa.me/94760246304" target="_blank"
+          class="text-purple-400 hover:underline">Contact Admin (WhatsApp)</a>
+      </div>
+
+      <!-- PayHere Required Bilingual Policy Links -->
+      <div class="mt-6 pt-4 border-t border-slate-700/50 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-slate-400">
+        <button type="button" onclick="openPolicyModal('terms')" class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Terms &amp; Conditions (කොන්දේසි)</button>
+        <span class="text-slate-600">•</span>
+        <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Privacy Policy (පෞද්ගලිකත්වය)</button>
+        <span class="text-slate-600">•</span>
+        <button type="button" onclick="openPolicyModal('refund')" class="hover:text-purple-400 transition-colors cursor-pointer bg-transparent border-0 text-slate-400 text-xs font-semibold">Return Policy (මුදල් ආපසු ගෙවීම)</button>
       </div>
     </div>
   </div>
@@ -4376,9 +4463,14 @@
 
       if (options.type === 'confirm') {
         cancelBtn.classList.remove('hidden');
-        confirmBtn.innerText = 'Yes, Delete';
-        icon.className = 'w-16 h-16 rounded-full bg-gradient-to-tr from-red-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg shadow-red-500/30';
-        icon.innerHTML = '<i data-lucide="trash-2" class="w-8 h-8 text-white"></i>';
+        confirmBtn.innerText = options.confirmText || 'Yes, Delete';
+        if (options.isPayment) {
+          icon.className = 'w-16 h-16 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center mb-4 shadow-lg shadow-amber-500/30';
+          icon.innerHTML = '<i data-lucide="zap" class="w-8 h-8 text-white"></i>';
+        } else {
+          icon.className = 'w-16 h-16 rounded-full bg-gradient-to-tr from-red-500 to-pink-500 flex items-center justify-center mb-4 shadow-lg shadow-red-500/30';
+          icon.innerHTML = '<i data-lucide="trash-2" class="w-8 h-8 text-white"></i>';
+        }
       } else {
         cancelBtn.classList.add('hidden');
         confirmBtn.innerText = 'OK';
@@ -4419,18 +4511,123 @@
     window.customConfirm = (msg, cb) => showCustomDialog({ title: 'Confirmation', message: msg, type: 'confirm', onConfirm: cb });
   </script>
   <script>
-    // PayHere Payment Integration
+    // PayHere Payment Integration & Sandbox Demo Simulator
+    window._pendingPayment = null;
+
+    // Direct Backend Confirmation & Real-time Database/Admin Sync
+    async function confirmPaymentWithBackend(email, packageType, amount, orderId, isDemo = false, description = '') {
+      try {
+        const fetchFn = window.originalFetch || window.fetch;
+        const payload = {
+          email: email,
+          packageType: packageType,
+          amount: parseFloat(amount) || 0,
+          order_id: orderId || `${isDemo ? 'DEMO' : 'PAY'}_${Date.now()}`,
+          is_demo: !!isDemo
+        };
+
+        let res = await fetchFn(`${window.API_BASE_URL || ''}/api/payhere-confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-user-email': email },
+          body: JSON.stringify(payload)
+        }).catch(() => null);
+
+        if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
+          res = await fetchFn(`https://capzone.kaveez.top/api/payhere-confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-user-email': email },
+            body: JSON.stringify(payload)
+          }).catch(() => null);
+        }
+
+        if (res && res.ok) {
+          const result = await res.json();
+          if (result && result.user) {
+            window.currentUserData = result.user;
+            localStorage.setItem('capzone_cached_user_' + email.toLowerCase(), JSON.stringify(result.user));
+            localStorage.setItem('capzone_user_profile', JSON.stringify(result.user));
+            localStorage.setItem('capzone_payment_sync', JSON.stringify({ email, amount, packageType, order_id: payload.order_id, time: Date.now() }));
+
+            // Broadcast real-time event to Admin Panel and other open tabs
+            try {
+              const syncChannel = new BroadcastChannel('capzone_realtime_sync');
+              syncChannel.postMessage({
+                type: 'PAYMENT_COMPLETED',
+                email: email,
+                amount: amount,
+                package: packageType,
+                order_id: payload.order_id,
+                user: result.user
+              });
+            } catch(e) {}
+
+            if (typeof window.updateUserProfileUI === 'function') {
+              window.updateUserProfileUI(result.user);
+            }
+
+            closeModal('subscriptionModal');
+            showPopup(
+              isDemo 
+                ? `Demo Payment Successful! (Rs. ${amount} added to Database & synced to Admin Panel)` 
+                : `Payment Verified! Your balance has been updated (+Rs. ${amount}).`, 
+              'success'
+            );
+            return true;
+          }
+        }
+        throw new Error('Server confirmation failed');
+      } catch (err) {
+        console.error('[Payment Confirmation Error]:', err);
+        showPopup('Payment confirmed on client, but failed to sync backend: ' + err.message, 'error');
+        return false;
+      }
+    }
+
+    // Sandbox Demo Payment Tester (Instant Database & Admin Panel Verification)
+    window.testDemoPayment = function(packageType = 'balance_250', amount = 250, description = 'Standard Video (Demo Sandbox Test)') {
+      const uEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'kaveeshatd@gmail.com').toLowerCase().trim();
+      
+      const confirmAction = () => {
+        showPopup('Processing Sandbox Demo payment...', 'info');
+        confirmPaymentWithBackend(uEmail, packageType, amount, 'DEMO_' + Date.now(), true, description);
+      };
+
+      if (typeof window.showCustomDialog === 'function') {
+        window.showCustomDialog({
+          title: 'PayHere Sandbox Demo Payment',
+          message: `Simulate payment for "${description}"?\n\nAmount: Rs. ${amount}.00\nUser: ${uEmail}\n\nThis will instantly credit the database (users_db.json) and notify the Admin Panel in real time.`,
+          type: 'confirm',
+          confirmText: 'Pay Now',
+          isPayment: true,
+          onConfirm: confirmAction
+        });
+      } else if (confirm(`Simulate PayHere Demo Payment of Rs. ${amount} for ${uEmail}?`)) {
+        confirmAction();
+      }
+    };
+
+    // PayHere Payment Gateway Checkout
     function startPayHere(packageType, amount, description) {
-      const uEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.local';
-      if (!uEmail) {
-        showPopup('Please login first to make a payment', 'error');
+      const uEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+      if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
+        showPopup('Please log in with a valid account before making a payment.', 'error');
+        return;
+      }
+
+      if (typeof payhere === 'undefined') {
+        if (confirm('PayHere JS is blocked by your browser or adblocker. Would you like to run a Sandbox Demo Payment instead?')) {
+          window.testDemoPayment(packageType, amount, description);
+        } else {
+          showPopup('PayHere library not loaded. Check adblocker.', 'error');
+        }
         return;
       }
 
       const order_id = packageType + "_" + Date.now();
+      window._pendingPayment = { packageType, amount, description, order_id, email: uEmail };
 
       // 1. Fetch Hash from Backend
-      fetch(`${window.API_BASE_URL}/api/payhere-hash`, {
+      fetch(`${window.API_BASE_URL || ''}/api/payhere-hash`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -4446,66 +4643,90 @@
             return;
           }
 
-          // 2. Setup PayHere JS Object
+          // 2. Setup PayHere JS Object (Sandbox Mode)
           var payment = {
-            "sandbox": true, // Change to false for Live
-            "merchant_id": data.merchant_id, // Comes from backend
+            "sandbox": true, // PayHere Sandbox Active
+            "merchant_id": data.merchant_id || "1238227",
             "return_url": window.location.href,
             "cancel_url": window.location.href,
-            "notify_url": "https://capzone.kaveez.top/api/payhere-notify",
+            "notify_url": `${window.location.origin}/api/payhere-notify`,
             "order_id": order_id,
             "items": description,
-            "amount": amount.toFixed(2),
+            "amount": parseFloat(amount).toFixed(2),
             "currency": "LKR",
-            "hash": data.hash, // MD5 Hash from backend
+            "hash": data.hash,
             "first_name": "CapZone",
             "last_name": "User",
             "email": uEmail,
-            "phone": "0771234567",
+            "phone": "0760246304",
             "address": "No.1, Colombo",
             "city": "Colombo",
             "country": "Sri Lanka",
-            "custom_1": uEmail,    // Very important: Passed to Webhook to identify user
-            "custom_2": packageType   // Identify package in Webhook
+            "custom_1": uEmail,
+            "custom_2": packageType
           };
 
           // 3. Start Payment Popup
           payhere.startPayment(payment);
         })
         .catch(err => {
-          console.error(err);
-          showPopup('Error initializing payment. Check console.', 'error');
+          console.error('[PayHere Hash Error]:', err);
+          showPopup('Error initializing PayHere. Running Demo fallback...', 'warning');
+          window.testDemoPayment(packageType, amount, description);
         });
     }
 
-    window.handleCustomTopUp = function() {
+    window.payViaWhatsApp = function(description, amount) {
+      const uEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+      if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
+        showPopup('Please log in with a valid account before making a payment.', 'error');
+        return;
+      }
+      const adminWhatsApp = '+94760246304';
+      const message = `Hello Admin,\n\nI would like to top up my CapZone account.\n\nUser Email: ${uEmail}\nPackage: ${description}\nAmount: Rs. ${amount}.00\n\nPlease let me know the payment details (Bank Transfer / eZ Cash, etc.)`;
+      const waUrl = `https://wa.me/${adminWhatsApp.replace('+', '')}?text=${encodeURIComponent(message)}`;
+      window.open(waUrl, '_blank');
+    };
+
+    window.handleCustomTopUp = function(method = 'online') {
       const amtInput = document.getElementById('customTopupAmount');
       const amount = parseFloat(amtInput ? amtInput.value : 0);
       if (!amount || amount < 50) {
         showPopup('Please enter a valid top-up amount (minimum Rs. 50)', 'Invalid Amount', 'warning');
         return;
       }
-      startPayHere('balance_' + Math.round(amount), amount, `Wallet Top-Up (Rs. ${amount.toFixed(2)})`);
-    };
-
-    payhere.onCompleted = function onCompleted(orderId) {
-      console.log("Payment completed. OrderID:" + orderId);
-      closeModal('subscriptionModal');
-      showPopup('Payment Successful! Processing balance...', 'success');
-      if (typeof window.fetchUserProfile === 'function') {
-        window.fetchUserProfile();
+      if (method === 'whatsapp') {
+        window.payViaWhatsApp(`Wallet Top-Up (Rs. ${amount.toFixed(2)})`, amount);
+      } else {
+        startPayHere('balance_' + Math.round(amount), amount, `Wallet Top-Up (Rs. ${amount.toFixed(2)})`);
       }
-      setTimeout(() => window.location.reload(), 2000); // Reload to fetch new balance
     };
 
-    payhere.onDismissed = function onDismissed() {
-      console.log("Payment dismissed");
-    };
+    if (typeof payhere !== 'undefined') {
+      payhere.onCompleted = function onCompleted(orderId) {
+        console.log("[PayHere] Payment completed. OrderID:" + orderId);
+        const pending = window._pendingPayment || {};
+        const uEmail = pending.email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
+        confirmPaymentWithBackend(
+          uEmail,
+          pending.packageType || 'balance_100',
+          pending.amount || 100,
+          orderId || ('PH_' + Date.now()),
+          false,
+          pending.description || 'PayHere Payment'
+        );
+      };
 
-    payhere.onError = function onError(error) {
-      console.log("Error:" + error);
-      showPopup('Payment failed: ' + error, 'error');
-    };
+      payhere.onDismissed = function onDismissed() {
+        console.log("[PayHere] Payment dismissed by user");
+        showPopup('Payment checkout was closed.', 'info');
+      };
+
+      payhere.onError = function onError(error) {
+        console.error("[PayHere Error]:" + error);
+        showPopup('Payment error: ' + error, 'error');
+      };
+    }
   </script>
 </body>
 
