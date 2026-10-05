@@ -248,7 +248,7 @@
                                 <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
                             </div>
                             <label for="terms" class="ml-3 text-xs text-theme-textMuted leading-relaxed">
-                                I agree to the <a href="#" class="text-theme-primary hover:text-white font-semibold transition-colors">Rules of the Realm</a> and <a href="#" class="text-theme-primary hover:text-white font-semibold transition-colors">Privacy Policy</a>.
+                                I agree to the <a href="#" onclick="openPolicyModal('terms'); return false;" class="text-theme-primary hover:text-white font-semibold transition-colors">Terms &amp; Conditions</a> and <a href="#" onclick="openPolicyModal('privacy'); return false;" class="text-theme-primary hover:text-white font-semibold transition-colors">Privacy Policy</a>.
                             </label>
                         </div>
 
@@ -315,6 +315,15 @@
                 </form>
             </div>
 
+        </div>
+
+        <!-- PayHere Required Bilingual Policy Links -->
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-theme-textMuted pb-6">
+            <button type="button" onclick="openPolicyModal('terms')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-xs text-theme-textMuted">Terms &amp; Conditions (කොන්දේසි)</button>
+            <span>•</span>
+            <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-xs text-theme-textMuted">Privacy Policy (පෞද්ගලිකත්වය)</button>
+            <span>•</span>
+            <button type="button" onclick="openPolicyModal('refund')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-xs text-theme-textMuted">Return Policy (මුදල් ආපසු ගෙවීම)</button>
         </div>
     </div>
 
@@ -437,7 +446,7 @@
     <!-- Firebase Authentication Logic -->
     <script type="module">
         import { auth, googleProvider, signInWithPopup, signInWithEmailAndPassword, onAuthStateChanged, signOut } from './firebase-config.js';
-        import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+        import { sendPasswordResetEmail, setPersistence, browserLocalPersistence, browserSessionPersistence, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         // Global safeguard: prevent background IndexedDB closing errors from breaking user UI
         window.addEventListener('unhandledrejection', (event) => {
@@ -487,6 +496,11 @@
             const btn = document.getElementById('btnGoogleLogin');
             setLoading(btn, true);
             try {
+                if (window.location.protocol === 'file:') {
+                    showToast('Google Sign-In requires a web server. Please open via http://localhost:6039', 'error');
+                    setLoading(btn, false);
+                    return;
+                }
                 try {
                     const remember = document.getElementById('remember-me').checked;
                     await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
@@ -656,6 +670,8 @@
             }
         });
     </script>
+    <!-- Universal Bilingual Policy Modal Script -->
+    <script src="public/policies-modal.js"></script>
 </body>
 </html>
 
