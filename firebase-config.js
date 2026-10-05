@@ -32,7 +32,16 @@ try {
     persistence: [browserLocalPersistence, indexedDBLocalPersistence, inMemoryPersistence]
   });
 } catch (e) {
-  auth = getAuth(app);
+  try {
+    auth = getAuth(app);
+  } catch (e2) {
+    console.warn("Auth init failed, falling back to inMemory:", e2);
+    try {
+      auth = initializeAuth(app, { persistence: inMemoryPersistence });
+    } catch (e3) {
+      console.error("Critical Auth Init Failure:", e3);
+    }
+  }
 }
 
 const googleProvider = new GoogleAuthProvider();
