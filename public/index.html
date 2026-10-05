@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sinhala SRT Generator - Premium</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for modern typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Noto+Sans+Sinhala:wght@300;400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="background-animation"></div>
+    
+    <main class="glass-container">
+        <header>
+            <h1>සිංහල SRT <span>Generator</span></h1>
+            <p>ඔබේ වීඩියෝ සඳහා නිවැරදි සිංහල උපසිරැසි ස්වයංක්‍රීයව නිර්මාණය කරන්න.</p>
+        </header>
+
+        <section class="upload-section">
+            <div class="drop-zone" id="dropZone">
+                <div class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                </div>
+                <p>වීඩියෝව මෙතනට අදින්න (Drag & Drop) හෝ <br><span class="browse-btn">Browse Files</span></p>
+                <input type="file" id="videoFile" accept="video/*" hidden>
+            </div>
+            
+            <div class="file-info" id="fileInfo" style="display: none;">
+                <span class="file-name" id="fileName"></span>
+                <button type="button" class="remove-btn" id="removeFile">✖</button>
+            </div>
+
+            <button id="generateBtn" class="primary-btn" disabled>
+                <span>උපසිරැසි හදන්න (Generate SRT)</span>
+                <div class="loader" id="btnLoader" style="display: none;"></div>
+            </button>
+        </section>
+
+        <section class="status-section" id="statusSection" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <p id="statusText">Processing your video...</p>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
