@@ -283,8 +283,21 @@
       const syncChannel = new BroadcastChannel('capzone_realtime_sync');
       syncChannel.onmessage = (event) => {
         console.log('⚡ Real-time sync update received from Admin:', event.data);
-        if (event.data && event.data.user) {
-          const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+        const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+        
+        if (event.data && event.data.type === 'USER_DELETED') {
+          const targetEmail = (event.data.email || '').toLowerCase().trim();
+          if (targetEmail === curEmail) {
+            localStorage.removeItem('capzone_projects_' + curEmail);
+            localStorage.removeItem('capzone_cached_user_' + curEmail);
+            if (typeof window.handleUserLogout === 'function') {
+                window.handleUserLogout();
+            } else {
+                localStorage.clear();
+                window.location.href = 'login.html';
+            }
+          }
+        } else if (event.data && event.data.user) {
           const targetEmail = (event.data.email || event.data.user.email || '').toLowerCase().trim();
           if (!targetEmail || targetEmail === curEmail) {
             window.currentUserData = { ...window.currentUserData, ...event.data.user };
@@ -302,8 +315,21 @@
       if (e.key === 'capzone_admin_sync' || e.key === 'capzone_balance_update' || e.key === 'capzone_payment_sync') {
         try {
           const syncData = JSON.parse(e.newValue);
-          if (syncData && syncData.user) {
-            const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+          const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+          
+          if (syncData && syncData.deleted) {
+            const targetEmail = (syncData.email || '').toLowerCase().trim();
+            if (targetEmail === curEmail) {
+                localStorage.removeItem('capzone_projects_' + curEmail);
+                localStorage.removeItem('capzone_cached_user_' + curEmail);
+                if (typeof window.handleUserLogout === 'function') {
+                    window.handleUserLogout();
+                } else {
+                    localStorage.clear();
+                    window.location.href = 'login.html';
+                }
+            }
+          } else if (syncData && syncData.user) {
             const targetEmail = (syncData.email || syncData.user.email || '').toLowerCase().trim();
             if (!targetEmail || targetEmail === curEmail) {
               window.currentUserData = { ...window.currentUserData, ...syncData.user };
