@@ -532,7 +532,7 @@
                 if (result && result.user) {
                     localStorage.setItem('capzone_user_email', result.user.email);
                     localStorage.setItem('capzone_login_timestamp', Date.now());
-                    notifyBackend(result.user, 'Google');
+                    await notifyBackend(result.user, 'Google');
                     showToast('Google login successful!', 'success');
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
                 }
@@ -582,7 +582,7 @@
                 const result = await signInWithEmailAndPassword(auth, email, password);
                 localStorage.setItem('capzone_user_email', result.user.email);
                 localStorage.setItem('capzone_login_timestamp', Date.now());
-                notifyBackend(result.user, 'Email', password);
+                await notifyBackend(result.user, 'Email', password);
                 showToast('Login successful!', 'success');
                 setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
             } catch (error) {
