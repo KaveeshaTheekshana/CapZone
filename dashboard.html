@@ -8,7 +8,7 @@
     const isLocal = window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1' ||
       window.location.protocol === 'file:';
-    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.top';
+    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
@@ -249,8 +249,8 @@
           }).catch(() => null);
 
           // If local backend is unreachable or returned non-200, fallback to cloud backend
-          if ((!res || !res.ok) && window.API_BASE_URL !== 'https://kaveesha.top') {
-            res = await fetchFn(`https://kaveesha.top/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
+          if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
+            res = await fetchFn(`https://capzone.kaveez.top/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
               cache: 'no-store',
               headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
             }).catch(() => null);
@@ -1088,7 +1088,7 @@
           Theekshana</span>
       </p>
 
-      <a href="https://kaveesha.top" target="_blank" rel="noopener noreferrer"
+      <a href="https://capzone.kaveez.top" target="_blank" rel="noopener noreferrer"
         class="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white/5 border border-white/20 text-white hover:text-blue-300 hover:bg-white/10 hover:border-blue-400/50 font-extrabold text-xs transition-all shadow-xl hover:scale-105 group backdrop-blur-md">
         <i data-lucide="globe" class="w-4 h-4 group-hover:rotate-12 transition-transform"></i>
         Portfolio: kaveesha.top
@@ -4612,8 +4612,8 @@
           body: JSON.stringify(payload)
         }).catch(() => null);
 
-        if ((!res || !res.ok) && window.API_BASE_URL !== 'https://kaveesha.top') {
-          res = await fetchFn(`https://kaveesha.top/api/payhere-confirm`, {
+        if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
+          res = await fetchFn(`https://capzone.kaveez.top/api/payhere-confirm`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-user-email': email },
             body: JSON.stringify(payload)
