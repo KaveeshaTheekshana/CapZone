@@ -1676,37 +1676,90 @@
         </button>
       </form>
 
-      <div id="srtProgressCard" class="mt-6 p-8 rounded-3xl border border-blue-500/30 relative overflow-hidden bg-slate-900/95 shadow-2xl"
+      <!-- SRT PROGRESS CARD (Matches screenshot exactly) -->
+      <div id="srtProgressCard" class="mt-6 p-6 sm:p-7 rounded-2xl bg-[#141416] border border-white/10 shadow-2xl relative overflow-hidden"
         style="display: none;">
-        <!-- Gemini UI Blue Glow Background Effect -->
-        <div class="absolute inset-0 flex justify-center items-center opacity-30 pointer-events-none">
-          <div class="w-48 h-48 bg-blue-500 rounded-full blur-3xl animate-pulse" style="animation-duration: 3s;"></div>
-          <div class="w-32 h-32 bg-purple-500 rounded-full blur-3xl animate-pulse absolute mix-blend-screen" style="animation-duration: 4s; animation-delay: 1s;"></div>
-        </div>
         
-        <div class="relative z-10 flex flex-col items-center text-center">
-          <!-- Animated Spinner -->
-          <div class="relative w-16 h-16 mb-4">
-            <div class="absolute inset-0 border-4 border-slate-700/50 rounded-full"></div>
-            <div class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-              <i data-lucide="sparkles" class="w-6 h-6 text-blue-400 animate-pulse"></i>
-            </div>
+        <!-- Golden Mic Badge with Glow -->
+        <div class="mb-4 inline-block text-left">
+          <div class="w-12 h-12 rounded-2xl bg-[#ffbf00] flex items-center justify-center text-slate-950 shadow-[0_0_24px_rgba(255,191,0,0.35)]">
+            <svg class="w-6 h-6 fill-slate-950" viewBox="0 0 24 24">
+              <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/>
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z"/>
+            </svg>
           </div>
-          
-          <h3 class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-2">SRT AI Engine Running...</h3>
-          <p class="text-sm font-medium text-slate-300 mb-5 flex items-center justify-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-            <span id="srtStatusText" class="tracking-wide">Analyzing your media file...</span>
-          </p>
-          
-          <div class="w-full max-w-sm bg-slate-800/80 rounded-full h-2.5 overflow-hidden shadow-inner border border-white/5">
-            <div id="srtProgressBar"
-              class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-full rounded-full transition-all duration-300 relative"
-              style="width: 0%">
-              <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
-            </div>
+        </div>
+
+        <!-- Heading & Subtitle -->
+        <h3 class="text-xl sm:text-2xl font-bold text-white mb-1 tracking-tight text-left">Generating captions...</h3>
+        <p class="text-xs sm:text-sm text-zinc-400 mb-6 font-normal text-left">Sent securely, then deleted. Nothing is stored on our servers.</p>
+
+        <!-- Progress Line Bar -->
+        <div class="w-full bg-[#27272a] h-1.5 rounded-full overflow-hidden mb-2.5">
+          <div id="srtProgressBar"
+            class="bg-[#eab308] h-full rounded-full transition-all duration-300"
+            style="width: 0%">
           </div>
+        </div>
+
+        <!-- Percentage Display -->
+        <div id="srtProgressPct" class="text-xs font-bold text-[#eab308] mb-6 text-left tracking-wide">0%</div>
+
+        <!-- 4-Item Steps Checklist -->
+        <div class="space-y-4 mb-7 text-left">
+          <!-- Step 1: Separating audio -->
+          <div id="stepSeparatingAudio" class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
+            <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </span>
+            <span class="step-label">Separating audio</span>
+          </div>
+
+          <!-- Step 2: Uploading audio -->
+          <div id="stepUploadingAudio" class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
+            <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </span>
+            <span class="step-label">Uploading audio</span>
+          </div>
+
+          <!-- Step 3: Generating captions -->
+          <div id="stepGeneratingCaptions" class="transition-all">
+            <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
+              <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
+                <svg class="w-4 h-4 text-amber-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+              </span>
+              <span class="step-label">Generating captions</span>
+            </div>
+            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">0 of 4 parts done</div>
+          </div>
+
+          <!-- Step 4: Aligning word timing -->
+          <div id="stepAligningTiming" class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
+            <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
+              <div class="w-4 h-4 rounded-full border border-zinc-600"></div>
+            </span>
+            <span class="step-label">Aligning word timing</span>
+          </div>
+        </div>
+
+        <!-- Hidden compatibility status text -->
+        <span id="srtStatusText" class="sr-only">Processing...</span>
+
+        <!-- Cancel Import Button -->
+        <div class="text-left">
+          <button type="button" id="srtCancelBtn" onclick="cancelSrtGeneration()"
+            class="px-5 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-semibold transition-all">
+            Cancel import
+          </button>
         </div>
       </div>
 
@@ -2354,7 +2407,11 @@
       }
     };
     window.showDeveloperWarning = function(msg) {
-      const message = msg || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
+      let message = msg || 'පද්ධතියේ තාක්ෂණික දෝෂයක් ඇති විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
+      const lower = String(message).toLowerCase();
+      if (lower.includes('error') || lower.includes('failed') || lower.includes('http') || lower.includes('exception') || lower.includes('{') || lower.includes('fetch') || lower.includes('syntax')) {
+        message = 'පද්ධතියේ තාක්ෂණික දෝෂයක් ඇති විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
+      }
       showPopup(message, 'දැනුම්දීමයි / Warning', 'warning');
       const modal = document.getElementById('developerWarningModal');
       const textEl = document.getElementById('developerWarningMessage');
@@ -2407,11 +2464,128 @@
       }, 5000);
     }
 
-    // --- Handlers (Dummy implementation to maintain UI integrity, replace logic as needed with API code) ---
+    // --- Handlers & Progress Tracker ---
     const API_BASE_URL = window.API_BASE_URL;
+
+    function updateSrtStepUI(activeStep, options = {}) {
+      const pct = options.percent !== undefined ? options.percent : (activeStep === 1 ? 15 : activeStep === 2 ? 35 : activeStep === 3 ? 65 : activeStep === 4 ? 92 : 100);
+      
+      const bar = document.getElementById('srtProgressBar');
+      if (bar) bar.style.width = pct + '%';
+      
+      const pctEl = document.getElementById('srtProgressPct');
+      if (pctEl) pctEl.innerText = pct + '%';
+
+      const checkIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>`;
+      const spinIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><svg class="w-4 h-4 text-amber-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>`;
+      const pendingIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><div class="w-4 h-4 rounded-full border border-zinc-600"></div></span>`;
+
+      // Step 1: Separating audio
+      const s1 = document.getElementById('stepSeparatingAudio');
+      if (s1) {
+        if (activeStep > 1) {
+          s1.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all';
+          s1.innerHTML = `${checkIcon}<span class="step-label">Separating audio</span>`;
+        } else if (activeStep === 1) {
+          s1.className = 'flex items-center gap-3 text-xs sm:text-sm font-semibold text-white transition-all';
+          s1.innerHTML = `${spinIcon}<span class="step-label">Separating audio</span>`;
+        } else {
+          s1.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
+          s1.innerHTML = `${pendingIcon}<span class="step-label">Separating audio</span>`;
+        }
+      }
+
+      // Step 2: Uploading audio
+      const s2 = document.getElementById('stepUploadingAudio');
+      if (s2) {
+        if (activeStep > 2) {
+          s2.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all';
+          s2.innerHTML = `${checkIcon}<span class="step-label">Uploading audio</span>`;
+        } else if (activeStep === 2) {
+          s2.className = 'flex items-center gap-3 text-xs sm:text-sm font-semibold text-white transition-all';
+          s2.innerHTML = `${spinIcon}<span class="step-label">Uploading audio</span>`;
+        } else {
+          s2.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
+          s2.innerHTML = `${pendingIcon}<span class="step-label">Uploading audio</span>`;
+        }
+      }
+
+      // Step 3: Generating captions
+      const s3 = document.getElementById('stepGeneratingCaptions');
+      const partText = options.partsText || (options.part !== undefined ? `${options.part} of ${options.totalParts || 4} parts done` : (activeStep >= 4 ? '4 of 4 parts done' : '0 of 4 parts done'));
+      if (s3) {
+        if (activeStep > 3) {
+          s3.innerHTML = `
+            <div class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium">
+              ${checkIcon}<span class="step-label">Generating captions</span>
+            </div>
+            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">${partText}</div>
+          `;
+        } else if (activeStep === 3) {
+          s3.innerHTML = `
+            <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
+              ${spinIcon}<span class="step-label">Generating captions</span>
+            </div>
+            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">${partText}</div>
+          `;
+        } else {
+          s3.innerHTML = `
+            <div class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal">
+              ${pendingIcon}<span class="step-label">Generating captions</span>
+            </div>
+            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">${partText}</div>
+          `;
+        }
+      }
+
+      // Step 4: Aligning word timing
+      const s4 = document.getElementById('stepAligningTiming');
+      if (s4) {
+        if (activeStep > 4) {
+          s4.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all';
+          s4.innerHTML = `${checkIcon}<span class="step-label">Aligning word timing</span>`;
+        } else if (activeStep === 4) {
+          s4.className = 'flex items-center gap-3 text-xs sm:text-sm font-semibold text-white transition-all';
+          s4.innerHTML = `${spinIcon}<span class="step-label">Aligning word timing</span>`;
+        } else {
+          s4.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
+          s4.innerHTML = `${pendingIcon}<span class="step-label">Aligning word timing</span>`;
+        }
+      }
+    }
+    window.updateSrtStepUI = updateSrtStepUI;
+
+    window.currentSrtAbortController = null;
+    window.currentSrtEventSource = null;
+
+    function cancelSrtGeneration() {
+      if (window.currentSrtAbortController) {
+        try { window.currentSrtAbortController.abort(); } catch(e){}
+        window.currentSrtAbortController = null;
+      }
+      if (window.currentSrtEventSource) {
+        try { window.currentSrtEventSource.close(); } catch(e){}
+        window.currentSrtEventSource = null;
+      }
+      const progressCard = document.getElementById('srtProgressCard');
+      if (progressCard) progressCard.style.display = 'none';
+      const srtForm = document.getElementById('srtForm');
+      if (srtForm) srtForm.style.display = 'block';
+      const submitBtn = document.getElementById('srtSubmitBtn');
+      if (submitBtn) submitBtn.disabled = false;
+      const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+      if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+      if (typeof showPopup === 'function') {
+        showPopup('Subtitle generation cancelled.', 'Import Cancelled', 'info');
+      }
+    }
+    window.cancelSrtGeneration = cancelSrtGeneration;
 
     function setupProgressTracker(clientId, stepsPrefix, barId) {
       const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
+      if (stepsPrefix === 'srt') {
+        window.currentSrtEventSource = eventSource;
+      }
       let originalMsg = 'Processing';
       let dots = 0;
       const animInterval = setInterval(() => {
@@ -2488,6 +2662,7 @@
             }
             // For Subtitles (SRT)
             if (stepsPrefix === 'srt') {
+              updateSrtStepUI(5, { percent: 100, partsText: '4 of 4 parts done' });
               if (data.data && data.data.srt && data.data.srt.trim()) {
                 if (typeof window.renderSrtResult === 'function') {
                   window.renderSrtResult(data.data);
@@ -2546,12 +2721,38 @@
             }
             clearInterval(animInterval);
             eventSource.close();
-          } else if (data.message) {
+          } else if (data.message || data.status === 'processing') {
             const bar = document.getElementById(barId);
-            if (bar) bar.style.width = '80%';
+            if (bar && stepsPrefix !== 'srt') bar.style.width = '80%';
 
-            // Dynamic status text update
-            originalMsg = data.message;
+            if (stepsPrefix === 'srt') {
+              let stepNum = 3;
+              let partNum = data.extraData?.part !== undefined ? data.extraData.part : (data.part);
+              let totalPartsNum = data.extraData?.totalParts || data.totalParts || 4;
+              let pctNum = data.extraData?.percent || data.percent;
+
+              if (data.extraData?.step) {
+                stepNum = data.extraData.step;
+              } else if (data.message && data.message.includes('Aligning')) {
+                stepNum = 4;
+              } else if (data.message && data.message.includes('Uploading')) {
+                stepNum = 2;
+              } else if (data.message && data.message.includes('Separating')) {
+                stepNum = 1;
+              }
+
+              if (!pctNum) {
+                pctNum = (stepNum === 1 ? 20 : stepNum === 2 ? 35 : stepNum === 3 ? (partNum ? Math.min(85, 45 + (partNum * 10)) : 65) : 92);
+              }
+
+              updateSrtStepUI(stepNum, {
+                percent: pctNum,
+                part: partNum,
+                totalParts: totalPartsNum
+              });
+            }
+
+            originalMsg = data.message || 'Processing';
           }
         } catch (e) { }
       };
@@ -3186,20 +3387,20 @@
       const progressCard = document.getElementById('srtProgressCard');
       progressCard.style.display = 'block';
       document.getElementById('srtResultArea').style.display = 'none';
-      const srtStatus = document.getElementById('srtStatusText');
-      if (srtStatus) srtStatus.innerText = 'Optimizing media for instant upload...';
       const modalBox = e.target.closest('.glass-card');
       if (modalBox) {
         modalBox.classList.add('kaveez-glowing-aura');
         modalBox.scrollTo({ top: 0, behavior: 'smooth' });
       }
       const clientId = 'srt_' + Date.now();
+      window.currentSrtAbortController = new AbortController();
+      updateSrtStepUI(1, { percent: 15 });
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
       // Optimize upload by extracting lightweight 16kHz mono audio from video if possible
       let fileToUpload = currentSrtFile;
       if (currentSrtFile && currentSrtFile.type && (currentSrtFile.type.startsWith('video/') || currentSrtFile.name.match(/\.(mp4|mov|avi|mkv|webm)$/i))) {
-        if (srtStatus) srtStatus.innerText = 'Extracting audio & optimizing for instant upload...';
+        updateSrtStepUI(1, { percent: 20 });
         try {
           fileToUpload = await extractOptimizedAudio(currentSrtFile);
         } catch (audioErr) {
@@ -3218,7 +3419,7 @@
         showDeveloperWarning('ගොනුවේ ප්‍රමාණය විශාල වැඩිය (උපරිම 95MB). කරුණාකර කුඩා වීඩියෝවක් ලබා දෙන්න හෝ Audio ගොනුවක් ලබා දෙන්න. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
         return;
       }
-      if (srtStatus) srtStatus.innerText = 'Connecting AI engine & uploading media...';
+      updateSrtStepUI(2, { percent: 35 });
 
       const formData = new FormData();
       formData.append('video', fileToUpload);
@@ -3268,13 +3469,24 @@
         }
 
         document.getElementById('srtProgressBar').style.width = '100%';
-        document.getElementById('srtResultArea').style.display = 'flex';
+        const resultArea = document.getElementById('srtResultArea');
+        if (resultArea) resultArea.style.display = 'flex';
         document.getElementById('srtProgressCard').style.display = 'none';
         document.getElementById('srtSubmitBtn').disabled = false;
         document.getElementById('srtForm').style.display = 'block';
         const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
         if (window.lucide) lucide.createIcons();
+
+        // Auto-redirect & smooth scroll user directly to the generated SRT results & download area
+        if (resultArea) {
+          setTimeout(() => {
+            resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (modalBox) {
+              modalBox.scrollTo({ top: resultArea.offsetTop - 30, behavior: 'smooth' });
+            }
+          }, 100);
+        }
 
         // Update user balance and quota live across dashboard
         if (data.user) {
@@ -3292,7 +3504,8 @@
         const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, {
           method: 'POST',
           body: formData,
-          headers: headers
+          headers: headers,
+          signal: window.currentSrtAbortController ? window.currentSrtAbortController.signal : undefined
         });
 
         if (!res.ok) {
@@ -3328,6 +3541,7 @@
 
         // Asynchronous task accepted by server
         if (data.status === 'processing') {
+          updateSrtStepUI(3, { percent: 50, part: 0, totalParts: 4 });
           let isPollDone = false;
           let pollCount = 0;
           const maxPolls = 100; // 5 minutes max
