@@ -2844,8 +2844,8 @@
 
         if (apiType === 'own' && apiKey) {
           try {
-            // Direct call using modern gemini-3.6-flash model
-            const candidateModels = ['gemini-3.6-flash', 'gemini-flash-latest', 'gemini-3.5-flash'];
+            // Direct call using verified high-availability models
+            const candidateModels = ['gemini-flash-latest', 'gemini-3.5-flash', 'gemini-3.6-flash'];
             for (const model of candidateModels) {
               try {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
