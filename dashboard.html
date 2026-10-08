@@ -2409,6 +2409,12 @@
               document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
               document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
             }
+            // For Subtitles (SRT)
+            if (data.data && data.data.srt && stepsPrefix === 'srt') {
+              if (typeof window.renderSrtResult === 'function') {
+                window.renderSrtResult(data.data);
+              }
+            }
 
             document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
             document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
@@ -3045,6 +3051,54 @@
       const customApiKeySrt = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
       if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
 
+      function renderSrtResult(data) {
+        if (!data || !data.srt) return;
+        const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
+        const lang = (data.language || (document.getElementById('srtLanguage')?.value === 'en' ? 'English' : 'Sinhala'));
+        window.lastGeneratedSrtContent = data.srt;
+        window.saveToRecentProjects({
+          type: 'Subtitle',
+          title: srtName,
+          metadata: `${lang} Subtitles`,
+          media_url: data.downloadUrl ? `${API_BASE_URL}${data.downloadUrl}` : '',
+          payload: {
+            srt: data.srt,
+            language: lang,
+            filename: `${srtName.replace(/\.[^/.]+$/, "")}.srt`
+          }
+        });
+        const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
+        document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
+        document.getElementById('srtDownloadLink').download = `${(currentSrtFile ? currentSrtFile.name : 'subtitles').replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
+
+        const resultSubtext = document.getElementById('srtResultSubtext');
+        if (resultSubtext) {
+          if (lang === 'English') {
+            resultSubtext.textContent = 'English subtitles generated successfully in standard UTF-8 format.';
+          } else {
+            resultSubtext.textContent = 'Sinhala subtitles generated successfully in FM-Abhaya legacy font format.';
+          }
+        }
+
+        document.getElementById('srtProgressBar').style.width = '100%';
+        document.getElementById('srtResultArea').style.display = 'flex';
+        document.getElementById('srtProgressCard').style.display = 'none';
+        document.getElementById('srtSubmitBtn').disabled = false;
+        document.getElementById('srtForm').style.display = 'block';
+        const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+        if (window.lucide) lucide.createIcons();
+
+        // Update user balance and quota live across dashboard
+        if (data.user) {
+          window.currentUserData = data.user;
+          window.updateUserProfileUI(data.user);
+        } else if (typeof window.fetchUserProfile === 'function') {
+          window.fetchUserProfile();
+        }
+      }
+      window.renderSrtResult = renderSrtResult;
+
       try {
         const userEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
         const headers = { 'x-user-email': userEmail };
@@ -3054,62 +3108,64 @@
           headers: headers
         });
         const data = await res.json();
-        es.close();
+
+        // Asynchronous task accepted by server
+        if (data.status === 'processing') {
+          let isPollDone = false;
+          const pollInterval = setInterval(async () => {
+            if (isPollDone) { clearInterval(pollInterval); return; }
+            try {
+              const pRes = await fetch(`${API_BASE_URL}/api/srt-result?clientId=${clientId}`);
+              if (pRes.ok) {
+                const pData = await pRes.json();
+                if (pData.status === 'completed' && pData.data) {
+                  isPollDone = true;
+                  clearInterval(pollInterval);
+                  es.close();
+                  renderSrtResult(pData.data);
+                } else if (pData.status === 'error') {
+                  isPollDone = true;
+                  clearInterval(pollInterval);
+                  es.close();
+                  showPopup(pData.error || 'Failed', 'Error', 'error');
+                  document.getElementById('srtSubmitBtn').disabled = false;
+                  document.getElementById('srtForm').style.display = 'block';
+                  document.getElementById('srtProgressCard').style.display = 'none';
+                }
+              }
+            } catch(e) {}
+          }, 3000);
+          return;
+        }
+
         if (data.srt) {
-          const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
-          const lang = (data.language || (document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala'));
-          window.lastGeneratedSrtContent = data.srt;
-          window.saveToRecentProjects({
-            type: 'Subtitle',
-            title: srtName,
-            metadata: `${lang} Subtitles`,
-            media_url: data.downloadUrl ? `${API_BASE_URL}${data.downloadUrl}` : '',
-            payload: {
-              srt: data.srt,
-              language: lang,
-              filename: `${srtName.replace(/\.[^/.]+$/, "")}.srt`
-            }
-          });
-          const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
-          document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
-          document.getElementById('srtDownloadLink').download = `${currentSrtFile.name.replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
-
-          const resultSubtext = document.getElementById('srtResultSubtext');
-          if (resultSubtext) {
-            if (lang === 'English') {
-              resultSubtext.textContent = 'English subtitles generated successfully in standard UTF-8 format.';
-            } else {
-              resultSubtext.textContent = 'Sinhala subtitles generated successfully in FM-Abhaya legacy font format.';
-            }
-          }
-
-          document.getElementById('srtProgressBar').style.width = '100%';
-          document.getElementById('srtResultArea').style.display = 'flex';
-          if (window.lucide) lucide.createIcons();
-
-          // Update user balance and quota live across dashboard
-          if (data.user) {
-            window.currentUserData = data.user;
-            window.updateUserProfileUI(data.user);
-          } else if (typeof window.fetchUserProfile === 'function') {
-            window.fetchUserProfile();
-          }
+          es.close();
+          renderSrtResult(data);
         } else if (data.code === 'INSUFFICIENT_BALANCE' || data.code === 'QUOTA_EXCEEDED' || data.code === 'NO_PACKAGE_ACTIVE' || data.error === 'NO_SUBSCRIPTION_ACTIVE') {
+          es.close();
           showPopup(data.error || 'Payment or subscription required.', 'Subscription Notice', 'warning');
           setTimeout(() => {
             const modal = document.getElementById('subscriptionModal');
             if (modal) { modal.style.display = 'flex'; modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; }
           }, 1500);
+          document.getElementById('srtSubmitBtn').disabled = false;
+          document.getElementById('srtForm').style.display = 'block';
+          document.getElementById('srtProgressCard').style.display = 'none';
         } else if (data.code === 'ACCOUNT_DEACTIVATED') {
+          es.close();
           showPopup(data.error || 'Your account is deactivated by administrator.', 'Account Blocked', 'error');
-        } else { showPopup(data.error || 'System Error, please contact developer', 'Error', 'error'); }
-      } catch (err) { es.close(); showPopup('System Error, please contact developer', 'System Error', 'error'); }
-      finally {
-        document.getElementById('srtSubmitBtn').disabled = false;
-        document.getElementById('srtForm').style.display = 'block';
-        document.getElementById('srtProgressCard').style.display = 'none';
-        const modalBox = e.target.closest('.glass-card');
-        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+          document.getElementById('srtSubmitBtn').disabled = false;
+          document.getElementById('srtForm').style.display = 'block';
+          document.getElementById('srtProgressCard').style.display = 'none';
+        } else {
+          es.close();
+          showPopup(data.error || 'System Error, please contact developer', 'Error', 'error');
+          document.getElementById('srtSubmitBtn').disabled = false;
+          document.getElementById('srtForm').style.display = 'block';
+          document.getElementById('srtProgressCard').style.display = 'none';
+        }
+      } catch (err) {
+        console.warn('POST generate-srt fetch notice:', err.message);
       }
     }
 
