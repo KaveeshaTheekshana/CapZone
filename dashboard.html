@@ -3037,12 +3037,8 @@
       const clientId = 'srt_' + Date.now();
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
+      // Upload the original media file directly for 100% audio fidelity and zero browser truncation
       let fileToUpload = currentSrtFile;
-      try {
-        fileToUpload = await extractOptimizedAudio(currentSrtFile);
-      } catch (eOpt) {
-        console.warn('Audio extraction fallback:', eOpt);
-      }
 
       const formData = new FormData();
       formData.append('video', fileToUpload);
