@@ -2060,6 +2060,45 @@
     </div>
   </div>
 
+  <!-- DEVELOPER CONTACT / WARNING POPUP MODAL -->
+  <div id="developerWarningModal"
+    class="fixed inset-0 z-[120] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+    style="display: none;">
+    <div class="glass-card w-full max-w-md rounded-3xl p-6 md:p-8 relative border border-amber-500/40 shadow-2xl text-center bg-slate-900/95">
+      <button onclick="document.getElementById('developerWarningModal').style.display='none'"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/10 p-2 rounded-full transition-colors z-10">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4 shadow-lg shadow-amber-500/10">
+        <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+      </div>
+
+      <h3 class="text-xl font-black text-white tracking-tight uppercase mb-2">දැනුම්දීමයි / Warning</h3>
+      <p id="developerWarningMessage" class="text-sm text-slate-200 leading-relaxed mb-6 font-medium">
+        උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304
+      </p>
+
+      <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-700/60 mb-6 flex flex-col items-center gap-2">
+        <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Developer Contact / Hotline</span>
+        <a href="tel:0760246304" class="text-2xl font-black text-amber-400 tracking-wider hover:underline flex items-center gap-2">
+          <i data-lucide="phone-call" class="w-5 h-5"></i> 0760246304
+        </a>
+      </div>
+
+      <div class="flex gap-3">
+        <a href="https://wa.me/94760246304" target="_blank"
+          class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2">
+          <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
+        </a>
+        <button onclick="navigator.clipboard.writeText('0760246304'); if (typeof showPopup === 'function') showPopup('0760246304 දුරකථන අංකය Copy විය!', 'Copied', 'success')"
+          class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition-all border border-slate-700 flex items-center justify-center gap-2">
+          <i data-lucide="copy" class="w-4 h-4"></i> Copy Number
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     document.addEventListener("DOMContentLoaded", () => {
       try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
@@ -2290,6 +2329,18 @@
         buttons.forEach(b => b.disabled = false);
       }
     };
+    window.showDeveloperWarning = function(msg) {
+      const message = msg || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
+      showPopup(message, 'දැනුම්දීමයි / Warning', 'warning');
+      const modal = document.getElementById('developerWarningModal');
+      const textEl = document.getElementById('developerWarningMessage');
+      if (modal) {
+        if (textEl) textEl.innerText = message;
+        modal.style.display = 'flex';
+        try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e){}
+      }
+    };
+
     function showPopup(message, title = 'Notice', type = 'success') {
       const toast = document.getElementById('toastNotification');
       const msg = document.getElementById('toastMessage');
@@ -2299,10 +2350,12 @@
       let displayMsg = message || 'Notice';
       const lower = String(displayMsg).toLowerCase();
 
-      // Normalize any system/AI/backend error message to the exact developer prompt requested
-      if (type === 'error' || lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('weda na') || lower.includes('gemini') || lower.includes('quota') || lower.includes('timeout') || lower.includes('contact developer')) {
+      // Normalize any system/AI/backend error message to include developer contact requested
+      if (type === 'error' || lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('weda na') || lower.includes('contact developer')) {
         type = 'warning';
-        displayMsg = 'System Error, please contact developer';
+        if (!displayMsg.includes('0760246304')) {
+          displayMsg = (displayMsg ? displayMsg + ' - ' : '') + 'කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
+        }
       }
 
       if (type === 'error') {
@@ -2410,9 +2463,27 @@
               document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
             }
             // For Subtitles (SRT)
-            if (data.data && data.data.srt && stepsPrefix === 'srt') {
-              if (typeof window.renderSrtResult === 'function') {
-                window.renderSrtResult(data.data);
+            if (stepsPrefix === 'srt') {
+              if (data.data && data.data.srt && data.data.srt.trim()) {
+                if (typeof window.renderSrtResult === 'function') {
+                  window.renderSrtResult(data.data);
+                }
+              } else {
+                document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
+                document.getElementById(stepsPrefix + 'ResultArea').style.display = 'none';
+                document.getElementById('srtForm').style.display = 'block';
+                const submitBtn = document.getElementById('srtSubmitBtn');
+                if (submitBtn) submitBtn.disabled = false;
+                const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+                if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+                clearInterval(animInterval);
+                eventSource.close();
+                if (typeof window.showDeveloperWarning === 'function') {
+                  window.showDeveloperWarning('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+                } else {
+                  showPopup('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304', 'දැනුම්දීමයි / Warning', 'warning');
+                }
+                return;
               }
             }
 
@@ -2429,10 +2500,22 @@
             clearInterval(animInterval);
             eventSource.close();
           } else if (data.status === 'error') {
-            showPopup(data.message || 'Failed', 'Error', 'error');
             document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
             const submitBtn = document.getElementById(stepsPrefix === 'img' ? 'imageGenerateBtn' : stepsPrefix + 'SubmitBtn');
             if (submitBtn) submitBtn.disabled = false;
+            if (stepsPrefix === 'srt') {
+              document.getElementById('srtForm').style.display = 'block';
+              document.getElementById(stepsPrefix + 'ResultArea').style.display = 'none';
+              const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+              if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+              if (typeof window.showDeveloperWarning === 'function') {
+                window.showDeveloperWarning(data.message || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+              } else {
+                showPopup(data.message || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304', 'දැනුම්දීමයි / Warning', 'warning');
+              }
+            } else {
+              showPopup(data.message || 'Failed', 'Error', 'error');
+            }
             if (stepsPrefix === 'img') {
               document.getElementById('imageEnhanceBtn').disabled = false;
               window.isImageTaskRunning = false;
@@ -2447,6 +2530,9 @@
             originalMsg = data.message;
           }
         } catch (e) { }
+      };
+      eventSource.onerror = () => {
+        clearInterval(animInterval);
       };
       return eventSource;
     }
@@ -3037,8 +3123,29 @@
       const clientId = 'srt_' + Date.now();
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
-      // Upload the original media file directly for 100% audio fidelity and zero browser truncation
+      // Optimize upload by extracting lightweight 16kHz mono audio from video if possible
       let fileToUpload = currentSrtFile;
+      if (currentSrtFile && currentSrtFile.type && (currentSrtFile.type.startsWith('video/') || currentSrtFile.name.match(/\.(mp4|mov|avi|mkv|webm)$/i))) {
+        if (srtStatus) srtStatus.innerText = 'Extracting audio & optimizing for instant upload...';
+        try {
+          fileToUpload = await extractOptimizedAudio(currentSrtFile);
+        } catch (audioErr) {
+          console.warn('Audio extraction notice, fallback to original:', audioErr);
+          fileToUpload = currentSrtFile;
+        }
+      }
+
+      if (fileToUpload.size > 95 * 1024 * 1024) {
+        if (es) { try { es.close(); } catch(e){} }
+        document.getElementById('srtSubmitBtn').disabled = false;
+        document.getElementById('srtForm').style.display = 'block';
+        document.getElementById('srtProgressCard').style.display = 'none';
+        document.getElementById('srtResultArea').style.display = 'none';
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+        showDeveloperWarning('ගොනුවේ ප්‍රමාණය විශාල වැඩිය (උපරිම 95MB). කරුණාකර කුඩා වීඩියෝවක් ලබා දෙන්න හෝ Audio ගොනුවක් ලබා දෙන්න. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+        return;
+      }
+      if (srtStatus) srtStatus.innerText = 'Connecting AI engine & uploading media...';
 
       const formData = new FormData();
       formData.append('video', fileToUpload);
@@ -3049,7 +3156,17 @@
       if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
 
       function renderSrtResult(data) {
-        if (!data || !data.srt) return;
+        if (!data || !data.srt || !data.srt.trim()) {
+          if (es) { try { es.close(); } catch(e){} }
+          document.getElementById('srtSubmitBtn').disabled = false;
+          document.getElementById('srtForm').style.display = 'block';
+          document.getElementById('srtProgressCard').style.display = 'none';
+          document.getElementById('srtResultArea').style.display = 'none';
+          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+          showDeveloperWarning('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. නිවැරදි උපසිරැසි ගොනුවක් සෑදුනේ නැත. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+          return;
+        }
         const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
         const lang = (data.language || (document.getElementById('srtLanguage')?.value === 'en' ? 'English' : 'Sinhala'));
         window.lastGeneratedSrtContent = data.srt;
@@ -3104,30 +3221,92 @@
           body: formData,
           headers: headers
         });
+
+        if (!res.ok) {
+          let errData = {};
+          try { errData = await res.json(); } catch(e){}
+          if (es) { try { es.close(); } catch(e){} }
+          document.getElementById('srtSubmitBtn').disabled = false;
+          document.getElementById('srtForm').style.display = 'block';
+          document.getElementById('srtProgressCard').style.display = 'none';
+          document.getElementById('srtResultArea').style.display = 'none';
+          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+
+          if (errData.code === 'INSUFFICIENT_BALANCE' || errData.code === 'QUOTA_EXCEEDED' || errData.code === 'NO_PACKAGE_ACTIVE' || errData.error === 'NO_SUBSCRIPTION_ACTIVE') {
+            showPopup(errData.error || 'Payment or subscription required.', 'Subscription Notice', 'warning');
+            setTimeout(() => {
+              const modal = document.getElementById('subscriptionModal');
+              if (modal) { modal.style.display = 'flex'; modal.style.opacity = '1'; modal.style.pointerEvents = 'auto'; }
+            }, 1500);
+            return;
+          }
+
+          if (errData.code === 'ACCOUNT_DEACTIVATED') {
+            showPopup(errData.error || 'Your account is deactivated by administrator.', 'Account Blocked', 'error');
+            return;
+          }
+
+          showDeveloperWarning(errData.error || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+          return;
+        }
+
         const data = await res.json();
 
         // Asynchronous task accepted by server
         if (data.status === 'processing') {
           let isPollDone = false;
+          let pollCount = 0;
+          const maxPolls = 100; // 5 minutes max
           const pollInterval = setInterval(async () => {
             if (isPollDone) { clearInterval(pollInterval); return; }
+            pollCount++;
+            if (pollCount > maxPolls) {
+              isPollDone = true;
+              clearInterval(pollInterval);
+              if (es) { try { es.close(); } catch(e){} }
+              document.getElementById('srtSubmitBtn').disabled = false;
+              document.getElementById('srtForm').style.display = 'block';
+              document.getElementById('srtProgressCard').style.display = 'none';
+              document.getElementById('srtResultArea').style.display = 'none';
+              const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+              if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+              showDeveloperWarning('උපසිරැසි සැකසීමට වැඩි වේලාවක් ගත විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+              return;
+            }
             try {
               const pRes = await fetch(`${API_BASE_URL}/api/srt-result?clientId=${clientId}`);
               if (pRes.ok) {
                 const pData = await pRes.json();
                 if (pData.status === 'completed' && pData.data) {
+                  if (!pData.data.srt || !pData.data.srt.trim()) {
+                    isPollDone = true;
+                    clearInterval(pollInterval);
+                    if (es) { try { es.close(); } catch(e){} }
+                    document.getElementById('srtSubmitBtn').disabled = false;
+                    document.getElementById('srtForm').style.display = 'block';
+                    document.getElementById('srtProgressCard').style.display = 'none';
+                    document.getElementById('srtResultArea').style.display = 'none';
+                    const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+                    if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+                    showDeveloperWarning('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. නිවැරදි උපසිරැසි ගොනුවක් සෑදුනේ නැත. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
+                    return;
+                  }
                   isPollDone = true;
                   clearInterval(pollInterval);
-                  es.close();
+                  if (es) { try { es.close(); } catch(e){} }
                   renderSrtResult(pData.data);
                 } else if (pData.status === 'error') {
                   isPollDone = true;
                   clearInterval(pollInterval);
-                  es.close();
-                  showPopup(pData.error || 'Failed', 'Error', 'error');
+                  if (es) { try { es.close(); } catch(e){} }
                   document.getElementById('srtSubmitBtn').disabled = false;
                   document.getElementById('srtForm').style.display = 'block';
                   document.getElementById('srtProgressCard').style.display = 'none';
+                  document.getElementById('srtResultArea').style.display = 'none';
+                  const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+                  if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+                  showDeveloperWarning(pData.error || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
                 }
               }
             } catch(e) {}
@@ -3135,11 +3314,11 @@
           return;
         }
 
-        if (data.srt) {
-          es.close();
+        if (data.srt && data.srt.trim()) {
+          if (es) { try { es.close(); } catch(e){} }
           renderSrtResult(data);
         } else if (data.code === 'INSUFFICIENT_BALANCE' || data.code === 'QUOTA_EXCEEDED' || data.code === 'NO_PACKAGE_ACTIVE' || data.error === 'NO_SUBSCRIPTION_ACTIVE') {
-          es.close();
+          if (es) { try { es.close(); } catch(e){} }
           showPopup(data.error || 'Payment or subscription required.', 'Subscription Notice', 'warning');
           setTimeout(() => {
             const modal = document.getElementById('subscriptionModal');
@@ -3148,21 +3327,38 @@
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
           document.getElementById('srtProgressCard').style.display = 'none';
+          document.getElementById('srtResultArea').style.display = 'none';
+          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
         } else if (data.code === 'ACCOUNT_DEACTIVATED') {
-          es.close();
+          if (es) { try { es.close(); } catch(e){} }
           showPopup(data.error || 'Your account is deactivated by administrator.', 'Account Blocked', 'error');
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
           document.getElementById('srtProgressCard').style.display = 'none';
+          document.getElementById('srtResultArea').style.display = 'none';
+          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
         } else {
-          es.close();
-          showPopup(data.error || 'System Error, please contact developer', 'Error', 'error');
+          if (es) { try { es.close(); } catch(e){} }
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
           document.getElementById('srtProgressCard').style.display = 'none';
+          document.getElementById('srtResultArea').style.display = 'none';
+          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+          showDeveloperWarning(data.error || 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
         }
       } catch (err) {
         console.warn('POST generate-srt fetch notice:', err.message);
+        if (es) { try { es.close(); } catch(e){} }
+        document.getElementById('srtSubmitBtn').disabled = false;
+        document.getElementById('srtForm').style.display = 'block';
+        document.getElementById('srtProgressCard').style.display = 'none';
+        document.getElementById('srtResultArea').style.display = 'none';
+        const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+        showDeveloperWarning('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. Network/CORS හෝ සේවාදායක දෝෂයකි. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
       }
     }
 
