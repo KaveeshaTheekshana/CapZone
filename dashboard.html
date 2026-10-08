@@ -1652,18 +1652,18 @@
         </button>
       </form>
 
-      <div id="srtProgressCard" class="mt-6 p-8 rounded-3xl border border-blue-500/30 relative overflow-hidden"
-        style="display: none; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px);">
-        <!-- Gemini UI Blue Blur Background Effect -->
-        <div class="absolute inset-0 flex justify-center items-center opacity-40">
-          <div class="w-48 h-48 bg-blue-500 rounded-full blur-[60px] animate-pulse" style="animation-duration: 3s;"></div>
-          <div class="w-32 h-32 bg-purple-500 rounded-full blur-[50px] animate-pulse absolute mix-blend-screen" style="animation-duration: 4s; animation-delay: 1s;"></div>
+      <div id="srtProgressCard" class="mt-6 p-8 rounded-3xl border border-blue-500/30 relative overflow-hidden bg-slate-900/95 shadow-2xl"
+        style="display: none;">
+        <!-- Gemini UI Blue Glow Background Effect -->
+        <div class="absolute inset-0 flex justify-center items-center opacity-30 pointer-events-none">
+          <div class="w-48 h-48 bg-blue-500 rounded-full blur-3xl animate-pulse" style="animation-duration: 3s;"></div>
+          <div class="w-32 h-32 bg-purple-500 rounded-full blur-3xl animate-pulse absolute mix-blend-screen" style="animation-duration: 4s; animation-delay: 1s;"></div>
         </div>
         
         <div class="relative z-10 flex flex-col items-center text-center">
           <!-- Animated Spinner -->
           <div class="relative w-16 h-16 mb-4">
-            <div class="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
+            <div class="absolute inset-0 border-4 border-slate-700/50 rounded-full"></div>
             <div class="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
             <div class="absolute inset-0 flex items-center justify-center">
               <i data-lucide="sparkles" class="w-6 h-6 text-blue-400 animate-pulse"></i>
@@ -1672,7 +1672,7 @@
           
           <h3 class="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 mb-2">SRT AI Engine Running...</h3>
           <p class="text-sm font-medium text-slate-300 mb-5 flex items-center justify-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-blue-500 animate-[ping_1.5s_cubic-bezier(0,0,0.2,1)_infinite]"></span>
+            <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
             <span id="srtStatusText" class="tracking-wide">Analyzing your media file...</span>
           </p>
           
@@ -1680,8 +1680,7 @@
             <div id="srtProgressBar"
               class="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 h-full rounded-full transition-all duration-300 relative"
               style="width: 0%">
-              <div class="absolute inset-0 bg-white/30 animate-[pulse_1s_ease-in-out_infinite]"></div>
-              <div class="absolute top-0 right-0 bottom-0 w-10 bg-gradient-to-r from-transparent to-white/40 blur-[2px]"></div>
+              <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
             </div>
           </div>
         </div>
@@ -3017,12 +3016,17 @@
       }
 
       document.getElementById('srtSubmitBtn').disabled = true;
-      document.getElementById('srtProgressCard').style.display = 'block';
+      document.getElementById('srtForm').style.display = 'none';
+      const progressCard = document.getElementById('srtProgressCard');
+      progressCard.style.display = 'block';
       document.getElementById('srtResultArea').style.display = 'none';
       const srtStatus = document.getElementById('srtStatusText');
       if (srtStatus) srtStatus.innerText = 'Optimizing media for instant upload...';
       const modalBox = e.target.closest('.glass-card');
-      if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
+      if (modalBox) {
+        modalBox.classList.add('kaveez-glowing-aura');
+        modalBox.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       const clientId = 'srt_' + Date.now();
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
@@ -3102,6 +3106,8 @@
       } catch (err) { es.close(); showPopup('System Error, please contact developer', 'System Error', 'error'); }
       finally {
         document.getElementById('srtSubmitBtn').disabled = false;
+        document.getElementById('srtForm').style.display = 'block';
+        document.getElementById('srtProgressCard').style.display = 'none';
         const modalBox = e.target.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
       }
