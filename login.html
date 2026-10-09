@@ -47,14 +47,30 @@
                 mix-blend-mode: normal !important;
             }
         }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInLeft {
+            from { opacity: 0; transform: translateX(-30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .animate-fade-in-left {
+            animation: fadeInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .animate-fade-in-right {
+            animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
         .tab-content {
             display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
         }
         .tab-content.active {
             display: block;
-            opacity: 1;
+            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         /* Custom scrollbar for dark theme */
         ::-webkit-scrollbar {
@@ -72,36 +88,42 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex overflow-hidden bg-[url('https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=100&w=2070&auto=format&fit=crop')] bg-cover bg-center bg-fixed">
+<body class="min-h-screen flex overflow-hidden bg-[url('https://i.pinimg.com/736x/10/ec/d9/10ecd929adef0a3cc59c206bb76bb922.jpg')] lg:bg-none lg:bg-[#131722] bg-cover bg-center bg-fixed">
 
     <!-- Mobile Dark Overlay to ensure text readability on small screens -->
     <div class="absolute inset-0 bg-theme-bg/70 lg:hidden z-0 pointer-events-none"></div>
 
     <!-- Left Side: Visual Showcase (Hidden on Mobile) -->
-    <div class="hidden lg:flex lg:w-1/2 relative h-screen flex-col justify-end p-12 z-10 bg-gradient-to-t from-theme-bg via-theme-bg/60 to-theme-bg/20 border-r border-theme-border/50 shadow-[10px_0_30px_rgba(0,0,0,0.5)] backdrop-blur-sm">
-        <div class="absolute inset-0 bg-theme-primary/5 mix-blend-overlay"></div>
+    <div class="hidden lg:flex lg:w-1/2 relative h-screen flex-col justify-end p-12 z-10 border-r border-theme-border/50 shadow-[10px_0_30px_rgba(0,0,0,0.5)]">
+        
+        <!-- Desktop Background Image (Contained to Left Side) -->
+        <div class="absolute inset-0 bg-[url('https://i.pinimg.com/736x/3e/48/0c/3e480c3fe9cd002a0e363704a709efd2.jpg')] bg-cover bg-top -z-20"></div>
+        
+        <!-- Gradient Overlays -->
+        <div class="absolute inset-0 bg-gradient-to-t from-theme-bg via-theme-bg/60 to-theme-bg/20 backdrop-blur-[2px] -z-10"></div>
+        <div class="absolute inset-0 bg-theme-primary/10 mix-blend-overlay -z-10"></div>
         
         <!-- Premium Text Overlay on the Left Side -->
-        <div class="relative z-10">
+        <div class="relative z-10 animate-fade-in-left">
             <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-white uppercase tracking-wider mb-6 shadow-xl">
                 <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                AI Powered Studio
+                CapZone Subtitles
             </div>
             <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
-                Create Viral Content <br><span class="text-theme-primary">Instantly.</span>
+                Welcome to <br><span class="text-theme-primary">CapZone.</span>
             </h1>
             <p class="text-gray-300 text-sm lg:text-base leading-relaxed max-w-md drop-shadow-md font-medium">
-                Generate millisecond-accurate AI subtitles, download videos without watermarks, and export directly to your favorite editors.
+                Generate millisecond-accurate subtitles in Sinhala and English, download videos without watermarks, and export directly to your favorite editors.
             </p>
         </div>
     </div>
 
     <!-- Right Side: Dynamic Form Area -->
     <!-- On mobile, it's a glass panel over the full background. On desktop, it's solid dark background to match the split theme. -->
-    <div class="w-full lg:w-1/2 h-screen flex flex-col justify-center items-center p-6 sm:p-12 bg-theme-bg/85 lg:bg-theme-bg backdrop-blur-xl lg:backdrop-blur-none relative z-20 overflow-y-auto shadow-2xl">
+    <div class="w-full lg:w-1/2 h-screen flex flex-col items-center p-6 sm:p-12 bg-theme-bg/85 lg:bg-theme-bg backdrop-blur-xl lg:backdrop-blur-none relative z-20 overflow-y-auto shadow-2xl animate-fade-in-right">
         
         <!-- Form Container -->
-        <div class="w-full max-w-md">
+        <div class="w-full max-w-md my-auto pt-8">
             
             <!-- Brand Header -->
             <div class="flex items-center gap-3 mb-6 group">
@@ -137,7 +159,7 @@
                             <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
                                 <i class="fa-regular fa-envelope"></i>
                             </span>
-                            <input type="email" id="signinEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
+                            <input type="text" id="signinEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
                         </div>
                     </div>
 
@@ -182,13 +204,9 @@
                 </div>
 
                 <!-- Social Login -->
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-4">
                     <button type="button" id="btnGoogleLogin" class="w-full flex items-center justify-center py-2.5 px-4 rounded-lg border border-theme-border bg-theme-card hover:bg-[#282d3b] text-white font-medium text-sm transition-all shadow-sm">
                         <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4 mr-2" alt="Google"> Google
-                    </button>
-                    <!-- Mock Github button just for aesthetic matching the screenshot -->
-                    <button type="button" class="w-full flex items-center justify-center py-2.5 px-4 rounded-lg border border-theme-border bg-theme-card hover:bg-[#282d3b] text-white font-medium text-sm transition-all shadow-sm opacity-50 cursor-not-allowed" title="Coming soon">
-                        <i class="fa-brands fa-github text-white mr-2"></i> GitHub
                     </button>
                 </div>
 
@@ -219,7 +237,7 @@
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
                                     <i class="fa-regular fa-envelope"></i>
                                 </span>
-                                <input type="email" id="signupEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
+                                <input type="text" id="signupEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
                             </div>
                         </div>
 
@@ -567,6 +585,11 @@
                 return;
             }
 
+            if (!email.includes('@')) {
+                showToast("Please enter your Email Address, not your Username!", "error");
+                return;
+            }
+
             const password = document.getElementById('signinPassword').value;
             
             const btn = document.getElementById('btnSignIn');
@@ -598,6 +621,11 @@
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
             
+            if (!email.includes('@')) {
+                showToast("Please enter a valid Email Address!", "error");
+                return;
+            }
+
             const btn = document.getElementById('btnSignUp');
             setLoading(btn, true);
 
