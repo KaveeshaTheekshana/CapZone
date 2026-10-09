@@ -88,10 +88,28 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex overflow-hidden bg-[url('https://i.pinimg.com/736x/10/ec/d9/10ecd929adef0a3cc59c206bb76bb922.jpg')] lg:bg-none lg:bg-[#131722] bg-cover bg-center bg-fixed">
+<body class="min-h-[100dvh] flex flex-col lg:flex-row overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-[url('https://i.pinimg.com/736x/10/ec/d9/10ecd929adef0a3cc59c206bb76bb922.jpg')] lg:bg-none lg:bg-[#131722] bg-cover bg-center bg-fixed">
+
+    <!-- CapZone Ultra-Premium Loading Screen -->
+    <div id="capzonePreloader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0f19] transition-opacity duration-700 pointer-events-auto">
+        <div class="relative flex items-center justify-center mb-6">
+            <div class="absolute w-28 h-28 rounded-full bg-blue-500/20 blur-xl animate-pulse"></div>
+            <div class="w-16 h-16 rounded-full border-2 border-theme-primary/30 border-t-theme-primary animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(37,99,235,0.4)]">
+                <img src="logo.jpg" class="w-10 h-10 rounded-full object-cover" alt="CapZone Logo">
+            </div>
+        </div>
+        <div class="text-xl font-bold tracking-widest text-white uppercase drop-shadow-md flex items-center gap-2">
+            <span>CapZone</span>
+            <span class="text-theme-primary font-extrabold animate-pulse">Studio</span>
+        </div>
+        <div class="flex items-center gap-2 mt-3 text-xs text-slate-400 font-medium tracking-wide">
+            <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
+            <span>CapZone Loading...</span>
+        </div>
+    </div>
 
     <!-- Mobile Dark Overlay to ensure text readability on small screens -->
-    <div class="absolute inset-0 bg-theme-bg/70 lg:hidden z-0 pointer-events-none"></div>
+    <div class="absolute inset-0 bg-theme-bg/75 lg:hidden z-0 pointer-events-none"></div>
 
     <!-- Left Side: Visual Showcase (Hidden on Mobile) -->
     <div class="hidden lg:flex lg:w-1/2 relative h-screen flex-col justify-end p-12 z-10 border-r border-theme-border/50 shadow-[10px_0_30px_rgba(0,0,0,0.5)]">
@@ -120,10 +138,10 @@
 
     <!-- Right Side: Dynamic Form Area -->
     <!-- On mobile, it's a glass panel over the full background. On desktop, it's solid dark background to match the split theme. -->
-    <div class="w-full lg:w-1/2 h-screen flex flex-col items-center p-6 sm:p-12 bg-theme-bg/85 lg:bg-theme-bg backdrop-blur-xl lg:backdrop-blur-none relative z-20 overflow-y-auto shadow-2xl animate-fade-in-right">
+    <div class="w-full lg:w-1/2 min-h-[100dvh] lg:h-screen flex flex-col items-center justify-between p-6 sm:p-12 pb-28 sm:pb-16 bg-theme-bg/85 lg:bg-theme-bg backdrop-blur-xl lg:backdrop-blur-none relative z-20 overflow-y-auto shadow-2xl animate-fade-in-right">
         
         <!-- Form Container -->
-        <div class="w-full max-w-md my-auto pt-8">
+        <div class="w-full max-w-md my-auto pt-6 pb-6">
             
             <!-- Brand Header -->
             <div class="flex items-center gap-3 mb-6 group">
@@ -716,6 +734,17 @@
                 showToast("Error sending reset email: " + error.message, 'error');
             } finally {
                 setLoading(btn, false);
+            }
+        });
+
+        // Smooth Preloader Fade-out when page and images are fully loaded
+        window.addEventListener('load', () => {
+            const preloader = document.getElementById('capzonePreloader');
+            if (preloader) {
+                setTimeout(() => {
+                    preloader.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => preloader.style.display = 'none', 750);
+                }, 450);
             }
         });
     </script>
