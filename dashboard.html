@@ -4,11 +4,44 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    // Dynamic API Base URL: connects to local backend when running locally, or cloud backend in production
-    const isLocal = window.location.hostname === 'localhost' ||
+    // Dynamic API Base URL: connects to current host (works across PC, LAN/Wi-Fi mobile, and cloud production)
+    const isLocalHost = window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1' ||
       window.location.protocol === 'file:';
-    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
+    const isLocalNetwork = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(window.location.hostname) ||
+      window.location.port === '6039';
+
+    if (window.location.origin && window.location.origin.startsWith('http')) {
+      window.API_BASE_URL = window.location.origin;
+    } else if (isLocalHost || isLocalNetwork) {
+      window.API_BASE_URL = 'http://localhost:6039';
+    } else {
+      window.API_BASE_URL = 'https://capzone.kaveez.top';
+    }
+
+    // Universal Cross-Device Media URL Normalizer:
+    // Resolves localhost URLs to the active origin so images and previews load seamlessly across PC and Mobile devices
+    window.formatMediaUrl = function (url) {
+      if (!url || typeof url !== 'string') return '';
+      if (url.startsWith('blob:') || url.startsWith('data:')) return url;
+      
+      let cleanUrl = url.trim();
+      // If the URL contains localhost or 127.0.0.1 (e.g. created on PC), strip out the host so mobile can load it
+      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(cleanUrl)) {
+        cleanUrl = cleanUrl.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
+      }
+
+      // If it's a relative path (/uploads/... or /api/...)
+      if (cleanUrl.startsWith('/')) {
+        const base = window.API_BASE_URL || '';
+        if (base && base.startsWith('http')) {
+          return base.replace(/\/$/, '') + cleanUrl;
+        }
+        return cleanUrl;
+      }
+      return cleanUrl;
+    };
+
     window.currentUserEmail = (localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
@@ -648,30 +681,73 @@
       box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 0 18px rgba(99, 102, 241, 0.2);
     }
 
-    /* Mobile Ultra-Smooth Scrolling & Performance Engine */
+    /* Mobile Ultra-Smooth 60FPS Performance Engine */
     @media (max-width: 1024px) {
+      /* 1. Turn off expensive GPU backdrop blur on mobile to eliminate scroll stutter and frame drops */
+      .glass-panel,
+      .glass-card,
+      nav.fixed div,
+      header.fixed,
+      .project-3d-card {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+      }
+
       .glass-panel {
-        background: rgba(12, 16, 28, 0.94) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        background: #0d121f !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
       }
 
       .glass-card {
-        background: rgba(14, 19, 32, 0.94) !important;
-        backdrop-filter: blur(10px) !important;
-        -webkit-backdrop-filter: blur(10px) !important;
+        background: #0f1526 !important;
+        border-color: rgba(255, 255, 255, 0.08) !important;
       }
 
-      .studio-tool-card:hover {
+      header.fixed {
+        background: rgba(11, 15, 25, 0.96) !important;
+      }
+
+      nav.fixed div {
+        background: #0b0f19 !important;
+      }
+
+      /* 2. Optimize Project Cards: eliminate laggy hover 3D transforms & memory leaks */
+      .project-3d-card {
+        contain: content;
+        content-visibility: auto;
+        contain-intrinsic-size: 66px;
+        will-change: auto !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
         transform: none !important;
       }
 
+      .studio-tool-card:hover,
       .project-3d-card:hover {
         transform: none !important;
       }
 
+      /* 3. Smooth Hardware Momentum Touch Scrolling */
+      html, body {
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-y: none;
+      }
+
+      #recentProjectsContainer,
+      .overflow-y-auto,
+      .overflow-x-auto {
+        -webkit-overflow-scrolling: touch !important;
+        scroll-behavior: smooth;
+      }
+
+      /* 4. Disable heavy continuous background animations on mobile */
+      #dashboardBackground div[class*="blur-"] {
+        display: none !important;
+      }
+
+      /* 5. Instant Tap Reaction */
       * {
         -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
       }
     }
   </style>
@@ -2108,7 +2184,7 @@
           <input type="file" id="enhanceImageInput" accept="image/*" required class="hidden"
             onchange="document.getElementById('enhanceFileName').textContent = this.files[0] ? this.files[0].name : 'Click to Upload Image'" />
           <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-amber-500 mb-2"></i>
-          <p class="text-xs text-white font-bold" id="enhanceFileName">Click to Upload Image to Remove BG</p>
+          <p class="text-xs text-white font-bold" id="enhanceFileName">Click to Upload Image</p>
         </div>
         <button type="button" id="imageEnhanceBtn" onclick="handleImageEnhanceSubmit(event)"
           class="w-full py-3.5 bg-amber-600 text-white font-bold text-sm rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2">
@@ -2117,7 +2193,7 @@
       </form>
 
       <div id="imgProgressCard" class="mt-4 p-4 rounded-2xl bg-black/30 border border-white/5" style="display: none;">
-        <p id="imgStatusText" class="text-xs font-bold text-white mb-2">Processing (May take up to 2 mins)...</p>
+        <p id="imgStatusText" class="text-xs font-bold text-white mb-2">Removing background...</p>
         <div class="w-full bg-black/20 rounded-full h-1.5 overflow-hidden">
           <div id="imgProgressBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-300"
             style="width: 0%">
@@ -2130,7 +2206,7 @@
         style="display: none;">
         <div class="w-full flex items-center justify-between px-1">
           <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full">
-            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Background Removed (Transparent PNG)
+            <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Background Removed
           </span>
           <span id="imgResultMeta" class="text-[10px] text-slate-400 font-medium">Ready to download</span>
         </div>
@@ -2144,9 +2220,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full mt-1">
           <a id="imgDownloadLink"
             href="#"
-            download="transparent_removed_bg.png"
+            download="nobg_image.png"
             class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]">
-            <i data-lucide="download" class="w-4 h-4"></i> Download Real PNG
+            <i data-lucide="download" class="w-4 h-4"></i> Download Image
           </a>
           <button type="button" id="imgNewUploadBtn" onclick="resetBgRemoverForm()"
             class="w-full py-3 bg-white/10 hover:bg-white/15 text-slate-200 font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center transition-all active:scale-[0.98]">
@@ -2426,7 +2502,7 @@
         const fileLabels = modal.querySelectorAll('p[id$="FileName"]');
         fileLabels.forEach(l => {
           if (l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
-          if (l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image to Remove BG';
+          if (l.id === 'enhanceFileName') l.textContent = 'Click to Upload Image';
           if (l.id === 'dubFileName') l.textContent = 'Click to Browse Video';
         });
         const progressCards = modal.querySelectorAll('[id$="ProgressCard"]');
@@ -2662,7 +2738,7 @@
                 // Cache-busting query to guarantee preview always loads freshly
                 const bustUrl = previewUrl.includes('?') ? `${previewUrl}&t=${Date.now()}` : `${previewUrl}?t=${Date.now()}`;
                 imgPreviewEl.src = bustUrl;
-                imgPreviewEl.alt = 'Background Removed Transparent PNG';
+                imgPreviewEl.alt = 'Background Removed';
               }
 
               const downloadLinkEl = document.getElementById('imgDownloadLink');
@@ -2703,7 +2779,7 @@
               if (progCard) progCard.style.display = 'none';
 
               const metaEl = document.getElementById('imgResultMeta');
-              if (metaEl) metaEl.innerText = 'Transparent PNG Ready';
+              if (metaEl) metaEl.innerText = 'Ready to download';
 
               if (window.lucide) window.lucide.createIcons();
 
@@ -2714,12 +2790,12 @@
                 window.saveToRecentProjects({
                   type: type,
                   title: title,
-                  metadata: 'Transparent PNG (AI Processed)',
-                  media_url: previewUrl,
+                  metadata: 'Background Removed',
+                  media_url: window.formatMediaUrl(previewUrl),
                   payload: {
                     prompt: document.getElementById('imagePromptInput')?.value || '',
                     isBgRemover: isBgRemover,
-                    url: previewUrl,
+                    url: window.formatMediaUrl(previewUrl),
                     downloadUrl: downloadUrl
                   }
                 });
@@ -3967,7 +4043,7 @@
       const form = document.getElementById('imageEnhanceForm');
       if (form) form.reset();
       const fileNameEl = document.getElementById('enhanceFileName');
-      if (fileNameEl) fileNameEl.textContent = 'Click to Upload Image to Remove BG';
+      if (fileNameEl) fileNameEl.textContent = 'Click to Upload Image';
       const fileInput = document.getElementById('enhanceImageInput');
       if (fileInput) fileInput.value = '';
       const resultArea = document.getElementById('imgResultArea');
@@ -3991,7 +4067,7 @@
       document.getElementById('imageEnhanceBtn').disabled = true;
       document.getElementById('imgProgressCard').style.display = 'block';
       const statusEl = document.getElementById('imgStatusText');
-      if (statusEl) statusEl.innerText = 'Initializing AI Background Remover...';
+      if (statusEl) statusEl.innerText = 'Removing background...';
       const resultArea = document.getElementById('imgResultArea');
       if (resultArea) resultArea.style.display = 'none';
       const previewEl = document.getElementById('imgResultPreview');
@@ -4523,6 +4599,13 @@
         };
       }
 
+      // Universal Media URL normalizer for DB storage
+      if (project.media_url && typeof project.media_url === 'string') {
+        if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(project.media_url)) {
+          project.media_url = project.media_url.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
+        }
+      }
+
       // Always ensure valid user email with fallback
       let rawEmail = project.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
       project.email = rawEmail.toLowerCase().trim();
@@ -4700,19 +4783,19 @@
         const displayType = isAudio ? 'Audio' : (p.type || 'Media');
         const icon = icons[displayType] || 'folder';
         const colorClass = colors[displayType] || 'bg-slate-500/20 text-slate-300 border-slate-500/30';
-        const timeStr = formatTimeAgo(p.date);
-        const hasThumb = (p.type === 'Image' || p.type === 'Background') && p.media_url;
+        const formattedMedia = window.formatMediaUrl(p.media_url);
+        const hasThumb = (p.type === 'Image' || p.type === 'Background') && formattedMedia;
 
         let thumbnailHtml = '';
         if (hasThumb) {
           thumbnailHtml = `
             <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/40 border border-white/15 flex-shrink-0 shadow-md relative flex items-center justify-center">
-              <img src="${p.media_url}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.style.display='none'">
+              <img src="${formattedMedia}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src='logo.jpg';">
             </div>`;
-        } else if (displayType === 'Video' && p.media_url) {
+        } else if (displayType === 'Video' && formattedMedia) {
           thumbnailHtml = `
             <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/60 border border-blue-500/30 flex-shrink-0 shadow-md relative flex items-center justify-center group">
-              <video src="${p.media_url}" preload="metadata" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"></video>
+              <video src="${formattedMedia}" preload="metadata" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"></video>
               <i data-lucide="play" class="w-4 h-4 text-white absolute z-10 drop-shadow-lg"></i>
             </div>`;
         } else {
@@ -4866,11 +4949,12 @@
       if (audBox) audBox.classList.add('hidden');
       if (textArea) textArea.classList.add('hidden');
 
-      const isImage = (p.type === 'Image' || p.type === 'Background') && p.media_url;
-      const isVideo = (p.type === 'Video') && p.media_url && !isAudio;
+      const formattedMedia = window.formatMediaUrl(p.media_url);
+      const isImage = (p.type === 'Image' || p.type === 'Background') && formattedMedia;
+      const isVideo = (p.type === 'Video') && formattedMedia && !isAudio;
 
       if (isImage && imgEl && mediaArea) {
-        imgEl.src = p.media_url;
+        imgEl.src = formattedMedia;
         imgEl.classList.remove('hidden');
         mediaArea.classList.remove('hidden');
         if (p.type === 'Background') {
@@ -4886,7 +4970,7 @@
         mediaArea.style.backgroundColor = '';
         mediaArea.style.backgroundImage = '';
         mediaArea.style.backgroundSize = '';
-        audEl.src = p.media_url;
+        audEl.src = formattedMedia;
         if (audTitle) audTitle.innerText = p.title || 'Audio Recording';
         audBox.classList.remove('hidden');
         mediaArea.classList.remove('hidden');
@@ -4894,8 +4978,8 @@
         mediaArea.style.backgroundColor = '';
         mediaArea.style.backgroundImage = '';
         mediaArea.style.backgroundSize = '';
-        vidEl.src = p.media_url;
-        if (directLink) directLink.href = p.media_url;
+        vidEl.src = formattedMedia;
+        if (directLink) directLink.href = formattedMedia;
         vidBox.classList.remove('hidden');
         mediaArea.classList.remove('hidden');
       }
@@ -5033,16 +5117,17 @@
         try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
       }
 
-      if (p.media_url) {
+      const formattedMedia = window.formatMediaUrl(p.media_url);
+      if (formattedMedia) {
         let ext = '.mp4';
-        if (p.type === 'Background' || (p.media_url && p.media_url.endsWith('.png'))) ext = '.png';
-        else if (p.type === 'Image' || (p.media_url && (p.media_url.endsWith('.jpg') || p.media_url.endsWith('.jpeg')))) ext = '.jpg';
-        else if (p.type === 'Audio' || (p.media_url && p.media_url.endsWith('.mp3'))) ext = '.mp3';
+        if (p.type === 'Background' || (formattedMedia && formattedMedia.endsWith('.png'))) ext = '.png';
+        else if (p.type === 'Image' || (formattedMedia && (formattedMedia.endsWith('.jpg') || formattedMedia.endsWith('.jpeg')))) ext = '.jpg';
+        else if (p.type === 'Audio' || (formattedMedia && formattedMedia.endsWith('.mp3'))) ext = '.mp3';
 
         let cleanTitle = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
         if (!cleanTitle.toLowerCase().endsWith(ext)) cleanTitle += ext;
 
-        fetch(p.media_url)
+        fetch(formattedMedia)
           .then(res => res.blob())
           .then(blob => {
             const mimeType = ext === '.png' ? 'image/png' : (ext === '.mp3' ? 'audio/mpeg' : (ext === '.jpg' ? 'image/jpeg' : 'video/mp4'));
@@ -5060,7 +5145,7 @@
           })
           .catch(() => {
             const a = document.createElement('a');
-            a.href = p.media_url;
+            a.href = formattedMedia;
             a.download = cleanTitle;
             document.body.appendChild(a);
             a.click();
