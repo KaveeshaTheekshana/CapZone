@@ -4,47 +4,31 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    // Live API Engine is hosted strictly at https://capzone.kaveez.top (capzone.top is static frontend only)
-    const isLocal = window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.protocol === 'file:';
+    // Pure Relative API Routing - Zero domain exposure
+    window.API_BASE_URL = '';
 
-    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
-
-    // Universal Cross-Device Media URL Normalizer:
-    // Resolves localhost URLs to the active origin so images and previews load seamlessly across PC and Mobile devices
     window.formatMediaUrl = function (url) {
       if (!url || typeof url !== 'string') return '';
       if (url.startsWith('blob:') || url.startsWith('data:')) return url;
-      
-      let cleanUrl = url.trim();
-      // If the URL contains localhost or 127.0.0.1 (e.g. created on PC), strip out the host so mobile/cloud can load it
-      if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(cleanUrl)) {
-        cleanUrl = cleanUrl.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
-      }
-
-      // If it's a relative path (/uploads/... or /api/...)
-      if (cleanUrl.startsWith('/')) {
-        const base = window.API_BASE_URL || 'https://capzone.kaveez.top';
-        return base.replace(/\/$/, '') + cleanUrl;
-      }
-      return cleanUrl;
+      return url.trim();
     };
+
+    // 🛡️ Cloudflare / CyberShield Human Verification Enforcement
+    (function enforceHumanVerification() {
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isVerified = sessionStorage.getItem('capzone_robot_verified');
+      const email = localStorage.getItem('capzone_user_email');
+      if (!isLocal && (!isVerified || !email)) {
+        console.warn("[CyberShield] Direct access blocked: Turnstile verification required.");
+        window.location.replace('login.html');
+      }
+    })();
 
     window.currentUserEmail = (localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
       let [resource, config] = arguments;
-      const activeApiBase = window.API_BASE_URL || 'https://capzone.kaveez.top';
-
-      if (typeof resource === 'string') {
-        if (resource.startsWith('/api/')) {
-          resource = activeApiBase + resource;
-        } else if (resource.startsWith('https://capzone.top/api/')) {
-          resource = resource.replace('https://capzone.top/api/', activeApiBase + '/api/');
-        }
-      }
       if (typeof resource === 'string' && resource.includes('/api/')) {
         config = config || {};
 
@@ -292,13 +276,6 @@
             headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
           }).catch(() => null);
 
-          // If local backend is unreachable or returned non-200, fallback to cloud backend
-          if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
-            res = await fetchFn(`https://capzone.kaveez.top/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
-              cache: 'no-store',
-              headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
-            }).catch(() => null);
-          }
 
           if (res && res.ok) {
             const data = await res.json();
@@ -5883,13 +5860,6 @@
           body: JSON.stringify(payload)
         }).catch(() => null);
 
-        if ((!res || !res.ok) && window.API_BASE_URL !== 'https://capzone.kaveez.top') {
-          res = await fetchFn(`https://capzone.kaveez.top/api/payhere-confirm`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'x-user-email': email },
-            body: JSON.stringify(payload)
-          }).catch(() => null);
-        }
 
         if (res && res.ok) {
           const result = await res.json();
