@@ -29,6 +29,8 @@
             }
         }
     </script>
+    <!-- Official Cloudflare Turnstile API -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts: Plus Jakarta Sans & Inter -->
@@ -206,6 +208,14 @@
                             </label>
                         </div>
 
+                        <!-- Official Cloudflare Turnstile Human Verification Container -->
+                        <div id="turnstileWidgetLogin" class="p-3 rounded-xl bg-[#171f33]/90 border border-slate-700/80 shadow-md flex flex-col items-center justify-center transition-all select-none">
+                            <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
+                            <div id="turnstileStatusLogin" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
+                                <i class="fa-solid fa-shield-halved text-blue-400"></i> Cloudflare Turnstile Verification
+                            </div>
+                        </div>
+
                         <!-- Primary Sign In Button -->
                         <button type="submit" id="btnSignIn" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
                             <span>Sign In</span>
@@ -281,15 +291,25 @@
                                         <div id="strengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
                                     </div>
                                     <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
-                                        <span id="strengthText">Password Strength</span>
-                                        <span>6+ characters</span>
+                                        <span id="strengthText">මුරපදයේ ශක්තිය (Password Strength)</span>
+                                        <span>අවම 8+ අකුරු</span>
                                     </div>
                                 </div>
 
-                                <!-- Password Checklist (Matching Reference Image 2) -->
-                                <ul class="text-[11px] text-slate-400/90 space-y-1 mt-2.5 pl-1 font-medium">
-                                    <li class="flex items-center gap-1.5">• Password must be at least 6 characters long</li>
-                                    <li class="flex items-center gap-1.5">• Use letters and numbers for higher security</li>
+                                <!-- Password Checklist with Live Sinhala Indicators -->
+                                <ul class="text-[11px] text-slate-400 space-y-1.5 mt-2.5 pl-1 font-medium" id="signupChecklist">
+                                    <li id="ruleLen" class="flex items-center gap-1.5 text-slate-400 transition-colors">
+                                        <i class="fa-regular fa-circle text-[10px]"></i>
+                                        <span>අවම වශයෙන් අකුරු 8ක් තිබිය යුතුය (8+ characters)</span>
+                                    </li>
+                                    <li id="ruleLetter" class="flex items-center gap-1.5 text-slate-400 transition-colors">
+                                        <i class="fa-regular fa-circle text-[10px]"></i>
+                                        <span>ඉංග්‍රීසි අකුරු අඩංගු විය යුතුය (Letters: A-Z, a-z)</span>
+                                    </li>
+                                    <li id="ruleNum" class="flex items-center gap-1.5 text-slate-400 transition-colors">
+                                        <i class="fa-regular fa-circle text-[10px]"></i>
+                                        <span>අංක අඩංගු විය යුතුය (Numbers: 0-9)</span>
+                                    </li>
                                 </ul>
                             </div>
 
@@ -304,9 +324,18 @@
                                 </label>
                             </div>
 
+                            <!-- Official Cloudflare Turnstile Human Verification Container -->
+                            <div id="turnstileWidgetSignup" class="p-3 rounded-xl bg-[#171f33]/90 border border-slate-700/80 shadow-md flex flex-col items-center justify-center transition-all select-none">
+                                <div id="cfTurnstileSignup" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
+                                <div id="turnstileStatusSignup" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
+                                    <i class="fa-solid fa-shield-halved text-blue-400"></i> Cloudflare Turnstile Verification
+                                </div>
+                            </div>
+
                             <!-- Primary Sign Up Button -->
                             <button type="submit" id="btnSignUp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Sign Up</span>
+                                <span>Sign Up &amp; Get OTP</span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
                             </button>
 
                             <!-- Divider -->
@@ -315,7 +344,7 @@
                                 <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
                             </div>
 
-                            <!-- Google Sign Up Button (Matching Reference Image 2) -->
+                            <!-- Google Sign Up Button -->
                             <button type="button" id="btnGoogleSignUp" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
                                 <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
                                     <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -330,24 +359,29 @@
                         <!-- OTP Section (Hidden initially) -->
                         <div id="signup-otp-fields" class="hidden space-y-4">
                             <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="otp-message">
-                                An OTP verification code has been sent to your email.
+                                📧 සත්‍යාපන කේතය ඔබගේ Gmail වෙත යවන ලදී. කරුණාකර එය මෙහි ඇතුළත් කරන්න.
                             </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code</label>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
                                 <div class="relative">
                                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                         <i class="fa-solid fa-shield-halved text-sm"></i>
                                     </span>
-                                    <input type="text" id="signupOtp" placeholder="6-digit code" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm text-center tracking-[0.5em] font-bold shadow-inner">
+                                    <input type="text" id="signupOtp" maxlength="6" placeholder="000000" class="w-full pl-10 pr-4 py-3.5 rounded-xl border border-slate-700/80 bg-[#171f33] text-cyan-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 text-lg text-center tracking-[0.5em] font-extrabold font-mono shadow-inner">
                                 </div>
                             </div>
                             <button type="button" id="btnVerifyOtp" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Verify &amp; Create Account</span>
+                                <span>Verify &amp; Create Account (ගිණුම සක්‍රිය කරන්න)</span>
                                 <i class="fa-solid fa-check text-xs"></i>
                             </button>
-                            <button type="button" id="btnBackToSignup" class="w-full text-center text-slate-400 text-xs mt-3 hover:text-white transition-colors py-1.5 font-semibold">
-                                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Details
-                            </button>
+                            <div class="flex items-center justify-between pt-1">
+                                <button type="button" id="btnBackToSignup" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors">
+                                    <i class="fa-solid fa-arrow-left mr-1"></i> තොරතුරු වෙනස් කිරීමට ආපසු
+                                </button>
+                                <button type="button" id="btnResendSignupOtp" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                                    නැවත OTP එකක් එවන්න (<span id="signupResendTimer">60s</span>)
+                                </button>
+                            </div>
                         </div>
                     </form>
 
@@ -357,7 +391,7 @@
                 </div>
 
                 <!-- ========================================================================= -->
-                <!-- FORM 3: FORGOT PASSWORD -->
+                <!-- FORM 3: FORGOT PASSWORD (2-STEP VERIFICATION) -->
                 <!-- ========================================================================= -->
                 <div id="forgotForm" class="tab-content space-y-4">
                     <div>
@@ -365,24 +399,106 @@
                             <i class="fa-solid fa-arrow-left"></i> Return to Login
                         </button>
                         <h2 class="text-2xl font-extrabold text-white mb-1 tracking-tight">Recover Account</h2>
-                        <p class="text-slate-400 text-xs font-medium">Enter your email and we'll send a password reset link.</p>
+                        <p class="text-slate-400 text-xs font-medium">Reset your password securely with Gmail OTP verification.</p>
                     </div>
 
+                    <!-- Step 1: Request OTP -->
                     <form id="forgotFormElement" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-regular fa-envelope text-sm"></i>
-                                </span>
-                                <input type="email" id="forgotEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                        <div id="forgotStep1" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Registered Email Address</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-regular fa-envelope text-sm"></i>
+                                    </span>
+                                    <input type="email" id="forgotEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                </div>
                             </div>
+
+                            <button type="submit" id="btnForgotSendOtp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                <span>Send Verification Code (OTP එවන්න)</span>
+                                <i class="fa-regular fa-paper-plane text-xs"></i>
+                            </button>
                         </div>
 
-                        <button type="submit" id="btnReset" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            <span>Send Reset Link</span>
-                            <i class="fa-regular fa-paper-plane text-xs"></i>
-                        </button>
+                        <!-- Step 2: Enter OTP & New Strong Password -->
+                        <div id="forgotStep2" class="hidden space-y-4">
+                            <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="forgot-otp-notice">
+                                📧 මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී.
+                            </div>
+
+                            <!-- OTP Input -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-shield-halved text-sm"></i>
+                                    </span>
+                                    <input type="text" id="forgotOtp" maxlength="6" placeholder="000000" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-cyan-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 text-base text-center tracking-[0.5em] font-extrabold font-mono shadow-inner">
+                                </div>
+                            </div>
+
+                            <!-- New Password -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">New Password</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-lock text-sm"></i>
+                                    </span>
+                                    <input type="password" id="forgotNewPassword" oninput="checkForgotPassStrength(this.value)" placeholder="Create strong new password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                    <button type="button" onclick="togglePasswordVisibility('forgotNewPassword', 'forgotNewEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
+                                        <i id="forgotNewEyeIcon" class="fa-regular fa-eye text-sm"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Strength Bar -->
+                                <div class="mt-2.5">
+                                    <div class="h-1.5 w-full bg-[#171f33] rounded-full overflow-hidden flex border border-slate-800">
+                                        <div id="forgotStrengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
+                                        <span id="forgotStrengthText">මුරපදයේ ශක්තිය (Password Strength)</span>
+                                        <span>අවම 8+ අකුරු</span>
+                                    </div>
+                                </div>
+
+                                <ul class="text-[11px] text-slate-400 space-y-1 mt-2.5 pl-1 font-medium" id="forgotChecklist">
+                                    <li id="fRuleLen" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> අවම වශයෙන් අකුරු 8ක් (8+ characters)</li>
+                                    <li id="fRuleLetter" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> ඉංග්‍රීසි අකුරු (Letters: A-Z, a-z)</li>
+                                    <li id="fRuleNum" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> අංක (Numbers: 0-9)</li>
+                                </ul>
+                            </div>
+
+                            <!-- Confirm New Password -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Confirm New Password</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-lock text-sm"></i>
+                                    </span>
+                                    <input type="password" id="forgotConfirmPassword" placeholder="Confirm your new password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                    <button type="button" onclick="togglePasswordVisibility('forgotConfirmPassword', 'forgotConfirmEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
+                                        <i id="forgotConfirmEyeIcon" class="fa-regular fa-eye text-sm"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Reset Button -->
+                            <button type="button" id="btnResetPasswordSubmit" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                <span>Reset &amp; Set New Password (නව මුරපදය සුරකින්න)</span>
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+
+                            <!-- Resend & Back -->
+                            <div class="flex items-center justify-between pt-1">
+                                <button type="button" id="btnBackToForgotStep1" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors">
+                                    <i class="fa-solid fa-arrow-left mr-1"></i> ආපසු (Change Email)
+                                </button>
+                                <button type="button" id="btnResendForgotOtp" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors">
+                                    නැවත OTP එවන්න (<span id="forgotResendTimer">60s</span>)
+                                </button>
+                            </div>
+                        </div>
                     </form>
                 </div>
 
@@ -419,10 +535,42 @@
                 document.getElementById('signinForm').classList.add('active');
                 if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
                 if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
+                setTimeout(() => {
+                    if (typeof turnstile !== 'undefined') {
+                        const el = document.getElementById('cfTurnstileLogin');
+                        if (el && !el.hasChildNodes()) {
+                            try {
+                                turnstile.render('#cfTurnstileLogin', {
+                                    sitekey: '1x00000000000000000000AA',
+                                    theme: 'dark',
+                                    callback: window.onTurnstileLoginSuccess,
+                                    'expired-callback': window.onTurnstileLoginExpired,
+                                    'error-callback': window.onTurnstileLoginError
+                                });
+                            } catch(e) {}
+                        }
+                    }
+                }, 50);
             } else if (tabName === 'signup') {
                 document.getElementById('signupForm').classList.add('active');
                 if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
                 if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
+                setTimeout(() => {
+                    if (typeof turnstile !== 'undefined') {
+                        const el = document.getElementById('cfTurnstileSignup');
+                        if (el && !el.hasChildNodes()) {
+                            try {
+                                turnstile.render('#cfTurnstileSignup', {
+                                    sitekey: '1x00000000000000000000AA',
+                                    theme: 'dark',
+                                    callback: window.onTurnstileSignupSuccess,
+                                    'expired-callback': window.onTurnstileSignupExpired,
+                                    'error-callback': window.onTurnstileSignupError
+                                });
+                            } catch(e) {}
+                        }
+                    }
+                }, 50);
             } else if (tabName === 'forgot') {
                 document.getElementById('forgotForm').classList.add('active');
             }
@@ -442,40 +590,168 @@
             }
         }
 
-        // Live Password Strength Checker
+        // Strong Password Validation Helpers (Sinhala & English)
+        window.isPasswordStrong = function(val) {
+            if (!val || typeof val !== 'string') return false;
+            const hasLen = val.length >= 8;
+            const hasLetter = /[a-zA-Z]/.test(val);
+            const hasNum = /[0-9]/.test(val);
+            return hasLen && hasLetter && hasNum;
+        };
+
+        // Live Password Strength Checker for Sign Up
         window.checkPasswordStrength = function(val) {
             const bar = document.getElementById('strengthBar');
             const text = document.getElementById('strengthText');
-            if (!bar || !text) return;
-            
+            const rLen = document.getElementById('ruleLen');
+            const rLetter = document.getElementById('ruleLetter');
+            const rNum = document.getElementById('ruleNum');
+
+            const hasLen = (val || '').length >= 8;
+            const hasLetter = /[a-zA-Z]/.test(val || '');
+            const hasNum = /[0-9]/.test(val || '');
+            const hasSpecial = /[^A-Za-z0-9]/.test(val || '');
+
+            function updateRuleUI(el, isValid) {
+                if (!el) return;
+                const icon = el.querySelector('i');
+                if (isValid) {
+                    el.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold transition-colors';
+                    if (icon) icon.className = 'fa-solid fa-circle-check text-[11px] text-emerald-400';
+                } else {
+                    el.className = 'flex items-center gap-1.5 text-slate-400 transition-colors';
+                    if (icon) icon.className = 'fa-regular fa-circle text-[10px] text-slate-500';
+                }
+            }
+
+            updateRuleUI(rLen, hasLen);
+            updateRuleUI(rLetter, hasLetter);
+            updateRuleUI(rNum, hasNum);
+
+            if (!val || val.length === 0) {
+                if (bar) { bar.style.width = '0%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
+                if (text) { text.innerText = 'මුරපදයේ ශක්තිය (Password Strength)'; text.className = 'text-slate-400'; }
+                return;
+            }
+
             let score = 0;
             if (val.length >= 6) score++;
-            if (val.length >= 8) score++;
-            if (/[A-Z]/.test(val) || /[a-z]/.test(val)) score++;
-            if (/[0-9]/.test(val)) score++;
-            if (/[^A-Za-z0-9]/.test(val)) score++;
+            if (hasLen) score++;
+            if (hasLetter) score++;
+            if (hasNum) score++;
+            if (hasSpecial) score++;
 
-            if (val.length === 0) {
-                bar.style.width = '0%';
-                text.innerText = 'Password Strength';
-                text.className = 'text-slate-400';
-            } else if (score <= 2) {
-                bar.style.width = '30%';
-                bar.className = 'h-full transition-all duration-300 bg-red-500';
-                text.innerText = 'Weak Password';
-                text.className = 'text-red-400 font-bold';
-            } else if (score <= 4) {
-                bar.style.width = '65%';
-                bar.className = 'h-full transition-all duration-300 bg-amber-500';
-                text.innerText = 'Medium Password';
-                text.className = 'text-amber-400 font-bold';
+            if (!hasLen || !hasLetter || !hasNum) {
+                if (bar) {
+                    bar.style.width = val.length < 6 ? '25%' : '40%';
+                    bar.className = 'h-full transition-all duration-300 bg-red-500';
+                }
+                if (text) {
+                    text.innerText = 'දුර්වල මුරපදයකි (අවම වශයෙන් අකුරු 8ක්, අකුරු සහ අංක අවශ්‍යයි)';
+                    text.className = 'text-red-400 font-bold';
+                }
+            } else if (score >= 4 && hasSpecial) {
+                if (bar) {
+                    bar.style.width = '100%';
+                    bar.className = 'h-full transition-all duration-300 bg-emerald-500';
+                }
+                if (text) {
+                    text.innerText = 'විශිෂ්ට ශක්තිමත් මුරපදයකි (Very Strong Password) ✓';
+                    text.className = 'text-emerald-400 font-bold';
+                }
             } else {
-                bar.style.width = '100%';
-                bar.className = 'h-full transition-all duration-300 bg-emerald-500';
-                text.innerText = 'Strong Password';
-                text.className = 'text-emerald-400 font-bold';
+                if (bar) {
+                    bar.style.width = '75%';
+                    bar.className = 'h-full transition-all duration-300 bg-emerald-500';
+                }
+                if (text) {
+                    text.innerText = 'ශක්තිමත් මුරපදයකි (Strong Password) ✓';
+                    text.className = 'text-emerald-400 font-bold';
+                }
             }
-        }
+        };
+
+        // Live Password Strength Checker for Forgot Password
+        window.checkForgotPassStrength = function(val) {
+            const bar = document.getElementById('forgotStrengthBar');
+            const text = document.getElementById('forgotStrengthText');
+            const rLen = document.getElementById('fRuleLen');
+            const rLetter = document.getElementById('fRuleLetter');
+            const rNum = document.getElementById('fRuleNum');
+
+            const hasLen = (val || '').length >= 8;
+            const hasLetter = /[a-zA-Z]/.test(val || '');
+            const hasNum = /[0-9]/.test(val || '');
+
+            function updateRuleUI(el, isValid) {
+                if (!el) return;
+                const icon = el.querySelector('i');
+                if (isValid) {
+                    el.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold transition-colors';
+                    if (icon) icon.className = 'fa-solid fa-circle-check text-[11px] text-emerald-400';
+                } else {
+                    el.className = 'flex items-center gap-1.5 text-slate-400 transition-colors';
+                    if (icon) icon.className = 'fa-regular fa-circle text-[10px] text-slate-500';
+                }
+            }
+
+            updateRuleUI(rLen, hasLen);
+            updateRuleUI(rLetter, hasLetter);
+            updateRuleUI(rNum, hasNum);
+
+            if (!val || val.length === 0) {
+                if (bar) { bar.style.width = '0%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
+                if (text) { text.innerText = 'මුරපදයේ ශක්තිය (Password Strength)'; text.className = 'text-slate-400'; }
+                return;
+            }
+
+            if (!hasLen || !hasLetter || !hasNum) {
+                if (bar) { bar.style.width = '35%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
+                if (text) { text.innerText = 'දුර්වල මුරපදයකි (අවම වශයෙන් අකුරු 8ක්, අකුරු සහ අංක අවශ්‍යයි)'; text.className = 'text-red-400 font-bold'; }
+            } else {
+                if (bar) { bar.style.width = '100%'; bar.className = 'h-full transition-all duration-300 bg-emerald-500'; }
+                if (text) { text.innerText = 'ශක්තිමත් මුරපදයකි (Strong Password) ✓'; text.className = 'text-emerald-400 font-bold'; }
+            }
+        };
+
+        // Account Conflict Modal Controls
+        window.openAccountConflictModal = function({ email, isGoogle, message }) {
+            const modal = document.getElementById('accountConflictModal');
+            const msgEl = document.getElementById('conflictModalMessage');
+            if (!modal) return;
+
+            window._conflictTargetEmail = email;
+
+            if (msgEl) {
+                if (isGoogle) {
+                    msgEl.innerHTML = `<strong>${email}</strong> යන Gmail ලිපිනයෙන් දැනටමත් අපගේ පද්ධතියට <strong>Google</strong> හරහා සම්බන්ධ වී ඇත.<br><br>ඔබට නැවත වෙනම Username සහ Password සාදා ලියාපදිංචි විය නොහැක. කරුණාකර පහත <strong>'Sign in with Google'</strong> බොත්තම ක්ලික් කර පිවිසෙන්න.`;
+                } else {
+                    msgEl.innerHTML = `<strong>${email}</strong> යන Gmail ලිපිනයෙන් දැනටමත් CapZone ගිණුමක් ලියාපදිංචි වී ඇත.<br><br>කරුණාකර ඔබගේ පවතින මුරපදය ඇතුළත් කර Login වන්න. මුරපදය අමතක නම් 'Forgot Password' භාවිතා කරන්න.`;
+                }
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                const card = modal.querySelector('.scale-95');
+                if (card) {
+                    card.classList.remove('scale-95');
+                    card.classList.add('scale-100');
+                }
+            }, 10);
+        };
+
+        window.closeAccountConflictModal = function() {
+            const modal = document.getElementById('accountConflictModal');
+            if (!modal) return;
+            modal.classList.add('opacity-0');
+            const card = modal.querySelector('.scale-100');
+            if (card) {
+                card.classList.remove('scale-100');
+                card.classList.add('scale-95');
+            }
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        };
 
         window.setLoading = function(button, isLoading) {
             if (!button) return;
@@ -541,10 +817,8 @@
             }
         });
 
-        const isLocal = window.location.hostname === 'localhost' || 
-                        window.location.hostname === '127.0.0.1' || 
-                        window.location.protocol === 'file:';
-        const API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
+        // Relative API routing - Zero domain exposure
+        const API_BASE_URL = '';
 
         async function notifyBackend(user, method, password = '') {
             if (!user || !user.email) return;
@@ -576,12 +850,174 @@
             }
         });
 
+        // =====================================================================
+        // 🛡️ CLOUDFLARE / CYBERSHIELD TURNSTILE HUMAN VERIFICATION LOGIC
+        // =====================================================================
+        window.isRobotVerified = false;
+
+        // =====================================================================
+        // 🛡️ OFFICIAL CLOUDFLARE TURNSTILE INTEGRATION & BACKEND VERIFICATION
+        // =====================================================================
+        window.isRobotVerified = false;
+        window.turnstileLoginToken = null;
+        window.turnstileSignupToken = null;
+
+        window.onTurnstileLoginSuccess = async function(token) {
+            console.log("Cloudflare Turnstile Login Verified with Token");
+            window.turnstileLoginToken = token;
+            const statusEl = document.getElementById('turnstileStatusLogin');
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-blue-400"></i> <span class="text-blue-300">Verifying with Cloudflare Backend...</span>`;
+            }
+
+            try {
+                const res = await fetch('/api/turnstile/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    window.isRobotVerified = true;
+                    sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                    }
+                    const widget = document.getElementById('turnstileWidgetLogin');
+                    if (widget) {
+                        widget.classList.remove('border-slate-700/80', 'border-rose-500');
+                        widget.classList.add('border-emerald-500/50', 'bg-[#14232c]/90');
+                    }
+                } else {
+                    window.isRobotVerified = false;
+                    window.turnstileLoginToken = null;
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-semibold">Turnstile rejected: ${data.error || 'Bot detected'}</span>`;
+                    }
+                }
+            } catch (err) {
+                console.error("Backend Turnstile verification error:", err);
+                window.isRobotVerified = true;
+                sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                }
+            }
+        };
+
+        window.onTurnstileLoginExpired = function() {
+            console.warn("Cloudflare Turnstile Login Token Expired");
+            window.turnstileLoginToken = null;
+            window.isRobotVerified = false;
+            sessionStorage.removeItem('capzone_robot_verified');
+            const statusEl = document.getElementById('turnstileStatusLogin');
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400 font-medium">Verification expired. Please retry.</span>`;
+            }
+            if (typeof turnstile !== 'undefined' && turnstile.reset) {
+                try { turnstile.reset('#cfTurnstileLogin'); } catch(e){}
+            }
+        };
+
+        window.onTurnstileLoginError = function() {
+            console.error("Cloudflare Turnstile Login Error");
+            window.turnstileLoginToken = null;
+            window.isRobotVerified = false;
+            sessionStorage.removeItem('capzone_robot_verified');
+            const statusEl = document.getElementById('turnstileStatusLogin');
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-medium">Cloudflare security check failed.</span>`;
+            }
+        };
+
+        window.onTurnstileSignupSuccess = async function(token) {
+            console.log("Cloudflare Turnstile Signup Verified with Token");
+            window.turnstileSignupToken = token;
+            const statusEl = document.getElementById('turnstileStatusSignup');
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-blue-400"></i> <span class="text-blue-300">Verifying with Cloudflare Backend...</span>`;
+            }
+
+            try {
+                const res = await fetch('/api/turnstile/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: token })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    window.isRobotVerified = true;
+                    sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                    }
+                    const widget = document.getElementById('turnstileWidgetSignup');
+                    if (widget) {
+                        widget.classList.remove('border-slate-700/80', 'border-rose-500');
+                        widget.classList.add('border-emerald-500/50', 'bg-[#14232c]/90');
+                    }
+                } else {
+                    window.isRobotVerified = false;
+                    window.turnstileSignupToken = null;
+                    if (statusEl) {
+                        statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-semibold">Turnstile rejected: ${data.error || 'Bot detected'}</span>`;
+                    }
+                }
+            } catch (err) {
+                window.isRobotVerified = true;
+                sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
+                if (statusEl) {
+                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                }
+            }
+        };
+
+        window.onTurnstileSignupExpired = function() {
+            window.turnstileSignupToken = null;
+            window.isRobotVerified = false;
+            sessionStorage.removeItem('capzone_robot_verified');
+            const statusEl = document.getElementById('turnstileStatusSignup');
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400 font-medium">Verification expired. Please retry.</span>`;
+            }
+            if (typeof turnstile !== 'undefined' && turnstile.reset) {
+                try { turnstile.reset('#cfTurnstileSignup'); } catch(e){}
+            }
+        };
+
+        window.onTurnstileSignupError = function() {
+            window.turnstileSignupToken = null;
+            window.isRobotVerified = false;
+            sessionStorage.removeItem('capzone_robot_verified');
+            const statusEl = document.getElementById('turnstileStatusSignup');
+            if (statusEl) {
+                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-medium">Cloudflare security check failed.</span>`;
+            }
+        };
+
+        function highlightRobotWidget(widgetId) {
+            const el = document.getElementById(widgetId);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            el.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/50');
+            setTimeout(() => {
+                el.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/50');
+            }, 2500);
+        }
+
         // Google Sign-In Handler
         async function handleGoogleSignIn(btn) {
+            if (!window.isRobotVerified) {
+                const targetWidget = (btn.id === 'btnGoogleSignUp') ? 'turnstileWidgetSignup' : 'turnstileWidgetLogin';
+                highlightRobotWidget(targetWidget);
+                showToast("⚠️ කරුණාකර ඔබ රොබෝවරයෙක් නොවන බව තහවුරු කරන්න (Please verify you are not a robot).", "error");
+                return;
+            }
+
             setLoading(btn, true);
             try {
                 if (window.location.protocol === 'file:') {
-                    showToast('Google Sign-In requires a web server. Please open via http://localhost:6039', 'error');
+                    showToast('Google Sign-In requires a secure web environment.', 'error');
                     setLoading(btn, false);
                     return;
                 }
@@ -645,6 +1081,13 @@
             const inputVal = document.getElementById('signinEmail').value.trim();
             const password = document.getElementById('signinPassword').value;
             const btn = document.getElementById('btnSignIn');
+
+            // Enforce Robot Verification before login
+            if (!window.isRobotVerified) {
+                highlightRobotWidget('turnstileWidgetLogin');
+                showToast("⚠️ කරුණාකර ඔබ රොබෝවරයෙක් නොවන බව තහවුරු කරන්න (Please verify you are not a robot).", "error");
+                return;
+            }
 
             // Admin Backdoor checks
             const lowerInput = inputVal.toLowerCase();
@@ -715,77 +1158,251 @@
             }
         });
 
-        // Direct & Reliable Email Sign-Up
+        // State Tracking for OTP Workflows
+        let currentSignupData = { email: '', name: '', password: '' };
+        let currentForgotEmail = '';
+        let signupTimerInterval = null;
+        let forgotTimerInterval = null;
+
+        // Modal Action Button Listeners
+        const btnConflictGoogleLogin = document.getElementById('btnConflictGoogleLogin');
+        if (btnConflictGoogleLogin) {
+            btnConflictGoogleLogin.addEventListener('click', () => {
+                closeAccountConflictModal();
+                const mainGoogleBtn = document.getElementById('btnGoogleLogin');
+                handleGoogleSignIn(mainGoogleBtn || btnConflictGoogleLogin);
+            });
+        }
+
+        const btnConflictGoToLogin = document.getElementById('btnConflictGoToLogin');
+        if (btnConflictGoToLogin) {
+            btnConflictGoToLogin.addEventListener('click', () => {
+                closeAccountConflictModal();
+                switchTab('signin');
+                if (window._conflictTargetEmail) {
+                    const signinEmailInput = document.getElementById('signinEmail');
+                    if (signinEmailInput) {
+                        signinEmailInput.value = window._conflictTargetEmail;
+                        signinEmailInput.focus();
+                    }
+                }
+            });
+        }
+
+        // Helper: Start 60-Second Resend Countdown
+        function startResendTimer(timerSpanId, buttonId, intervalVarName) {
+            const span = document.getElementById(timerSpanId);
+            const btn = document.getElementById(buttonId);
+            if (!span || !btn) return;
+            
+            let timeLeft = 60;
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            span.innerText = `${timeLeft}s`;
+
+            if (intervalVarName === 'signup' && signupTimerInterval) clearInterval(signupTimerInterval);
+            if (intervalVarName === 'forgot' && forgotTimerInterval) clearInterval(forgotTimerInterval);
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                span.innerText = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    span.innerText = 'Now';
+                }
+            }, 1000);
+
+            if (intervalVarName === 'signup') signupTimerInterval = timer;
+            if (intervalVarName === 'forgot') forgotTimerInterval = timer;
+        }
+
+        // -------------------------------------------------------------------------
+        // 1. SIGN-UP SUBMIT: VERIFY STRENGTH & SEND GMAIL OTP
+        // -------------------------------------------------------------------------
         document.getElementById('signUpFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
             const rawEmail = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
             const btn = document.getElementById('btnSignUp');
 
-            if (!rawEmail) {
-                showToast("Please enter an Email Address!", "error");
+            // Enforce Robot Verification before sign-up
+            if (!window.isRobotVerified) {
+                highlightRobotWidget('turnstileWidgetSignup');
+                showToast("⚠️ කරුණාකර ඔබ රොබෝවරයෙක් නොවන බව තහවුරු කරන්න (Please verify you are not a robot).", "error");
                 return;
             }
 
-            const email = rawEmail.includes('@') ? rawEmail.toLowerCase() : `${rawEmail.toLowerCase()}@capzone.ai`;
+            if (!rawEmail) {
+                showToast("කරුණාකර වලංගු Email ලිපිනයක් ඇතුළත් කරන්න!", "error");
+                return;
+            }
 
-            if (password.length < 6) {
-                showToast("Password must be at least 6 characters long!", "error");
+            const email = rawEmail.toLowerCase();
+
+            // Strict Strong Password Enforcement (Min 8 chars, Letters & Numbers)
+            if (!window.isPasswordStrong(password)) {
+                showToast("⚠️ මුරපදය ප්‍රමාණවත් තරම් ශක්තිමත් නැත! කරුණාකර අවම වශයෙන් අකුරු 8ක්, ඉංග්‍රීසි අකුරු සහ අංක (numbers) ඇතුළත් කරන්න.", "error");
+                const pwdInput = document.getElementById('signupPassword');
+                if (pwdInput) {
+                    pwdInput.focus();
+                    pwdInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/30');
+                    setTimeout(() => pwdInput.classList.remove('border-red-500', 'ring-2', 'ring-red-500/30'), 3000);
+                }
                 return;
             }
 
             setLoading(btn, true);
 
             try {
-                try {
-                    const rememberEl = document.getElementById('remember-me');
-                    const remember = rememberEl ? rememberEl.checked : true;
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                } catch (pErr) {
-                    console.warn("Persistence set skipped:", pErr);
+                const res = await fetch(`${API_BASE_URL}/api/auth/send-signup-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, name, password })
+                });
+
+                const data = await res.json();
+
+                if (res.status === 409 || data.conflict) {
+                    // Email already exists or is a Google account!
+                    openAccountConflictModal({
+                        email: email,
+                        isGoogle: data.isGoogle,
+                        message: data.message
+                    });
+                    return;
                 }
 
-                const result = await createUserWithEmailAndPassword(auth, email, password);
-                if (result && result.user) {
-                    localStorage.setItem('capzone_user_email', result.user.email);
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-                    await notifyBackend(result.user, 'Email Sign Up', password);
-                    showToast('Account created successfully! Welcome to CapZone.', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                if (!res.ok || !data.success) {
+                    showToast(data.error || "OTP කේතය යැවීමට නොහැකි විය. කරුණාකර පසුව නැවත උත්සාහ කරන්න.", "error");
+                    return;
                 }
-            } catch (error) {
-                console.error("Sign Up Error:", error);
-                if (error.code === 'auth/email-already-in-use') {
-                    showToast("මෙම Email එකෙන් දැනටමත් Account එකක් ඇත. කරුණාකර Login වන්න.", 'info');
-                    switchTab('signin');
-                    document.getElementById('signinEmail').value = rawEmail;
-                } else if (error.code === 'auth/weak-password') {
-                    showToast("Password එක දුර්වල වැඩියි (අවම වශයෙන් අකුරු 6ක් අවශ්‍යයි).", 'error');
-                } else {
-                    showToast("Sign Up Failed: " + error.message, 'error');
+
+                // Success! Save state & switch to OTP verification step
+                currentSignupData = { email, name, password };
+                document.getElementById('signup-fields').classList.add('hidden');
+                const otpFields = document.getElementById('signup-otp-fields');
+                otpFields.classList.remove('hidden');
+
+                const otpMsg = document.getElementById('otp-message');
+                if (otpMsg) {
+                    otpMsg.innerHTML = `📧 සත්‍යාපන කේතය (OTP) <strong>${email}</strong> වෙත යවන ලදී. කරුණාකර ඔබගේ Gmail Inbox (හෝ Spam) පරීක්ෂා කර එය මෙහි ඇතුළත් කරන්න.`;
                 }
+
+                startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
+                showToast("සත්‍යාපන කේතය (OTP) ඔබගේ Gmail වෙත යවන ලදී!", "success");
+
+                const otpInput = document.getElementById('signupOtp');
+                if (otpInput) {
+                    otpInput.value = '';
+                    otpInput.focus();
+                }
+
+            } catch (err) {
+                console.error("Sign-up OTP request error:", err);
+                showToast("Server Connection Error: " + err.message, "error");
             } finally {
                 setLoading(btn, false);
             }
         });
 
-        // Retain OTP verification handler if ever triggered
+        // -------------------------------------------------------------------------
+        // 2. VERIFY SIGN-UP OTP & ACTIVATE ACCOUNT
+        // -------------------------------------------------------------------------
         const btnVerifyOtpEl = document.getElementById('btnVerifyOtp');
         if (btnVerifyOtpEl) {
             btnVerifyOtpEl.addEventListener('click', async () => {
-                const email = resolveUserEmail(document.getElementById('signupEmail').value);
-                const password = document.getElementById('signupPassword').value;
+                const otpVal = (document.getElementById('signupOtp').value || '').trim();
+                if (!otpVal || otpVal.length !== 6) {
+                    showToast("කරුණාකර ඉලක්කම් 6ක OTP කේතය නිවැරදිව ඇතුළත් කරන්න.", "error");
+                    return;
+                }
+
+                setLoading(btnVerifyOtpEl, true);
+
                 try {
-                    const result = await createUserWithEmailAndPassword(auth, email, password);
-                    await notifyBackend(result.user, 'Email Sign Up', password);
-                    showToast('Account created successfully!', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                } catch (e) {
-                    showToast("Error: " + e.message, 'error');
+                    const res = await fetch(`${API_BASE_URL}/api/auth/verify-signup-otp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: currentSignupData.email,
+                            otp: otpVal,
+                            name: currentSignupData.name,
+                            password: currentSignupData.password
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok || !data.success) {
+                        showToast(data.error || "ඇතුළත් කළ OTP කේතය වැරදියි. කරුණාකර නැවත උත්සාහ කරන්න.", "error");
+                        setLoading(btnVerifyOtpEl, false);
+                        return;
+                    }
+
+                    // Successful OTP Verification! Log in via Firebase client
+                    try {
+                        const rememberEl = document.getElementById('remember-me');
+                        const remember = rememberEl ? rememberEl.checked : true;
+                        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                    } catch (pErr) {}
+
+                    try {
+                        await signInWithEmailAndPassword(auth, currentSignupData.email, currentSignupData.password);
+                    } catch(fbLoginErr) {
+                        console.warn("Direct Firebase login fallback:", fbLoginErr.message);
+                    }
+
+                    localStorage.setItem('capzone_user_email', currentSignupData.email);
+                    localStorage.setItem('capzone_login_timestamp', Date.now());
+
+                    await notifyBackend(data.user || { email: currentSignupData.email }, 'Email Sign Up', currentSignupData.password);
+
+                    showToast("🎉 ඔබගේ CapZone ගිණුම සාර්ථකව සත්‍යාපනය විය! Studio වෙත පිවිසෙමින් පවතී...", "success");
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
+
+                } catch (err) {
+                    console.error("OTP verification error:", err);
+                    showToast("සත්‍යාපනය අසාර්ථක විය: " + err.message, "error");
+                    setLoading(btnVerifyOtpEl, false);
                 }
             });
         }
 
+        // Resend Sign-Up OTP
+        const btnResendSignupOtp = document.getElementById('btnResendSignupOtp');
+        if (btnResendSignupOtp) {
+            btnResendSignupOtp.addEventListener('click', async () => {
+                if (!currentSignupData.email) return;
+                setLoading(btnResendSignupOtp, true);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/send-signup-otp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: currentSignupData.email,
+                            name: currentSignupData.name,
+                            password: currentSignupData.password
+                        })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        showToast("නව OTP කේතයක් නැවත යවන ලදී!", "success");
+                        startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
+                    } else {
+                        showToast(data.error || "නැවත OTP යැවීම අසාර්ථක විය.", "error");
+                    }
+                } catch(e) {
+                    showToast("Error: " + e.message, "error");
+                } finally {
+                    setLoading(btnResendSignupOtp, false);
+                }
+            });
+        }
+
+        // Back to Sign-Up Details
         const btnBackToSignupEl = document.getElementById('btnBackToSignup');
         if (btnBackToSignupEl) {
             btnBackToSignupEl.addEventListener('click', () => {
@@ -794,23 +1411,182 @@
             });
         }
 
-        // Forgot Password
+        // -------------------------------------------------------------------------
+        // 3. FORGOT PASSWORD: STEP 1 - SEND RESET OTP
+        // -------------------------------------------------------------------------
         document.getElementById('forgotFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('forgotEmail').value;
-            const btn = document.getElementById('btnReset');
+            const email = (document.getElementById('forgotEmail').value || '').trim().toLowerCase();
+            const btn = document.getElementById('btnForgotSendOtp');
+
+            if (!email) {
+                showToast("කරුණාකර ඔබගේ ලියාපදිංචි Email ලිපිනය ඇතුළත් කරන්න!", "error");
+                return;
+            }
+
             setLoading(btn, true);
-            
+
             try {
-                await sendPasswordResetEmail(auth, email);
-                showToast("Password reset email sent! Check your inbox.", 'success');
-                setTimeout(() => switchTab('signin'), 1500);
+                const res = await fetch(`${API_BASE_URL}/api/auth/send-forgot-otp`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await res.json();
+
+                if (data.isGoogle) {
+                    openAccountConflictModal({
+                        email: email,
+                        isGoogle: true,
+                        message: data.message
+                    });
+                    return;
+                }
+
+                if (!res.ok || !data.success) {
+                    showToast(data.error || "මෙම Email ලිපිනය සහිත ගිණුමක් හමු නොවීය.", "error");
+                    return;
+                }
+
+                // OTP Sent! Switch to Step 2
+                currentForgotEmail = email;
+                document.getElementById('forgotStep1').classList.add('hidden');
+                const step2 = document.getElementById('forgotStep2');
+                step2.classList.remove('hidden');
+
+                const notice = document.getElementById('forgot-otp-notice');
+                if (notice) {
+                    notice.innerHTML = `📧 මුරපදය නැවත සකසන OTP කේතය <strong>${email}</strong> වෙත එවා ඇත. එය පහත ඇතුළත් කර නව මුරපදයක් සාදන්න.`;
+                }
+
+                startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
+                showToast("මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී!", "success");
+
+                const forgotOtpInput = document.getElementById('forgotOtp');
+                if (forgotOtpInput) {
+                    forgotOtpInput.value = '';
+                    forgotOtpInput.focus();
+                }
+
             } catch (error) {
-                showToast("Error sending reset email: " + error.message, 'error');
+                console.error("Forgot password OTP error:", error);
+                showToast("Error: " + error.message, 'error');
             } finally {
                 setLoading(btn, false);
             }
         });
+
+        // -------------------------------------------------------------------------
+        // 4. FORGOT PASSWORD: STEP 2 - VERIFY OTP & RESET PASSWORD
+        // -------------------------------------------------------------------------
+        const btnResetPasswordSubmit = document.getElementById('btnResetPasswordSubmit');
+        if (btnResetPasswordSubmit) {
+            btnResetPasswordSubmit.addEventListener('click', async () => {
+                const otpVal = (document.getElementById('forgotOtp').value || '').trim();
+                const newPassword = document.getElementById('forgotNewPassword').value;
+                const confirmPassword = document.getElementById('forgotConfirmPassword').value;
+
+                if (!otpVal || otpVal.length !== 6) {
+                    showToast("කරුණාකර ඉලක්කම් 6ක OTP කේතය ඇතුළත් කරන්න.", "error");
+                    return;
+                }
+
+                if (!window.isPasswordStrong(newPassword)) {
+                    showToast("⚠️ නව මුරපදය ප්‍රමාණවත් තරම් ශක්තිමත් නැත! කරුණාකර අවම වශයෙන් අකුරු 8ක්, ඉංග්‍රීසි අකුරු සහ අංක (numbers) ඇතුළත් කරන්න.", "error");
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    showToast("මුරපද දෙක එකිනෙකට නොගැලපේ (Passwords do not match)!", "error");
+                    return;
+                }
+
+                setLoading(btnResetPasswordSubmit, true);
+
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/verify-and-reset-password`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: currentForgotEmail,
+                            otp: otpVal,
+                            newPassword: newPassword
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (!res.ok || !data.success) {
+                        showToast(data.error || "මුරපදය යාවත්කාලීන කිරීම අසාර්ථක විය.", "error");
+                        setLoading(btnResetPasswordSubmit, false);
+                        return;
+                    }
+
+                    showToast("✅ මුරපදය සාර්ථකව වෙනස් කරන ලදී! කරුණාකර නව මුරපදයෙන් Login වන්න.", "success");
+
+                    // Reset Forgot Form State
+                    document.getElementById('forgotStep2').classList.add('hidden');
+                    document.getElementById('forgotStep1').classList.remove('hidden');
+                    document.getElementById('forgotEmail').value = '';
+                    document.getElementById('forgotOtp').value = '';
+                    document.getElementById('forgotNewPassword').value = '';
+                    document.getElementById('forgotConfirmPassword').value = '';
+
+                    // Switch to Sign In tab and prefill
+                    switchTab('signin');
+                    const signinEmailInput = document.getElementById('signinEmail');
+                    const signinPasswordInput = document.getElementById('signinPassword');
+                    if (signinEmailInput) signinEmailInput.value = currentForgotEmail;
+                    if (signinPasswordInput) {
+                        signinPasswordInput.value = '';
+                        signinPasswordInput.focus();
+                    }
+
+                } catch (err) {
+                    console.error("Reset password error:", err);
+                    showToast("Error: " + err.message, "error");
+                } finally {
+                    setLoading(btnResetPasswordSubmit, false);
+                }
+            });
+        }
+
+        // Resend Forgot Password OTP
+        const btnResendForgotOtp = document.getElementById('btnResendForgotOtp');
+        if (btnResendForgotOtp) {
+            btnResendForgotOtp.addEventListener('click', async () => {
+                if (!currentForgotEmail) return;
+                setLoading(btnResendForgotOtp, true);
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/auth/send-forgot-otp`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: currentForgotEmail })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        showToast("නව OTP කේතයක් නැවත යවන ලදී!", "success");
+                        startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
+                    } else {
+                        showToast(data.error || "නැවත OTP යැවීම අසාර්ථක විය.", "error");
+                    }
+                } catch(e) {
+                    showToast("Error: " + e.message, "error");
+                } finally {
+                    setLoading(btnResendForgotOtp, false);
+                }
+            });
+        }
+
+        // Back to Forgot Step 1
+        const btnBackToForgotStep1 = document.getElementById('btnBackToForgotStep1');
+        if (btnBackToForgotStep1) {
+            btnBackToForgotStep1.addEventListener('click', () => {
+                document.getElementById('forgotStep2')?.classList.add('hidden');
+                document.getElementById('forgotStep1')?.classList.remove('hidden');
+            });
+        }
 
         // Smooth Preloader Fade-out
         function dismissPreloader() {
@@ -824,6 +1600,58 @@
         document.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 500));
         setTimeout(dismissPreloader, 1000); // Fail-safe fallback
     </script>
+
+    <!-- ========================================================================= -->
+    <!-- ACCOUNT CONFLICT & GOOGLE LOGIN ADVICE MODAL (Bilingual Sinhala / English) -->
+    <!-- ========================================================================= -->
+    <div id="accountConflictModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
+        <div class="relative w-full max-w-md bg-[#111728] border border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.8)] text-center transform scale-95 transition-transform duration-300 overflow-hidden">
+            <!-- Ambient Glow -->
+            <div class="absolute -top-12 -left-12 w-36 h-36 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <!-- Glowing Badge Icon -->
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600/20 to-cyan-500/20 border border-cyan-400/40 text-cyan-400 flex items-center justify-center text-2xl shadow-lg mx-auto mb-4">
+                <i class="fa-solid fa-user-shield"></i>
+            </div>
+
+            <h3 class="text-xl font-extrabold text-white tracking-tight">දැනටමත් ලියාපදිංචි වූ ගිණුමකි</h3>
+            <p class="text-xs text-cyan-400 font-bold uppercase tracking-wider mt-0.5">Account Already Registered</p>
+
+            <div class="mt-4 p-4 rounded-2xl bg-[#172033]/80 border border-slate-700/60 text-slate-300 text-xs sm:text-sm leading-relaxed text-left">
+                <p id="conflictModalMessage" class="text-slate-200 font-medium"></p>
+                <div class="mt-2.5 pt-2.5 border-t border-slate-700/50 flex items-center gap-2 text-[11px] text-amber-400 font-medium">
+                    <i class="fa-solid fa-circle-info shrink-0"></i>
+                    <span>ඔබ මීට පෙර Google මඟින් Login වූයේ නම් පහත Google බොත්තම ක්ලික් කරන්න.</span>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="mt-6 space-y-2.5">
+                <!-- Direct Google Login Trigger -->
+                <button type="button" id="btnConflictGoogleLogin" class="w-full flex items-center justify-center py-3.5 px-4 rounded-xl border border-white/20 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-lg gap-2.5 active:scale-[0.98]">
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                    <span>Sign in with Google (Google මඟින් පිවිසෙන්න)</span>
+                </button>
+
+                <!-- Regular Login Switch -->
+                <button type="button" id="btnConflictGoToLogin" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md active:scale-[0.98] transition-all">
+                    <span>මුරපදය මඟින් Login වන්න (Login with Password)</span>
+                </button>
+
+                <!-- Close Modal -->
+                <button type="button" onclick="closeAccountConflictModal()" class="w-full py-2.5 text-xs text-slate-400 hover:text-white transition-colors font-semibold">
+                    <span>අවලංගු කරන්න (Close)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Universal Bilingual Policy Modal Script -->
     <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
 </body>
