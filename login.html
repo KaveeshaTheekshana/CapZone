@@ -425,7 +425,8 @@
                         <!-- OTP Section (Hidden initially) -->
                         <div id="signup-otp-fields" class="hidden space-y-4">
                             <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="otp-message">
-                                📧 සත්‍යාපන කේතය ඔබගේ Gmail වෙත යවන ලදී. කරුණාකර එය මෙහි ඇතුළත් කරන්න.
+                                📧 සත්‍යාපන කේතය ඔබගේ Gmail වෙත යවන ලදී.<br>
+                                <span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>
                             </div>
                             <div>
                                 <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
@@ -490,7 +491,8 @@
                         <!-- Step 2: Enter OTP & New Strong Password -->
                         <div id="forgotStep2" class="hidden space-y-4">
                             <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="forgot-otp-notice">
-                                📧 මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී.
+                                📧 මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී.<br>
+                                <span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>
                             </div>
 
                             <!-- OTP Input -->
@@ -584,6 +586,28 @@
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Beautiful Centered Robot Verification Modal -->
+    <div id="robotVerificationModal" class="fixed inset-0 z-[150] hidden items-center justify-center pointer-events-none">
+        <div id="robotModalBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 transition-opacity duration-300 pointer-events-auto" onclick="closeRobotModal()"></div>
+        <div id="robotModalContent" class="relative w-full max-w-sm mx-4 bg-[#0a0f1c] border border-rose-500/30 rounded-3xl p-7 shadow-[0_0_50px_rgba(244,63,94,0.15)] transform scale-95 opacity-0 transition-all duration-300 pointer-events-auto">
+            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-[#0a0f1c] rounded-full flex items-center justify-center border-4 border-[#030712] shadow-xl">
+                <div class="w-full h-full rounded-full bg-rose-500/10 flex items-center justify-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-rose-500/20 animate-ping"></div>
+                    <i class="fa-solid fa-robot text-3xl text-rose-500 relative z-10 animate-bounce" style="animation-duration: 2s;"></i>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <h3 class="text-xl font-bold text-white mb-2 tracking-wide">Verification Required</h3>
+                <p class="text-[13px] text-slate-300 leading-relaxed mb-6">
+                    කරුණාකර ඔබ රොබෝවරයෙකු නොවන බව තහවුරු කිරීමට <br><span class="text-rose-400 font-semibold">Security Check (Tick box)</span> එක සම්පූර්ණ කරන්න.
+                </p>
+                <button type="button" onclick="closeRobotModal()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold text-sm shadow-[0_4px_20px_rgba(244,63,94,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-check text-xs"></i> <span>තේරුම් ගත්තා</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Tab Switching Logic
@@ -832,6 +856,42 @@
                 button.classList.remove('opacity-70', 'cursor-not-allowed');
             }
         }
+
+        // Beautiful Robot Modal Logic
+        window.showRobotModal = function() {
+            const modal = document.getElementById('robotVerificationModal');
+            const backdrop = document.getElementById('robotModalBackdrop');
+            const content = document.getElementById('robotModalContent');
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Force reflow for animation
+            void modal.offsetWidth;
+            
+            backdrop.classList.remove('opacity-0');
+            backdrop.classList.add('opacity-100');
+            
+            content.classList.remove('scale-95', 'opacity-0');
+            content.classList.add('scale-100', 'opacity-100');
+        };
+
+        window.closeRobotModal = function() {
+            const modal = document.getElementById('robotVerificationModal');
+            const backdrop = document.getElementById('robotModalBackdrop');
+            const content = document.getElementById('robotModalContent');
+            
+            backdrop.classList.remove('opacity-100');
+            backdrop.classList.add('opacity-0');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }, 300);
+        };
 
         // Toast Notification Function
         window.showToast = function(message, type = 'info') {
@@ -1132,7 +1192,7 @@
             if (!window.isRobotVerified) {
                 const targetWidget = (btn.id === 'btnGoogleSignUp') ? 'turnstileWidgetSignup' : 'turnstileWidgetLogin';
                 highlightRobotWidget(targetWidget);
-                showToast("⚠️ කරුණාකර ඔබ රොබෝවරයෙක් නොවන බව තහවුරු කරන්න (Please verify you are not a robot).", "error");
+                window.showRobotModal();
                 return;
             }
 
@@ -1208,7 +1268,7 @@
             // Enforce Robot Verification before login
             if (!window.isRobotVerified) {
                 highlightRobotWidget('turnstileWidgetLogin');
-                showToast("⚠️ කරුණාකර ඔබ රොබෝවරයෙක් නොවන බව තහවුරු කරන්න (Please verify you are not a robot).", "error");
+                window.showRobotModal();
                 return;
             }
 
@@ -1359,7 +1419,7 @@
             // Enforce Robot Verification before sign-up
             if (!window.isRobotVerified) {
                 highlightRobotWidget('turnstileWidgetSignup');
-                showToast("⚠️ කරුණාකර ඔබ රොබෝවරයෙක් නොවන බව තහවුරු කරන්න (Please verify you are not a robot).", "error");
+                window.showRobotModal();
                 return;
             }
 
@@ -1416,7 +1476,7 @@
 
                 const otpMsg = document.getElementById('otp-message');
                 if (otpMsg) {
-                    otpMsg.innerHTML = `📧 සත්‍යාපන කේතය (OTP) <strong>${email}</strong> වෙත යවන ලදී. කරුණාකර ඔබගේ Gmail Inbox (හෝ Spam) පරීක්ෂා කර එය මෙහි ඇතුළත් කරන්න.`;
+                    otpMsg.innerHTML = `📧 සත්‍යාපන කේතය (OTP) <strong>${email}</strong> වෙත යවන ලදී.<br><span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>`;
                 }
 
                 startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
@@ -1586,7 +1646,7 @@
 
                 const notice = document.getElementById('forgot-otp-notice');
                 if (notice) {
-                    notice.innerHTML = `📧 මුරපදය නැවත සකසන OTP කේතය <strong>${email}</strong> වෙත එවා ඇත. එය පහත ඇතුළත් කර නව මුරපදයක් සාදන්න.`;
+                    notice.innerHTML = `📧 මුරපදය නැවත සකසන OTP කේතය <strong>${email}</strong> වෙත එවා ඇත.<br><span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>`;
                 }
 
                 startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
