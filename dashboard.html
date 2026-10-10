@@ -1844,8 +1844,25 @@
         <!-- Hidden compatibility status text -->
         <span id="srtStatusText" class="sr-only">Processing...</span>
 
+        <!-- Celebratory Congratulations Box (Step 5 Done) -->
+        <div id="srtCelebrationContainer" class="mt-5 p-5 rounded-2xl bg-gradient-to-r from-purple-900/40 via-indigo-950/60 to-emerald-950/40 border border-purple-500/40 text-left relative z-10 shadow-2xl" style="display: none;">
+          <div class="flex items-center gap-2 mb-2 text-emerald-400 font-extrabold text-sm sm:text-base">
+            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <span>🎉 සුබ පැතුම්! උපසිරැසි ගොනුව සාර්ථකව සූදානම්!</span>
+          </div>
+          <p class="text-xs text-purple-200/90 mb-3 leading-relaxed">
+            ඔබගේ වීඩියෝවට අදාළ සියලුම උපසිරැසි (Continuous Dialogue Verification) සාර්ථකව අවසන් කර ඇත. ගොනුව බාගත කර ගැනීමට පහත බොත්තම ඔබන්න.
+          </p>
+          <div id="srtCelebrationDetails" class="bg-black/40 rounded-xl p-3 mb-4 border border-white/10 space-y-1.5"></div>
+          <button type="button" id="srtCelebrationDownloadBtn" onclick="window.downloadAndDismissSrtPopup()"
+            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-extrabold shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 cursor-pointer transform active:scale-95">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>📥 SRT බාගත කරන්න (Download SRT)</span>
+          </button>
+        </div>
+
         <!-- Action Buttons (Cancel / Direct Download) -->
-        <div class="flex items-center justify-between gap-3 pt-2 relative z-10">
+        <div id="srtActionButtonsRow" class="flex items-center justify-between gap-3 pt-2 relative z-10">
           <button type="button" id="srtCancelBtn" onclick="cancelSrtGeneration()"
             class="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white text-xs font-semibold transition-all">
             Cancel import
@@ -3677,18 +3694,8 @@
         const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
         const blobUrl = URL.createObjectURL(blob);
 
-        // 1. Immediately activate Step 5: "All done" on the purple card
+        // 1. Activate Step 5: "All done" on the purple card
         updateSrtStepUI(5, { percent: 100, partsText: '4 of 4 parts done' });
-
-        // Update direct download button on the card
-        const cardDlBtn = document.getElementById('srtDirectDownloadCardBtn');
-        if (cardDlBtn) {
-          cardDlBtn.href = blobUrl;
-          cardDlBtn.download = downloadFileName;
-          cardDlBtn.style.display = 'inline-flex';
-        }
-        const cancelBtn = document.getElementById('srtCancelBtn');
-        if (cancelBtn) cancelBtn.style.display = 'none';
 
         // Save to Recent Projects
         window.saveToRecentProjects({
@@ -3699,7 +3706,8 @@
           payload: {
             srt: data.srt,
             language: lang,
-            filename: downloadFileName
+            filename: downloadFileName,
+            blocks: data.blocks
           }
         });
 
@@ -3721,7 +3729,52 @@
           window.fetchUserProfile();
         }
 
-        // 2. Automatically trigger the file download
+        // Store active download details for manual download action
+        window._activeSrtDownload = {
+          blobUrl: blobUrl,
+          downloadFileName: downloadFileName
+        };
+
+        // Populate and display Celebratory Congratulations Box (No auto-download!)
+        const celebrationBox = document.getElementById('srtCelebrationContainer');
+        const detailsEl = document.getElementById('srtCelebrationDetails');
+        if (celebrationBox) {
+          celebrationBox.style.display = 'block';
+          if (detailsEl) {
+            detailsEl.innerHTML = `
+              <div class="flex items-center justify-between text-xs py-0.5 border-b border-white/5">
+                <span class="text-slate-400">ගොනුවේ නම:</span>
+                <span class="text-white font-semibold truncate max-w-[210px]">${downloadFileName}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs py-0.5 border-b border-white/5">
+                <span class="text-slate-400">භාෂාව:</span>
+                <span class="text-emerald-400 font-bold">${lang}</span>
+              </div>
+              <div class="flex items-center justify-between text-xs py-0.5">
+                <span class="text-slate-400">උපසිරැසි Blocks:</span>
+                <span class="text-purple-300 font-bold">${data.blocks || 'සම්පූර්ණයි'}</span>
+              </div>
+            `;
+          }
+        }
+
+        // Hide cancel button and default action row
+        const cancelBtn = document.getElementById('srtCancelBtn');
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        const actRow = document.getElementById('srtActionButtonsRow');
+        if (actRow) actRow.style.display = 'none';
+
+        if (typeof window.loadAndRenderProjects === 'function') {
+          window.loadAndRenderProjects(true);
+        }
+      }
+
+      window.downloadAndDismissSrtPopup = function () {
+        if (!window._activeSrtDownload) {
+          window.closeModal('srtModal');
+          return;
+        }
+        const { blobUrl, downloadFileName } = window._activeSrtDownload;
         try {
           const downloadAnchor = document.createElement('a');
           downloadAnchor.style.display = 'none';
@@ -3731,28 +3784,32 @@
           downloadAnchor.click();
           setTimeout(() => { downloadAnchor.remove(); }, 300);
         } catch (e) {
-          console.warn('Auto-download notice:', e);
+          console.warn('Manual download notice:', e);
         }
 
-        // 3. Keep "All done!" displayed for 1.3 seconds, then smoothly close popup
-        setTimeout(() => {
-          window.closeModal('srtModal');
+        // Cleanly close modal popup
+        window.closeModal('srtModal');
 
-          // Reset form ready for next subtitle task
-          document.getElementById('srtSubmitBtn').disabled = false;
-          document.getElementById('srtForm').style.display = 'block';
-          document.getElementById('srtProgressCard').style.display = 'none';
-          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
-          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+        // Reset form ready for next subtitle task
+        document.getElementById('srtSubmitBtn').disabled = false;
+        document.getElementById('srtForm').style.display = 'block';
+        document.getElementById('srtProgressCard').style.display = 'none';
+        const celebrationBox = document.getElementById('srtCelebrationContainer');
+        if (celebrationBox) celebrationBox.style.display = 'none';
+        const actRow = document.getElementById('srtActionButtonsRow');
+        if (actRow) actRow.style.display = 'flex';
+        const cancelBtn = document.getElementById('srtCancelBtn');
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
 
-          if (typeof showPopup === 'function') {
-            showPopup(`"${downloadFileName}" generated & downloaded successfully!`, 'All Done!', 'success');
-          }
-          if (typeof window.loadAndRenderProjects === 'function') {
-            window.loadAndRenderProjects(true);
-          }
-        }, 1300);
-      }
+        if (typeof showPopup === 'function') {
+          showPopup(`"${downloadFileName}" ගොනුව සාර්ථකව බාගත විය!`, 'All Done!', 'success');
+        }
+        if (typeof window.loadAndRenderProjects === 'function') {
+          window.loadAndRenderProjects(true);
+        }
+      };
       window.renderSrtResult = renderSrtResult;
 
       try {
@@ -4696,7 +4753,8 @@
       const cacheKey = 'capzone_projects_' + project.email;
       let cached = [];
       try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
-      cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && p.title === project.title && Math.abs(new Date(p.date || 0) - new Date(project.date || 0)) < 15000));
+      // Deduplicate strictly by id OR (type + title match)
+      cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && (p.title || '').trim().toLowerCase() === (project.title || '').trim().toLowerCase()));
       cached.unshift(project);
       if (cached.length > 50) cached.pop();
       localStorage.setItem(cacheKey, JSON.stringify(cached));
@@ -4715,7 +4773,13 @@
         }).then(res => res.json()).then(data => {
           if (data && data.success) {
             project.id = data.id || project.id;
+            project.synced = true;
+            if (data.telegram_msg_id) project.telegram_msg_id = data.telegram_msg_id;
+            if (data.telegram_file_id) project.telegram_file_id = data.telegram_file_id;
+            const idx = (window.allProjects || []).findIndex(p => p.id === project.id || (p.type === project.type && (p.title || '').trim().toLowerCase() === (project.title || '').trim().toLowerCase()));
+            if (idx !== -1) window.allProjects[idx] = Object.assign({}, window.allProjects[idx], project);
             localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+            window.renderRecentProjects();
           }
         }).catch(err => console.warn('Sync project error:', err));
       } catch (e) {
@@ -4742,11 +4806,28 @@
       if (!rawEmail) return;
       const email = rawEmail.toLowerCase().trim();
       const cacheKey = 'capzone_projects_' + email;
+      const deletedKeysKey = 'capzone_deleted_keys_' + email;
+      let deletedKeys = new Set();
+      try { 
+        const arr = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]'); 
+        deletedKeys = new Set(arr.map(String));
+      } catch(e){}
+
+      const isDeletedItem = (item) => {
+        if (!item) return false;
+        if (item.id && deletedKeys.has(String(item.id))) return true;
+        if (item.telegram_msg_id && deletedKeys.has(String(item.telegram_msg_id))) return true;
+        const key = `${item.type || ''}_${(item.title || '').trim().toLowerCase()}`;
+        if (deletedKeys.has(key)) return true;
+        if (item.media_url && deletedKeys.has(item.media_url)) return true;
+        return false;
+      };
+
       if (!forceRefresh) {
         try {
           const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
           if (cached && cached.length > 0) {
-            window.allProjects = cached;
+            window.allProjects = cached.filter(p => !isDeletedItem(p));
             window.renderRecentProjects();
           }
         } catch (e) { }
@@ -4765,6 +4846,11 @@
 
           const mergedMap = new Map();
           fetchedProjects.forEach(p => {
+            if (isDeletedItem(p)) {
+              // Silently clean up ghost item from server
+              fetch(`${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(p.id)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(p.telegram_msg_id || '')}`, { method: 'DELETE' }).catch(() => {});
+              return;
+            }
             const item = Object.assign({}, p);
             item.synced = true;
             if (item.payload && typeof item.payload === 'string') {
@@ -4775,10 +4861,11 @@
 
           const unsyncedProjects = [];
           localCached.forEach(p => {
+            if (isDeletedItem(p)) return;
             const alreadyOnServer = mergedMap.has(String(p.id)) || 
               fetchedProjects.some(sp => sp.type === p.type && (sp.title || '').trim().toLowerCase() === (p.title || '').trim().toLowerCase());
             if (!alreadyOnServer && !p.synced) {
-              p.synced = true; // Guard against rapid loops
+              p.synced = true;
               mergedMap.set(String(p.id), p);
               unsyncedProjects.push(p);
             }
@@ -4801,7 +4888,7 @@
             });
           }
 
-          window.allProjects = Array.from(mergedMap.values()).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+          window.allProjects = Array.from(mergedMap.values()).filter(p => !isDeletedItem(p)).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
           localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
           window.renderRecentProjects();
@@ -5311,15 +5398,39 @@
       const email = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
       window.customConfirm('මෙම Project එක සම්පූර්ණයෙන්ම Delete කිරීමට අවශ්‍ය බව තහවුරු කරන්න.', () => {
         const p = (window.allProjects || []).find(item => String(item.id) === String(projectId));
-        window.allProjects = (window.allProjects || []).filter(item => String(item.id) !== String(projectId));
+        const pTitle = p ? (p.title || '') : '';
+        const pType = p ? (p.type || '') : '';
+        const pTgMsgId = p ? (p.telegram_msg_id || '') : '';
+        const pMediaUrl = p ? (p.media_url || '') : '';
+
+        // 1. Maintain persistent deletion blacklist in localStorage
+        const deletedKeysKey = 'capzone_deleted_keys_' + email;
+        let deletedKeys = [];
+        try { deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]'); } catch(e){}
+        if (projectId) deletedKeys.push(String(projectId));
+        if (pTgMsgId) deletedKeys.push(String(pTgMsgId));
+        if (pTitle && pType) deletedKeys.push(`${pType}_${pTitle.trim().toLowerCase()}`);
+        if (pMediaUrl) deletedKeys.push(pMediaUrl);
+        if (deletedKeys.length > 200) deletedKeys = deletedKeys.slice(-200);
+        localStorage.setItem(deletedKeysKey, JSON.stringify(deletedKeys));
+
+        // 2. Remove immediately from local state & cache
+        window.allProjects = (window.allProjects || []).filter(item => {
+          if (String(item.id) === String(projectId)) return false;
+          if (pTgMsgId && String(item.telegram_msg_id) === String(pTgMsgId)) return false;
+          if (pTitle && pType && item.type === pType && (item.title || '').trim().toLowerCase() === pTitle.trim().toLowerCase()) return false;
+          return true;
+        });
 
         const cacheKey = 'capzone_projects_' + email;
         localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
         window.renderRecentProjects();
         window.closeProjectDetailModal();
 
+        // 3. Send DELETE to server with all matching criteria
         try {
-          fetch(`${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(projectId)}&email=${encodeURIComponent(email)}`, {
+          const deleteUrl = `${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(projectId)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(pTgMsgId)}&title=${encodeURIComponent(pTitle)}&type=${encodeURIComponent(pType)}`;
+          fetch(deleteUrl, {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
@@ -5328,7 +5439,7 @@
           }).catch(e => console.warn('Could not delete project from cloud DB:', e));
         } catch (e) { }
 
-        if (typeof showPopup === 'function') showPopup('Project එක සාර්ථකව ඉවත් කරන ලදී!', 'Project Deleted', 'success');
+        if (typeof showPopup === 'function') showPopup('Project එක සහ Telegram backup එක සාර්ථකව ඉවත් කරන ලදී!', 'Project Deleted', 'success');
       });
     };
 
