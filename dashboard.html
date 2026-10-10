@@ -4,20 +4,12 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    // Dynamic API Base URL: connects to current host (works across PC, LAN/Wi-Fi mobile, and cloud production)
-    const isLocalHost = window.location.hostname === 'localhost' ||
+    // Live API Engine is hosted strictly at https://capzone.kaveez.top (capzone.top is static frontend only)
+    const isLocal = window.location.hostname === 'localhost' ||
       window.location.hostname === '127.0.0.1' ||
       window.location.protocol === 'file:';
-    const isLocalNetwork = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(window.location.hostname) ||
-      window.location.port === '6039';
 
-    if (window.location.origin && window.location.origin.startsWith('http')) {
-      window.API_BASE_URL = window.location.origin;
-    } else if (isLocalHost || isLocalNetwork) {
-      window.API_BASE_URL = 'http://localhost:6039';
-    } else {
-      window.API_BASE_URL = 'https://capzone.kaveez.top';
-    }
+    window.API_BASE_URL = isLocal ? 'http://localhost:6039' : 'https://capzone.kaveez.top';
 
     // Universal Cross-Device Media URL Normalizer:
     // Resolves localhost URLs to the active origin so images and previews load seamlessly across PC and Mobile devices
@@ -26,18 +18,15 @@
       if (url.startsWith('blob:') || url.startsWith('data:')) return url;
       
       let cleanUrl = url.trim();
-      // If the URL contains localhost or 127.0.0.1 (e.g. created on PC), strip out the host so mobile can load it
+      // If the URL contains localhost or 127.0.0.1 (e.g. created on PC), strip out the host so mobile/cloud can load it
       if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(cleanUrl)) {
         cleanUrl = cleanUrl.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
       }
 
       // If it's a relative path (/uploads/... or /api/...)
       if (cleanUrl.startsWith('/')) {
-        const base = window.API_BASE_URL || '';
-        if (base && base.startsWith('http')) {
-          return base.replace(/\/$/, '') + cleanUrl;
-        }
-        return cleanUrl;
+        const base = window.API_BASE_URL || 'https://capzone.kaveez.top';
+        return base.replace(/\/$/, '') + cleanUrl;
       }
       return cleanUrl;
     };
@@ -47,9 +36,13 @@
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
     window.fetch = async function () {
       let [resource, config] = arguments;
-      if (typeof resource === 'string' && resource.startsWith('/api/')) {
-        if (window.API_BASE_URL && !resource.startsWith('http')) {
-          resource = window.API_BASE_URL + resource;
+      const activeApiBase = window.API_BASE_URL || 'https://capzone.kaveez.top';
+
+      if (typeof resource === 'string') {
+        if (resource.startsWith('/api/')) {
+          resource = activeApiBase + resource;
+        } else if (resource.startsWith('https://capzone.top/api/')) {
+          resource = resource.replace('https://capzone.top/api/', activeApiBase + '/api/');
         }
       }
       if (typeof resource === 'string' && resource.includes('/api/')) {
