@@ -3439,7 +3439,9 @@
         // Finalize
         document.getElementById('scraperSrtProgressBar').style.width = '100%';
 
-        if (typeof window.saveToRecentProjects === 'function') {
+        if (!window._scriptLogged && typeof window.saveToRecentProjects === 'function') {
+          window._scriptLogged = true;
+          setTimeout(() => window._scriptLogged = false, 1500);
           window.saveToRecentProjects({
             type: 'Script',
             title: topic,
@@ -3662,8 +3664,14 @@
       }
       updateSrtStepUI(2, { percent: 35 });
 
+      const srtOriginalName = currentSrtFile ? currentSrtFile.name : 'subtitles.mp4';
+      const currentUserEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
+
       const formData = new FormData();
-      formData.append('video', fileToUpload);
+      formData.append('video', fileToUpload, srtOriginalName);
+      formData.append('fileName', srtOriginalName);
+      formData.append('title', srtOriginalName);
+      formData.append('email', currentUserEmail);
       formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
       formData.append('wordsLimit', document.getElementById('srtWordsLimit')?.value || '1');
 
@@ -3687,10 +3695,10 @@
           return;
         }
 
-        const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
+        const srtName = currentSrtFile ? currentSrtFile.name : (data.title || 'Video Subtitles');
         const lang = (data.language || (document.getElementById('srtLanguage')?.value === 'en' ? 'English' : 'Sinhala'));
         window.lastGeneratedSrtContent = data.srt;
-        const downloadFileName = `${(currentSrtFile ? currentSrtFile.name : 'subtitles').replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
+        const downloadFileName = `${(currentSrtFile ? currentSrtFile.name : (data.title || 'subtitles')).replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
         const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
         const blobUrl = URL.createObjectURL(blob);
 
@@ -3699,6 +3707,7 @@
 
         // Save to Recent Projects
         window.saveToRecentProjects({
+          id: data.projectId || undefined,
           type: 'Subtitle',
           title: srtName,
           metadata: `${lang} Subtitles`,
@@ -3764,9 +3773,11 @@
         const actRow = document.getElementById('srtActionButtonsRow');
         if (actRow) actRow.style.display = 'none';
 
-        if (typeof window.loadAndRenderProjects === 'function') {
-          window.loadAndRenderProjects(true);
-        }
+        setTimeout(() => {
+          if (typeof window.loadAndRenderProjects === 'function') {
+            window.loadAndRenderProjects(false);
+          }
+        }, 1500);
       }
 
       window.downloadAndDismissSrtPopup = function () {
@@ -4102,8 +4113,9 @@
             const projectTitle = `${platformName} ${isAudioFormat ? 'Audio' : 'Video'}${data.filename ? ' (' + data.filename + ')' : ''}`;
 
             window.saveToRecentProjects({
+              id: data.projectId || undefined,
               type: mediaType,
-              title: projectTitle,
+              title: data.title || projectTitle,
               metadata: `${isAudioFormat ? 'Audio MP3' : 'Video MP4'} - ${qualityLevel || 'HD'}`,
               media_url: finalDlUrl,
               payload: {
@@ -4817,9 +4829,6 @@
         if (!item) return false;
         if (item.id && deletedKeys.has(String(item.id))) return true;
         if (item.telegram_msg_id && deletedKeys.has(String(item.telegram_msg_id))) return true;
-        const key = `${item.type || ''}_${(item.title || '').trim().toLowerCase()}`;
-        if (deletedKeys.has(key)) return true;
-        if (item.media_url && deletedKeys.has(item.media_url)) return true;
         return false;
       };
 
@@ -4926,13 +4935,35 @@
         });
       }
 
-      // Deduplicate consecutive or identical projects (by type + title)
+      // Deduplicate consecutive or identical projects (by source URL, media URL, or normalized title)
       const uniqueList = [];
       const seenMap = new Map();
       for (const p of filtered) {
-        const key = `${p.type || ''}_${(p.title || '').trim().toLowerCase()}`;
-        if (!seenMap.has(key)) {
-          seenMap.set(key, true);
+        if (!p) continue;
+        let normTitle = (p.title || '')
+          .toLowerCase()
+          .replace(/^(facebook|tiktok)\s*(audio|video)?\s*/i, '')
+          .replace(/\.(mp3|mp4|webm|wav|srt|png|jpg|jpeg)$/i, '')
+          .replace(/[\(\)\[\]_\-\s]+/g, '')
+          .trim();
+
+        let payloadUrl = '';
+        if (p.payload) {
+          let pl = typeof p.payload === 'string' ? null : p.payload;
+          if (!pl) { try { pl = JSON.parse(p.payload); } catch(e){} }
+          if (pl) payloadUrl = pl.url || pl.filename || '';
+        }
+
+        let dedupKey = '';
+        if (p.type === 'Audio' || p.type === 'Video') {
+          // Both Audio and Video of the same media will collapse cleanly into a single card
+          dedupKey = payloadUrl || normTitle || String(p.id);
+        } else {
+          dedupKey = `${p.type || ''}_${payloadUrl || normTitle || String(p.id)}`;
+        }
+
+        if (!seenMap.has(dedupKey)) {
+          seenMap.set(dedupKey, true);
           uniqueList.push(p);
         }
       }
@@ -5409,8 +5440,6 @@
         try { deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]'); } catch(e){}
         if (projectId) deletedKeys.push(String(projectId));
         if (pTgMsgId) deletedKeys.push(String(pTgMsgId));
-        if (pTitle && pType) deletedKeys.push(`${pType}_${pTitle.trim().toLowerCase()}`);
-        if (pMediaUrl) deletedKeys.push(pMediaUrl);
         if (deletedKeys.length > 200) deletedKeys = deletedKeys.slice(-200);
         localStorage.setItem(deletedKeysKey, JSON.stringify(deletedKeys));
 
@@ -5418,7 +5447,6 @@
         window.allProjects = (window.allProjects || []).filter(item => {
           if (String(item.id) === String(projectId)) return false;
           if (pTgMsgId && String(item.telegram_msg_id) === String(pTgMsgId)) return false;
-          if (pTitle && pType && item.type === pType && (item.title || '').trim().toLowerCase() === pTitle.trim().toLowerCase()) return false;
           return true;
         });
 
