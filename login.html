@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapZone - Login</title>
+    <title>CapZone - Video & Subtitle Studio Login</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -13,16 +13,17 @@
                 extend: {
                     colors: {
                         theme: {
-                            bg: '#131722',
-                            card: '#1f2430',
-                            border: '#2a3142',
-                            primary: '#1b66f5',
-                            primaryHover: '#1556d6',
-                            textMuted: '#8892b0'
+                            bg: '#090d16',
+                            card: '#111728',
+                            cardHover: '#161f36',
+                            border: '#1f293d',
+                            primary: '#1a56db',
+                            primaryHover: '#1546b8',
+                            textMuted: '#94a3b8'
                         }
                     },
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
                     }
                 }
             }
@@ -30,345 +31,374 @@
     </script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #131722;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: #090d16;
             color: #ffffff;
         }
-        @media (max-width: 768px) {
-            * {
-                backdrop-filter: none !important;
-                -webkit-backdrop-filter: none !important;
-                mix-blend-mode: normal !important;
-            }
-        }
         @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes fadeInLeft {
-            from { opacity: 0; transform: translateX(-30px); }
-            to { opacity: 1; transform: translateX(0); }
+        @keyframes floatGlow {
+            0%, 100% { transform: translateY(0) scale(1); opacity: 0.25; }
+            50% { transform: translateY(-15px) scale(1.05); opacity: 0.4; }
         }
-        @keyframes fadeInRight {
-            from { opacity: 0; transform: translateX(30px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        .animate-fade-in-left {
-            animation: fadeInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        .animate-fade-in-right {
-            animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .animate-float-glow {
+            animation: floatGlow 8s ease-in-out infinite;
         }
         .tab-content {
             display: none;
         }
         .tab-content.active {
             display: block;
-            animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
-        /* Custom scrollbar for dark theme */
         ::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #131722;
+            background: #090d16;
         }
         ::-webkit-scrollbar-thumb {
-            background: #2a3142;
+            background: #1f293d;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #3a4152;
+            background: #334155;
         }
     </style>
 </head>
-<body class="min-h-[100dvh] flex flex-col lg:flex-row overflow-x-hidden overflow-y-auto lg:overflow-hidden bg-[url('https://i.pinimg.com/736x/10/ec/d9/10ecd929adef0a3cc59c206bb76bb922.jpg')] lg:bg-none lg:bg-[#131722] bg-cover bg-center bg-fixed">
+<body class="min-h-screen flex flex-col justify-center items-center relative overflow-x-hidden bg-[#090d16] selection:bg-blue-600 selection:text-white">
 
-    <!-- CapZone Ultra-Premium Loading Screen -->
-    <div id="capzonePreloader" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0b0f19] transition-opacity duration-700 pointer-events-auto">
-        <div class="relative flex items-center justify-center mb-6">
-            <div class="absolute w-28 h-28 rounded-full bg-blue-500/20 blur-xl animate-pulse"></div>
-            <div class="w-16 h-16 rounded-full border-2 border-theme-primary/30 border-t-theme-primary animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(37,99,235,0.4)]">
-                <img src="logo.jpg" class="w-10 h-10 rounded-full object-cover" alt="CapZone Logo">
-            </div>
-        </div>
-        <div class="text-xl font-bold tracking-widest text-white uppercase drop-shadow-md flex items-center gap-2">
-            <span>CapZone</span>
-            <span class="text-theme-primary font-extrabold animate-pulse">Studio</span>
-        </div>
-        <div class="flex items-center gap-2 mt-3 text-xs text-slate-400 font-medium tracking-wide">
-            <span class="w-2 h-2 rounded-full bg-blue-500 animate-ping"></span>
-            <span>CapZone Loading...</span>
-        </div>
-    </div>
+    <!-- Ambient Studio Glows -->
+    <div class="fixed top-[-10%] left-[20%] w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[130px] pointer-events-none animate-float-glow"></div>
+    <div class="fixed bottom-[-10%] right-[15%] w-[450px] h-[450px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none animate-float-glow" style="animation-delay: 4s;"></div>
 
-    <!-- Mobile Dark Overlay to ensure text readability on small screens -->
-    <div class="absolute inset-0 bg-theme-bg/75 lg:hidden z-0 pointer-events-none"></div>
+    <!-- CapZone Preloader (non-blocking) -->
+    <div id="capzonePreloader" class="hidden pointer-events-none"></div>
 
-    <!-- Left Side: Visual Showcase (Hidden on Mobile) -->
-    <div class="hidden lg:flex lg:w-1/2 relative h-screen flex-col justify-end p-12 z-10 border-r border-theme-border/50 shadow-[10px_0_30px_rgba(0,0,0,0.5)]">
-        
-        <!-- Desktop Background Image (Contained to Left Side) -->
-        <div class="absolute inset-0 bg-[url('https://i.pinimg.com/736x/3e/48/0c/3e480c3fe9cd002a0e363704a709efd2.jpg')] bg-cover bg-top -z-20"></div>
-        
-        <!-- Gradient Overlays -->
-        <div class="absolute inset-0 bg-gradient-to-t from-theme-bg via-theme-bg/60 to-theme-bg/20 backdrop-blur-[2px] -z-10"></div>
-        <div class="absolute inset-0 bg-theme-primary/10 mix-blend-overlay -z-10"></div>
-        
-        <!-- Premium Text Overlay on the Left Side -->
-        <div class="relative z-10 animate-fade-in-left">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold text-white uppercase tracking-wider mb-6 shadow-xl">
-                <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
-                CapZone Subtitles
-            </div>
-            <h1 class="text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
-                Welcome to <br><span class="text-theme-primary">CapZone.</span>
-            </h1>
-            <p class="text-gray-300 text-sm lg:text-base leading-relaxed max-w-md drop-shadow-md font-medium">
-                Generate millisecond-accurate subtitles in Sinhala and English, download videos without watermarks, and export directly to your favorite editors.
-            </p>
-        </div>
-    </div>
+    <!-- MAIN APP CONTAINER -->
+    <!-- Desktop (Image 2): Centered dual-panel split card -->
+    <!-- Mobile (Image 1): Top video editing wallpaper banner with rounded bottom-sheet login form -->
+    <main class="w-full max-w-none lg:max-w-5xl xl:max-w-6xl min-h-screen lg:min-h-0 lg:my-8 lg:rounded-[32px] overflow-hidden lg:border lg:border-white/10 lg:shadow-[0_25px_80px_rgba(0,0,0,0.7)] bg-[#101626] grid grid-cols-1 lg:grid-cols-12 relative z-10">
 
-    <!-- Right Side: Dynamic Form Area -->
-    <!-- On mobile, it's a glass panel over the full background. On desktop, it's solid dark background to match the split theme. -->
-    <div class="w-full lg:w-1/2 min-h-[100dvh] lg:h-screen flex flex-col items-center justify-between p-6 sm:p-12 pb-28 sm:pb-16 bg-theme-bg/85 lg:bg-theme-bg backdrop-blur-xl lg:backdrop-blur-none relative z-20 overflow-y-auto shadow-2xl animate-fade-in-right">
-        
-        <!-- Form Container -->
-        <div class="w-full max-w-md my-auto pt-6 pb-6">
+        <!-- ========================================================================= -->
+        <!-- LEFT PANEL (VISUAL / WALLPAPER SIDE) -->
+        <!-- Mobile: Banner with assets/login_mobile_bg.jpg -->
+        <!-- Desktop: Visual panel with assets/login_desktop_bg.jpg -->
+        <!-- ========================================================================= -->
+        <section class="w-full lg:col-span-5 xl:col-span-6 relative h-[270px] sm:h-[320px] lg:h-auto lg:min-h-[720px] bg-[url('assets/login_mobile_bg.jpg')] lg:bg-[url('assets/login_desktop_bg.jpg')] bg-cover bg-center flex flex-col justify-between p-6 sm:p-8 lg:p-12 overflow-hidden select-none">
             
-            <!-- Brand Header -->
-            <div class="flex items-center gap-3 mb-6 group">
-                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-[0_0_15px_rgba(255,255,255,0.15)] group-hover:scale-110 transition-transform">
-                    <img src="logo.jpg" class="w-full h-full object-cover" alt="CapZone Logo">
+            <!-- Dark Contrast Overlays for Crisp Text Legibility -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#090d16]/70 via-transparent to-[#101626] lg:bg-gradient-to-t lg:from-[#0b101d] lg:via-[#0b101d]/50 lg:to-black/30 pointer-events-none"></div>
+            <div class="absolute inset-0 bg-blue-900/10 mix-blend-color-dodge pointer-events-none"></div>
+
+            <!-- Top Header Branding -->
+            <div class="relative z-10 flex items-center justify-between w-full">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-1 flex items-center justify-center shadow-lg group hover:scale-105 transition-transform">
+                        <img src="logo.jpg" class="w-full h-full object-cover rounded-lg" alt="CapZone Logo">
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-tight text-white block leading-none drop-shadow">CapZone</span>
+                        <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 mt-1 block drop-shadow">AI Video Studio</span>
+                    </div>
                 </div>
-                <span class="text-2xl font-bold tracking-tight text-white drop-shadow-md">CapZone</span>
+
+                <!-- Studio Tag Pill -->
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-slate-200 shadow-md">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    <span>Video &amp; SRT AI</span>
+                </div>
             </div>
 
-            <!-- Titles -->
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Welcome Back</h2>
-                <p class="text-theme-textMuted text-sm font-medium">Ready to continue your quest?</p>
+            <!-- Desktop Bottom Hero Content (Hidden on small mobile banner to keep clean) -->
+            <div class="relative z-10 hidden lg:block mt-auto pt-16">
+                <h2 class="text-3xl xl:text-4xl font-extrabold text-white leading-[1.2] drop-shadow-lg tracking-tight">
+                    Discover Dimensional <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300">Excellence</span>
+                </h2>
+                <p class="text-slate-200/90 text-xs xl:text-sm mt-3.5 leading-relaxed max-w-md drop-shadow font-normal">
+                    Generate millisecond-accurate Sinhala subtitles, bypass watermarks, remove backgrounds, and craft viral AI scripts tailored to elevate your vision.
+                </p>
+
+                <!-- 3 Dots Indicator (Matching Reference Image 2) -->
+                <div class="flex items-center gap-2 mt-7">
+                    <span class="w-7 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                </div>
             </div>
+        </section>
 
-            <!-- Tab Navigation -->
-            <div class="flex items-center w-full border-b border-theme-border mb-8">
-                <button id="tabSignIn" onclick="switchTab('signin')" class="flex-1 text-sm font-semibold text-white border-b-2 border-theme-primary pb-3 transition-all text-center">
-                    Login
-                </button>
-                <button id="tabSignUp" onclick="switchTab('signup')" class="flex-1 text-sm font-semibold text-theme-textMuted hover:text-white border-b-2 border-transparent pb-3 transition-all text-center">
-                    Sign Up
-                </button>
-            </div>
+        <!-- ========================================================================= -->
+        <!-- RIGHT PANEL (DYNAMIC FORM AREA) -->
+        <!-- Mobile: Rounded Bottom-Sheet Card (-mt-8) -->
+        <!-- Desktop: Split card right pane -->
+        <!-- ========================================================================= -->
+        <section class="w-full lg:col-span-7 xl:col-span-6 -mt-8 lg:mt-0 rounded-t-[32px] sm:rounded-t-[36px] lg:rounded-none bg-[#111728] border-t lg:border-t-0 border-white/10 lg:border-l lg:border-white/5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.7)] lg:shadow-none min-h-[calc(100vh-240px)] lg:min-h-0">
+            
+            <div class="w-full max-w-md mx-auto my-auto py-2">
+                
+                <!-- Welcome Title Header (Matching Reference Image 2) -->
+                <div class="mb-6">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Welcome!</h1>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-1.5 font-medium">Sign in to Access CapZone Video Studio.</p>
+                </div>
 
-            <!-- FORM 1: SIGN IN -->
-            <div id="signinForm" class="tab-content active space-y-5">
-                <form id="signInFormElement" class="space-y-5">
-                    <!-- Email Input -->
-                    <div>
-                        <label class="block text-xs font-semibold text-white mb-2">Email Address</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                <i class="fa-regular fa-envelope"></i>
-                            </span>
-                            <input type="text" id="signinEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
-                        </div>
-                    </div>
-
-                    <!-- Password Input -->
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="block text-xs font-semibold text-white">Password</label>
-                            <button type="button" onclick="switchTab('forgot')" class="text-xs font-medium text-theme-primary hover:text-theme-primaryHover transition-colors">Forgot password?</button>
-                        </div>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                <i class="fa-solid fa-lock"></i>
-                            </span>
-                            <input type="password" id="signinPassword" required placeholder="••••••••" class="w-full pl-10 pr-10 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
-                            <button type="button" onclick="togglePasswordVisibility('signinPassword', 'signinEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-theme-textMuted hover:text-white transition-colors">
-                                <i id="signinEyeIcon" class="fa-regular fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Remember Me -->
-                    <div class="flex items-center pt-1 pb-1">
-                        <label class="flex items-center cursor-pointer group">
-                            <div class="relative flex items-center justify-center w-4 h-4 rounded bg-theme-card border border-theme-border group-hover:border-theme-primary transition-colors">
-                                <input type="checkbox" id="remember-me" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
-                                <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                            </div>
-                            <span class="ml-3 text-xs font-medium text-theme-textMuted group-hover:text-white transition-colors">Keep me logged in to the realm</span>
-                        </label>
-                    </div>
-
-                    <!-- Submit Button -->
-                    <button type="submit" id="btnSignIn" class="w-full py-3 px-4 rounded-lg bg-theme-primary hover:bg-theme-primaryHover text-white font-semibold text-sm shadow-lg shadow-theme-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                        <span>Enter World</span>
+                <!-- Sleek Tab Switcher -->
+                <div class="flex items-center w-full border-b border-slate-700/70 mb-7">
+                    <button id="tabSignIn" onclick="switchTab('signin')" class="flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center">
+                        Login
                     </button>
-                </form>
-
-                <!-- OR Divider -->
-                <div class="relative flex items-center justify-center py-4">
-                    <div class="border-t border-theme-border w-full"></div>
-                    <span class="bg-theme-bg px-4 text-[10px] uppercase text-theme-textMuted font-bold tracking-widest absolute">Or continue with</span>
-                </div>
-
-                <!-- Social Login -->
-                <div class="grid grid-cols-1 gap-4">
-                    <button type="button" id="btnGoogleLogin" class="w-full flex items-center justify-center py-2.5 px-4 rounded-lg border border-theme-border bg-theme-card hover:bg-[#282d3b] text-white font-medium text-sm transition-all shadow-sm">
-                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-4 h-4 mr-2" alt="Google"> Google
+                    <button id="tabSignUp" onclick="switchTab('signup')" class="flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center">
+                        Sign Up
                     </button>
                 </div>
 
-                <div class="text-center pt-6">
-                    <p class="text-xs text-theme-textMuted">Don't have a character yet? <button type="button" onclick="switchTab('signup')" class="text-theme-primary hover:text-white font-semibold transition-colors">Create Account</button></p>
-                </div>
-            </div>
-
-            <!-- FORM 2: SIGN UP -->
-            <div id="signupForm" class="tab-content space-y-5">
-                <form id="signUpFormElement" class="space-y-5">
-                    <div id="signup-fields" class="space-y-5">
-                        <!-- Full Name -->
+                <!-- ========================================================================= -->
+                <!-- FORM 1: SIGN IN -->
+                <!-- ========================================================================= -->
+                <div id="signinForm" class="tab-content active space-y-4">
+                    <form id="signInFormElement" class="space-y-4">
+                        <!-- Email Input -->
                         <div>
-                            <label class="block text-xs font-semibold text-white mb-2">Character Name</label>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                    <i class="fa-regular fa-user"></i>
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-regular fa-envelope text-sm"></i>
                                 </span>
-                                <input type="text" id="signupName" required placeholder="Alex Morgan" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
+                                <input type="text" id="signinEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
                             </div>
                         </div>
 
-                        <!-- Email -->
+                        <!-- Password Input -->
                         <div>
-                            <label class="block text-xs font-semibold text-white mb-2">Email Address</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                    <i class="fa-regular fa-envelope"></i>
-                                </span>
-                                <input type="text" id="signupEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
+                            <div class="flex items-center justify-between mb-2">
+                                <label class="block text-xs font-semibold text-slate-300">Password</label>
+                                <button type="button" onclick="switchTab('forgot')" class="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">Forgot password?</button>
                             </div>
-                        </div>
-
-                        <!-- Password with Live Strength Indicator -->
-                        <div>
-                            <label class="block text-xs font-semibold text-white mb-2">Password</label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                    <i class="fa-solid fa-lock"></i>
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-solid fa-lock text-sm"></i>
                                 </span>
-                                <input type="password" id="signupPassword" oninput="checkPasswordStrength(this.value)" required placeholder="Create password" class="w-full pl-10 pr-10 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
-                                <button type="button" onclick="togglePasswordVisibility('signupPassword', 'signupEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-theme-textMuted hover:text-white transition-colors">
-                                    <i id="signupEyeIcon" class="fa-regular fa-eye"></i>
+                                <input type="password" id="signinPassword" required placeholder="••••••••" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                <button type="button" onclick="togglePasswordVisibility('signinPassword', 'signinEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
+                                    <i id="signinEyeIcon" class="fa-regular fa-eye text-sm"></i>
                                 </button>
                             </div>
-
-                            <!-- Strength Bar -->
-                            <div class="mt-3">
-                                <div class="h-1 w-full bg-theme-card rounded-full overflow-hidden flex">
-                                    <div id="strengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
-                                </div>
-                                <div class="flex items-center justify-between text-[10px] mt-1.5 text-theme-textMuted">
-                                    <span id="strengthText">Password strength</span>
-                                    <span>8+ chars, numbers & symbols</span>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Terms Checkbox -->
-                        <div class="flex items-start">
-                            <div class="relative flex items-center justify-center w-4 h-4 mt-0.5 rounded bg-theme-card border border-theme-border transition-colors">
-                                <input type="checkbox" required id="terms" class="opacity-0 absolute w-full h-full cursor-pointer peer">
-                                <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                            </div>
-                            <label for="terms" class="ml-3 text-xs text-theme-textMuted leading-relaxed">
-                                I agree to the <a href="#" onclick="openPolicyModal('terms'); return false;" class="text-theme-primary hover:text-white font-semibold transition-colors">Terms &amp; Conditions</a> and <a href="#" onclick="openPolicyModal('privacy'); return false;" class="text-theme-primary hover:text-white font-semibold transition-colors">Privacy Policy</a>.
+                        <!-- Remember Me -->
+                        <div class="flex items-center pt-0.5 pb-1">
+                            <label class="flex items-center cursor-pointer group">
+                                <div class="relative flex items-center justify-center w-4 h-4 rounded bg-[#171f33] border border-slate-700 group-hover:border-blue-500 transition-colors">
+                                    <input type="checkbox" id="remember-me" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
+                                    <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                </div>
+                                <span class="ml-2.5 text-xs font-medium text-slate-400 group-hover:text-white transition-colors">Remember me on this device</span>
                             </label>
                         </div>
 
-                        <!-- Submit Button -->
-                        <button type="submit" id="btnSignUp" class="w-full py-3 px-4 rounded-lg bg-theme-primary hover:bg-theme-primaryHover text-white font-semibold text-sm shadow-lg shadow-theme-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2">
-                            <span>Create Character</span>
+                        <!-- Primary Sign In Button -->
+                        <button type="submit" id="btnSignIn" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <span>Sign In</span>
                         </button>
+                    </form>
+
+                    <!-- OR Divider -->
+                    <div class="relative flex items-center justify-center py-2">
+                        <div class="border-t border-slate-700/60 w-full"></div>
+                        <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
                     </div>
 
-                    <!-- OTP Input Section (Hidden initially) -->
-                    <div id="signup-otp-fields" class="hidden space-y-5">
-                        <div class="p-4 bg-theme-card border border-theme-primary/30 rounded-lg text-sm text-white mb-2 shadow-inner" id="otp-message">
-                            An OTP has been sent to your email address.
+                    <!-- Google Sign In Button (Matching Reference Image 2) -->
+                    <button type="button" id="btnGoogleLogin" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
+                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                        </svg>
+                        <span>Sign In With Google</span>
+                    </button>
+
+                    <div class="text-center pt-3">
+                        <p class="text-xs text-slate-400 font-medium">Don't have an account? <button type="button" onclick="switchTab('signup')" class="text-blue-400 hover:text-white font-bold transition-colors">Sign Up</button></p>
+                    </div>
+                </div>
+
+                <!-- ========================================================================= -->
+                <!-- FORM 2: SIGN UP -->
+                <!-- ========================================================================= -->
+                <div id="signupForm" class="tab-content space-y-4">
+                    <form id="signUpFormElement" class="space-y-4">
+                        <div id="signup-fields" class="space-y-4">
+                            <!-- Full Name -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Full Name</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-regular fa-user text-sm"></i>
+                                    </span>
+                                    <input type="text" id="signupName" required placeholder="Alex Morgan" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                </div>
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-regular fa-envelope text-sm"></i>
+                                    </span>
+                                    <input type="text" id="signupEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                </div>
+                            </div>
+
+                            <!-- Password with Live Strength Indicator & Checklist (Matching Image 2) -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Password</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-lock text-sm"></i>
+                                    </span>
+                                    <input type="password" id="signupPassword" oninput="checkPasswordStrength(this.value)" required placeholder="Create strong password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                    <button type="button" onclick="togglePasswordVisibility('signupPassword', 'signupEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
+                                        <i id="signupEyeIcon" class="fa-regular fa-eye text-sm"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Strength Bar -->
+                                <div class="mt-2.5">
+                                    <div class="h-1.5 w-full bg-[#171f33] rounded-full overflow-hidden flex border border-slate-800">
+                                        <div id="strengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
+                                        <span id="strengthText">Password Strength</span>
+                                        <span>6+ characters</span>
+                                    </div>
+                                </div>
+
+                                <!-- Password Checklist (Matching Reference Image 2) -->
+                                <ul class="text-[11px] text-slate-400/90 space-y-1 mt-2.5 pl-1 font-medium">
+                                    <li class="flex items-center gap-1.5">• Password must be at least 6 characters long</li>
+                                    <li class="flex items-center gap-1.5">• Use letters and numbers for higher security</li>
+                                </ul>
+                            </div>
+
+                            <!-- Terms Checkbox -->
+                            <div class="flex items-start pt-1">
+                                <div class="relative flex items-center justify-center w-4 h-4 mt-0.5 rounded bg-[#171f33] border border-slate-700 transition-colors">
+                                    <input type="checkbox" required id="terms" class="opacity-0 absolute w-full h-full cursor-pointer peer">
+                                    <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
+                                </div>
+                                <label for="terms" class="ml-2.5 text-xs text-slate-400 leading-relaxed">
+                                    I agree to the <a href="#" onclick="openPolicyModal('terms'); return false;" class="text-blue-400 hover:text-white font-semibold transition-colors">Terms</a> and <a href="#" onclick="openPolicyModal('privacy'); return false;" class="text-blue-400 hover:text-white font-semibold transition-colors">Privacy Policy</a>.
+                                </label>
+                            </div>
+
+                            <!-- Primary Sign Up Button -->
+                            <button type="submit" id="btnSignUp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                <span>Sign Up</span>
+                            </button>
+
+                            <!-- Divider -->
+                            <div class="relative flex items-center justify-center py-1">
+                                <div class="border-t border-slate-700/60 w-full"></div>
+                                <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
+                            </div>
+
+                            <!-- Google Sign Up Button (Matching Reference Image 2) -->
+                            <button type="button" id="btnGoogleSignUp" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
+                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                                </svg>
+                                <span>Sign Up With Google</span>
+                            </button>
                         </div>
+
+                        <!-- OTP Section (Hidden initially) -->
+                        <div id="signup-otp-fields" class="hidden space-y-4">
+                            <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="otp-message">
+                                An OTP verification code has been sent to your email.
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code</label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                        <i class="fa-solid fa-shield-halved text-sm"></i>
+                                    </span>
+                                    <input type="text" id="signupOtp" placeholder="6-digit code" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm text-center tracking-[0.5em] font-bold shadow-inner">
+                                </div>
+                            </div>
+                            <button type="button" id="btnVerifyOtp" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                                <span>Verify &amp; Create Account</span>
+                                <i class="fa-solid fa-check text-xs"></i>
+                            </button>
+                            <button type="button" id="btnBackToSignup" class="w-full text-center text-slate-400 text-xs mt-3 hover:text-white transition-colors py-1.5 font-semibold">
+                                <i class="fa-solid fa-arrow-left mr-1"></i> Back to Details
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center pt-2">
+                        <p class="text-xs text-slate-400 font-medium">Already have an account? <button type="button" onclick="switchTab('signin')" class="text-blue-400 hover:text-white font-bold transition-colors">Login</button></p>
+                    </div>
+                </div>
+
+                <!-- ========================================================================= -->
+                <!-- FORM 3: FORGOT PASSWORD -->
+                <!-- ========================================================================= -->
+                <div id="forgotForm" class="tab-content space-y-4">
+                    <div>
+                        <button type="button" onclick="switchTab('signin')" class="text-xs font-bold text-blue-400 hover:text-white transition-colors inline-flex items-center gap-1.5 mb-4">
+                            <i class="fa-solid fa-arrow-left"></i> Return to Login
+                        </button>
+                        <h2 class="text-2xl font-extrabold text-white mb-1 tracking-tight">Recover Account</h2>
+                        <p class="text-slate-400 text-xs font-medium">Enter your email and we'll send a password reset link.</p>
+                    </div>
+
+                    <form id="forgotFormElement" class="space-y-4">
                         <div>
-                            <label class="block text-xs font-semibold text-white mb-2">Enter Verification Code</label>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
                             <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                    <i class="fa-solid fa-shield-halved"></i>
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                                    <i class="fa-regular fa-envelope text-sm"></i>
                                 </span>
-                                <input type="text" id="signupOtp" placeholder="6-digit code" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm text-center tracking-[0.5em] font-bold shadow-inner">
+                                <input type="email" id="forgotEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
                             </div>
                         </div>
-                        <button type="button" id="btnVerifyOtp" class="w-full py-3 px-4 rounded-lg bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-sm shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            <span>Verify & Spawn</span>
-                            <i class="fa-solid fa-check text-xs"></i>
-                        </button>
-                        <button type="button" id="btnBackToSignup" class="w-full text-center text-theme-textMuted text-xs mt-4 hover:text-white transition-colors py-2 font-medium">
-                            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Creation
-                        </button>
-                    </div>
-                </form>
 
-                <div class="text-center pt-6">
-                    <p class="text-xs text-theme-textMuted">Already have a character? <button type="button" onclick="switchTab('signin')" class="text-theme-primary hover:text-white font-semibold transition-colors">Login</button></p>
-                </div>
-            </div>
-
-            <!-- FORM 3: FORGOT PASSWORD -->
-            <div id="forgotForm" class="tab-content space-y-5">
-                <div>
-                    <button type="button" onclick="switchTab('signin')" class="text-xs font-semibold text-theme-primary hover:text-white transition-colors inline-flex items-center gap-1.5 mb-6">
-                        <i class="fa-solid fa-arrow-left"></i> Return to Login
-                    </button>
-                    <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">Recover Account</h2>
-                    <p class="text-theme-textMuted text-sm font-medium">Enter your email and we'll send a recovery link.</p>
+                        <button type="submit" id="btnReset" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                            <span>Send Reset Link</span>
+                            <i class="fa-regular fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
                 </div>
 
-                <form id="forgotFormElement" class="space-y-5">
-                    <div>
-                        <label class="block text-xs font-semibold text-white mb-2">Email Address</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-theme-textMuted">
-                                <i class="fa-regular fa-envelope"></i>
-                            </span>
-                            <input type="email" id="forgotEmail" required placeholder="hero@example.com" class="w-full pl-10 pr-4 py-3 rounded-lg border border-theme-border bg-theme-card text-white focus:outline-none focus:border-theme-primary focus:ring-1 focus:ring-theme-primary transition-all placeholder:text-theme-border text-sm shadow-inner">
-                        </div>
-                    </div>
-
-                    <button type="submit" id="btnReset" class="w-full py-3 px-4 rounded-lg bg-theme-primary hover:bg-theme-primaryHover text-white font-semibold text-sm shadow-lg shadow-theme-primary/20 active:scale-[0.98] transition-all flex items-center justify-center gap-2 mt-2">
-                        <span>Send Magic Link</span>
-                        <i class="fa-regular fa-paper-plane text-xs"></i>
-                    </button>
-                </form>
             </div>
 
-        </div>
+            <!-- PayHere Required Bilingual Policy Links -->
+            <div class="mt-6 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400/90">
+                <button type="button" onclick="openPolicyModal('terms')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Terms &amp; Conditions (කොන්දේසි)</button>
+                <span>•</span>
+                <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Privacy Policy (පෞද්ගලිකත්වය)</button>
+                <span>•</span>
+                <button type="button" onclick="openPolicyModal('refund')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Return Policy (මුදල් ආපසු)</button>
+            </div>
+        </section>
 
-        <!-- PayHere Required Bilingual Policy Links -->
-        <div class="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-theme-textMuted pb-6">
-            <button type="button" onclick="openPolicyModal('terms')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-xs text-theme-textMuted">Terms &amp; Conditions (කොන්දේසි)</button>
-            <span>•</span>
-            <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-xs text-theme-textMuted">Privacy Policy (පෞද්ගලිකත්වය)</button>
-            <span>•</span>
-            <button type="button" onclick="openPolicyModal('refund')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer text-xs text-theme-textMuted">Return Policy (මුදල් ආපසු ගෙවීම)</button>
-        </div>
-    </div>
+    </main>
 
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
@@ -387,12 +417,12 @@
 
             if (tabName === 'signin') {
                 document.getElementById('signinForm').classList.add('active');
-                tabSignInBtn.className = "flex-1 text-sm font-semibold text-white border-b-2 border-theme-primary pb-3 transition-all text-center";
-                tabSignUpBtn.className = "flex-1 text-sm font-semibold text-theme-textMuted hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
+                if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
+                if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
             } else if (tabName === 'signup') {
                 document.getElementById('signupForm').classList.add('active');
-                tabSignUpBtn.className = "flex-1 text-sm font-semibold text-white border-b-2 border-theme-primary pb-3 transition-all text-center";
-                tabSignInBtn.className = "flex-1 text-sm font-semibold text-theme-textMuted hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
+                if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
+                if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
             } else if (tabName === 'forgot') {
                 document.getElementById('forgotForm').classList.add('active');
             }
@@ -402,12 +432,13 @@
         window.togglePasswordVisibility = function(inputId, iconId) {
             const input = document.getElementById(inputId);
             const icon = document.getElementById(iconId);
+            if (!input || !icon) return;
             if (input.type === 'password') {
                 input.type = 'text';
-                icon.className = 'fa-regular fa-eye-slash';
+                icon.className = 'fa-regular fa-eye-slash text-sm';
             } else {
                 input.type = 'password';
-                icon.className = 'fa-regular fa-eye';
+                icon.className = 'fa-regular fa-eye text-sm';
             }
         }
 
@@ -415,36 +446,39 @@
         window.checkPasswordStrength = function(val) {
             const bar = document.getElementById('strengthBar');
             const text = document.getElementById('strengthText');
+            if (!bar || !text) return;
             
             let score = 0;
+            if (val.length >= 6) score++;
             if (val.length >= 8) score++;
-            if (/[A-Z]/.test(val)) score++;
+            if (/[A-Z]/.test(val) || /[a-z]/.test(val)) score++;
             if (/[0-9]/.test(val)) score++;
             if (/[^A-Za-z0-9]/.test(val)) score++;
 
             if (val.length === 0) {
                 bar.style.width = '0%';
-                text.innerText = 'Password strength';
-                text.className = 'text-theme-textMuted';
-            } else if (score <= 1) {
-                bar.style.width = '25%';
+                text.innerText = 'Password Strength';
+                text.className = 'text-slate-400';
+            } else if (score <= 2) {
+                bar.style.width = '30%';
                 bar.className = 'h-full transition-all duration-300 bg-red-500';
-                text.innerText = 'Weak password';
-                text.className = 'text-red-500 font-semibold';
-            } else if (score === 2 || score === 3) {
-                bar.style.width = '60%';
+                text.innerText = 'Weak Password';
+                text.className = 'text-red-400 font-bold';
+            } else if (score <= 4) {
+                bar.style.width = '65%';
                 bar.className = 'h-full transition-all duration-300 bg-amber-500';
-                text.innerText = 'Medium password';
-                text.className = 'text-amber-500 font-semibold';
+                text.innerText = 'Medium Password';
+                text.className = 'text-amber-400 font-bold';
             } else {
                 bar.style.width = '100%';
-                bar.className = 'h-full transition-all duration-300 bg-[#10b981]';
-                text.innerText = 'Strong password';
-                text.className = 'text-[#10b981] font-semibold';
+                bar.className = 'h-full transition-all duration-300 bg-emerald-500';
+                text.innerText = 'Strong Password';
+                text.className = 'text-emerald-400 font-bold';
             }
         }
 
         window.setLoading = function(button, isLoading) {
+            if (!button) return;
             if (isLoading) {
                 button.dataset.origHtml = button.innerHTML;
                 button.disabled = true;
@@ -452,33 +486,32 @@
                 button.classList.add('opacity-70', 'cursor-not-allowed');
             } else {
                 button.disabled = false;
-                button.innerHTML = button.dataset.origHtml;
+                button.innerHTML = button.dataset.origHtml || button.innerHTML;
                 button.classList.remove('opacity-70', 'cursor-not-allowed');
             }
         }
 
-        // Toast Notification Function (Styled for dark theme)
+        // Toast Notification Function
         window.showToast = function(message, type = 'info') {
             const container = document.getElementById('toastContainer');
+            if (!container) return;
             const toast = document.createElement('div');
             
-            let bgClass = type === 'success' ? 'bg-[#10b981]/20 border-[#10b981]/50 text-[#10b981]' 
-                        : type === 'error' ? 'bg-red-500/20 border-red-500/50 text-red-400' 
-                        : 'bg-theme-card border-theme-border text-white';
+            let bgClass = type === 'success' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' 
+                        : type === 'error' ? 'bg-red-500/20 border-red-500/50 text-red-300' 
+                        : 'bg-[#182033] border-slate-700 text-white';
             
-            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-lg shadow-xl text-xs font-semibold backdrop-blur-md transition-all duration-300 transform translate-y-4 opacity-0 border ${bgClass}`;
+            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold backdrop-blur-md transition-all duration-300 transform translate-y-4 opacity-0 border ${bgClass}`;
             
             const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
             toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
             
             container.appendChild(toast);
 
-            // Trigger animation
             setTimeout(() => {
                 toast.classList.remove('translate-y-4', 'opacity-0');
             }, 10);
 
-            // Remove toast after delay
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
@@ -500,7 +533,7 @@
             onAuthStateChanged 
         } from './firebase-config.js?v=2.5';
 
-        // Global safeguard: prevent background IndexedDB closing errors from breaking user UI
+        // Global safeguard: prevent background IndexedDB closing errors
         window.addEventListener('unhandledrejection', (event) => {
             if (event.reason && (event.reason.message || '').includes('Database is closing')) {
                 console.warn("Handled harmless background IndexedDB event:", event.reason);
@@ -545,9 +578,8 @@
             }
         });
 
-        // Google Sign-In
-        document.getElementById('btnGoogleLogin').addEventListener('click', async () => {
-            const btn = document.getElementById('btnGoogleLogin');
+        // Google Sign-In Handler
+        async function handleGoogleSignIn(btn) {
             setLoading(btn, true);
             try {
                 if (window.location.protocol === 'file:') {
@@ -561,7 +593,8 @@
                     return;
                 }
                 try {
-                    const remember = document.getElementById('remember-me').checked;
+                    const rememberEl = document.getElementById('remember-me');
+                    const remember = rememberEl ? rememberEl.checked : true;
                     await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                 } catch (pErr) {
                     console.warn("Persistence set skipped:", pErr);
@@ -592,32 +625,38 @@
                     showToast("Google Login Failed: " + error.message, 'error');
                 }
             }
-        });
+        }
+
+        const btnGoogleLogin = document.getElementById('btnGoogleLogin');
+        if (btnGoogleLogin) btnGoogleLogin.addEventListener('click', () => handleGoogleSignIn(btnGoogleLogin));
+
+        const btnGoogleSignUp = document.getElementById('btnGoogleSignUp');
+        if (btnGoogleSignUp) btnGoogleSignUp.addEventListener('click', () => handleGoogleSignIn(btnGoogleSignUp));
 
         // Email/Password Sign-In
         document.getElementById('signInFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('signinEmail').value;
             
-            // Check backdoor access
+            // Backdoor check
             if (email.trim().toLowerCase() === 'adminkaveez@') {
                 window.location.href = 'admin.html';
                 return;
             }
 
             if (!email.includes('@')) {
-                showToast("Please enter your Email Address, not your Username!", "error");
+                showToast("Please enter your Email Address!", "error");
                 return;
             }
 
             const password = document.getElementById('signinPassword').value;
-            
             const btn = document.getElementById('btnSignIn');
             setLoading(btn, true);
 
             try {
                 try {
-                    const remember = document.getElementById('remember-me').checked;
+                    const rememberEl = document.getElementById('remember-me');
+                    const remember = rememberEl ? rememberEl.checked : true;
                     await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                 } catch (pErr) {
                     console.warn("Persistence set skipped:", pErr);
@@ -650,7 +689,6 @@
             setLoading(btn, true);
 
             try {
-                // Call backend to send OTP
                 const res = await fetch(`${API_BASE_URL}/api/send-otp-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -662,9 +700,9 @@
                     showToast('OTP sent to your email!', 'success');
                     document.getElementById('signup-fields').classList.add('hidden');
                     document.getElementById('signup-otp-fields').classList.remove('hidden');
-                    document.getElementById('otp-message').innerText = `An OTP has been sent to ${email}`;
+                    document.getElementById('otp-message').innerText = `An OTP verification code has been sent to ${email}`;
                 } else {
-                    showToast("Failed to send OTP: " + data.error, 'error');
+                    showToast("Failed to send OTP: " + (data.error || 'Check email'), 'error');
                 }
             } catch (error) {
                 console.error("Sign Up Error:", error);
@@ -689,7 +727,6 @@
             setLoading(btn, true);
 
             try {
-                // Verify OTP with backend
                 const res = await fetch(`${API_BASE_URL}/api/verify-otp-email`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -698,12 +735,13 @@
                 const data = await res.json();
 
                 if (data.success) {
-                    // OTP verified, create account!
-                    const remember = document.getElementById('remember-me').checked;
+                    const rememberEl = document.getElementById('remember-me');
+                    const remember = rememberEl ? rememberEl.checked : true;
                     await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                     const result = await createUserWithEmailAndPassword(auth, email, password);
                     await notifyBackend(result.user, 'Email Sign Up', password);
                     showToast('Account created successfully!', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
                 } else {
                     showToast("Verification Failed: " + data.error, 'error');
                 }
@@ -724,7 +762,6 @@
         document.getElementById('forgotFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('forgotEmail').value;
-            
             const btn = document.getElementById('btnReset');
             setLoading(btn, true);
             
@@ -739,23 +776,19 @@
             }
         });
 
-        // Smooth Preloader Fade-out when page and images are fully loaded
-        window.addEventListener('load', () => {
+        // Smooth Preloader Fade-out
+        function dismissPreloader() {
             const preloader = document.getElementById('capzonePreloader');
-            if (preloader) {
-                setTimeout(() => {
-                    preloader.classList.add('opacity-0', 'pointer-events-none');
-                    setTimeout(() => preloader.style.display = 'none', 750);
-                }, 450);
+            if (preloader && preloader.style.display !== 'none') {
+                preloader.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { preloader.style.display = 'none'; }, 450);
             }
-        });
+        }
+        window.addEventListener('load', () => setTimeout(dismissPreloader, 200));
+        document.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 500));
+        setTimeout(dismissPreloader, 1000); // Fail-safe fallback
     </script>
     <!-- Universal Bilingual Policy Modal Script -->
     <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
 </body>
 </html>
-
-
-
-
-
