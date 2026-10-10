@@ -1004,18 +1004,13 @@
                 }
             } catch (err) {
                 console.error("Backend Turnstile verification error:", err);
-                window.isRobotVerified = true;
-                sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
+                window.isRobotVerified = false;
+                sessionStorage.removeItem('capzone_robot_verified');
                 if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                    statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400 font-semibold">Backend verification failed. Please retry.</span>`;
                 }
                 if (typeof window.dismissPreloader === 'function') {
-                    window.dismissPreloader('turnstile_verified');
-                }
-                if (auth && auth.currentUser) {
-                    localStorage.setItem('capzone_user_email', auth.currentUser.email);
-                    if (auth.currentUser.displayName) localStorage.setItem('capzone_user_name', auth.currentUser.displayName);
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                    window.dismissPreloader('turnstile_error');
                 }
             }
         };
@@ -1090,10 +1085,11 @@
                     }
                 }
             } catch (err) {
-                window.isRobotVerified = true;
-                sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
+                console.error("Backend Turnstile verification error:", err);
+                window.isRobotVerified = false;
+                sessionStorage.removeItem('capzone_robot_verified');
                 if (statusEl) {
-                    statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                    statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400 font-semibold">Backend verification failed. Please retry.</span>`;
                 }
             }
         };
