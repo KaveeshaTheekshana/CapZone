@@ -299,8 +299,8 @@
 
 
           if (res && res.status === 404) {
-              if (typeof window.handleUserLogout === 'function') {
-                  window.handleUserLogout();
+              if (typeof window.handleLogout === 'function') {
+                  window.handleLogout();
               } else {
                   localStorage.clear();
                   window.location.href = 'login.html';
@@ -342,8 +342,8 @@
           if (targetEmail === curEmail) {
             localStorage.removeItem('capzone_projects_' + curEmail);
             localStorage.removeItem('capzone_cached_user_' + curEmail);
-            if (typeof window.handleUserLogout === 'function') {
-              window.handleUserLogout();
+            if (typeof window.handleLogout === 'function') {
+              window.handleLogout();
             } else {
               localStorage.clear();
               window.location.href = 'login.html';
@@ -374,8 +374,8 @@
             if (targetEmail === curEmail) {
               localStorage.removeItem('capzone_projects_' + curEmail);
               localStorage.removeItem('capzone_cached_user_' + curEmail);
-              if (typeof window.handleUserLogout === 'function') {
-                window.handleUserLogout();
+              if (typeof window.handleLogout === 'function') {
+                window.handleLogout();
               } else {
                 localStorage.clear();
                 window.location.href = 'login.html';
