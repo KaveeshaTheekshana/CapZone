@@ -69,8 +69,48 @@
             background: #1f293d;
             border-radius: 4px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
+        /* CapZone Premium Preloader */
+        #capzonePreloader {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #090d16;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
+        }
+        #capzonePreloader.fade-out {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        @keyframes preloaderSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes preloaderProgress {
+            0% { transform: translateX(-100%); }
+            50% { transform: translateX(20%); }
+            100% { transform: translateX(100%); }
+        }
+        .preloader-ring {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            border-top-color: #06b6d4;
+            border-right-color: #2563eb;
+            animation: preloaderSpin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+        }
+        .preloader-bar-fill {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, #2563eb, #06b6d4, #3b82f6);
+            animation: preloaderProgress 1.4s ease-in-out infinite;
         }
     </style>
 </head>
@@ -80,8 +120,36 @@
     <div class="fixed top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, rgba(9,13,22,0) 70%); transform: translateZ(0);"></div>
     <div class="fixed bottom-[-10%] right-[15%] w-[450px] h-[450px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, rgba(9,13,22,0) 70%); transform: translateZ(0);"></div>
 
-    <!-- CapZone Preloader (non-blocking) -->
-    <div id="capzonePreloader" class="hidden pointer-events-none"></div>
+    <!-- CapZone Premium Preloader (Smooth fade-out when page is fully ready) -->
+    <div id="capzonePreloader">
+        <div class="relative flex items-center justify-center mb-6">
+            <!-- Background Radial Glow -->
+            <div class="absolute -inset-6 bg-gradient-to-r from-blue-600/30 via-cyan-500/30 to-indigo-600/30 rounded-full blur-2xl animate-pulse pointer-events-none"></div>
+            <!-- Outer Spinning Gradient Ring -->
+            <div class="preloader-ring"></div>
+            <!-- Center Brand Logo Icon -->
+            <div class="absolute w-12 h-12 rounded-2xl bg-[#111728] border border-white/15 p-1.5 flex items-center justify-center shadow-lg shadow-cyan-500/10">
+                <img src="logo.jpg" class="w-full h-full object-cover rounded-xl" alt="CapZone Logo">
+            </div>
+        </div>
+        
+        <!-- Branding Titles -->
+        <div class="text-center">
+            <div class="text-xl font-extrabold tracking-tight text-white flex items-center justify-center gap-2">
+                <span>CapZone</span>
+                <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">Studio</span>
+            </div>
+            <p id="preloaderStatusText" class="text-xs text-slate-400 font-medium mt-2 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]"></i>
+                <span>Loading Studio &amp; AI Tools...</span>
+            </p>
+        </div>
+
+        <!-- Shimmering Progress Bar -->
+        <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mt-5 relative">
+            <div class="preloader-bar-fill rounded-full"></div>
+        </div>
+    </div>
 
     <!-- MAIN APP CONTAINER -->
     <!-- Desktop (Image 2): Centered dual-panel split card -->
@@ -1707,5 +1775,37 @@
 
     <!-- Universal Bilingual Policy Modal Script -->
     <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
+
+    <!-- CapZone Preloader Completion Controller -->
+    <script>
+        (function() {
+            var dismissed = false;
+            function dismissPreloader() {
+                if (dismissed) return;
+                dismissed = true;
+                var preloader = document.getElementById('capzonePreloader');
+                var statusText = document.getElementById('preloaderStatusText');
+                if (statusText) {
+                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">Studio Ready!</span>';
+                }
+                setTimeout(function() {
+                    if (preloader) {
+                        preloader.classList.add('fade-out');
+                        setTimeout(function() {
+                            preloader.style.display = 'none';
+                        }, 450);
+                    }
+                }, 200);
+            }
+
+            if (document.readyState === 'complete') {
+                setTimeout(dismissPreloader, 150);
+            } else {
+                window.addEventListener('load', dismissPreloader);
+                // Safety net fallback so user is NEVER blocked by slow external resources
+                setTimeout(dismissPreloader, 2200);
+            }
+        })();
+    </script>
 </body>
 </html>
