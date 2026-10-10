@@ -4691,11 +4691,24 @@
             }
             mergedMap.set(String(item.id), item);
           });
+          const unsyncedProjects = [];
           localCached.forEach(p => {
             if (!mergedMap.has(String(p.id))) {
               mergedMap.set(String(p.id), p);
+              unsyncedProjects.push(p);
             }
           });
+
+          // Upload any unsynced local projects to server so other devices see them
+          if (unsyncedProjects.length > 0) {
+            unsyncedProjects.forEach(up => {
+              fetch(`${API_BASE_URL}/api/user-projects`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-user-email': email },
+                body: JSON.stringify(up)
+              }).catch(() => {});
+            });
+          }
 
           window.allProjects = Array.from(mergedMap.values()).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
 
