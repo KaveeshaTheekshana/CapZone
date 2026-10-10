@@ -141,7 +141,7 @@
             </div>
             <p id="preloaderStatusText" class="text-xs text-slate-400 font-medium mt-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]"></i>
-                <span>Loading Studio &amp; AI Tools...</span>
+                <span>Loading CapZone Studio...</span>
             </p>
         </div>
 
@@ -175,14 +175,14 @@
                     </div>
                     <div>
                         <span class="text-xl font-extrabold tracking-tight text-white block leading-none drop-shadow">CapZone</span>
-                        <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 mt-1 block drop-shadow">AI Video Studio</span>
+                        <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 mt-1 block drop-shadow">CapZone Studio</span>
                     </div>
                 </div>
 
                 <!-- Studio Tag Pill -->
                 <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-slate-200 shadow-md">
                     <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span>Video &amp; SRT AI</span>
+                    <span>CapZone Studio</span>
                 </div>
             </div>
 
@@ -193,7 +193,7 @@
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300">Excellence</span>
                 </h2>
                 <p class="text-slate-200/90 text-xs xl:text-sm mt-3.5 leading-relaxed max-w-md drop-shadow font-normal">
-                    Generate millisecond-accurate Sinhala subtitles, bypass watermarks, remove backgrounds, and craft viral AI scripts tailored to elevate your vision.
+                    Generate millisecond-accurate Sinhala subtitles, bypass watermarks, remove backgrounds, and craft viral scripts tailored to elevate your vision.
                 </p>
 
                 <!-- 3 Dots Indicator (Matching Reference Image 2) -->
@@ -276,7 +276,7 @@
 
                         <!-- Official Cloudflare Turnstile Human Verification Container -->
                         <div id="turnstileWidgetLogin" class="p-3 rounded-xl bg-[#171f33]/90 border border-slate-700/80 shadow-md flex flex-col items-center justify-center transition-all select-none">
-                            <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="3x00000000000000000000FF" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
+                            <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
                             <div id="turnstileStatusLogin" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
                                 <i class="fa-solid fa-shield-halved text-blue-400"></i> Cloudflare Turnstile Verification
                             </div>
@@ -392,7 +392,7 @@
 
                             <!-- Official Cloudflare Turnstile Human Verification Container -->
                             <div id="turnstileWidgetSignup" class="p-3 rounded-xl bg-[#171f33]/90 border border-slate-700/80 shadow-md flex flex-col items-center justify-center transition-all select-none">
-                                <div id="cfTurnstileSignup" class="cf-turnstile" data-sitekey="3x00000000000000000000FF" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
+                                <div id="cfTurnstileSignup" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
                                 <div id="turnstileStatusSignup" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
                                     <i class="fa-solid fa-shield-halved text-blue-400"></i> Cloudflare Turnstile Verification
                                 </div>
@@ -607,7 +607,7 @@
                         if (el && !el.hasChildNodes()) {
                             try {
                                 turnstile.render('#cfTurnstileLogin', {
-                                    sitekey: '3x00000000000000000000FF',
+                                    sitekey: '1x00000000000000000000AA',
                                     theme: 'dark',
                                     callback: window.onTurnstileLoginSuccess,
                                     'expired-callback': window.onTurnstileLoginExpired,
@@ -627,7 +627,7 @@
                         if (el && !el.hasChildNodes()) {
                             try {
                                 turnstile.render('#cfTurnstileSignup', {
-                                    sitekey: '3x00000000000000000000FF',
+                                    sitekey: '1x00000000000000000000AA',
                                     theme: 'dark',
                                     callback: window.onTurnstileSignupSuccess,
                                     'expired-callback': window.onTurnstileSignupExpired,
@@ -970,6 +970,9 @@
                         widget.classList.remove('border-slate-700/80', 'border-rose-500');
                         widget.classList.add('border-emerald-500/50', 'bg-[#14232c]/90');
                     }
+                    if (typeof window.dismissPreloader === 'function') {
+                        window.dismissPreloader('turnstile_verified');
+                    }
                     if (auth && auth.currentUser) {
                         localStorage.setItem('capzone_user_email', auth.currentUser.email);
                         if (auth.currentUser.displayName) localStorage.setItem('capzone_user_name', auth.currentUser.displayName);
@@ -986,11 +989,17 @@
                         widget.classList.remove('border-slate-700/80', 'border-rose-500');
                         widget.classList.add('border-emerald-500/50', 'bg-[#14232c]/90');
                     }
+                    if (typeof window.dismissPreloader === 'function') {
+                        window.dismissPreloader('turnstile_verified');
+                    }
                 } else {
                     window.isRobotVerified = false;
                     window.turnstileLoginToken = null;
                     if (statusEl) {
                         statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-semibold">Turnstile rejected: ${data.error || 'Bot detected'}</span>`;
+                    }
+                    if (typeof window.dismissPreloader === 'function') {
+                        window.dismissPreloader('turnstile_rejected');
                     }
                 }
             } catch (err) {
@@ -999,6 +1008,9 @@
                 sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
                 if (statusEl) {
                     statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                }
+                if (typeof window.dismissPreloader === 'function') {
+                    window.dismissPreloader('turnstile_verified');
                 }
                 if (auth && auth.currentUser) {
                     localStorage.setItem('capzone_user_email', auth.currentUser.email);
@@ -1187,7 +1199,7 @@
             const raw = (input || '').trim();
             if (!raw) return '';
             if (raw.includes('@')) return raw.toLowerCase();
-            return `${raw.toLowerCase()}@capzone.ai`;
+            return `${raw.toLowerCase()}@capzone.studio`;
         }
 
         // Email/Username and Password Sign-In
@@ -1232,7 +1244,7 @@
                 if (inputVal.includes('@')) {
                     candidateEmails.push(inputVal.toLowerCase());
                 } else {
-                    candidateEmails.push(`${lowerInput}@capzone.ai`);
+                    candidateEmails.push(`${lowerInput}@capzone.studio`);
                     candidateEmails.push(`${lowerInput}@gmail.com`);
                 }
 
@@ -1709,17 +1721,18 @@
             });
         }
 
-        // Smooth Preloader Fade-out
-        function dismissPreloader() {
+        // Preloader transition handler
+        window.dismissPreloader = function(reason) {
             const preloader = document.getElementById('capzonePreloader');
-            if (preloader && preloader.style.display !== 'none') {
-                preloader.classList.add('opacity-0', 'pointer-events-none');
+            const statusText = document.getElementById('preloaderStatusText');
+            if (statusText) {
+                statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">CapZone Studio Ready!</span>';
+            }
+            if (preloader && preloader.style.display !== 'none' && !preloader.classList.contains('fade-out')) {
+                preloader.classList.add('fade-out');
                 setTimeout(() => { preloader.style.display = 'none'; }, 450);
             }
-        }
-        window.addEventListener('load', () => setTimeout(dismissPreloader, 200));
-        document.addEventListener('DOMContentLoaded', () => setTimeout(dismissPreloader, 500));
-        setTimeout(dismissPreloader, 1000); // Fail-safe fallback
+        };
     </script>
 
     <!-- ========================================================================= -->
@@ -1776,18 +1789,24 @@
     <!-- Universal Bilingual Policy Modal Script -->
     <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
 
-    <!-- CapZone Preloader Completion Controller -->
+    <!-- ========================================================================= -->
+    <!-- 🛡️ CAPZONE STUDIO - CLOUDFLARE TURNSTILE & NETWORK GATE CONTROLLER -->
+    <!-- Keeps preloader visible until Cloudflare tick is fully loaded & network ready -->
+    <!-- ========================================================================= -->
     <script>
         (function() {
             var dismissed = false;
-            function dismissPreloader() {
+
+            window.dismissPreloader = function(reason) {
                 if (dismissed) return;
                 dismissed = true;
+
                 var preloader = document.getElementById('capzonePreloader');
                 var statusText = document.getElementById('preloaderStatusText');
                 if (statusText) {
-                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">Studio Ready!</span>';
+                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">CapZone Studio Ready!</span>';
                 }
+
                 setTimeout(function() {
                     if (preloader) {
                         preloader.classList.add('fade-out');
@@ -1795,16 +1814,64 @@
                             preloader.style.display = 'none';
                         }, 450);
                     }
-                }, 200);
+                }, 220);
+            };
+
+            function updatePreloaderStatus(text, iconClass) {
+                var statusText = document.getElementById('preloaderStatusText');
+                if (statusText && !dismissed) {
+                    statusText.innerHTML = '<i class="' + (iconClass || 'fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]') + '"></i><span>' + text + '</span>';
+                }
             }
 
-            if (document.readyState === 'complete') {
-                setTimeout(dismissPreloader, 150);
-            } else {
-                window.addEventListener('load', dismissPreloader);
-                // Safety net fallback so user is NEVER blocked by slow external resources
-                setTimeout(dismissPreloader, 2200);
+            // Step 1: Update status to indicate Cloudflare network handshake
+            updatePreloaderStatus('Connecting to CapZone Studio Security Network...');
+
+            // Step 2: Check for Turnstile readiness
+            function checkTurnstileReadiness() {
+                if (dismissed) return;
+
+                // If already verified (tick complete & backend validated)
+                if (window.isRobotVerified || window.turnstileLoginToken) {
+                    updatePreloaderStatus('Security Verified. Opening CapZone Studio...', 'fa-solid fa-circle-check text-emerald-400 text-[11px]');
+                    setTimeout(function() { window.dismissPreloader('verified'); }, 200);
+                    return;
+                }
+
+                // If Cloudflare Turnstile iframe has established its network and loaded into container
+                var container = document.getElementById('cfTurnstileLogin');
+                if (container && container.querySelector('iframe')) {
+                    updatePreloaderStatus('Cloudflare Security Network Initialized...', 'fa-solid fa-shield-halved text-cyan-400 text-[11px]');
+                    // Give auto-tick 450ms to finish verification, or dismiss so user can interact
+                    setTimeout(function() {
+                        if (!dismissed) {
+                            window.dismissPreloader('iframe_ready');
+                        }
+                    }, 450);
+                }
             }
+
+            var checkTimer = setInterval(function() {
+                checkTurnstileReadiness();
+                if (dismissed) clearInterval(checkTimer);
+            }, 100);
+
+            // Hook into Turnstile API ready event
+            if (typeof turnstile !== 'undefined' && turnstile.ready) {
+                try {
+                    turnstile.ready(function() {
+                        updatePreloaderStatus('Cloudflare Security Network Initialized...');
+                        checkTurnstileReadiness();
+                    });
+                } catch(e) {}
+            }
+
+            // Fallback safety timeout (4s) so slow networks / blocked CDNs never trap user
+            setTimeout(function() {
+                if (!dismissed) {
+                    window.dismissPreloader('safety_timeout');
+                }
+            }, 4000);
         })();
     </script>
 </body>
