@@ -1751,40 +1751,44 @@
         </button>
       </form>
 
-      <!-- SRT PROGRESS CARD (Matches screenshot exactly) -->
-      <div id="srtProgressCard" class="mt-6 p-6 sm:p-7 rounded-2xl bg-[#141416] border border-white/10 shadow-2xl relative overflow-hidden"
+      <!-- SRT PROGRESS CARD (Brand Purple Theme with All Done Flow) -->
+      <div id="srtProgressCard" class="mt-6 p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#161226]/95 via-[#0e0c18]/95 to-[#090810] border border-purple-500/30 shadow-[0_20px_60px_rgba(147,51,234,0.18)] relative overflow-hidden backdrop-blur-2xl"
         style="display: none;">
         
-        <!-- Golden Mic Badge with Glow -->
-        <div class="mb-4 inline-block text-left">
-          <div class="w-12 h-12 rounded-2xl bg-[#ffbf00] flex items-center justify-center text-slate-950 shadow-[0_0_24px_rgba(255,191,0,0.35)]">
-            <svg class="w-6 h-6 fill-slate-950" viewBox="0 0 24 24">
+        <!-- Ambient Purple & Violet Background Glows -->
+        <div class="absolute -top-16 -right-16 w-44 h-44 bg-purple-600/25 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-16 -left-16 w-44 h-44 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Glowing Purple Badge & API Type -->
+        <div class="mb-4 flex items-center justify-between relative z-10">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(168,85,247,0.5)] border border-purple-400/30">
+            <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24">
               <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/>
               <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z"/>
             </svg>
           </div>
+          <span id="apiStatusBadge" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border"></span>
         </div>
 
         <!-- Heading & Subtitle -->
-        <div class="flex items-center gap-3 mb-1">
-          <h3 class="text-xl sm:text-2xl font-bold text-white tracking-tight text-left">Generating captions...</h3>
-          <span id="apiStatusBadge" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border"></span>
+        <div class="relative z-10 mb-1">
+          <h3 id="srtProgressTitle" class="text-xl sm:text-2xl font-black text-white tracking-tight text-left">Generating captions...</h3>
         </div>
-        <p class="text-xs sm:text-sm text-zinc-400 mb-6 font-normal text-left">Sent securely, then deleted. Nothing is stored on our servers.</p>
+        <p id="srtProgressSubtitle" class="text-xs sm:text-sm text-purple-200/60 mb-6 font-normal text-left relative z-10">Sent securely, then deleted. Nothing is stored on our servers.</p>
 
-        <!-- Progress Line Bar -->
-        <div class="w-full bg-[#27272a] h-1.5 rounded-full overflow-hidden mb-2.5">
+        <!-- Purple Gradient Progress Line Bar -->
+        <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-2.5 border border-white/5 relative z-10">
           <div id="srtProgressBar"
-            class="bg-[#eab308] h-full rounded-full transition-all duration-300"
+            class="bg-gradient-to-r from-purple-600 via-indigo-500 to-purple-400 h-full rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.6)]"
             style="width: 0%">
           </div>
         </div>
 
         <!-- Percentage Display -->
-        <div id="srtProgressPct" class="text-xs font-bold text-[#eab308] mb-6 text-left tracking-wide">0%</div>
+        <div id="srtProgressPct" class="text-xs font-black text-purple-400 mb-6 text-left tracking-wider relative z-10">0%</div>
 
-        <!-- 4-Item Steps Checklist -->
-        <div class="space-y-4 mb-7 text-left">
+        <!-- 5-Item Steps Checklist -->
+        <div class="space-y-4 mb-7 text-left relative z-10">
           <!-- Step 1: Separating audio -->
           <div id="stepSeparatingAudio" class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
@@ -1811,13 +1815,13 @@
           <div id="stepGeneratingCaptions" class="transition-all">
             <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
               <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
-                <svg class="w-4 h-4 text-amber-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="w-4 h-4 text-purple-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
                 </svg>
               </span>
               <span class="step-label">Generating captions</span>
             </div>
-            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">0 of 4 parts done</div>
+            <div id="srtPartsCount" class="text-xs text-purple-300/70 ml-8 mt-1 font-normal">0 of 4 parts done</div>
           </div>
 
           <!-- Step 4: Aligning word timing -->
@@ -1827,17 +1831,30 @@
             </span>
             <span class="step-label">Aligning word timing</span>
           </div>
+
+          <!-- Step 5: All done -->
+          <div id="stepAllDone" class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
+            <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
+              <div class="w-4 h-4 rounded-full border border-zinc-600"></div>
+            </span>
+            <span class="step-label">All done</span>
+          </div>
         </div>
 
         <!-- Hidden compatibility status text -->
         <span id="srtStatusText" class="sr-only">Processing...</span>
 
-        <!-- Cancel Import Button -->
-        <div class="text-left">
+        <!-- Action Buttons (Cancel / Direct Download) -->
+        <div class="flex items-center justify-between gap-3 pt-2 relative z-10">
           <button type="button" id="srtCancelBtn" onclick="cancelSrtGeneration()"
-            class="px-5 py-2.5 rounded-xl border border-zinc-700 bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white text-xs font-semibold transition-all">
+            class="px-5 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white text-xs font-semibold transition-all">
             Cancel import
           </button>
+          <a id="srtDirectDownloadCardBtn" style="display: none;"
+            class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-[0_0_25px_rgba(168,85,247,0.5)] transition-all flex items-center gap-2 cursor-pointer">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span>Download .SRT</span>
+          </a>
         </div>
       </div>
 
@@ -2491,7 +2508,10 @@
         document.body.classList.remove('overflow-hidden');
         // Auto-reset forms and specific UI states on close
         const forms = modal.querySelectorAll('form');
-        forms.forEach(f => f.reset());
+        forms.forEach(f => {
+          f.reset();
+          f.style.display = 'block';
+        });
         const fileLabels = modal.querySelectorAll('p[id$="FileName"]');
         fileLabels.forEach(l => {
           if (l.id === 'srtFileName') l.textContent = 'Click to Browse Media';
@@ -2500,10 +2520,14 @@
         });
         const progressCards = modal.querySelectorAll('[id$="ProgressCard"]');
         progressCards.forEach(c => c.style.display = 'none');
+        const cancelBtn = modal.querySelector('#srtCancelBtn');
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+        const cardDlBtn = modal.querySelector('#srtDirectDownloadCardBtn');
+        if (cardDlBtn) cardDlBtn.style.display = 'none';
         const resultAreas = modal.querySelectorAll('[id$="ResultArea"]');
         resultAreas.forEach(c => c.style.display = 'none');
         // Re-enable submit buttons just in case
-        const buttons = modal.querySelectorAll('button[type="submit"]');
+        const buttons = modal.querySelectorAll('button[type="submit"], #srtSubmitBtn');
         buttons.forEach(b => b.disabled = false);
       }
     };
@@ -2575,10 +2599,22 @@
       if (bar) bar.style.width = pct + '%';
       
       const pctEl = document.getElementById('srtProgressPct');
-      if (pctEl) pctEl.innerText = pct + '%';
+      if (pctEl) {
+        pctEl.innerText = activeStep >= 5 ? '100% Completed' : (pct + '%');
+      }
+
+      const titleEl = document.getElementById('srtProgressTitle');
+      const subtitleEl = document.getElementById('srtProgressSubtitle');
+      if (activeStep >= 5) {
+        if (titleEl) titleEl.innerHTML = 'All done! 🎉';
+        if (subtitleEl) subtitleEl.innerText = 'Subtitles generated successfully! Starting download...';
+      } else {
+        if (titleEl && titleEl.innerHTML.includes('All done')) titleEl.innerHTML = 'Generating captions...';
+        if (subtitleEl && subtitleEl.innerText.includes('Subtitles generated')) subtitleEl.innerText = 'Sent securely, then deleted. Nothing is stored on our servers.';
+      }
 
       const checkIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></span>`;
-      const spinIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><svg class="w-4 h-4 text-amber-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>`;
+      const spinIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><svg class="w-4 h-4 text-purple-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span>`;
       const pendingIcon = `<span class="step-icon flex items-center justify-center w-5 h-5 shrink-0"><div class="w-4 h-4 rounded-full border border-zinc-600"></div></span>`;
 
       // Step 1: Separating audio
@@ -2620,14 +2656,14 @@
             <div class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium">
               ${checkIcon}<span class="step-label">Generating captions</span>
             </div>
-            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">${partText}</div>
+            <div id="srtPartsCount" class="text-xs text-purple-300/70 ml-8 mt-1 font-normal">${partText}</div>
           `;
         } else if (activeStep === 3) {
           s3.innerHTML = `
             <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
               ${spinIcon}<span class="step-label">Generating captions</span>
             </div>
-            <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">${partText}</div>
+            <div id="srtPartsCount" class="text-xs text-purple-300/70 ml-8 mt-1 font-normal">${partText}</div>
           `;
         } else {
           s3.innerHTML = `
@@ -2653,6 +2689,26 @@
           s4.innerHTML = `${pendingIcon}<span class="step-label">Aligning word timing</span>`;
         }
       }
+
+      // Step 5: All done
+      const s5 = document.getElementById('stepAllDone');
+      if (s5) {
+        if (activeStep >= 5) {
+          s5.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-300 font-bold transition-all';
+          s5.innerHTML = `${checkIcon}<span class="step-label text-white">All done</span>`;
+        } else {
+          s5.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
+          s5.innerHTML = `${pendingIcon}<span class="step-label">All done</span>`;
+        }
+      }
+
+      // Buttons toggle on completion
+      const cancelBtn = document.getElementById('srtCancelBtn');
+      const cardDlBtn = document.getElementById('srtDirectDownloadCardBtn');
+      if (activeStep >= 5) {
+        if (cancelBtn) cancelBtn.style.display = 'none';
+        if (cardDlBtn) cardDlBtn.style.display = 'inline-flex';
+      }
     }
     window.updateSrtStepUI = updateSrtStepUI;
 
@@ -2670,6 +2726,10 @@
       }
       const progressCard = document.getElementById('srtProgressCard');
       if (progressCard) progressCard.style.display = 'none';
+      const cancelBtn = document.getElementById('srtCancelBtn');
+      if (cancelBtn) cancelBtn.style.display = 'inline-block';
+      const cardDlBtn = document.getElementById('srtDirectDownloadCardBtn');
+      if (cardDlBtn) cardDlBtn.style.display = 'none';
       const srtForm = document.getElementById('srtForm');
       if (srtForm) srtForm.style.display = 'block';
       const submitBtn = document.getElementById('srtSubmitBtn');
@@ -2825,22 +2885,14 @@
                   window.renderSrtResult(data.data);
                 }
               } else {
-                document.getElementById(stepsPrefix + 'ProgressCard').style.display = 'none';
-                document.getElementById(stepsPrefix + 'ResultArea').style.display = 'none';
-                document.getElementById('srtForm').style.display = 'block';
-                const submitBtn = document.getElementById('srtSubmitBtn');
-                if (submitBtn) submitBtn.disabled = false;
-                const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
-                if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
-                clearInterval(animInterval);
-                eventSource.close();
-                if (typeof window.showDeveloperWarning === 'function') {
-                  window.showDeveloperWarning('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
-                } else {
-                  showPopup('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304', 'දැනුම්දීමයි / Warning', 'warning');
+                // If data was not embedded, try polling immediately
+                if (typeof window.renderSrtResult === 'function' && window._lastPollResult) {
+                  window.renderSrtResult(window._lastPollResult);
                 }
-                return;
               }
+              clearInterval(animInterval);
+              try { eventSource.close(); } catch(e){}
+              return;
             }
 
             document.getElementById(stepsPrefix + 'ResultArea').style.display = 'flex';
@@ -3390,15 +3442,6 @@
           submitBtn.disabled = false;
           if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
           showPopup('Script generated successfully with KaveezCloud AI!', 'Success', 'success');
-
-          if (typeof window.saveToRecentProjects === 'function') {
-            window.saveToRecentProjects({
-              type: 'Script',
-              title: topic,
-              metadata: format,
-              payload: { topic, format, scriptText }
-            });
-          }
         }, 400);
 
       } catch (err) {
@@ -3543,6 +3586,16 @@
       document.getElementById('srtForm').style.display = 'none';
       const progressCard = document.getElementById('srtProgressCard');
       progressCard.style.display = 'block';
+
+      // Reset card elements for fresh generation
+      const cancelBtnInit = document.getElementById('srtCancelBtn');
+      if (cancelBtnInit) cancelBtnInit.style.display = 'inline-block';
+      const cardDlBtnInit = document.getElementById('srtDirectDownloadCardBtn');
+      if (cardDlBtnInit) cardDlBtnInit.style.display = 'none';
+      const progressTitleInit = document.getElementById('srtProgressTitle');
+      if (progressTitleInit) progressTitleInit.innerText = 'Generating captions...';
+      const progressSubtitleInit = document.getElementById('srtProgressSubtitle');
+      if (progressSubtitleInit) progressSubtitleInit.innerText = 'Sent securely, then deleted. Nothing is stored on our servers.';
       
       const badge = document.getElementById('apiStatusBadge');
       if (badge) {
@@ -3601,6 +3654,10 @@
       if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
 
       function renderSrtResult(data) {
+        if (window._isSrtRenderedNow) return;
+        window._isSrtRenderedNow = true;
+        setTimeout(() => { window._isSrtRenderedNow = false; }, 4000);
+
         if (!data || !data.srt || !data.srt.trim()) {
           if (es) { try { es.close(); } catch(e){} }
           document.getElementById('srtSubmitBtn').disabled = false;
@@ -3612,9 +3669,28 @@
           showDeveloperWarning('උපසිරැසි ජනනය කිරීම අසාර්ථක විය. නිවැරදි උපසිරැසි ගොනුවක් සෑදුනේ නැත. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304');
           return;
         }
+
         const srtName = currentSrtFile ? currentSrtFile.name : 'Subtitles';
         const lang = (data.language || (document.getElementById('srtLanguage')?.value === 'en' ? 'English' : 'Sinhala'));
         window.lastGeneratedSrtContent = data.srt;
+        const downloadFileName = `${(currentSrtFile ? currentSrtFile.name : 'subtitles').replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
+        const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+
+        // 1. Immediately activate Step 5: "All done" on the purple card
+        updateSrtStepUI(5, { percent: 100, partsText: '4 of 4 parts done' });
+
+        // Update direct download button on the card
+        const cardDlBtn = document.getElementById('srtDirectDownloadCardBtn');
+        if (cardDlBtn) {
+          cardDlBtn.href = blobUrl;
+          cardDlBtn.download = downloadFileName;
+          cardDlBtn.style.display = 'inline-flex';
+        }
+        const cancelBtn = document.getElementById('srtCancelBtn');
+        if (cancelBtn) cancelBtn.style.display = 'none';
+
+        // Save to Recent Projects
         window.saveToRecentProjects({
           type: 'Subtitle',
           title: srtName,
@@ -3623,49 +3699,59 @@
           payload: {
             srt: data.srt,
             language: lang,
-            filename: `${srtName.replace(/\.[^/.]+$/, "")}.srt`
+            filename: downloadFileName
           }
         });
-        const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
-        document.getElementById('srtDownloadLink').href = URL.createObjectURL(blob);
-        document.getElementById('srtDownloadLink').download = `${(currentSrtFile ? currentSrtFile.name : 'subtitles').replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
 
-        const resultSubtext = document.getElementById('srtResultSubtext');
-        if (resultSubtext) {
-          if (lang === 'English') {
-            resultSubtext.textContent = 'English subtitles generated successfully in standard UTF-8 format.';
-          } else {
-            resultSubtext.textContent = 'Sinhala subtitles generated successfully in FM-Abhaya legacy font format.';
-          }
+        // Set download link on result area as backup
+        const srtDlLink = document.getElementById('srtDownloadLink');
+        if (srtDlLink) {
+          srtDlLink.href = blobUrl;
+          srtDlLink.download = downloadFileName;
         }
 
-        document.getElementById('srtProgressBar').style.width = '100%';
-        const resultArea = document.getElementById('srtResultArea');
-        if (resultArea) resultArea.style.display = 'flex';
-        document.getElementById('srtProgressCard').style.display = 'none';
-        document.getElementById('srtSubmitBtn').disabled = false;
-        document.getElementById('srtForm').style.display = 'block';
-        const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
-        if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
-        if (window.lucide) lucide.createIcons();
+        // Close EventSource
+        if (es) { try { es.close(); } catch(e){} }
 
-        // Auto-redirect & smooth scroll user directly to the generated SRT results & download area
-        if (resultArea) {
-          setTimeout(() => {
-            resultArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            if (modalBox) {
-              modalBox.scrollTo({ top: resultArea.offsetTop - 30, behavior: 'smooth' });
-            }
-          }, 100);
-        }
-
-        // Update user balance and quota live across dashboard
+        // Update user balance / profile
         if (data.user) {
           window.currentUserData = data.user;
           window.updateUserProfileUI(data.user);
         } else if (typeof window.fetchUserProfile === 'function') {
           window.fetchUserProfile();
         }
+
+        // 2. Automatically trigger the file download
+        try {
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.style.display = 'none';
+          downloadAnchor.href = blobUrl;
+          downloadAnchor.download = downloadFileName;
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          setTimeout(() => { downloadAnchor.remove(); }, 300);
+        } catch (e) {
+          console.warn('Auto-download notice:', e);
+        }
+
+        // 3. Keep "All done!" displayed for 1.3 seconds, then smoothly close popup
+        setTimeout(() => {
+          window.closeModal('srtModal');
+
+          // Reset form ready for next subtitle task
+          document.getElementById('srtSubmitBtn').disabled = false;
+          document.getElementById('srtForm').style.display = 'block';
+          document.getElementById('srtProgressCard').style.display = 'none';
+          const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
+          if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
+
+          if (typeof showPopup === 'function') {
+            showPopup(`"${downloadFileName}" generated & downloaded successfully!`, 'All Done!', 'success');
+          }
+          if (typeof window.loadAndRenderProjects === 'function') {
+            window.loadAndRenderProjects(true);
+          }
+        }, 1300);
       }
       window.renderSrtResult = renderSrtResult;
 
@@ -3753,6 +3839,7 @@
                   isPollDone = true;
                   clearInterval(pollInterval);
                   if (es) { try { es.close(); } catch(e){} }
+                  window._lastPollResult = pData.data;
                   renderSrtResult(pData.data);
                 } else if (pData.status === 'error') {
                   isPollDone = true;
@@ -4679,26 +4766,37 @@
           const mergedMap = new Map();
           fetchedProjects.forEach(p => {
             const item = Object.assign({}, p);
+            item.synced = true;
             if (item.payload && typeof item.payload === 'string') {
               try { item.payload = JSON.parse(item.payload); } catch(e){}
             }
             mergedMap.set(String(item.id), item);
           });
+
           const unsyncedProjects = [];
           localCached.forEach(p => {
-            if (!mergedMap.has(String(p.id))) {
+            const alreadyOnServer = mergedMap.has(String(p.id)) || 
+              fetchedProjects.some(sp => sp.type === p.type && (sp.title || '').trim().toLowerCase() === (p.title || '').trim().toLowerCase());
+            if (!alreadyOnServer && !p.synced) {
+              p.synced = true; // Guard against rapid loops
               mergedMap.set(String(p.id), p);
               unsyncedProjects.push(p);
             }
           });
 
-          // Upload any unsynced local projects to server so other devices see them
+          // Upload any truly unsynced local projects to server so other devices see them
           if (unsyncedProjects.length > 0) {
             unsyncedProjects.forEach(up => {
               fetch(`${API_BASE_URL}/api/user-projects`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'x-user-email': email },
                 body: JSON.stringify(up)
+              }).then(r => r.json()).then(data => {
+                if (data && data.id) {
+                  up.id = data.id;
+                  up.synced = true;
+                  localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+                }
               }).catch(() => {});
             });
           }
@@ -4791,6 +4889,7 @@
         const colorClass = colors[displayType] || 'bg-slate-500/20 text-slate-300 border-slate-500/30';
         const formattedMedia = window.formatMediaUrl(p.media_url);
         const hasThumb = (p.type === 'Image' || p.type === 'Background') && formattedMedia;
+        const timeStr = formatTimeAgo(p.date);
 
         let thumbnailHtml = '';
         if (hasThumb) {
@@ -4833,10 +4932,13 @@
               </div>
             </div>
 
-            <!-- Action Buttons (Visible for quick preview & actions) -->
+            <!-- Action Buttons (Visible for quick preview, download & actions) -->
             <div class="flex items-center gap-1 flex-shrink-0">
+              <button onclick="event.stopPropagation(); window.downloadProjectMedia('${p.id}')" title="Download Media / File" class="p-1.5 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/25 text-emerald-400 hover:text-emerald-300 border border-emerald-500/20 transition-colors active:scale-90" aria-label="Download">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+              </button>
               <button onclick="event.stopPropagation(); window.openProjectDetailsModal('${p.id}')" title="Preview Project" class="p-1.5 rounded-lg bg-white/5 hover:bg-indigo-500/20 text-indigo-300 hover:text-white transition-colors active:scale-90" aria-label="Preview">
-                <i data-lucide="eye" class="w-4 h-4"></i>
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
               </button>
               <button onclick="event.stopPropagation(); window.reEditProject('${p.id}')" title="Re-Edit in Studio" class="p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white transition-colors active:scale-90 hidden sm:inline-flex">
                 <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
@@ -5123,12 +5225,44 @@
         try { payload = typeof p.payload === 'string' ? JSON.parse(p.payload) : p.payload; } catch (e) { }
       }
 
+      // 1. Direct instant text download for Subtitles
+      if ((p.type === 'Subtitle' || (p.metadata && p.metadata.includes('Subtitles'))) && payload && payload.srt) {
+        const blob = new Blob([payload.srt], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        let srtTitle = (p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_');
+        if (!srtTitle.toLowerCase().endsWith('.srt')) srtTitle += '.srt';
+        a.download = srtTitle;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 200);
+        if (typeof showPopup === 'function') showPopup('SRT Subtitles ගොනුව බාගත වීම ආරම්භ විය!', 'බාගත කිරීම සාර්ථකයි', 'success');
+        return;
+      }
+
+      // 2. Direct instant text download for Scripts
+      if (p.type === 'Script' && payload && payload.scriptText) {
+        const blob = new Blob([payload.scriptText], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        let scriptTitle = (p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_');
+        if (!scriptTitle.toLowerCase().endsWith('.txt')) scriptTitle += '.txt';
+        a.download = scriptTitle;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 200);
+        if (typeof showPopup === 'function') showPopup('AI Script ගොනුව බාගත වීම ආරම්භ විය!', 'බාගත කිරීම සාර්ථකයි', 'success');
+        return;
+      }
+
+      // 3. Media files (MP4 Video, MP3 Audio, PNG Background, JPG Image, SRT)
       const formattedMedia = window.formatMediaUrl(p.media_url);
       if (formattedMedia) {
         let ext = '.mp4';
         if (p.type === 'Background' || (formattedMedia && formattedMedia.endsWith('.png'))) ext = '.png';
         else if (p.type === 'Image' || (formattedMedia && (formattedMedia.endsWith('.jpg') || formattedMedia.endsWith('.jpeg')))) ext = '.jpg';
-        else if (p.type === 'Audio' || (formattedMedia && formattedMedia.endsWith('.mp3'))) ext = '.mp3';
+        else if (p.type === 'Audio' || (formattedMedia && formattedMedia.endsWith('.mp3')) || (p.metadata && p.metadata.includes('MP3'))) ext = '.mp3';
+        else if (p.type === 'Subtitle' || (formattedMedia && formattedMedia.endsWith('.srt'))) ext = '.srt';
 
         let cleanTitle = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
         if (!cleanTitle.toLowerCase().endsWith(ext)) cleanTitle += ext;
@@ -5136,7 +5270,11 @@
         fetch(formattedMedia)
           .then(res => res.blob())
           .then(blob => {
-            const mimeType = ext === '.png' ? 'image/png' : (ext === '.mp3' ? 'audio/mpeg' : (ext === '.jpg' ? 'image/jpeg' : 'video/mp4'));
+            const mimeType = ext === '.png' ? 'image/png' 
+                          : ext === '.mp3' ? 'audio/mpeg' 
+                          : ext === '.jpg' ? 'image/jpeg' 
+                          : ext === '.srt' ? 'text/plain' 
+                          : 'video/mp4';
             const typedBlob = new Blob([blob], { type: mimeType });
             const blobUrl = URL.createObjectURL(typedBlob);
             const a = document.createElement('a');
@@ -5148,6 +5286,7 @@
               URL.revokeObjectURL(blobUrl);
               a.remove();
             }, 200);
+            if (typeof showPopup === 'function') showPopup('ගොනුව සාර්ථකව බාගත වෙමින් පවතී!', 'Download Active', 'success');
           })
           .catch(() => {
             const a = document.createElement('a');
@@ -5157,22 +5296,6 @@
             a.click();
             a.remove();
           });
-      } else if (payload && payload.scriptText) {
-        const blob = new Blob([payload.scriptText], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `${(p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_')}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      } else if (payload && payload.srt) {
-        const blob = new Blob([payload.srt], { type: 'text/plain' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = `${(p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_')}.srt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
       } else {
         if (typeof showPopup === 'function') showPopup('බාගත කිරීමට File එකක් නොමැත.', 'තොරතුරු', 'info');
       }
