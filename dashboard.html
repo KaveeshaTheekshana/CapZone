@@ -392,12 +392,12 @@
       }
     });
 
-    // Polling engine: Checks server every 12 seconds with visibility guard
+    // Polling engine: Checks server every 45 seconds with visibility guard (smooth, low-overhead)
     setInterval(() => {
       if (document.visibilityState === 'visible' && typeof window.fetchUserProfile === 'function') {
         window.fetchUserProfile();
       }
-    }, 12000);
+    }, 45000);
 
     // Initial immediate fetch on page boot
     window.fetchUserProfile();
@@ -5627,10 +5627,10 @@
         window.loadAndRenderProjects();
       }
       setInterval(() => {
-        if (typeof window.loadAndRenderProjects === 'function') {
+        if (document.visibilityState === 'visible' && typeof window.loadAndRenderProjects === 'function') {
           window.loadAndRenderProjects();
         }
-      }, 10000);
+      }, 45000);
 
       // Show Notice Popup every time user opens dashboard
       setTimeout(() => {
