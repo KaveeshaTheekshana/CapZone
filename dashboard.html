@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <script>
-  
+
     window.API_BASE_URL = (function () {
       const h = window.location.hostname || '';
       if (!h || h === 'localhost' || h === '127.0.0.1') return '';
@@ -19,7 +19,7 @@
       return url.trim();
     };
 
-    // 🛡️ Cloudflare / CyberShield Human Verification Enforcement
+
     (function enforceHumanVerification() {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const isVerified = sessionStorage.getItem('capzone_robot_verified');
@@ -71,11 +71,13 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>CapZone | Video Editor Dashboard</title>
   <link rel="icon" href="data:,">
-  
+
   <!-- Modern Typography: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -146,7 +148,7 @@
       // 0. User Profile Identity (Full Name & Email)
       const uName = data.name || data.displayName || data.username || localStorage.getItem('capzone_user_name') || (data.email ? data.email.split('@')[0] : 'User');
       const uEmail = data.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || '';
-      
+
       const profileName = document.getElementById('profileName');
       if (profileName) profileName.textContent = uName;
       const navProfileName = document.getElementById('navProfileName');
@@ -296,6 +298,16 @@
           }).catch(() => null);
 
 
+          if (res && res.status === 404) {
+              if (typeof window.handleUserLogout === 'function') {
+                  window.handleUserLogout();
+              } else {
+                  localStorage.clear();
+                  window.location.href = 'login.html';
+              }
+              return;
+          }
+
           if (res && res.ok) {
             const data = await res.json();
             if (data && data.email) {
@@ -324,17 +336,17 @@
       syncChannel.onmessage = (event) => {
         console.log('⚡ Real-time sync update received from Admin:', event.data);
         const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
-        
+
         if (event.data && event.data.type === 'USER_DELETED') {
           const targetEmail = (event.data.email || '').toLowerCase().trim();
           if (targetEmail === curEmail) {
             localStorage.removeItem('capzone_projects_' + curEmail);
             localStorage.removeItem('capzone_cached_user_' + curEmail);
             if (typeof window.handleUserLogout === 'function') {
-                window.handleUserLogout();
+              window.handleUserLogout();
             } else {
-                localStorage.clear();
-                window.location.href = 'login.html';
+              localStorage.clear();
+              window.location.href = 'login.html';
             }
           }
         } else if (event.data && event.data.user) {
@@ -356,18 +368,18 @@
         try {
           const syncData = JSON.parse(e.newValue);
           const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
-          
+
           if (syncData && syncData.deleted) {
             const targetEmail = (syncData.email || '').toLowerCase().trim();
             if (targetEmail === curEmail) {
-                localStorage.removeItem('capzone_projects_' + curEmail);
-                localStorage.removeItem('capzone_cached_user_' + curEmail);
-                if (typeof window.handleUserLogout === 'function') {
-                    window.handleUserLogout();
-                } else {
-                    localStorage.clear();
-                    window.location.href = 'login.html';
-                }
+              localStorage.removeItem('capzone_projects_' + curEmail);
+              localStorage.removeItem('capzone_cached_user_' + curEmail);
+              if (typeof window.handleUserLogout === 'function') {
+                window.handleUserLogout();
+              } else {
+                localStorage.clear();
+                window.location.href = 'login.html';
+              }
             }
           } else if (syncData && syncData.user) {
             const targetEmail = (syncData.email || syncData.user.email || '').toLowerCase().trim();
@@ -675,6 +687,7 @@
 
     /* Mobile Ultra-Smooth 60FPS Performance Engine */
     @media (max-width: 1024px) {
+
       /* 1. Turn off expensive GPU backdrop blur on mobile to eliminate scroll stutter and frame drops */
       .glass-panel,
       .glass-card,
@@ -719,7 +732,8 @@
       }
 
       /* 3. Smooth Hardware Momentum Touch Scrolling */
-      html, body {
+      html,
+      body {
         -webkit-overflow-scrolling: touch !important;
         overscroll-behavior-y: none;
       }
@@ -822,7 +836,8 @@
           class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
           <i data-lucide="wallet" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white"></i>
         </div>
-        <span class="text-[10px] sm:text-xs font-bold text-emerald-300 tracking-wider" id="navWalletText">Rs. 0.00</span>
+        <span class="text-[10px] sm:text-xs font-bold text-emerald-300 tracking-wider" id="navWalletText">Rs.
+          0.00</span>
         <span
           class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider hidden md:inline"
           id="navPlanTag">Pay-Per-Video</span>
@@ -947,30 +962,37 @@
     <div id="studioMainArea" class="flex-1 flex flex-col gap-6 lg:gap-8 min-w-0 order-1 lg:order-2">
 
       <!-- Desktop Hero Section (Hidden on Mobile) -->
-      <section class="hidden md:flex rounded-3xl bg-hero-gradient p-1 relative overflow-hidden shadow-2xl shadow-brand-purple/20 group h-[340px]">
+      <section
+        class="hidden md:flex rounded-3xl bg-hero-gradient p-1 relative overflow-hidden shadow-2xl shadow-brand-purple/20 group h-[340px]">
         <div class="absolute inset-1 rounded-[22px] glass-panel bg-opacity-20 z-0 pointer-events-none"></div>
-        
-        <div class="relative z-10 flex w-full rounded-[22px] overflow-hidden bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
+
+        <div
+          class="relative z-10 flex w-full rounded-[22px] overflow-hidden bg-[url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center">
           <div class="absolute inset-0 bg-gradient-to-r from-[#06080F] via-[#06080F]/90 to-transparent"></div>
-          
+
           <div class="relative z-10 flex flex-col justify-center p-12 w-2/3">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold w-max mb-6">
+            <div
+              class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 text-xs font-bold w-max mb-6">
               <span class="relative flex h-2 w-2">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+                <span
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
                 <span class="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
               </span>
               KaveezCloud Engine Active
             </div>
-            
-            <h2 class="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 tracking-tight leading-tight">
-              Create Magical Content <br/>
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">At Light Speed.</span>
+
+            <h2
+              class="text-4xl lg:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 mb-4 tracking-tight leading-tight">
+              Create Magical Content <br />
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">At Light
+                Speed.</span>
             </h2>
-            
+
             <p class="text-gray-400 text-base max-w-lg mb-8 leading-relaxed">
-              Your all-in-one powerhouse. Generate perfectly synced subtitles, download high-res media, and remove backgrounds with zero lag.
+              Your all-in-one powerhouse. Generate perfectly synced subtitles, download high-res media, and remove
+              backgrounds with zero lag.
             </p>
-            
+
             <div class="flex flex-wrap items-center gap-3 sm:gap-4">
               <button onclick="openToolWithIntercept('srtModal', event)"
                 class="px-7 py-3.5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 rounded-xl text-white font-bold shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transition-all flex items-center gap-2 transform hover:-translate-y-1 cursor-pointer">
@@ -996,11 +1018,12 @@
             <h2 class="text-2xl font-black text-white tracking-tight">Hi, Creator 👋</h2>
             <p class="text-xs text-gray-400 mt-1">What are we creating today?</p>
           </div>
-          <div class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center">
+          <div
+            class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center">
             <i data-lucide="sparkles" class="w-6 h-6 text-indigo-400"></i>
           </div>
         </div>
-        
+
         <!-- Mobile Action Buttons (PC Style: Auto Subtitles & Video Edit) -->
         <div class="grid grid-cols-2 gap-2.5 mt-3">
           <button onclick="openToolWithIntercept('srtModal', event)"
@@ -1045,17 +1068,21 @@
       </div>
 
       <section id="studioGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6">
-        
+
         <!-- 1. AUTO SUBTITLES (Mobile Only card) -->
-        <article class="md:hidden glass-panel rounded-3xl p-5 flex flex-col hover:border-indigo-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/10 shadow-lg"
+        <article
+          class="md:hidden glass-panel rounded-3xl p-5 flex flex-col hover:border-indigo-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/10 shadow-lg"
           onclick="openToolWithIntercept('srtModal', event)">
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.2)]">
+            <div
+              class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-purple-500/10 border border-indigo-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.2)]">
               <i data-lucide="subtitles" class="w-7 h-7 text-indigo-400"></i>
             </div>
             <div class="flex-1">
-              <span class="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mb-1 inline-block">AUTO SYNC</span>
+              <span
+                class="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30 mb-1 inline-block">AUTO
+                SYNC</span>
               <h3 class="text-base font-bold text-white">Auto Subtitles</h3>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500"></i>
@@ -1063,15 +1090,19 @@
         </article>
 
         <!-- 1.5. VIDEO EDIT (Mobile Only card) -->
-        <article class="md:hidden glass-panel rounded-3xl p-5 flex flex-col hover:border-cyan-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/10 shadow-lg"
+        <article
+          class="md:hidden glass-panel rounded-3xl p-5 flex flex-col hover:border-cyan-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/10 shadow-lg"
           onclick="openVideoEditDevModal(event)">
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-500 to-blue-500"></div>
           <div class="flex items-center gap-4">
-            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.2)]">
+            <div
+              class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/10 border border-cyan-500/30 flex items-center justify-center shadow-[0_0_20px_rgba(6,182,212,0.2)]">
               <i data-lucide="video" class="w-7 h-7 text-cyan-400"></i>
             </div>
             <div class="flex-1">
-              <span class="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 mb-1 inline-block">COMING SOON</span>
+              <span
+                class="text-[9px] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 mb-1 inline-block">COMING
+                SOON</span>
               <h3 class="text-base font-bold text-white">Video Edit</h3>
             </div>
             <i data-lucide="chevron-right" class="w-5 h-5 text-gray-500"></i>
@@ -1079,75 +1110,109 @@
         </article>
 
         <!-- 2. FACEBOOK DOWNLOADER -->
-        <article class="glass-panel h-full rounded-3xl p-1 flex flex-col hover:border-blue-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/5 shadow-lg hover:shadow-[0_15px_35px_rgba(59,130,246,0.15)] hover:-translate-y-1"
+        <article
+          class="glass-panel h-full rounded-3xl p-1 flex flex-col hover:border-blue-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/5 shadow-lg hover:shadow-[0_15px_35px_rgba(59,130,246,0.15)] hover:-translate-y-1"
           onclick="openToolWithIntercept('fbModal', event)">
-          <div class="bg-[#0b0f19] h-full w-full rounded-[20px] p-5 md:p-6 flex flex-col relative z-10 border border-white/5">
-            <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-600 to-cyan-400 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            
-            <div class="flex items-center justify-between mb-4 md:mb-6">
-              <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-sky-500/10 border border-blue-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
-                <svg class="w-6 h-6 md:w-7 md:h-7 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10.05 10.05 0 008.44-9.9c0-5.54-4.5-10.02-10-10.02z" />
-                </svg>
-              </div>
-              <span class="text-[9px] md:text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">HD 4K + MP3</span>
+          <div
+            class="bg-[#0b0f19] h-full w-full rounded-[20px] p-5 md:p-6 flex flex-col relative z-10 border border-white/5">
+            <div
+              class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-600 to-cyan-400 opacity-50 group-hover:opacity-100 transition-opacity">
             </div>
 
-            <h3 class="text-lg md:text-xl font-bold text-white mb-2 md:mb-3 group-hover:text-blue-400 transition-colors">FB Video Saver</h3>
+            <div class="flex items-center justify-between mb-4 md:mb-6">
+              <div
+                class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-sky-500/10 border border-blue-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                <svg class="w-6 h-6 md:w-7 md:h-7 text-blue-400" viewBox="0 0 24 24" fill="currentColor">
+                  <path
+                    d="M12 2.04c-5.5 0-10 4.48-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10.05 10.05 0 008.44-9.9c0-5.54-4.5-10.02-10-10.02z" />
+                </svg>
+              </div>
+              <span
+                class="text-[9px] md:text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">HD
+                4K + MP3</span>
+            </div>
+
+            <h3
+              class="text-lg md:text-xl font-bold text-white mb-2 md:mb-3 group-hover:text-blue-400 transition-colors">
+              FB Video Saver</h3>
             <p class="text-xs md:text-sm text-gray-400 leading-relaxed mb-6 md:mb-8 flex-1">
               Download 1080p/4K Facebook reels and extract crystal-clear MP3 audio instantly.
             </p>
 
-            <button type="button" class="w-full py-3 md:py-3.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 font-bold text-xs md:text-sm transition-all flex items-center justify-center gap-2 group-hover:border-blue-500/50">
-              Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            <button type="button"
+              class="w-full py-3 md:py-3.5 rounded-xl bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 text-blue-400 font-bold text-xs md:text-sm transition-all flex items-center justify-center gap-2 group-hover:border-blue-500/50">
+              Launch Tool <i data-lucide="arrow-right"
+                class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
             </button>
           </div>
         </article>
 
         <!-- 3. TIKTOK DOWNLOADER -->
-        <article class="glass-panel h-full rounded-3xl p-1 flex flex-col hover:border-purple-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/5 shadow-lg hover:shadow-[0_15px_35px_rgba(168,85,247,0.15)] hover:-translate-y-1"
+        <article
+          class="glass-panel h-full rounded-3xl p-1 flex flex-col hover:border-purple-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/5 shadow-lg hover:shadow-[0_15px_35px_rgba(168,85,247,0.15)] hover:-translate-y-1"
           onclick="openToolWithIntercept('tiktokModal', event)">
-          <div class="bg-[#0b0f19] h-full w-full rounded-[20px] p-5 md:p-6 flex flex-col relative z-10 border border-white/5">
-            <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            
-            <div class="flex items-center justify-between mb-4 md:mb-6">
-              <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/10 border border-purple-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                <i data-lucide="music" class="w-6 h-6 md:w-7 md:h-7 text-purple-400"></i>
-              </div>
-              <span class="text-[9px] md:text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">NO WATERMARK</span>
+          <div
+            class="bg-[#0b0f19] h-full w-full rounded-[20px] p-5 md:p-6 flex flex-col relative z-10 border border-white/5">
+            <div
+              class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-pink-500 to-purple-500 opacity-50 group-hover:opacity-100 transition-opacity">
             </div>
 
-            <h3 class="text-lg md:text-xl font-bold text-white mb-2 md:mb-3 group-hover:text-purple-400 transition-colors">TikTok Saver</h3>
+            <div class="flex items-center justify-between mb-4 md:mb-6">
+              <div
+                class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-pink-500/20 to-purple-500/10 border border-purple-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(168,85,247,0.2)]">
+                <i data-lucide="music" class="w-6 h-6 md:w-7 md:h-7 text-purple-400"></i>
+              </div>
+              <span
+                class="text-[9px] md:text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-400 border border-purple-500/20">NO
+                WATERMARK</span>
+            </div>
+
+            <h3
+              class="text-lg md:text-xl font-bold text-white mb-2 md:mb-3 group-hover:text-purple-400 transition-colors">
+              TikTok Saver</h3>
             <p class="text-xs md:text-sm text-gray-400 leading-relaxed mb-6 md:mb-8 flex-1">
               Download watermark-free TikTok videos in original HD quality with high-bitrate MP3.
             </p>
 
-            <button type="button" class="w-full py-3 md:py-3.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-400 font-bold text-xs md:text-sm transition-all flex items-center justify-center gap-2 group-hover:border-purple-500/50">
-              Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            <button type="button"
+              class="w-full py-3 md:py-3.5 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 text-purple-400 font-bold text-xs md:text-sm transition-all flex items-center justify-center gap-2 group-hover:border-purple-500/50">
+              Launch Tool <i data-lucide="arrow-right"
+                class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
             </button>
           </div>
         </article>
 
         <!-- 4. BG REMOVER STUDIO -->
-        <article class="glass-panel h-full rounded-3xl p-1 flex flex-col hover:border-emerald-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/5 shadow-lg hover:shadow-[0_15px_35px_rgba(16,185,129,0.15)] hover:-translate-y-1"
+        <article
+          class="glass-panel h-full rounded-3xl p-1 flex flex-col hover:border-emerald-500/50 transition-all duration-300 group cursor-pointer relative overflow-hidden border border-white/5 shadow-lg hover:shadow-[0_15px_35px_rgba(16,185,129,0.15)] hover:-translate-y-1"
           onclick="openToolWithIntercept('bgRemoverModal', event)">
-          <div class="bg-[#0b0f19] h-full w-full rounded-[20px] p-5 md:p-6 flex flex-col relative z-10 border border-white/5">
-            <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-400 to-teal-400 opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            
-            <div class="flex items-center justify-between mb-4 md:mb-6">
-              <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                <i data-lucide="image-minus" class="w-6 h-6 md:w-7 md:h-7 text-emerald-400"></i>
-              </div>
-              <span class="text-[9px] md:text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">SMART CUTOUT</span>
+          <div
+            class="bg-[#0b0f19] h-full w-full rounded-[20px] p-5 md:p-6 flex flex-col relative z-10 border border-white/5">
+            <div
+              class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-400 to-teal-400 opacity-50 group-hover:opacity-100 transition-opacity">
             </div>
 
-            <h3 class="text-lg md:text-xl font-bold text-white mb-2 md:mb-3 group-hover:text-emerald-400 transition-colors">BG Remover</h3>
+            <div class="flex items-center justify-between mb-4 md:mb-6">
+              <div
+                class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-teal-500/10 border border-emerald-500/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]">
+                <i data-lucide="image-minus" class="w-6 h-6 md:w-7 md:h-7 text-emerald-400"></i>
+              </div>
+              <span
+                class="text-[9px] md:text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">SMART
+                CUTOUT</span>
+            </div>
+
+            <h3
+              class="text-lg md:text-xl font-bold text-white mb-2 md:mb-3 group-hover:text-emerald-400 transition-colors">
+              BG Remover</h3>
             <p class="text-xs md:text-sm text-gray-400 leading-relaxed mb-6 md:mb-8 flex-1">
               Instantly remove backgrounds from photos with precise AI edge detection.
             </p>
 
-            <button type="button" class="w-full py-3 md:py-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-bold text-xs md:text-sm transition-all flex items-center justify-center gap-2 group-hover:border-emerald-500/50">
-              Launch Tool <i data-lucide="arrow-right" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+            <button type="button"
+              class="w-full py-3 md:py-3.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-bold text-xs md:text-sm transition-all flex items-center justify-center gap-2 group-hover:border-emerald-500/50">
+              Launch Tool <i data-lucide="arrow-right"
+                class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
             </button>
           </div>
         </article>
@@ -1275,11 +1340,11 @@
           id="profileInitial">U</div>
         <div class="flex items-center justify-center gap-2">
           <h2 class="text-xl font-bold text-white tracking-tight" id="profileName">User</h2>
-          <span
-            id="profileStatusBadge"
+          <span id="profileStatusBadge"
             class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
         </div>
-        <p class="text-xs text-slate-400 mt-1.5 font-medium tracking-wide break-all select-all leading-normal max-w-[280px] mx-auto" id="profileEmail">user@example.com</p>
+        <p class="text-xs text-slate-400 mt-1.5 font-medium tracking-wide break-all select-all leading-normal max-w-[280px] mx-auto"
+          id="profileEmail">user@example.com</p>
       </div>
 
       <div class="space-y-4">
@@ -1693,7 +1758,8 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
           <div class="glass-panel p-4 rounded-2xl border border-white/5 bg-white/5">
             <label class="text-xs font-bold text-slate-300 mb-3 flex items-center justify-between">
-              <span class="flex items-center gap-1.5"><i data-lucide="languages" class="w-4 h-4 text-purple-400"></i> Target Language</span>
+              <span class="flex items-center gap-1.5"><i data-lucide="languages" class="w-4 h-4 text-purple-400"></i>
+                Target Language</span>
               <span id="srtLangBadge"
                 class="text-[10px] text-purple-300 font-semibold bg-purple-500/20 px-2 py-0.5 rounded-full border border-purple-500/30">Auto
                 Translate</span>
@@ -1713,7 +1779,9 @@
               <label class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                 <i data-lucide="list-ordered" class="w-4 h-4 text-blue-400"></i> Words Per Block
               </label>
-              <span id="selectedWordsBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold">1 Word</span>
+              <span id="selectedWordsBadge"
+                class="text-[10px] px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 font-semibold">1
+                Word</span>
             </div>
             <input type="hidden" id="srtWordsLimit" value="1" />
             <div class="grid grid-cols-4 gap-2" id="wordsLimitButtonGroup">
@@ -1752,29 +1820,37 @@
       </form>
 
       <!-- SRT PROGRESS CARD (Brand Purple Theme with All Done Flow) -->
-      <div id="srtProgressCard" class="mt-6 p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#161226]/95 via-[#0e0c18]/95 to-[#090810] border border-purple-500/30 shadow-[0_20px_60px_rgba(147,51,234,0.18)] relative overflow-hidden backdrop-blur-2xl"
+      <div id="srtProgressCard"
+        class="mt-6 p-6 sm:p-7 rounded-3xl bg-gradient-to-b from-[#161226]/95 via-[#0e0c18]/95 to-[#090810] border border-purple-500/30 shadow-[0_20px_60px_rgba(147,51,234,0.18)] relative overflow-hidden backdrop-blur-2xl"
         style="display: none;">
-        
+
         <!-- Ambient Purple & Violet Background Glows -->
-        <div class="absolute -top-16 -right-16 w-44 h-44 bg-purple-600/25 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-16 -left-16 w-44 h-44 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -top-16 -right-16 w-44 h-44 bg-purple-600/25 rounded-full blur-3xl pointer-events-none">
+        </div>
+        <div class="absolute -bottom-16 -left-16 w-44 h-44 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none">
+        </div>
 
         <!-- Glowing Purple Badge & API Type -->
         <div class="mb-4 flex items-center justify-between relative z-10">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(168,85,247,0.5)] border border-purple-400/30">
+          <div
+            class="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-[0_0_30px_rgba(168,85,247,0.5)] border border-purple-400/30">
             <svg class="w-6 h-6 fill-white" viewBox="0 0 24 24">
-              <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z"/>
-              <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z"/>
+              <path d="M12 1a4 4 0 0 0-4 4v7a4 4 0 0 0 8 0V5a4 4 0 0 0-4-4z" />
+              <path d="M19 10v2a7 7 0 0 1-14 0v-2H3v2a9 9 0 0 0 8 8.94V23h2v-2.06A9 9 0 0 0 21 12v-2h-2z" />
             </svg>
           </div>
-          <span id="apiStatusBadge" class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border"></span>
+          <span id="apiStatusBadge"
+            class="hidden px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border"></span>
         </div>
 
         <!-- Heading & Subtitle -->
         <div class="relative z-10 mb-1">
-          <h3 id="srtProgressTitle" class="text-xl sm:text-2xl font-black text-white tracking-tight text-left">Generating captions...</h3>
+          <h3 id="srtProgressTitle" class="text-xl sm:text-2xl font-black text-white tracking-tight text-left">
+            Generating captions...</h3>
         </div>
-        <p id="srtProgressSubtitle" class="text-xs sm:text-sm text-purple-200/60 mb-6 font-normal text-left relative z-10">Sent securely, then deleted. Nothing is stored on our servers.</p>
+        <p id="srtProgressSubtitle"
+          class="text-xs sm:text-sm text-purple-200/60 mb-6 font-normal text-left relative z-10">Sent securely, then
+          deleted. Nothing is stored on our servers.</p>
 
         <!-- Purple Gradient Progress Line Bar -->
         <div class="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-2.5 border border-white/5 relative z-10">
@@ -1785,14 +1861,17 @@
         </div>
 
         <!-- Percentage Display -->
-        <div id="srtProgressPct" class="text-xs font-black text-purple-400 mb-6 text-left tracking-wider relative z-10">0%</div>
+        <div id="srtProgressPct" class="text-xs font-black text-purple-400 mb-6 text-left tracking-wider relative z-10">
+          0%</div>
 
         <!-- 5-Item Steps Checklist -->
         <div class="space-y-4 mb-7 text-left relative z-10">
           <!-- Step 1: Separating audio -->
-          <div id="stepSeparatingAudio" class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
+          <div id="stepSeparatingAudio"
+            class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
-              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
@@ -1801,9 +1880,11 @@
           </div>
 
           <!-- Step 2: Uploading audio -->
-          <div id="stepUploadingAudio" class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
+          <div id="stepUploadingAudio"
+            class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
-              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <svg class="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
@@ -1815,8 +1896,10 @@
           <div id="stepGeneratingCaptions" class="transition-all">
             <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
               <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
-                <svg class="w-4 h-4 text-purple-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                <svg class="w-4 h-4 text-purple-400 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                  stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path
+                    d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                 </svg>
               </span>
               <span class="step-label">Generating captions</span>
@@ -1825,7 +1908,8 @@
           </div>
 
           <!-- Step 4: Aligning word timing -->
-          <div id="stepAligningTiming" class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
+          <div id="stepAligningTiming"
+            class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
               <div class="w-4 h-4 rounded-full border border-zinc-600"></div>
             </span>
@@ -1833,7 +1917,8 @@
           </div>
 
           <!-- Step 5: All done -->
-          <div id="stepAllDone" class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
+          <div id="stepAllDone"
+            class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
               <div class="w-4 h-4 rounded-full border border-zinc-600"></div>
             </span>
@@ -1845,18 +1930,30 @@
         <span id="srtStatusText" class="sr-only">Processing...</span>
 
         <!-- Celebratory Congratulations Box (Step 5 Done) -->
-        <div id="srtCelebrationContainer" class="mt-5 p-5 rounded-2xl bg-gradient-to-r from-purple-900/40 via-indigo-950/60 to-emerald-950/40 border border-purple-500/40 text-left relative z-10 shadow-2xl" style="display: none;">
+        <div id="srtCelebrationContainer"
+          class="mt-5 p-5 rounded-2xl bg-gradient-to-r from-purple-900/40 via-indigo-950/60 to-emerald-950/40 border border-purple-500/40 text-left relative z-10 shadow-2xl"
+          style="display: none;">
           <div class="flex items-center gap-2 mb-2 text-emerald-400 font-extrabold text-sm sm:text-base">
-            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            <svg class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2.5">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
             <span>🎉 සුබ පැතුම්! උපසිරැසි ගොනුව සාර්ථකව සූදානම්!</span>
           </div>
           <p class="text-xs text-purple-200/90 mb-3 leading-relaxed">
-            ඔබගේ වීඩියෝවට අදාළ සියලුම උපසිරැසි (Continuous Dialogue Verification) සාර්ථකව අවසන් කර ඇත. ගොනුව බාගත කර ගැනීමට පහත බොත්තම ඔබන්න.
+            ඔබගේ වීඩියෝවට අදාළ සියලුම උපසිරැසි (Continuous Dialogue Verification) සාර්ථකව අවසන් කර ඇත. ගොනුව බාගත කර
+            ගැනීමට පහත බොත්තම ඔබන්න.
           </p>
-          <div id="srtCelebrationDetails" class="bg-black/40 rounded-xl p-3 mb-4 border border-white/10 space-y-1.5"></div>
+          <div id="srtCelebrationDetails" class="bg-black/40 rounded-xl p-3 mb-4 border border-white/10 space-y-1.5">
+          </div>
           <button type="button" id="srtCelebrationDownloadBtn" onclick="window.downloadAndDismissSrtPopup()"
             class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-extrabold shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 cursor-pointer transform active:scale-95">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
             <span>📥 SRT බාගත කරන්න (Download SRT)</span>
           </button>
         </div>
@@ -1869,7 +1966,11 @@
           </button>
           <a id="srtDirectDownloadCardBtn" style="display: none;"
             class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-500 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-[0_0_25px_rgba(168,85,247,0.5)] transition-all flex items-center gap-2 cursor-pointer">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
             <span>Download .SRT</span>
           </a>
         </div>
@@ -2232,22 +2333,24 @@
         class="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex flex-col items-center gap-3"
         style="display: none;">
         <div class="w-full flex items-center justify-between px-1">
-          <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full">
+          <span
+            class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-1 rounded-full">
             <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Background Removed
           </span>
           <span id="imgResultMeta" class="text-[10px] text-slate-400 font-medium">Ready to download</span>
         </div>
-        
+
         <!-- Checkerboard Transparency Container -->
-        <div class="w-full rounded-xl overflow-hidden border border-white/10 relative flex items-center justify-center p-3 shadow-inner min-h-[160px]"
-             style="background-color: #1a202c; background-image: repeating-conic-gradient(#2d3748 0% 25%, #1a202c 0% 50%); background-size: 16px 16px;">
-          <img id="imgResultPreview" class="max-h-64 max-w-full rounded-lg object-contain drop-shadow-2xl transition-all duration-300" src="" alt="Background Removed Preview" />
+        <div
+          class="w-full rounded-xl overflow-hidden border border-white/10 relative flex items-center justify-center p-3 shadow-inner min-h-[160px]"
+          style="background-color: #1a202c; background-image: repeating-conic-gradient(#2d3748 0% 25%, #1a202c 0% 50%); background-size: 16px 16px;">
+          <img id="imgResultPreview"
+            class="max-h-64 max-w-full rounded-lg object-contain drop-shadow-2xl transition-all duration-300" src=""
+            alt="Background Removed Preview" />
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full mt-1">
-          <a id="imgDownloadLink"
-            href="#"
-            download="nobg_image.png"
+          <a id="imgDownloadLink" href="#" download="nobg_image.png"
             class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]">
             <i data-lucide="download" class="w-4 h-4"></i> Download Image
           </a>
@@ -2262,13 +2365,17 @@
 
   <div id="toastNotification"
     class="fixed top-5 left-1/2 -translate-x-1/2 sm:top-auto sm:left-auto sm:bottom-8 sm:right-8 sm:-translate-x-0 z-[200] transition-all duration-500 opacity-0 pointer-events-none transform -translate-y-10 sm:translate-y-10 scale-95 w-max max-w-[90vw]">
-    <div class="glass-panel px-5 py-3.5 rounded-2xl flex items-center gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-2xl bg-[#0b0f19]/90 ring-1 ring-white/5 relative overflow-hidden group">
+    <div
+      class="glass-panel px-5 py-3.5 rounded-2xl flex items-center gap-4 shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/10 backdrop-blur-2xl bg-[#0b0f19]/90 ring-1 ring-white/5 relative overflow-hidden group">
       <div class="absolute inset-0 bg-gradient-to-r from-white/5 to-transparent pointer-events-none"></div>
-      
-      <div id="toastIconContainer" class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner relative z-10">
+
+      <div id="toastIconContainer"
+        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 shadow-inner relative z-10">
         <i data-lucide="info" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-400 drop-shadow-md"></i>
       </div>
-      <span id="toastMessage" class="text-xs sm:text-[13px] font-bold text-white tracking-wide relative z-10 leading-snug pr-2">Notification Message</span>
+      <span id="toastMessage"
+        class="text-xs sm:text-[13px] font-bold text-white tracking-wide relative z-10 leading-snug pr-2">Notification
+        Message</span>
     </div>
   </div>
 
@@ -2276,13 +2383,15 @@
   <div id="developerWarningModal"
     class="fixed inset-0 z-[120] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
     style="display: none;">
-    <div class="glass-card w-full max-w-md rounded-3xl p-6 md:p-8 relative border border-amber-500/40 shadow-2xl text-center bg-slate-900/95">
+    <div
+      class="glass-card w-full max-w-md rounded-3xl p-6 md:p-8 relative border border-amber-500/40 shadow-2xl text-center bg-slate-900/95">
       <button onclick="document.getElementById('developerWarningModal').style.display='none'"
         class="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/10 p-2 rounded-full transition-colors z-10">
         <i data-lucide="x" class="w-4 h-4"></i>
       </button>
 
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4 shadow-lg shadow-amber-500/10">
+      <div
+        class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-4 shadow-lg shadow-amber-500/10">
         <i data-lucide="alert-triangle" class="w-8 h-8"></i>
       </div>
 
@@ -2293,7 +2402,8 @@
 
       <div class="p-4 rounded-2xl bg-slate-950/80 border border-slate-700/60 mb-6 flex flex-col items-center gap-2">
         <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Developer Contact / Hotline</span>
-        <a href="tel:0760246304" class="text-2xl font-black text-amber-400 tracking-wider hover:underline flex items-center gap-2">
+        <a href="tel:0760246304"
+          class="text-2xl font-black text-amber-400 tracking-wider hover:underline flex items-center gap-2">
           <i data-lucide="phone-call" class="w-5 h-5"></i> 0760246304
         </a>
       </div>
@@ -2303,7 +2413,8 @@
           class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2">
           <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
         </a>
-        <button onclick="navigator.clipboard.writeText('0760246304'); if (typeof showPopup === 'function') showPopup('0760246304 දුරකථන අංකය Copy විය!', 'Copied', 'success')"
+        <button
+          onclick="navigator.clipboard.writeText('0760246304'); if (typeof showPopup === 'function') showPopup('0760246304 දුරකථන අංකය Copy විය!', 'Copied', 'success')"
           class="flex-1 py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition-all border border-slate-700 flex items-center justify-center gap-2">
           <i data-lucide="copy" class="w-4 h-4"></i> Copy Number
         </button>
@@ -2548,7 +2659,7 @@
         buttons.forEach(b => b.disabled = false);
       }
     };
-    window.showDeveloperWarning = function(msg) {
+    window.showDeveloperWarning = function (msg) {
       let message = msg || 'පද්ධතියේ තාක්ෂණික දෝෂයක් ඇති විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
       const lower = String(message).toLowerCase();
       if (lower.includes('error') || lower.includes('failed') || lower.includes('http') || lower.includes('exception') || lower.includes('{') || lower.includes('fetch') || lower.includes('syntax')) {
@@ -2560,7 +2671,7 @@
       if (modal) {
         if (textEl) textEl.innerText = message;
         modal.style.display = 'flex';
-        try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch(e){}
+        try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
       }
     };
 
@@ -2611,10 +2722,10 @@
 
     function updateSrtStepUI(activeStep, options = {}) {
       const pct = options.percent !== undefined ? options.percent : (activeStep === 1 ? 15 : activeStep === 2 ? 35 : activeStep === 3 ? 65 : activeStep === 4 ? 92 : 100);
-      
+
       const bar = document.getElementById('srtProgressBar');
       if (bar) bar.style.width = pct + '%';
-      
+
       const pctEl = document.getElementById('srtProgressPct');
       if (pctEl) {
         pctEl.innerText = activeStep >= 5 ? '100% Completed' : (pct + '%');
@@ -2734,11 +2845,11 @@
 
     function cancelSrtGeneration() {
       if (window.currentSrtAbortController) {
-        try { window.currentSrtAbortController.abort(); } catch(e){}
+        try { window.currentSrtAbortController.abort(); } catch (e) { }
         window.currentSrtAbortController = null;
       }
       if (window.currentSrtEventSource) {
-        try { window.currentSrtEventSource.close(); } catch(e){}
+        try { window.currentSrtEventSource.close(); } catch (e) { }
         window.currentSrtEventSource = null;
       }
       const progressCard = document.getElementById('srtProgressCard');
@@ -2908,7 +3019,7 @@
                 }
               }
               clearInterval(animInterval);
-              try { eventSource.close(); } catch(e){}
+              try { eventSource.close(); } catch (e) { }
               return;
             }
 
@@ -3615,7 +3726,7 @@
       if (progressTitleInit) progressTitleInit.innerText = 'Generating captions...';
       const progressSubtitleInit = document.getElementById('srtProgressSubtitle');
       if (progressSubtitleInit) progressSubtitleInit.innerText = 'Sent securely, then deleted. Nothing is stored on our servers.';
-      
+
       const badge = document.getElementById('apiStatusBadge');
       if (badge) {
         const type = localStorage.getItem('capzone_api_type');
@@ -3653,7 +3764,7 @@
       }
 
       if (fileToUpload.size > 95 * 1024 * 1024) {
-        if (es) { try { es.close(); } catch(e){} }
+        if (es) { try { es.close(); } catch (e) { } }
         document.getElementById('srtSubmitBtn').disabled = false;
         document.getElementById('srtForm').style.display = 'block';
         document.getElementById('srtProgressCard').style.display = 'none';
@@ -3684,7 +3795,7 @@
         setTimeout(() => { window._isSrtRenderedNow = false; }, 4000);
 
         if (!data || !data.srt || !data.srt.trim()) {
-          if (es) { try { es.close(); } catch(e){} }
+          if (es) { try { es.close(); } catch (e) { } }
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
           document.getElementById('srtProgressCard').style.display = 'none';
@@ -3728,7 +3839,7 @@
         }
 
         // Close EventSource
-        if (es) { try { es.close(); } catch(e){} }
+        if (es) { try { es.close(); } catch (e) { } }
 
         // Update user balance / profile
         if (data.user) {
@@ -3835,8 +3946,8 @@
 
         if (!res.ok) {
           let errData = {};
-          try { errData = await res.json(); } catch(e){}
-          if (es) { try { es.close(); } catch(e){} }
+          try { errData = await res.json(); } catch (e) { }
+          if (es) { try { es.close(); } catch (e) { } }
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
           document.getElementById('srtProgressCard').style.display = 'none';
@@ -3876,7 +3987,7 @@
             if (pollCount > maxPolls) {
               isPollDone = true;
               clearInterval(pollInterval);
-              if (es) { try { es.close(); } catch(e){} }
+              if (es) { try { es.close(); } catch (e) { } }
               document.getElementById('srtSubmitBtn').disabled = false;
               document.getElementById('srtForm').style.display = 'block';
               document.getElementById('srtProgressCard').style.display = 'none';
@@ -3894,7 +4005,7 @@
                   if (!pData.data.srt || !pData.data.srt.trim()) {
                     isPollDone = true;
                     clearInterval(pollInterval);
-                    if (es) { try { es.close(); } catch(e){} }
+                    if (es) { try { es.close(); } catch (e) { } }
                     document.getElementById('srtSubmitBtn').disabled = false;
                     document.getElementById('srtForm').style.display = 'block';
                     document.getElementById('srtProgressCard').style.display = 'none';
@@ -3906,13 +4017,13 @@
                   }
                   isPollDone = true;
                   clearInterval(pollInterval);
-                  if (es) { try { es.close(); } catch(e){} }
+                  if (es) { try { es.close(); } catch (e) { } }
                   window._lastPollResult = pData.data;
                   renderSrtResult(pData.data);
                 } else if (pData.status === 'error') {
                   isPollDone = true;
                   clearInterval(pollInterval);
-                  if (es) { try { es.close(); } catch(e){} }
+                  if (es) { try { es.close(); } catch (e) { } }
                   document.getElementById('srtSubmitBtn').disabled = false;
                   document.getElementById('srtForm').style.display = 'block';
                   document.getElementById('srtProgressCard').style.display = 'none';
@@ -3927,16 +4038,16 @@
                   }
                 }
               }
-            } catch(e) {}
+            } catch (e) { }
           }, 3000);
           return;
         }
 
         if (data.srt && data.srt.trim()) {
-          if (es) { try { es.close(); } catch(e){} }
+          if (es) { try { es.close(); } catch (e) { } }
           renderSrtResult(data);
         } else if (data.code === 'INSUFFICIENT_BALANCE' || data.code === 'QUOTA_EXCEEDED' || data.code === 'NO_PACKAGE_ACTIVE' || data.error === 'NO_SUBSCRIPTION_ACTIVE') {
-          if (es) { try { es.close(); } catch(e){} }
+          if (es) { try { es.close(); } catch (e) { } }
           showPopup(data.error || 'Payment or subscription required.', 'Subscription Notice', 'warning');
           setTimeout(() => {
             const modal = document.getElementById('subscriptionModal');
@@ -3949,7 +4060,7 @@
           const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
           if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
         } else if (data.code === 'ACCOUNT_DEACTIVATED') {
-          if (es) { try { es.close(); } catch(e){} }
+          if (es) { try { es.close(); } catch (e) { } }
           showPopup(data.error || 'Your account is deactivated by administrator.', 'Account Blocked', 'error');
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
@@ -3958,7 +4069,7 @@
           const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
           if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
         } else {
-          if (es) { try { es.close(); } catch(e){} }
+          if (es) { try { es.close(); } catch (e) { } }
           document.getElementById('srtSubmitBtn').disabled = false;
           document.getElementById('srtForm').style.display = 'block';
           document.getElementById('srtProgressCard').style.display = 'none';
@@ -3974,14 +4085,14 @@
         }
       } catch (err) {
         console.warn('POST generate-srt fetch notice:', err.message);
-        if (es) { try { es.close(); } catch(e){} }
+        if (es) { try { es.close(); } catch (e) { } }
         document.getElementById('srtSubmitBtn').disabled = false;
         document.getElementById('srtForm').style.display = 'block';
         document.getElementById('srtProgressCard').style.display = 'none';
         document.getElementById('srtResultArea').style.display = 'none';
         const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
-        
+
         let errorMsgStr = (err.message || '').toLowerCase();
         if (errorMsgStr.includes('429') || errorMsgStr.includes('quota') || errorMsgStr.includes('limit') || errorMsgStr.includes('too many') || errorMsgStr.includes('exhausted')) {
           showDeveloperWarning('ඔබගේ Gemini API Key හි දෛනික සීමාව (Daily Limit) අවසන් වී ඇත. කරුණාකර පැය 24 කට පසු නැවත උත්සාහ කරන්න හෝ නව API Key එකක් භාවිතා කරන්න. නැතහොත් Premium Package එකක් මිලදී ගන්න.');
@@ -4360,18 +4471,23 @@
 
   <!-- ENHANCED MOBILE BOTTOM FLOATING NAVIGATION BAR -->
   <div class="fixed bottom-4 inset-x-4 z-40 sm:hidden">
-    <div class="glass-panel rounded-[24px] px-2 py-2.5 flex items-center justify-between border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.9)] backdrop-blur-2xl bg-[#0b0f19]/90 relative overflow-hidden">
+    <div
+      class="glass-panel rounded-[24px] px-2 py-2.5 flex items-center justify-between border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.9)] backdrop-blur-2xl bg-[#0b0f19]/90 relative overflow-hidden">
       <!-- Active indicator pill -->
-      <div class="absolute inset-y-2 left-2 w-[calc(20%-8px)] rounded-xl bg-white/10 border border-white/5 pointer-events-none transition-all duration-300" id="mobileNavIndicator"></div>
-      
-      <a href="dashboard.html" class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-indigo-400 group">
+      <div
+        class="absolute inset-y-2 left-2 w-[calc(20%-8px)] rounded-xl bg-white/10 border border-white/5 pointer-events-none transition-all duration-300"
+        id="mobileNavIndicator"></div>
+
+      <a href="dashboard.html"
+        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-indigo-400 group">
         <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
           <i data-lucide="home" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"></i>
         </div>
         <span class="text-[9px] font-bold tracking-wide">Home</span>
       </a>
-      
-      <button onclick="openToolWithIntercept('srtModal', event)" class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
+
+      <button onclick="openToolWithIntercept('srtModal', event)"
+        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
         <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
           <i data-lucide="subtitles" class="w-5 h-5 group-hover:text-purple-400 transition-colors"></i>
         </div>
@@ -4379,21 +4495,24 @@
       </button>
 
       <div class="relative z-10 flex flex-col items-center justify-center w-[20%] -mt-6">
-        <button onclick="document.getElementById('studioGrid').scrollIntoView({behavior: 'smooth'})" class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 p-[2px] shadow-[0_0_20px_rgba(99,102,241,0.5)] transform hover:scale-110 active:scale-95 transition-all">
+        <button onclick="document.getElementById('studioGrid').scrollIntoView({behavior: 'smooth'})"
+          class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 p-[2px] shadow-[0_0_20px_rgba(99,102,241,0.5)] transform hover:scale-110 active:scale-95 transition-all">
           <div class="w-full h-full rounded-full bg-[#0b0f19] flex items-center justify-center">
             <i data-lucide="plus" class="w-6 h-6 text-white"></i>
           </div>
         </button>
       </div>
 
-      <a href="editor.html" class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
+      <a href="editor.html"
+        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
         <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
           <i data-lucide="scissors" class="w-5 h-5 group-hover:text-blue-400 transition-colors"></i>
         </div>
         <span class="text-[9px] font-medium">Editor</span>
       </a>
 
-      <button onclick="openModal('profileModal', event)" class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
+      <button onclick="openModal('profileModal', event)"
+        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
         <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
           <i data-lucide="user" class="w-5 h-5 group-hover:text-emerald-400 transition-colors"></i>
         </div>
@@ -4403,35 +4522,43 @@
   </div>
 
   <!-- Video Edit Under Development Popup Modal -->
-  <div id="videoEditDevModal" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none"
+  <div id="videoEditDevModal"
+    class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none"
     onclick="if (event.target === this) closeVideoEditDevModal()">
-    <div class="relative w-full max-w-md p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#181d2a] to-[#0e121c] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.25)] transform transition-all duration-300 scale-95 text-center overflow-hidden">
-      
+    <div
+      class="relative w-full max-w-md p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#181d2a] to-[#0e121c] border border-cyan-500/30 shadow-[0_0_50px_rgba(6,182,212,0.25)] transform transition-all duration-300 scale-95 text-center overflow-hidden">
+
       <!-- Close X button -->
-      <button onclick="closeVideoEditDevModal()" class="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+      <button onclick="closeVideoEditDevModal()"
+        class="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
       <!-- Ambient Glow Effect -->
       <div class="absolute -top-16 -left-16 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
-      
+      <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl pointer-events-none">
+      </div>
+
       <!-- Top Icon Badge -->
-      <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center mb-5 shadow-lg shadow-cyan-500/30 border border-white/20">
+      <div
+        class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center mb-5 shadow-lg shadow-cyan-500/30 border border-white/20">
         <i data-lucide="video" class="w-8 h-8 text-white animate-pulse"></i>
       </div>
-      
+
       <!-- Title -->
       <h3 class="text-xl sm:text-2xl font-extrabold text-white mb-2 tracking-wide">
-        Video Editor <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Studio</span>
+        Video Editor <span
+          class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Studio</span>
       </h3>
-      
-      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold mb-4">
+
+      <div
+        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold mb-4">
         <i data-lucide="wrench" class="w-3.5 h-3.5"></i> Coming Soon
       </div>
 
       <!-- Content / Notice -->
-      <div class="bg-black/40 border border-white/10 rounded-2xl p-4 sm:p-5 mb-6 text-slate-200 text-sm leading-relaxed text-center space-y-2">
+      <div
+        class="bg-black/40 border border-white/10 rounded-2xl p-4 sm:p-5 mb-6 text-slate-200 text-sm leading-relaxed text-center space-y-2">
         <p class="font-bold text-white text-base">
           මෙය තවම සංවර්ධනය වෙමින් පවතී.
         </p>
@@ -4439,9 +4566,10 @@
           ඉතා ඉක්මනින් ඔබට උසස් තත්ත්වයේ Video Editing පහසුකම් මෙහිදී ලබාගත හැකි වනු ඇත!
         </p>
       </div>
-      
+
       <!-- Action Button -->
-      <button onclick="closeVideoEditDevModal()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-600 hover:from-cyan-500 to-blue-600 hover:to-blue-500 text-white font-bold text-base shadow-lg shadow-cyan-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20">
+      <button onclick="closeVideoEditDevModal()"
+        class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-cyan-600 hover:from-cyan-500 to-blue-600 hover:to-blue-500 text-white font-bold text-base shadow-lg shadow-cyan-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20">
         <i data-lucide="check-circle" class="w-5 h-5 text-white"></i>
         <span>තේරුණා</span>
       </button>
@@ -4449,28 +4577,35 @@
   </div>
 
   <!-- CapZone Notice / Welcome Guide Popup Modal -->
-  <div id="capzoneNoticeModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none">
-    <div class="relative w-full max-w-lg p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#181d2a] to-[#0e121c] border border-indigo-500/30 shadow-[0_0_50px_rgba(99,102,241,0.25)] transform transition-all duration-300 scale-95 text-center overflow-hidden">
-      
+  <div id="capzoneNoticeModal"
+    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-all duration-300 opacity-0 pointer-events-none">
+    <div
+      class="relative w-full max-w-lg p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#181d2a] to-[#0e121c] border border-indigo-500/30 shadow-[0_0_50px_rgba(99,102,241,0.25)] transform transition-all duration-300 scale-95 text-center overflow-hidden">
+
       <!-- Ambient Glow Effect -->
       <div class="absolute -top-16 -left-16 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-      
+      <div class="absolute -bottom-16 -right-16 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none">
+      </div>
+
       <!-- Top Icon Badge -->
-      <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30 border border-white/20">
+      <div
+        class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center mb-5 shadow-lg shadow-indigo-500/30 border border-white/20">
         <i data-lucide="sparkles" class="w-8 h-8 text-white animate-pulse"></i>
       </div>
-      
+
       <!-- Title -->
       <h3 class="text-xl sm:text-2xl font-extrabold text-white mb-3 tracking-wide">
-        CapZone <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">SRT Studio</span>
+        CapZone <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">SRT
+          Studio</span>
       </h3>
-      
+
       <!-- Notice Content in Sinhala -->
-      <div class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 text-slate-200 text-sm leading-relaxed mb-6 text-left space-y-3 font-medium">
+      <div
+        class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 text-slate-200 text-sm leading-relaxed mb-6 text-left space-y-3 font-medium">
         <div class="flex items-start gap-2.5">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mt-2 shrink-0"></span>
-          <p><strong>Free ඕනෑම තරමක්</strong> මෙය භාවිත කිරීමට හැක. ඒ සඳහා ඔයාගෙම <strong>Gemini API Key</strong> එක use කිරීමට හැක. එහි දෙන free trial version එක ඔයාට භාවිත කරන්න පුළුවන්.</p>
+          <p><strong>Free ඕනෑම තරමක්</strong> මෙය භාවිත කිරීමට හැක. ඒ සඳහා ඔයාගෙම <strong>Gemini API Key</strong> එක use
+            කිරීමට හැක. එහි දෙන free trial version එක ඔයාට භාවිත කරන්න පුළුවන්.</p>
         </div>
         <div class="flex items-start gap-2.5">
           <span class="inline-block w-2 h-2 rounded-full bg-purple-400 mt-2 shrink-0"></span>
@@ -4481,9 +4616,10 @@
           <span>මෙය අදාළ වන්නේ SRT සෑදීමට පමණි.</span>
         </div>
       </div>
-      
+
       <!-- Action Button -->
-      <button onclick="closeNoticeModal()" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 hover:from-indigo-500 to-purple-600 hover:to-purple-500 text-white font-bold text-base shadow-lg shadow-indigo-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20">
+      <button onclick="closeNoticeModal()"
+        class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 hover:from-indigo-500 to-purple-600 hover:to-purple-500 text-white font-bold text-base shadow-lg shadow-indigo-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20">
         <i data-lucide="check-circle" class="w-5 h-5 text-white"></i>
         <span>තේරුණා</span>
       </button>
@@ -4549,7 +4685,8 @@
 
       <!-- Own API Key Input Section (Hidden by default) -->
       <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
-        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your Gemini API Key</label>
+        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your Gemini API
+          Key</label>
         <input type="text" id="geminiApiKeyInput" autocomplete="off"
           style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
           class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2"
@@ -4820,10 +4957,10 @@
       const cacheKey = 'capzone_projects_' + email;
       const deletedKeysKey = 'capzone_deleted_keys_' + email;
       let deletedKeys = new Set();
-      try { 
-        const arr = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]'); 
+      try {
+        const arr = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]');
         deletedKeys = new Set(arr.map(String));
-      } catch(e){}
+      } catch (e) { }
 
       const isDeletedItem = (item) => {
         if (!item) return false;
@@ -4857,13 +4994,13 @@
           fetchedProjects.forEach(p => {
             if (isDeletedItem(p)) {
               // Silently clean up ghost item from server
-              fetch(`${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(p.id)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(p.telegram_msg_id || '')}`, { method: 'DELETE' }).catch(() => {});
+              fetch(`${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(p.id)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(p.telegram_msg_id || '')}`, { method: 'DELETE' }).catch(() => { });
               return;
             }
             const item = Object.assign({}, p);
             item.synced = true;
             if (item.payload && typeof item.payload === 'string') {
-              try { item.payload = JSON.parse(item.payload); } catch(e){}
+              try { item.payload = JSON.parse(item.payload); } catch (e) { }
             }
             mergedMap.set(String(item.id), item);
           });
@@ -4871,7 +5008,7 @@
           const unsyncedProjects = [];
           localCached.forEach(p => {
             if (isDeletedItem(p)) return;
-            const alreadyOnServer = mergedMap.has(String(p.id)) || 
+            const alreadyOnServer = mergedMap.has(String(p.id)) ||
               fetchedProjects.some(sp => sp.type === p.type && (sp.title || '').trim().toLowerCase() === (p.title || '').trim().toLowerCase());
             if (!alreadyOnServer && !p.synced) {
               p.synced = true;
@@ -4893,7 +5030,7 @@
                   up.synced = true;
                   localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
                 }
-              }).catch(() => {});
+              }).catch(() => { });
             });
           }
 
@@ -4950,7 +5087,7 @@
         let payloadUrl = '';
         if (p.payload) {
           let pl = typeof p.payload === 'string' ? null : p.payload;
-          if (!pl) { try { pl = JSON.parse(p.payload); } catch(e){} }
+          if (!pl) { try { pl = JSON.parse(p.payload); } catch (e) { } }
           if (pl) payloadUrl = pl.url || pl.filename || '';
         }
 
@@ -5388,11 +5525,11 @@
         fetch(formattedMedia)
           .then(res => res.blob())
           .then(blob => {
-            const mimeType = ext === '.png' ? 'image/png' 
-                          : ext === '.mp3' ? 'audio/mpeg' 
-                          : ext === '.jpg' ? 'image/jpeg' 
-                          : ext === '.srt' ? 'text/plain' 
-                          : 'video/mp4';
+            const mimeType = ext === '.png' ? 'image/png'
+              : ext === '.mp3' ? 'audio/mpeg'
+                : ext === '.jpg' ? 'image/jpeg'
+                  : ext === '.srt' ? 'text/plain'
+                    : 'video/mp4';
             const typedBlob = new Blob([blob], { type: mimeType });
             const blobUrl = URL.createObjectURL(typedBlob);
             const a = document.createElement('a');
@@ -5437,7 +5574,7 @@
         // 1. Maintain persistent deletion blacklist in localStorage
         const deletedKeysKey = 'capzone_deleted_keys_' + email;
         let deletedKeys = [];
-        try { deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]'); } catch(e){}
+        try { deletedKeys = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]'); } catch (e) { }
         if (projectId) deletedKeys.push(String(projectId));
         if (pTgMsgId) deletedKeys.push(String(pTgMsgId));
         if (deletedKeys.length > 200) deletedKeys = deletedKeys.slice(-200);
