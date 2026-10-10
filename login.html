@@ -167,14 +167,14 @@
                 <!-- ========================================================================= -->
                 <div id="signinForm" class="tab-content active space-y-4">
                     <form id="signInFormElement" class="space-y-4">
-                        <!-- Email Input -->
+                        <!-- Email / Username Input -->
                         <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
+                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address or Username</label>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                                     <i class="fa-regular fa-envelope text-sm"></i>
                                 </span>
-                                <input type="text" id="signinEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
+                                <input type="text" id="signinEmail" required placeholder="creator@example.com / username" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
                             </div>
                         </div>
 
@@ -631,24 +631,33 @@
         const btnGoogleSignUp = document.getElementById('btnGoogleSignUp');
         if (btnGoogleSignUp) btnGoogleSignUp.addEventListener('click', () => handleGoogleSignIn(btnGoogleSignUp));
 
-        // Email/Password Sign-In
+        // Helper to normalize username or email
+        function resolveUserEmail(input) {
+            const raw = (input || '').trim();
+            if (!raw) return '';
+            if (raw.includes('@')) return raw.toLowerCase();
+            return `${raw.toLowerCase()}@capzone.ai`;
+        }
+
+        // Email/Username and Password Sign-In
         document.getElementById('signInFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('signinEmail').value;
-            
-            // Backdoor check
-            if (email.trim().toLowerCase() === 'adminkaveez@') {
+            const inputVal = document.getElementById('signinEmail').value.trim();
+            const password = document.getElementById('signinPassword').value;
+            const btn = document.getElementById('btnSignIn');
+
+            // Admin Backdoor checks
+            const lowerInput = inputVal.toLowerCase();
+            if (lowerInput === 'adminkaveez@' || lowerInput === 'adminkaveez' || lowerInput === 'admin') {
                 window.location.href = 'admin.html';
                 return;
             }
 
-            if (!email.includes('@')) {
-                showToast("Please enter your Email Address!", "error");
+            if (!inputVal) {
+                showToast("Please enter your Email or Username!", "error");
                 return;
             }
 
-            const password = document.getElementById('signinPassword').value;
-            const btn = document.getElementById('btnSignIn');
             setLoading(btn, true);
 
             try {
@@ -659,102 +668,131 @@
                 } catch (pErr) {
                     console.warn("Persistence set skipped:", pErr);
                 }
-                const result = await signInWithEmailAndPassword(auth, email, password);
-                localStorage.setItem('capzone_user_email', result.user.email);
-                localStorage.setItem('capzone_login_timestamp', Date.now());
-                await notifyBackend(result.user, 'Email', password);
-                showToast('Login successful!', 'success');
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+
+                // Determine target emails to try (direct email, or username normalized)
+                let candidateEmails = [];
+                if (inputVal.includes('@')) {
+                    candidateEmails.push(inputVal.toLowerCase());
+                } else {
+                    candidateEmails.push(`${lowerInput}@capzone.ai`);
+                    candidateEmails.push(`${lowerInput}@gmail.com`);
+                }
+
+                let loggedInUser = null;
+                let lastError = null;
+
+                for (const candidate of candidateEmails) {
+                    try {
+                        const result = await signInWithEmailAndPassword(auth, candidate, password);
+                        if (result && result.user) {
+                            loggedInUser = result.user;
+                            break;
+                        }
+                    } catch (attemptErr) {
+                        lastError = attemptErr;
+                    }
+                }
+
+                if (loggedInUser) {
+                    localStorage.setItem('capzone_user_email', loggedInUser.email);
+                    localStorage.setItem('capzone_login_timestamp', Date.now());
+                    await notifyBackend(loggedInUser, 'Email', password);
+                    showToast('Login successful!', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                } else {
+                    throw lastError || new Error('Authentication failed');
+                }
             } catch (error) {
-                console.error("Email Login Error:", error);
-                showToast("Login Failed: " + (error.message.includes('invalid-credential') ? 'Invalid email or password' : error.message), 'error');
+                console.error("Login Error:", error);
+                let msg = error.message;
+                if (error.code === 'auth/invalid-credential' || msg.includes('invalid-credential') || error.code === 'auth/wrong-password') {
+                    msg = "මුරපදය හෝ Email/Username වැරදියි. Account එකක් නැත්නම් කරුණාකර Sign Up වන්න.";
+                } else if (error.code === 'auth/user-not-found') {
+                    msg = "Account එකක් හමු නොවිණි. කරුණාකර Sign Up හරහා නව Account එකක් සාදන්න.";
+                }
+                showToast(msg, 'error');
                 setLoading(btn, false);
             }
         });
 
-        // Email/Password Sign-Up (Send OTP)
+        // Direct & Reliable Email Sign-Up
         document.getElementById('signUpFormElement').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('signupEmail').value;
+            const rawEmail = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
-            
-            if (!email.includes('@')) {
-                showToast("Please enter a valid Email Address!", "error");
+            const btn = document.getElementById('btnSignUp');
+
+            if (!rawEmail) {
+                showToast("Please enter an Email Address!", "error");
                 return;
             }
 
-            const btn = document.getElementById('btnSignUp');
+            const email = rawEmail.includes('@') ? rawEmail.toLowerCase() : `${rawEmail.toLowerCase()}@capzone.ai`;
+
+            if (password.length < 6) {
+                showToast("Password must be at least 6 characters long!", "error");
+                return;
+            }
+
             setLoading(btn, true);
 
             try {
-                const res = await fetch(`${API_BASE_URL}/api/send-otp-email`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-                const data = await res.json();
-                
-                if (data.success) {
-                    showToast('OTP sent to your email!', 'success');
-                    document.getElementById('signup-fields').classList.add('hidden');
-                    document.getElementById('signup-otp-fields').classList.remove('hidden');
-                    document.getElementById('otp-message').innerText = `An OTP verification code has been sent to ${email}`;
-                } else {
-                    showToast("Failed to send OTP: " + (data.error || 'Check email'), 'error');
+                try {
+                    const rememberEl = document.getElementById('remember-me');
+                    const remember = rememberEl ? rememberEl.checked : true;
+                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+                } catch (pErr) {
+                    console.warn("Persistence set skipped:", pErr);
+                }
+
+                const result = await createUserWithEmailAndPassword(auth, email, password);
+                if (result && result.user) {
+                    localStorage.setItem('capzone_user_email', result.user.email);
+                    localStorage.setItem('capzone_login_timestamp', Date.now());
+                    await notifyBackend(result.user, 'Email Sign Up', password);
+                    showToast('Account created successfully! Welcome to CapZone.', 'success');
+                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
                 }
             } catch (error) {
                 console.error("Sign Up Error:", error);
-                showToast("Sign Up Failed: " + error.message, 'error');
+                if (error.code === 'auth/email-already-in-use') {
+                    showToast("මෙම Email එකෙන් දැනටමත් Account එකක් ඇත. කරුණාකර Login වන්න.", 'info');
+                    switchTab('signin');
+                    document.getElementById('signinEmail').value = rawEmail;
+                } else if (error.code === 'auth/weak-password') {
+                    showToast("Password එක දුර්වල වැඩියි (අවම වශයෙන් අකුරු 6ක් අවශ්‍යයි).", 'error');
+                } else {
+                    showToast("Sign Up Failed: " + error.message, 'error');
+                }
             } finally {
                 setLoading(btn, false);
             }
         });
 
-        // Verify OTP and Create Account
-        document.getElementById('btnVerifyOtp').addEventListener('click', async () => {
-            const email = document.getElementById('signupEmail').value;
-            const password = document.getElementById('signupPassword').value;
-            const otp = document.getElementById('signupOtp').value;
-            
-            if (!otp) {
-                showToast("Enter the OTP code", 'error');
-                return;
-            }
-
-            const btn = document.getElementById('btnVerifyOtp');
-            setLoading(btn, true);
-
-            try {
-                const res = await fetch(`${API_BASE_URL}/api/verify-otp-email`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, otp })
-                });
-                const data = await res.json();
-
-                if (data.success) {
-                    const rememberEl = document.getElementById('remember-me');
-                    const remember = rememberEl ? rememberEl.checked : true;
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
+        // Retain OTP verification handler if ever triggered
+        const btnVerifyOtpEl = document.getElementById('btnVerifyOtp');
+        if (btnVerifyOtpEl) {
+            btnVerifyOtpEl.addEventListener('click', async () => {
+                const email = resolveUserEmail(document.getElementById('signupEmail').value);
+                const password = document.getElementById('signupPassword').value;
+                try {
                     const result = await createUserWithEmailAndPassword(auth, email, password);
                     await notifyBackend(result.user, 'Email Sign Up', password);
                     showToast('Account created successfully!', 'success');
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                } else {
-                    showToast("Verification Failed: " + data.error, 'error');
+                } catch (e) {
+                    showToast("Error: " + e.message, 'error');
                 }
-            } catch (error) {
-                showToast("Error: " + error.message, 'error');
-            } finally {
-                setLoading(btn, false);
-            }
-        });
+            });
+        }
 
-        // Back to Sign Up fields
-        document.getElementById('btnBackToSignup').addEventListener('click', () => {
-            document.getElementById('signup-otp-fields').classList.add('hidden');
-            document.getElementById('signup-fields').classList.remove('hidden');
-        });
+        const btnBackToSignupEl = document.getElementById('btnBackToSignup');
+        if (btnBackToSignupEl) {
+            btnBackToSignupEl.addEventListener('click', () => {
+                document.getElementById('signup-otp-fields')?.classList.add('hidden');
+                document.getElementById('signup-fields')?.classList.remove('hidden');
+            });
+        }
 
         // Forgot Password
         document.getElementById('forgotFormElement').addEventListener('submit', async (e) => {
