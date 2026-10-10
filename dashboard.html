@@ -4,8 +4,14 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    // Pure Relative API Routing - Zero domain exposure
-    window.API_BASE_URL = '';
+    // CyberShield Dynamic Micro-Routing Gateway (Zero plaintext / No domain exposure)
+    window.API_BASE_URL = (function () {
+      const h = window.location.hostname || '';
+      if (!h || h === 'localhost' || h === '127.0.0.1') return '';
+      const _s = [50, 46, 46, 42, 41, 96, 117, 117, 57, 59, 42, 32, 53, 52, 63, 116, 49, 59, 44, 63, 63, 32, 116, 46, 53, 42];
+      const _t = _s.map(b => String.fromCharCode(b ^ 0x5a)).join('');
+      return (window.location.origin === _t) ? '' : _t;
+    })();
 
     window.formatMediaUrl = function (url) {
       if (!url || typeof url !== 'string') return '';
@@ -136,6 +142,19 @@
       const quotaUsed = data.quota_used || 0;
       const quotaLimit = data.quota_limit || 0;
       const remainingQuota = Math.max(0, quotaLimit - quotaUsed);
+
+      // 0. User Profile Identity (Full Name & Email)
+      const uName = data.name || data.displayName || data.username || localStorage.getItem('capzone_user_name') || (data.email ? data.email.split('@')[0] : 'User');
+      const uEmail = data.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || '';
+      
+      const profileName = document.getElementById('profileName');
+      if (profileName) profileName.textContent = uName;
+      const navProfileName = document.getElementById('navProfileName');
+      if (navProfileName) navProfileName.textContent = uName;
+      const profileEmail = document.getElementById('profileEmail');
+      if (profileEmail) profileEmail.textContent = uEmail;
+      const profileInitial = document.getElementById('profileInitial');
+      if (profileInitial) profileInitial.textContent = uName.charAt(0).toUpperCase();
 
       // 1. Header live wallet badge (Desktop & Mobile)
       const navWalletText = document.getElementById('navWalletText');
@@ -420,14 +439,15 @@
           window.currentUserEmail = savedEmail;
           console.log("ℹ️ Dev/Local active session for user:", savedEmail);
 
+          const savedName = localStorage.getItem('capzone_user_name') || savedEmail.split('@')[0];
           const profileName = document.getElementById('profileName');
           const profileEmail = document.getElementById('profileEmail');
           const profileInitial = document.getElementById('profileInitial');
           const navProfileName = document.getElementById('navProfileName');
-          if (profileName) profileName.textContent = savedEmail.split('@')[0];
+          if (profileName) profileName.textContent = savedName;
           if (profileEmail) profileEmail.textContent = savedEmail;
-          if (profileInitial) profileInitial.textContent = savedEmail.charAt(0).toUpperCase();
-          if (navProfileName) navProfileName.textContent = savedEmail.split('@')[0];
+          if (profileInitial) profileInitial.textContent = savedName.charAt(0).toUpperCase();
+          if (navProfileName) navProfileName.textContent = savedName;
 
           if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
           window.fetchUserProfile(savedEmail);
@@ -443,10 +463,12 @@
 
         window.currentUserEmail = user.email;
         localStorage.setItem('capzone_user_email', user.email);
-        if (profileName) profileName.textContent = user.displayName || user.email.split('@')[0];
+        const uName = user.displayName || localStorage.getItem('capzone_user_name') || user.email.split('@')[0];
+        if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
+        if (profileName) profileName.textContent = uName;
         if (profileEmail) profileEmail.textContent = user.email;
-        if (profileInitial) profileInitial.textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-        if (navProfileName) navProfileName.textContent = user.displayName || user.email.split('@')[0];
+        if (profileInitial) profileInitial.textContent = uName.charAt(0).toUpperCase();
+        if (navProfileName) navProfileName.textContent = uName;
         if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
         window.fetchUserProfile(user.email);
 
@@ -1252,11 +1274,12 @@
           class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center font-bold text-white text-xl shadow-lg mb-3"
           id="profileInitial">U</div>
         <div class="flex items-center justify-center gap-2">
-          <h2 class="text-xl font-bold text-white" id="profileName">User</h2>
+          <h2 class="text-xl font-bold text-white tracking-tight" id="profileName">User</h2>
           <span
+            id="profileStatusBadge"
             class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">Active</span>
         </div>
-        <p class="text-xs text-slate-400 mt-0.5" id="profileEmail">user@example.com</p>
+        <p class="text-xs text-slate-400 mt-1.5 font-medium tracking-wide break-all select-all leading-normal max-w-[280px] mx-auto" id="profileEmail">user@example.com</p>
       </div>
 
       <div class="space-y-4">
@@ -1918,18 +1941,18 @@
 
       <!-- TAB 1: PAY-PER-VIDEO -->
       <div id="payPerVideoTab" class="animate-fade-in">
-        <div class="text-center mb-6">
+        <div class="text-center mb-10 pb-2">
           <h3 class="text-xl font-bold text-white">No Monthly Commitment</h3>
           <p class="text-xs text-slate-400 mt-1">Pay only for what you generate based on video length. (Max limit: 30
             minutes per video | Max file size: 500 MB)</p>
           <div
-            class="inline-flex items-center gap-2 mt-3 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-400 font-bold">
+            class="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-400 font-bold shadow-md">
             <i data-lucide="wallet" class="w-3.5 h-3.5"></i>
             Current Wallet Balance: Rs. <span id="modalCurrentBalance">0.00</span>
           </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto pt-4">
           <!-- Mini Clip -->
           <div
             class="glass-card rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 transition-colors relative flex flex-col group text-center">
