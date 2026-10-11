@@ -67,16 +67,10 @@
             window.turnstileLoginWidgetId = null;
             window.turnstileSignupWidgetId = null;
 
-            // Retain active valid session verification if present
+            // Enforce live Cloudflare Turnstile tick without cached bypass
             try {
-                let storedVer = sessionStorage.getItem('capzone_robot_verified') || localStorage.getItem('capzone_robot_verified');
-                if (storedVer && storedVer.startsWith('cf_live_')) {
-                    const ts = parseInt(storedVer.replace('cf_live_', ''), 10);
-                    if (!isNaN(ts) && (Date.now() - ts) < 24 * 60 * 60 * 1000) {
-                        window.isRobotVerified = true;
-                        try { sessionStorage.setItem('capzone_robot_verified', storedVer); } catch(e){}
-                    }
-                }
+                sessionStorage.removeItem('capzone_robot_verified');
+                localStorage.removeItem('capzone_robot_verified');
             } catch(e) {}
 
             window.markTurnstileVerified = function(token, source) {
@@ -87,11 +81,6 @@
                 } else {
                     window.turnstileLoginToken = token;
                 }
-                try {
-                    const stamp = 'cf_live_' + Date.now();
-                    sessionStorage.setItem('capzone_robot_verified', stamp);
-                    localStorage.setItem('capzone_robot_verified', stamp);
-                } catch(e) {}
 
                 // Update UI on both Login and Signup widgets immediately
                 const loginStatus = document.getElementById('turnstileStatusLogin');
@@ -124,40 +113,47 @@
             };
 
             window.isUserRobotVerified = function(action) {
-                if (window.isRobotVerified) return true;
-
-                try {
-                    let stored = sessionStorage.getItem('capzone_robot_verified') || localStorage.getItem('capzone_robot_verified');
-                    if (stored && stored.startsWith('cf_live_')) {
-                        const ts = parseInt(stored.replace('cf_live_', ''), 10);
-                        if (!isNaN(ts) && (Date.now() - ts) < 24 * 60 * 60 * 1000) {
-                            window.isRobotVerified = true;
-                            try { sessionStorage.setItem('capzone_robot_verified', stored); } catch(e){}
-                            return true;
-                        }
+                if (action === 'signup') {
+                    if (window.turnstileSignupToken && typeof window.turnstileSignupToken === 'string' && window.turnstileSignupToken.length > 5) {
+                        return true;
                     }
-                } catch(e) {}
-
-                if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                    try {
-                        const targetId = (action === 'signup') ? '#cfTurnstileSignup' : '#cfTurnstileLogin';
-                        const token = turnstile.getResponse(targetId) || turnstile.getResponse();
-                        if (token && typeof token === 'string' && token.length > 5) {
-                            window.markTurnstileVerified(token, action || 'login');
-                            return true;
-                        }
-                    } catch(e) {}
+                    if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
+                        try {
+                            const tok = turnstile.getResponse('#cfTurnstileSignup');
+                            if (tok && typeof tok === 'string' && tok.length > 5) {
+                                window.turnstileSignupToken = tok;
+                                return true;
+                            }
+                        } catch(e) {}
+                    }
+                    const signupInput = document.querySelector('#signUpFormElement [name="cf-turnstile-response"]') || 
+                                        document.querySelector('#cfTurnstileSignup [name="cf-turnstile-response"]');
+                    if (signupInput && signupInput.value && signupInput.value.length > 5) {
+                        window.turnstileSignupToken = signupInput.value;
+                        return true;
+                    }
+                    return false;
+                } else {
+                    if (window.turnstileLoginToken && typeof window.turnstileLoginToken === 'string' && window.turnstileLoginToken.length > 5) {
+                        return true;
+                    }
+                    if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
+                        try {
+                            const tok = turnstile.getResponse('#cfTurnstileLogin') || turnstile.getResponse();
+                            if (tok && typeof tok === 'string' && tok.length > 5) {
+                                window.turnstileLoginToken = tok;
+                                return true;
+                            }
+                        } catch(e) {}
+                    }
+                    const loginInput = document.querySelector('#signInFormElement [name="cf-turnstile-response"]') || 
+                                       document.querySelector('#cfTurnstileLogin [name="cf-turnstile-response"]');
+                    if (loginInput && loginInput.value && loginInput.value.length > 5) {
+                        window.turnstileLoginToken = loginInput.value;
+                        return true;
+                    }
+                    return false;
                 }
-
-                const targetForm = (action === 'signup') ? '#signUpFormElement' : '#signInFormElement';
-                const hiddenInput = document.querySelector(targetForm + ' [name="cf-turnstile-response"]') || 
-                                    document.querySelector('[name="cf-turnstile-response"]');
-                if (hiddenInput && hiddenInput.value && hiddenInput.value.length > 5) {
-                    window.markTurnstileVerified(hiddenInput.value, action || 'login');
-                    return true;
-                }
-
-                return false;
             };
 
             // Callbacks defined before Turnstile API script parses HTML
@@ -866,6 +862,11 @@
                 <span>•</span>
                 <button type="button" onclick="openPolicyModal('refund')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Return Policy (මුදල් ආපසු)</button>
             </div>
+
+            <!-- Developer Attribution Footer -->
+            <div class="mt-4 text-center">
+                <p class="text-[11px] text-gray-500 font-medium">&copy; 2026 CapZone Studio. Powered by <span class="text-blue-400 font-semibold">Kaveez Developer Team</span>.</p>
+            </div>
         </section>
 
     </main>
@@ -1335,18 +1336,7 @@
             }
         }
 
-        // Maintain verification state across module initialization (do NOT wipe if verified)
-        if (!window.isRobotVerified) {
-            try {
-                const storedVer = sessionStorage.getItem('capzone_robot_verified');
-                if (storedVer && storedVer.startsWith('cf_live_')) {
-                    const ts = parseInt(storedVer.replace('cf_live_', ''), 10);
-                    if (!isNaN(ts) && (Date.now() - ts) < 15 * 60 * 1000) {
-                        window.isRobotVerified = true;
-                    }
-                }
-            } catch(e) {}
-        }
+
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
@@ -1393,11 +1383,15 @@
 
         // Google Sign-In Handler
         async function handleGoogleSignIn(btn) {
-            const action = (btn.id === 'btnGoogleSignUp') ? 'signup' : 'login';
-            if (!window.isUserRobotVerified(action)) {
-                const targetWidget = (btn.id === 'btnGoogleSignUp') ? 'turnstileWidgetSignup' : 'turnstileWidgetLogin';
+            const action = (btn && btn.id === 'btnGoogleSignUp') ? 'signup' : 'login';
+            if (typeof window.isUserRobotVerified === 'function' && !window.isUserRobotVerified(action)) {
+                const targetWidget = (action === 'signup') ? 'turnstileWidgetSignup' : 'turnstileWidgetLogin';
                 highlightRobotWidget(targetWidget);
-                window.showRobotModal();
+                if (typeof window.showRobotModal === 'function') {
+                    window.showRobotModal();
+                } else {
+                    showToast('Please complete the Cloudflare Turnstile verification before proceeding.', 'error');
+                }
                 return;
             }
 
