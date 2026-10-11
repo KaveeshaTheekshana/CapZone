@@ -1,2183 +1,972 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <script>
-    (function(){
-      var h=(window.location.hostname||"").toLowerCase();
-      var p=window.location.protocol;
-      var d=atob("Y2Fwem9uZS50b3A=");
-      var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
-      if(p==="file:"||!ok){
-        try{if(window.stop)window.stop();}catch(e){}
-        try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
-        document.write("");
+  <meta charset="utf-8" />
+  <script>
+  (function(){
+    var h=(window.location.hostname||"").toLowerCase();
+    var p=window.location.protocol;
+    var d=atob("Y2Fwem9uZS50b3A=");
+    var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
+    if(p==="file:"||!ok){
+      try{if(window.stop)window.stop();}catch(e){}
+      try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
+      document.write("");
+      return;
+    }
+    document.addEventListener("contextmenu",function(e){e.preventDefault();return false;},{passive:false});
+    document.addEventListener("keydown",function(e){
+      if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&["I","i","J","j","C","c"].includes(e.key))||(e.ctrlKey&&["u","U","s","S"].includes(e.key))){
+        e.preventDefault();e.stopPropagation();return false;
+      }
+    },true);
+    if(h!=="localhost"&&h!=="127.0.0.1"){
+      var noop=function(){};
+      window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
+    }
+    setInterval(function(){
+      var s=Date.now();
+      (function(){}).constructor("debugger")();
+      if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
+    },1800);
+  })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SRT Admin Dashboard | CapZone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { background-color: #0b0f19; color: #f8fafc; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+    .glass-card { background: rgba(18, 24, 38, 0.85); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .glass-header { background: rgba(11, 15, 25, 0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); }
+    ::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.4); border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.6); }
+  </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#3b82f6',
+            secondary: '#10b981',
+            accent: '#8b5cf6'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-screen bg-[#0b0f19] relative overflow-x-hidden">
+  
+  <!-- Ambient Glow Effects -->
+  <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+  <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="glass-header sticky top-0 z-40 px-4 sm:px-6 py-3.5 flex flex-wrap justify-between items-center gap-3 shadow-xl">
+    <div class="flex items-center gap-3">
+      <div class="p-2.5 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-xl text-white shadow-lg shadow-blue-500/20">
+        <i data-lucide="shield" class="w-5 h-5"></i>
+      </div>
+      <div>
+        <h1 class="text-lg sm:text-xl font-black tracking-tight flex items-center gap-2">
+          CapZone <span class="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">SRT ADMIN</span>
+        </h1>
+        <p class="text-[11px] text-slate-400">User & Quota Control Center</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Wallet Total Revenue Card in Header -->
+      <div class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gradient-to-r from-amber-500/15 via-[#1a2030] to-amber-500/10 border border-amber-500/30 shadow-md flex items-center gap-2.5">
+        <div class="p-1.5 bg-amber-500/20 text-amber-400 rounded-lg">
+          <i data-lucide="wallet" class="w-4 h-4"></i>
+        </div>
+        <div class="flex items-baseline gap-1.5">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Wallet:</span>
+          <span class="text-sm sm:text-base font-black text-amber-400">Rs. <span id="headerTotalEarnings">0.00</span></span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Server Down Alert Banner (In-page notification) -->
+  <div id="serverAlertBanner" class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 hidden">
+    <div class="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-red-300">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-red-500/20 rounded-xl text-red-400">
+          <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <p class="text-sm font-bold text-white">Backend Node Server is Offline</p>
+          <p class="text-xs text-red-300">Unable to reach <code class="bg-black/30 px-1.5 py-0.5 rounded text-red-200" id="currentApiUrlText">Backend Service</code>. Make sure the Node server is running.</p>
+        </div>
+      </div>
+      <button onclick="fetchUsers()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold shadow-lg transition-all flex items-center gap-1.5 shrink-0">
+        <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i> Retry Connection
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+    
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group hover:border-blue-500/30 transition-all">
+        <div>
+          <p class="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Total Users</p>
+          <h3 class="text-2xl sm:text-3xl font-black text-white" id="statTotalUsers">0</h3>
+        </div>
+        <div class="p-3.5 bg-blue-500/15 text-blue-400 rounded-xl group-hover:scale-110 transition-transform">
+          <i data-lucide="users" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+        <div>
+          <p class="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">SRTs Generated</p>
+          <h3 class="text-2xl sm:text-3xl font-black text-emerald-400" id="statTotalSrts">0</h3>
+        </div>
+        <div class="p-3.5 bg-emerald-500/15 text-emerald-400 rounded-xl group-hover:scale-110 transition-transform">
+          <i data-lucide="file-video" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group hover:border-amber-500/30 transition-all">
+        <div>
+          <p class="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Total Revenue (Wallet)</p>
+          <h3 class="text-2xl sm:text-3xl font-black text-amber-400">Rs. <span id="statTotalCredits">0.00</span></h3>
+        </div>
+        <div class="p-3.5 bg-amber-500/15 text-amber-400 rounded-xl group-hover:scale-110 transition-transform">
+          <i data-lucide="wallet" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="glass-card p-5 rounded-2xl flex items-center justify-between relative overflow-hidden group hover:border-purple-500/30 transition-all">
+        <div>
+          <p class="text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">Active Subscribers</p>
+          <h3 class="text-2xl sm:text-3xl font-black text-purple-400" id="statTotalSubs">0</h3>
+        </div>
+        <div class="p-3.5 bg-purple-500/15 text-purple-400 rounded-xl group-hover:scale-110 transition-transform">
+          <i data-lucide="zap" class="w-6 h-6"></i>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Users Management Card -->
+    <div class="glass-card rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+      
+      <!-- Toolbar -->
+      <div class="p-4 sm:p-5 border-b border-slate-800 flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
+        <div class="flex items-center gap-2">
+          <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="sliders" class="w-4 h-4 text-primary"></i> User Management
+          </h2>
+          <span id="filteredCountBadge" class="text-xs bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-mono">0 users</span>
+        </div>
+
+        <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2.5 w-full md:w-auto mt-3 md:mt-0">
+          <!-- Search Box -->
+          <div class="relative w-full sm:w-64">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"></i>
+            <input type="text" id="searchInput" placeholder="Search by email..." onkeyup="filterUsers()"
+              class="w-full pl-9 pr-4 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-colors" />
+          </div>
+
+          <!-- Status Filter -->
+          <select id="statusFilter" onchange="filterUsers()"
+            class="w-full sm:w-auto px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 transition-colors">
+            <option value="all">All Status</option>
+            <option value="active">Active Only</option>
+            <option value="deactivated">Deactivated Only</option>
+          </select>
+
+          <!-- Plan Filter -->
+          <select id="planFilter" onchange="filterUsers()"
+            class="w-full sm:w-auto px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-xl text-xs text-white focus:outline-none focus:border-blue-500 transition-colors">
+            <option value="all">All Plans</option>
+            <option value="payg">Pay As You Go</option>
+            <option value="creator">Creator Plan (120m)</option>
+            <option value="pro">Pro Plan (300m)</option>
+            <option value="none">None (Own API)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="overflow-x-auto w-full">
+        <table class="w-full text-left border-collapse min-w-[750px]">
+          <thead>
+            <tr class="bg-slate-900/60 text-slate-400 text-[11px] font-bold uppercase tracking-wider border-b border-slate-800">
+              <th class="py-3 px-4">User Email</th>
+              <th class="py-3 px-4">Status</th>
+              <th class="py-3 px-4">Wallet Balance</th>
+              <th class="py-3 px-4">Subscription</th>
+              <th class="py-3 px-4">Remaining Quota</th>
+              <th class="py-3 px-4">SRT Videos</th>
+              <th class="py-3 px-4">Joined</th>
+              <th class="py-3 px-4 text-center">Admin Controls</th>
+            </tr>
+          </thead>
+          <tbody id="usersTableBody" class="divide-y divide-slate-800/50 text-xs">
+            <!-- Dynamic User Rows -->
+            <tr>
+              <td colspan="8" class="text-center py-12 text-slate-400">
+                <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2 text-primary"></i>
+                <p>Loading user database...</p>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- Developer Attribution Footer -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
+    <p class="text-[11px] text-gray-500 font-medium">&copy; 2026 CapZone Admin Portal. Powered by <span class="text-blue-400 font-semibold">Kaveez Developer Team</span>.</p>
+  </footer>
+
+  <!-- EDIT / MANAGE USER MODAL -->
+  <div id="editModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm items-center justify-center p-4 hidden">
+    <div class="glass-card w-full max-w-lg rounded-2xl p-6 relative border border-slate-700 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-blue-500/20 text-blue-400 rounded-xl">
+          <i data-lucide="user-cog" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white">Manage User Account</h3>
+          <p id="editUserEmail" class="text-xs text-blue-400 font-mono"></p>
+        </div>
+      </div>
+      
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Account Status</label>
+            <select id="editStatus" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-primary">
+              <option value="true">Active (Allowed to generate)</option>
+              <option value="false">Deactivated (Blocked / Banned)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5">Subscription Plan</label>
+            <select id="editSub" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-primary">
+              <option value="none">None (Free only with Own API Key)</option>
+              <option value="payg">Pay As You Go (Per-Video Balance)</option>
+              <option value="creator">Creator (Rs. 2,500/mo - 120 mins)</option>
+              <option value="pro">Pro (Rs. 5,000/mo - 300 mins)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Quota Management -->
+        <div class="grid grid-cols-2 gap-3 bg-slate-900/40 p-3.5 rounded-xl border border-slate-800">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Quota Used (Mins)</label>
+            <input type="number" id="editQuotaUsed" min="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-primary" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1">Quota Limit (Mins)</label>
+            <input type="number" id="editQuotaLimit" min="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-primary" />
+          </div>
+          <div class="col-span-2 flex justify-between items-center pt-1">
+            <span class="text-[10px] text-slate-400">⚡ Auto-fills 120m for Creator, 300m for Pro</span>
+            <button type="button" onclick="document.getElementById('editQuotaUsed').value = '0'" class="text-[11px] text-blue-400 hover:text-blue-300 flex items-center gap-1 font-semibold">
+              <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Reset Quota to 0 Mins
+            </button>
+          </div>
+        </div>
+
+        <!-- Wallet Balance Management -->
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-xs font-semibold text-slate-300">Wallet Balance (LKR)</label>
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="quickAddToEditBalance(100)" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-colors">+100</button>
+              <button type="button" onclick="quickAddToEditBalance(250)" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-colors">+250</button>
+              <button type="button" onclick="quickAddToEditBalance(500)" class="px-2 py-0.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-colors">+500</button>
+              <button type="button" onclick="document.getElementById('editBalance').value = '0.00'" class="px-2 py-0.5 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-300 text-[10px] font-bold transition-colors">Clear</button>
+            </div>
+          </div>
+          <div class="relative">
+            <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 font-bold text-xs">Rs.</span>
+            <input type="number" id="editBalance" step="0.01" class="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-3 py-2.5 text-xs text-white font-mono font-bold focus:outline-none focus:border-primary" />
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center gap-3 pt-2">
+          <button onclick="saveUser()" class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-blue-600/20 transition-all flex justify-center items-center gap-2">
+            <i data-lucide="check" class="w-4 h-4"></i> Save Changes
+          </button>
+          <button onclick="closeModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD NEW USER MODAL -->
+  <div id="createUserModal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm items-center justify-center p-4 hidden">
+    <div class="glass-card w-full max-w-md rounded-2xl p-6 relative border border-slate-700 shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+      <button onclick="closeCreateUserModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+      
+      <div class="flex items-center gap-3 mb-4">
+        <div class="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-xl">
+          <i data-lucide="user-plus" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white">Add New User</h3>
+          <p class="text-xs text-slate-400">Register or credit an account</p>
+        </div>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">User Email Address *</label>
+          <input type="email" id="newEmail" placeholder="user@gmail.com" required
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Initial Balance (Rs.)</label>
+          <input type="number" id="newBalance" value="250" step="10"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-emerald-500" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1">Subscription Plan</label>
+          <select id="newSub" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <option value="none">None (Free only with Own API Key)</option>
+            <option value="payg" selected>Pay As You Go (Per-Video Balance)</option>
+            <option value="creator">Creator Plan (120 Mins / Month)</option>
+            <option value="pro">Pro Plan (300 Mins / Month)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+          <button onclick="submitNewUser()" class="flex-1 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/20 transition-all flex justify-center items-center gap-2">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i> Create User
+          </button>
+          <button onclick="closeCreateUserModal()" class="px-4 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-[999] flex flex-col gap-2 pointer-events-none"></div>
+
+  <script>
+    const API_BASE_URL = (function() {
+      const proto = window.location.protocol;
+      const host = window.location.hostname || '';
+      const port = window.location.port || '';
+      if ((host === 'localhost' || host === '127.0.0.1') && port === '6039') return '';
+      if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) return 'http://localhost:6039';
+      if (host.includes('capzone.top') || host.includes('web.app') || host.includes('firebaseapp.com')) return 'https://capzone.kaveez.top';
+      return '';
+    })();
+
+    // Direct API Post
+    async function apiPost(endpoint, payload) {
+      try {
+        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (e) {
+        console.warn('API Post notice:', e.message);
+      }
+      return null;
+    }
+
+    let allUsers = [];
+    let currentEditEmail = '';
+
+    function showToast(msg, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-emerald-600/90 text-white border-emerald-400/30',
+        error: 'bg-red-600/90 text-white border-red-400/30',
+        warning: 'bg-amber-600/90 text-white border-amber-400/30',
+        info: 'bg-blue-600/90 text-white border-blue-400/30'
+      };
+      toast.className = `px-4 py-2.5 rounded-xl shadow-xl text-xs font-semibold backdrop-blur border flex items-center gap-2 transform transition-all pointer-events-auto ${colors[type] || colors.info}`;
+      toast.innerHTML = `<span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px)';
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
+    async function checkServerHealth() {
+      const dot = document.getElementById('serverStatusDot');
+      const text = document.getElementById('serverStatusText');
+      const banner = document.getElementById('serverAlertBanner');
+      const urlText = document.getElementById('currentApiUrlText');
+      if (urlText) urlText.textContent = API_BASE_URL || 'Backend Service';
+
+      try {
+        let res = await fetch(`${API_BASE_URL}/api/status?_t=${Date.now()}`);
+        if (!res.ok && API_BASE_URL) res = await fetch(`/api/status?_t=${Date.now()}`);
+        if (res.ok) {
+          if (dot) dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+          if (text) {
+            text.textContent = 'Server Online';
+            text.className = 'text-emerald-400 font-semibold';
+          }
+          if (banner) banner.classList.add('hidden');
+          return true;
+        }
+      } catch (e) {}
+
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-amber-400 animate-pulse';
+      if (text) {
+        text.textContent = 'Server Offline';
+        text.className = 'text-amber-400 font-semibold';
+      }
+      if (banner) banner.classList.remove('hidden');
+      return false;
+    }
+
+    // Helper: Broadcast user update in Real-Time to Dashboard and across tabs
+    function broadcastUserUpdate(email, updatedUser) {
+      email = (email || '').toLowerCase().trim();
+      if (!email || !updatedUser) return;
+      
+      // 1. Update in-memory user list
+      const idx = allUsers.findIndex(u => (u.email || '').toLowerCase() === email);
+      if (idx !== -1) {
+        allUsers[idx] = { ...allUsers[idx], ...updatedUser };
+      } else {
+        allUsers.push(updatedUser);
+      }
+      localStorage.setItem('capzone_admin_cached_users', JSON.stringify(allUsers));
+
+      // 2. BroadcastChannel: 0ms real-time tab sync
+      try {
+        const bc = new BroadcastChannel('capzone_realtime_sync');
+        bc.postMessage({ type: 'USER_UPDATED', email: email, user: updatedUser });
+      } catch (e) {}
+
+      // 3. Storage events: triggers 'storage' listener in Dashboard
+      localStorage.setItem('capzone_admin_sync', JSON.stringify({ email: email, timestamp: Date.now(), user: updatedUser }));
+      localStorage.setItem('capzone_cached_user_' + email, JSON.stringify(updatedUser));
+      
+      // If updating currently logged in user, also update primary cache
+      const curUser = (localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
+      if (curUser === email) {
+        localStorage.setItem('capzone_user_profile', JSON.stringify(updatedUser));
+      }
+    }
+
+    async function fetchUsers() {
+      const refreshIcon = document.getElementById('refreshIcon');
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      await checkServerHealth();
+      
+      let users = null;
+      try {
+        let res = await fetch(`${API_BASE_URL}/api/admin/srt-users?_t=${Date.now()}`);
+        if (!res.ok && API_BASE_URL) {
+          res = await fetch(`/api/admin/srt-users?_t=${Date.now()}`);
+        }
+        if (res.ok) {
+          users = await res.json();
+        }
+      } catch (err) {
+        try {
+          const fallback = API_BASE_URL.includes('localhost') ? 'https://capzone.kaveez.top' : 'http://localhost:6039';
+          const res2 = await fetch(`${fallback}/api/admin/srt-users?_t=${Date.now()}`);
+          if (res2.ok) users = await res2.json();
+        } catch(e2) {}
+      }
+
+      if (users && Array.isArray(users)) {
+        allUsers = users;
+        localStorage.setItem('capzone_admin_cached_users', JSON.stringify(allUsers));
+        renderTable();
+        updateStats();
+        if (refreshIcon) refreshIcon.classList.remove('animate-spin');
         return;
       }
-      document.addEventListener("contextmenu",function(e){e.preventDefault();return false;},{passive:false});
-      document.addEventListener("keydown",function(e){
-        if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&["I","i","J","j","C","c"].includes(e.key))||(e.ctrlKey&&["u","U","s","S"].includes(e.key))){
-          e.preventDefault();e.stopPropagation();return false;
-        }
-      },true);
-      if(h!=="localhost"&&h!=="127.0.0.1"){
-        var noop=function(){};
-        window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
+
+      if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+
+      // Fallback: check cached users from localStorage (useful for VS Code / offline test)
+      const cached = localStorage.getItem('capzone_admin_cached_users');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed)) {
+            allUsers = parsed;
+            renderTable();
+            updateStats();
+            return;
+          }
+        } catch(e){}
       }
-      setInterval(function(){
-        var s=Date.now();
-        (function(){}).constructor("debugger")();
-        if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
-      },1800);
-    })();
-    </script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapZone - Video & Subtitle Studio Login</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        theme: {
-                            bg: '#090d16',
-                            card: '#111728',
-                            cardHover: '#161f36',
-                            border: '#1f293d',
-                            primary: '#1a56db',
-                            primaryHover: '#1546b8',
-                            textMuted: '#94a3b8'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- 🛡️ CapZone High-Reliability Cloudflare Turnstile Core Controller -->
-    <script>
-        (function() {
-            window.isRobotVerified = false;
-            window.turnstileLoginToken = null;
-            window.turnstileSignupToken = null;
-            window.turnstileLoginWidgetId = null;
-            window.turnstileSignupWidgetId = null;
 
-            // Enforce live Cloudflare Turnstile tick without cached bypass
-            try {
-                sessionStorage.removeItem('capzone_robot_verified');
-                localStorage.removeItem('capzone_robot_verified');
-            } catch(e) {}
+      // Default seed user if completely empty
+      if (!allUsers || allUsers.length === 0) {
+        allUsers = [{
+          email: 'kaveeshatd@gmail.com',
+          balance: 2500.01,
+          srt_count: 0,
+          active: true,
+          subscription_type: 'creator',
+          quota_used: 0,
+          quota_limit: 120,
+          joined: new Date().toISOString()
+        }];
+        localStorage.setItem('capzone_admin_cached_users', JSON.stringify(allUsers));
+        renderTable();
+        updateStats();
+      }
+    }
 
-            window.markTurnstileVerified = function(token, source) {
-                if (!token) return;
-                window.isRobotVerified = true;
-                if (source === 'signup') {
-                    window.turnstileSignupToken = token;
-                } else {
-                    window.turnstileLoginToken = token;
-                }
-
-                // Update UI on both Login and Signup widgets immediately
-                const loginStatus = document.getElementById('turnstileStatusLogin');
-                const loginWidget = document.getElementById('turnstileWidgetLogin');
-                if (loginStatus) {
-                    loginStatus.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                }
-                if (loginWidget) {
-                    loginWidget.classList.remove('border-cyan-500/25', 'border-rose-500', 'from-[#131b2e]/95');
-                    loginWidget.classList.add('border-emerald-500/60', 'from-[#0e2424]/95', 'shadow-[0_0_25px_rgba(16,185,129,0.25)]');
-                }
-
-                const signupStatus = document.getElementById('turnstileStatusSignup');
-                const signupWidget = document.getElementById('turnstileWidgetSignup');
-                if (signupStatus) {
-                    signupStatus.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                }
-                if (signupWidget) {
-                    signupWidget.classList.remove('border-cyan-500/25', 'border-rose-500', 'from-[#131b2e]/95');
-                    signupWidget.classList.add('border-emerald-500/60', 'from-[#0e2424]/95', 'shadow-[0_0_25px_rgba(16,185,129,0.25)]');
-                }
-
-                if (typeof window.dismissPreloader === 'function') {
-                    window.dismissPreloader('turnstile_verified');
-                }
-
-                if (typeof window.syncTurnstileBackend === 'function') {
-                    window.syncTurnstileBackend(token);
-                }
-            };
-
-            window.isUserRobotVerified = function(action) {
-                if (action === 'signup') {
-                    if (window.turnstileSignupToken && typeof window.turnstileSignupToken === 'string' && window.turnstileSignupToken.length > 5) {
-                        return true;
-                    }
-                    if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                        try {
-                            const tok = turnstile.getResponse('#cfTurnstileSignup');
-                            if (tok && typeof tok === 'string' && tok.length > 5) {
-                                window.turnstileSignupToken = tok;
-                                return true;
-                            }
-                        } catch(e) {}
-                    }
-                    const signupInput = document.querySelector('#signUpFormElement [name="cf-turnstile-response"]') || 
-                                        document.querySelector('#cfTurnstileSignup [name="cf-turnstile-response"]');
-                    if (signupInput && signupInput.value && signupInput.value.length > 5) {
-                        window.turnstileSignupToken = signupInput.value;
-                        return true;
-                    }
-                    return false;
-                } else {
-                    if (window.turnstileLoginToken && typeof window.turnstileLoginToken === 'string' && window.turnstileLoginToken.length > 5) {
-                        return true;
-                    }
-                    if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                        try {
-                            const tok = turnstile.getResponse('#cfTurnstileLogin') || turnstile.getResponse();
-                            if (tok && typeof tok === 'string' && tok.length > 5) {
-                                window.turnstileLoginToken = tok;
-                                return true;
-                            }
-                        } catch(e) {}
-                    }
-                    const loginInput = document.querySelector('#signInFormElement [name="cf-turnstile-response"]') || 
-                                       document.querySelector('#cfTurnstileLogin [name="cf-turnstile-response"]');
-                    if (loginInput && loginInput.value && loginInput.value.length > 5) {
-                        window.turnstileLoginToken = loginInput.value;
-                        return true;
-                    }
-                    return false;
-                }
-            };
-
-            // Callbacks defined before Turnstile API script parses HTML
-            window.onTurnstileLoginSuccess = function(token) {
-                console.log("[Turnstile] Login verified callback triggered");
-                window.markTurnstileVerified(token, 'login');
-            };
-
-            window.onTurnstileSignupSuccess = function(token) {
-                console.log("[Turnstile] Signup verified callback triggered");
-                window.markTurnstileVerified(token, 'signup');
-            };
-
-            window.onTurnstileLoginExpired = function() {
-                console.warn("[Turnstile] Login token expired");
-                window.turnstileLoginToken = null;
-                window.isRobotVerified = false;
-                try { sessionStorage.removeItem('capzone_robot_verified'); } catch(e){}
-                const statusEl = document.getElementById('turnstileStatusLogin');
-                if (statusEl) {
-                    statusEl.innerHTML = '<span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> RETRY</span>';
-                }
-                if (typeof turnstile !== 'undefined' && turnstile.reset) {
-                    try { turnstile.reset('#cfTurnstileLogin'); } catch(e){}
-                }
-            };
-
-            window.onTurnstileLoginError = function() {
-                console.error("[Turnstile] Login challenge error");
-                const statusEl = document.getElementById('turnstileStatusLogin');
-                if (statusEl && !window.isRobotVerified) {
-                    statusEl.innerHTML = '<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> RETRY</span>';
-                }
-            };
-
-            window.onTurnstileSignupExpired = function() {
-                window.turnstileSignupToken = null;
-                window.isRobotVerified = false;
-                try { sessionStorage.removeItem('capzone_robot_verified'); } catch(e){}
-                const statusEl = document.getElementById('turnstileStatusSignup');
-                if (statusEl) {
-                    statusEl.innerHTML = '<span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> RETRY</span>';
-                }
-                if (typeof turnstile !== 'undefined' && turnstile.reset) {
-                    try { turnstile.reset('#cfTurnstileSignup'); } catch(e){}
-                }
-            };
-
-            window.onTurnstileSignupError = function() {
-                const statusEl = document.getElementById('turnstileStatusSignup');
-                if (statusEl && !window.isRobotVerified) {
-                    statusEl.innerHTML = '<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> RETRY</span>';
-                }
-            };
-
-            // Active Sentinel Watcher to catch token from DOM/Turnstile API instantly
-            setInterval(function() {
-                if (window.isRobotVerified && (window.turnstileLoginToken || window.turnstileSignupToken)) {
-                    return;
-                }
-                if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                    try {
-                        const lToken = turnstile.getResponse('#cfTurnstileLogin');
-                        if (lToken && typeof lToken === 'string' && lToken.length > 5) {
-                            window.markTurnstileVerified(lToken, 'login');
-                            return;
-                        }
-                        const sToken = turnstile.getResponse('#cfTurnstileSignup');
-                        if (sToken && typeof sToken === 'string' && sToken.length > 5) {
-                            window.markTurnstileVerified(sToken, 'signup');
-                            return;
-                        }
-                    } catch(e) {}
-                }
-                const lInput = document.querySelector('#cfTurnstileLogin [name="cf-turnstile-response"]') || 
-                              document.querySelector('#signInFormElement [name="cf-turnstile-response"]');
-                if (lInput && lInput.value && lInput.value.length > 5) {
-                    window.markTurnstileVerified(lInput.value, 'login');
-                    return;
-                }
-                const sInput = document.querySelector('#cfTurnstileSignup [name="cf-turnstile-response"]') || 
-                              document.querySelector('#signUpFormElement [name="cf-turnstile-response"]');
-                if (sInput && sInput.value && sInput.value.length > 5) {
-                    window.markTurnstileVerified(sInput.value, 'signup');
-                    return;
-                }
-            }, 200);
-        })();
-    </script>
-    <!-- Official Cloudflare Turnstile API -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts: Plus Jakarta Sans & Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        body {
-            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-            background-color: #090d16;
-            color: #ffffff;
-            margin: 0;
-            padding: 0;
-        }
-        @keyframes centerModalZoom {
-            0% { opacity: 0; transform: scale(0.88); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .center-modal-anim {
-            animation: centerModalZoom 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-            transform-origin: center center !important;
-            margin: auto !important;
-        }
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-            animation: slideUpFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1f293d;
-            border-radius: 4px;
-        }
-        .turnstile-clip-box {
-            height: 65px !important;
-            max-height: 65px !important;
-            overflow: hidden !important;
-            position: relative;
-            width: 100%;
-            max-width: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        .turnstile-clip-box iframe {
-            height: 65px !important;
-            max-height: 65px !important;
-            overflow: hidden !important;
-            border: none !important;
-        }
-        #capzonePreloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 99999;
-            background: #090d16;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 1;
-            visibility: visible;
-            margin: auto;
-            padding: 1rem;
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
-        }
-        #capzonePreloader.fade-out {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-        @keyframes preloaderSpin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes preloaderProgress {
-            0% { transform: translateX(-100%); }
-            50% { transform: translateX(20%); }
-            100% { transform: translateX(100%); }
-        }
-        .preloader-ring {
-            width: 76px;
-            height: 76px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.08);
-            border-top-color: #06b6d4;
-            border-right-color: #2563eb;
-            animation: preloaderSpin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
-        }
-        .preloader-bar-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #2563eb, #06b6d4, #3b82f6);
-            animation: preloaderProgress 1.4s ease-in-out infinite;
-        }
-    </style>
-</head>
-<body class="min-h-screen flex flex-col justify-center items-center relative overflow-x-hidden bg-[#090d16] selection:bg-blue-600 selection:text-white">
-
-    <!-- High-Performance Ambient Radial Glows (Zero GPU Lag / Zero CPU overhead) -->
-    <div class="fixed top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, rgba(9,13,22,0) 70%); transform: translateZ(0);"></div>
-    <div class="fixed bottom-[-10%] right-[15%] w-[450px] h-[450px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, rgba(9,13,22,0) 70%); transform: translateZ(0);"></div>
-
-    <!-- CapZone Premium Preloader (Smooth fade-out when page is fully ready) -->
-    <div id="capzonePreloader">
-        <div class="relative flex items-center justify-center mb-6">
-            <!-- Background Radial Glow -->
-            <div class="absolute -inset-6 bg-gradient-to-r from-blue-600/30 via-cyan-500/30 to-indigo-600/30 rounded-full blur-2xl animate-pulse pointer-events-none"></div>
-            <!-- Outer Spinning Gradient Ring -->
-            <div class="preloader-ring"></div>
-            <!-- Center Brand Logo Icon -->
-            <div class="absolute w-12 h-12 rounded-2xl bg-[#111728] border border-white/15 p-1.5 flex items-center justify-center shadow-lg shadow-cyan-500/10">
-                <img src="logo.jpg" class="w-full h-full object-cover rounded-xl" alt="CapZone Logo">
+    function renderOfflineState() {
+      const tbody = document.getElementById('usersTableBody');
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="8" class="text-center py-10 text-slate-400">
+            <div class="w-12 h-12 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="wifi-off" class="w-6 h-6"></i>
             </div>
-        </div>
+            <p class="font-bold text-white text-sm">Cannot Connect to Node Backend</p>
+            <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Make sure <code class="text-blue-400">node server.js</code> is running on port 6039.</p>
+            <button onclick="fetchUsers()" class="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition-all">
+              Try Reconnecting
+            </button>
+          </td>
+        </tr>
+      `;
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function updateStats() {
+      document.getElementById('statTotalUsers').innerText = allUsers.length;
+      const srts = allUsers.reduce((sum, u) => sum + (u.srt_count || 0), 0);
+      document.getElementById('statTotalSrts').innerText = srts;
+
+      // Calculate total collected user payments (all revenue paid into wallet)
+      let totalCollected = 0;
+      allUsers.forEach(u => {
+        let userPaid = 0;
+        if (Array.isArray(u.payments) && u.payments.length > 0) {
+          userPaid = u.payments.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+        }
+        // Account for current balance if higher (e.g. manual topup / initial balance)
+        userPaid = Math.max(userPaid, parseFloat(u.balance) || 0);
+        totalCollected += userPaid;
+      });
+
+      const formattedTotal = totalCollected.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      
+      const headerTotalEl = document.getElementById('headerTotalEarnings');
+      if (headerTotalEl) headerTotalEl.innerText = formattedTotal;
+
+      const statCreditsEl = document.getElementById('statTotalCredits');
+      if (statCreditsEl) statCreditsEl.innerText = formattedTotal;
+
+      const subs = allUsers.filter(u => u.subscription_type === 'creator' || u.subscription_type === 'pro').length;
+      document.getElementById('statTotalSubs').innerText = subs;
+    }
+
+    function filterUsers() {
+      renderTable();
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('usersTableBody');
+      const query = document.getElementById('searchInput').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('statusFilter').value;
+      const planFilter = document.getElementById('planFilter').value;
+      
+      tbody.innerHTML = '';
+      
+      const filtered = allUsers.filter(u => {
+        const matchesQuery = !query || u.email.toLowerCase().includes(query);
+        const matchesStatus = statusFilter === 'all' || (statusFilter === 'active' ? u.active : !u.active);
+        const matchesPlan = planFilter === 'all' || (u.subscription_type || 'none') === planFilter;
+        return matchesQuery && matchesStatus && matchesPlan;
+      });
+
+      document.getElementById('filteredCountBadge').innerText = `${filtered.length} of ${allUsers.length} users`;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center py-12 text-slate-400">
+              <i data-lucide="user-x" class="w-8 h-8 text-slate-500 mx-auto mb-2"></i>
+              <p class="font-bold text-slate-300">No users found</p>
+              <p class="text-xs text-slate-500 mt-0.5">Try adjusting your search or filters.</p>
+            </td>
+          </tr>
+        `;
+        if (window.lucide) lucide.createIcons();
+        return;
+      }
+      
+      filtered.forEach(user => {
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-slate-800/40 transition-colors border-b border-slate-800/60';
         
-        <!-- Branding Titles -->
-        <div class="text-center">
-            <div class="text-xl font-extrabold tracking-tight text-white flex items-center justify-center gap-2">
-                <span>CapZone</span>
-                <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 px-2 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20">Studio</span>
-            </div>
-            <p id="preloaderStatusText" class="text-xs text-slate-400 font-medium mt-2 flex items-center justify-center gap-2">
-                <i class="fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]"></i>
-                <span>Loading CapZone Studio...</span>
-            </p>
-        </div>
+        const statusBadge = user.active 
+          ? `<span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 text-[11px] font-bold rounded-full border border-emerald-500/20 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Active</span>`
+          : `<span class="px-2.5 py-1 bg-red-500/10 text-red-400 text-[11px] font-bold rounded-full border border-red-500/20 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-red-400"></span>Deactivated</span>`;
 
-        <!-- Shimmering Progress Bar -->
-        <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mt-5 relative">
-            <div class="preloader-bar-fill rounded-full"></div>
-        </div>
-    </div>
-
-    <!-- MAIN APP CONTAINER -->
-    <!-- Desktop (Image 2): Centered dual-panel split card -->
-    <!-- Mobile (Image 1): Top video editing wallpaper banner with rounded bottom-sheet login form -->
-    <main class="w-full max-w-none lg:max-w-5xl xl:max-w-6xl min-h-screen lg:min-h-0 lg:my-8 lg:rounded-[32px] overflow-hidden lg:border lg:border-white/10 lg:shadow-[0_25px_80px_rgba(0,0,0,0.7)] bg-[#101626] grid grid-cols-1 lg:grid-cols-12 relative z-10">
-
-        <!-- ========================================================================= -->
-        <!-- LEFT PANEL (VISUAL / WALLPAPER SIDE) -->
-        <!-- Mobile: Banner with login_mobile_bg.jpg -->
-        <!-- Desktop: Visual panel with login_desktop_bg.jpg -->
-        <!-- ========================================================================= -->
-        <section class="w-full lg:col-span-5 xl:col-span-6 relative h-[270px] sm:h-[320px] lg:h-auto lg:min-h-[720px] bg-[url('login_mobile_bg.jpg')] lg:bg-[url('login_desktop_bg.jpg')] bg-cover bg-center flex flex-col justify-between p-6 sm:p-8 lg:p-12 overflow-hidden select-none">
-            
-            <!-- Dark Contrast Overlays for Crisp Text Legibility -->
-            <div class="absolute inset-0 bg-gradient-to-b from-[#090d16]/70 via-transparent to-[#101626] lg:bg-gradient-to-t lg:from-[#0b101d] lg:via-[#0b101d]/50 lg:to-black/30 pointer-events-none"></div>
-            <div class="absolute inset-0 bg-blue-900/10 mix-blend-color-dodge pointer-events-none"></div>
-
-            <!-- Top Header Branding -->
-            <div class="relative z-10 flex items-center justify-between w-full">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-1 flex items-center justify-center shadow-lg group hover:scale-105 transition-transform">
-                        <img src="logo.jpg" class="w-full h-full object-cover rounded-lg" alt="CapZone Logo">
-                    </div>
-                    <div>
-                        <span class="text-xl font-extrabold tracking-tight text-white block leading-none drop-shadow">CapZone</span>
-                        <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 mt-1 block drop-shadow">CapZone Studio</span>
-                    </div>
-                </div>
-
-                <!-- Studio Tag Pill -->
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-slate-200 shadow-md">
-                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span>CapZone Studio</span>
-                </div>
-            </div>
-
-            <!-- Desktop Bottom Hero Content (Hidden on small mobile banner to keep clean) -->
-            <div class="relative z-10 hidden lg:block mt-auto pt-16">
-                <h2 class="text-3xl xl:text-4xl font-extrabold text-white leading-[1.2] drop-shadow-lg tracking-tight">
-                    Discover Dimensional <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300">Excellence</span>
-                </h2>
-                <p class="text-slate-200/90 text-xs xl:text-sm mt-3.5 leading-relaxed max-w-md drop-shadow font-normal">
-                    Generate millisecond-accurate Sinhala subtitles, bypass watermarks, remove backgrounds, and craft viral scripts tailored to elevate your vision.
-                </p>
-
-                <!-- 3 Dots Indicator (Matching Reference Image 2) -->
-                <div class="flex items-center gap-2 mt-7">
-                    <span class="w-7 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                </div>
-            </div>
-        </section>
-
-        <!-- ========================================================================= -->
-        <!-- RIGHT PANEL (DYNAMIC FORM AREA) -->
-        <!-- Mobile: Rounded Bottom-Sheet Card (-mt-8) -->
-        <!-- Desktop: Split card right pane -->
-        <!-- ========================================================================= -->
-        <section class="w-full lg:col-span-7 xl:col-span-6 -mt-8 lg:mt-0 rounded-t-[32px] sm:rounded-t-[36px] lg:rounded-none bg-[#111728] border-t lg:border-t-0 border-white/10 lg:border-l lg:border-white/5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.7)] lg:shadow-none min-h-[calc(100vh-240px)] lg:min-h-0">
-            
-            <div class="w-full max-w-md mx-auto my-auto py-2">
-                
-                <!-- Welcome Title Header (Matching Reference Image 2) -->
-                <div class="mb-6">
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Welcome!</h1>
-                    <p class="text-slate-400 text-xs sm:text-sm mt-1.5 font-medium">Sign in to Access CapZone Video Studio.</p>
-                </div>
-
-                <!-- Sleek Tab Switcher -->
-                <div class="flex items-center w-full border-b border-slate-700/70 mb-7">
-                    <button id="tabSignIn" onclick="switchTab('signin')" class="flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center">
-                        Login
-                    </button>
-                    <button id="tabSignUp" onclick="switchTab('signup')" class="flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center">
-                        Sign Up
-                    </button>
-                </div>
-
-                <!-- ========================================================================= -->
-                <!-- FORM 1: SIGN IN -->
-                <!-- ========================================================================= -->
-                <div id="signinForm" class="tab-content active space-y-4">
-                    <form id="signInFormElement" class="space-y-4">
-                        <!-- Email / Username Input -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address or Username</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-regular fa-envelope text-sm"></i>
-                                </span>
-                                <input type="text" id="signinEmail" required placeholder="creator@example.com / username" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                            </div>
-                        </div>
-
-                        <!-- Password Input -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-xs font-semibold text-slate-300">Password</label>
-                                <button type="button" onclick="switchTab('forgot')" class="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">Forgot password?</button>
-                            </div>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-lock text-sm"></i>
-                                </span>
-                                <input type="password" id="signinPassword" required placeholder="••••••••" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                <button type="button" onclick="togglePasswordVisibility('signinPassword', 'signinEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                    <i id="signinEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Remember Me -->
-                        <div class="flex items-center pt-0.5 pb-1">
-                            <label class="flex items-center cursor-pointer group">
-                                <div class="relative flex items-center justify-center w-4 h-4 rounded bg-[#171f33] border border-slate-700 group-hover:border-blue-500 transition-colors">
-                                    <input type="checkbox" id="remember-me" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
-                                    <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                                </div>
-                                <span class="ml-2.5 text-xs font-medium text-slate-400 group-hover:text-white transition-colors">Remember me on this device</span>
-                            </label>
-                        </div>
-
-                        <!-- Official Cloudflare Turnstile Human Verification Container -->
-                        <div id="turnstileWidgetLogin" class="p-3.5 rounded-2xl bg-gradient-to-b from-[#131b2e]/95 to-[#0e1626]/95 border border-cyan-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center transition-all duration-300 select-none relative overflow-hidden group">
-                            <!-- Top Security Header Bar -->
-                            <div class="flex items-center justify-between w-full max-w-[300px] mb-2 px-1">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                                    <span class="text-[11px] font-bold text-slate-200 tracking-wide flex items-center gap-1">
-                                        <i class="fa-solid fa-shield-halved text-cyan-400"></i> Cloudflare Shield
-                                    </span>
-                                </div>
-                                <div id="turnstileStatusLogin" class="text-[10px] text-slate-400 font-mono tracking-wider font-semibold">
-                                    CLICK TO VERIFY
-                                </div>
-                            </div>
-                            <!-- Turnstile Widget Box (Clean 65px Clip to hide red testing bar) -->
-                            <div class="turnstile-clip-box rounded-xl bg-[#151f33] border border-slate-700/60 shadow-inner">
-                                <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="0x4AAAAAAFTt3WlfzARJ26K-" data-action="login" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
-                            </div>
-                        </div>
-
-                        <!-- Primary Sign In Button -->
-                        <button type="submit" id="btnSignIn" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            <span>Sign In</span>
-                        </button>
-                    </form>
-
-                    <!-- OR Divider -->
-                    <div class="relative flex items-center justify-center py-2">
-                        <div class="border-t border-slate-700/60 w-full"></div>
-                        <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
-                    </div>
-
-                    <!-- Google Sign In Button (Matching Reference Image 2) -->
-                    <button type="button" id="btnGoogleLogin" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
-                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                        </svg>
-                        <span>Sign In With Google</span>
-                    </button>
-
-                    <div class="text-center pt-3">
-                        <p class="text-xs text-slate-400 font-medium">Don't have an account? <button type="button" onclick="switchTab('signup')" class="text-blue-400 hover:text-white font-bold transition-colors">Sign Up</button></p>
-                    </div>
-                </div>
-
-                <!-- ========================================================================= -->
-                <!-- FORM 2: SIGN UP -->
-                <!-- ========================================================================= -->
-                <div id="signupForm" class="tab-content space-y-4">
-                    <form id="signUpFormElement" class="space-y-4">
-                        <div id="signup-fields" class="space-y-4">
-                            <!-- Full Name -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Full Name</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-regular fa-user text-sm"></i>
-                                    </span>
-                                    <input type="text" id="signupName" required placeholder="Alex Morgan" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                </div>
-                            </div>
-
-                            <!-- Email -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-regular fa-envelope text-sm"></i>
-                                    </span>
-                                    <input type="text" id="signupEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                </div>
-                            </div>
-
-                            <!-- Password with Live Strength Indicator & Checklist (Matching Image 2) -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Password</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-lock text-sm"></i>
-                                    </span>
-                                    <input type="password" id="signupPassword" oninput="checkPasswordStrength(this.value)" required placeholder="Create strong password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                    <button type="button" onclick="togglePasswordVisibility('signupPassword', 'signupEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                        <i id="signupEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Strength Bar -->
-                                <div class="mt-2.5">
-                                    <div class="h-1.5 w-full bg-[#171f33] rounded-full overflow-hidden flex border border-slate-800">
-                                        <div id="strengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
-                                        <span id="strengthText">මුරපදයේ ශක්තිය (Password Strength)</span>
-                                        <span>අවම 8+ අකුරු</span>
-                                    </div>
-                                </div>
-
-                                <!-- Password Checklist with Live Sinhala Indicators -->
-                                <ul class="text-[11px] text-slate-400 space-y-1.5 mt-2.5 pl-1 font-medium" id="signupChecklist">
-                                    <li id="ruleLen" class="flex items-center gap-1.5 text-slate-400 transition-colors">
-                                        <i class="fa-regular fa-circle text-[10px]"></i>
-                                        <span>අවම වශයෙන් අකුරු 8ක් තිබිය යුතුය (8+ characters)</span>
-                                    </li>
-                                    <li id="ruleLetter" class="flex items-center gap-1.5 text-slate-400 transition-colors">
-                                        <i class="fa-regular fa-circle text-[10px]"></i>
-                                        <span>ඉංග්‍රීසි අකුරු අඩංගු විය යුතුය (Letters: A-Z, a-z)</span>
-                                    </li>
-                                    <li id="ruleNum" class="flex items-center gap-1.5 text-slate-400 transition-colors">
-                                        <i class="fa-regular fa-circle text-[10px]"></i>
-                                        <span>අංක අඩංගු විය යුතුය (Numbers: 0-9)</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Terms Checkbox -->
-                            <div class="flex items-start pt-1">
-                                <div class="relative flex items-center justify-center w-4 h-4 mt-0.5 rounded bg-[#171f33] border border-slate-700 transition-colors">
-                                    <input type="checkbox" required id="terms" class="opacity-0 absolute w-full h-full cursor-pointer peer">
-                                    <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                                </div>
-                                <label for="terms" class="ml-2.5 text-xs text-slate-400 leading-relaxed">
-                                    I agree to the <a href="#" onclick="openPolicyModal('terms'); return false;" class="text-blue-400 hover:text-white font-semibold transition-colors">Terms</a> and <a href="#" onclick="openPolicyModal('privacy'); return false;" class="text-blue-400 hover:text-white font-semibold transition-colors">Privacy Policy</a>.
-                                </label>
-                            </div>
-
-                            <!-- Official Cloudflare Turnstile Human Verification Container -->
-                            <div id="turnstileWidgetSignup" class="p-3.5 rounded-2xl bg-gradient-to-b from-[#131b2e]/95 to-[#0e1626]/95 border border-cyan-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center transition-all duration-300 select-none relative overflow-hidden group">
-                                <!-- Top Security Header Bar -->
-                                <div class="flex items-center justify-between w-full max-w-[300px] mb-2 px-1">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                                        <span class="text-[11px] font-bold text-slate-200 tracking-wide flex items-center gap-1">
-                                            <i class="fa-solid fa-shield-halved text-cyan-400"></i> Cloudflare Shield
-                                        </span>
-                                    </div>
-                                    <div id="turnstileStatusSignup" class="text-[10px] text-slate-400 font-mono tracking-wider font-semibold">
-                                        CLICK TO VERIFY
-                                    </div>
-                                </div>
-                                <!-- Turnstile Widget Box (Clean 65px Clip to hide red testing bar) -->
-                                <div class="turnstile-clip-box rounded-xl bg-[#151f33] border border-slate-700/60 shadow-inner">
-                                    <div id="cfTurnstileSignup" data-sitekey="0x4AAAAAAFTt3WlfzARJ26K-" data-action="signup" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
-                                </div>
-                            </div>
-
-                            <!-- Primary Sign Up Button -->
-                            <button type="submit" id="btnSignUp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Sign Up &amp; Get OTP</span>
-                                <i class="fa-solid fa-arrow-right text-xs"></i>
-                            </button>
-
-                            <!-- Divider -->
-                            <div class="relative flex items-center justify-center py-1">
-                                <div class="border-t border-slate-700/60 w-full"></div>
-                                <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
-                            </div>
-
-                            <!-- Google Sign Up Button -->
-                            <button type="button" id="btnGoogleSignUp" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
-                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                                </svg>
-                                <span>Sign Up With Google</span>
-                            </button>
-                        </div>
-
-                        <!-- OTP Section (Hidden initially) -->
-                        <div id="signup-otp-fields" class="hidden space-y-4">
-                            <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="otp-message">
-                                📧 සත්‍යාපන කේතය ඔබගේ Gmail වෙත යවන ලදී.<br>
-                                <span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-shield-halved text-sm"></i>
-                                    </span>
-                                    <input type="text" id="signupOtp" maxlength="6" placeholder="000000" class="w-full pl-10 pr-4 py-3.5 rounded-xl border border-slate-700/80 bg-[#171f33] text-cyan-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 text-lg text-center tracking-[0.5em] font-extrabold font-mono shadow-inner">
-                                </div>
-                            </div>
-                            <button type="button" id="btnVerifyOtp" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Verify &amp; Create Account (ගිණුම සක්‍රිය කරන්න)</span>
-                                <i class="fa-solid fa-check text-xs"></i>
-                            </button>
-                            <div class="flex items-center justify-between pt-1">
-                                <button type="button" id="btnBackToSignup" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors">
-                                    <i class="fa-solid fa-arrow-left mr-1"></i> තොරතුරු වෙනස් කිරීමට ආපසු
-                                </button>
-                                <button type="button" id="btnResendSignupOtp" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors">
-                                    නැවත OTP එකක් එවන්න (<span id="signupResendTimer">60s</span>)
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="text-center pt-2">
-                        <p class="text-xs text-slate-400 font-medium">Already have an account? <button type="button" onclick="switchTab('signin')" class="text-blue-400 hover:text-white font-bold transition-colors">Login</button></p>
-                    </div>
-                </div>
-
-                <!-- ========================================================================= -->
-                <!-- FORM 3: FORGOT PASSWORD (2-STEP VERIFICATION) -->
-                <!-- ========================================================================= -->
-                <div id="forgotForm" class="tab-content space-y-4">
-                    <div>
-                        <button type="button" onclick="switchTab('signin')" class="text-xs font-bold text-blue-400 hover:text-white transition-colors inline-flex items-center gap-1.5 mb-4">
-                            <i class="fa-solid fa-arrow-left"></i> Return to Login
-                        </button>
-                        <h2 class="text-2xl font-extrabold text-white mb-1 tracking-tight">Recover Account</h2>
-                        <p class="text-slate-400 text-xs font-medium">Reset your password securely with Gmail OTP verification.</p>
-                    </div>
-
-                    <!-- Step 1: Request OTP -->
-                    <form id="forgotFormElement" class="space-y-4">
-                        <div id="forgotStep1" class="space-y-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Registered Email Address</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-regular fa-envelope text-sm"></i>
-                                    </span>
-                                    <input type="email" id="forgotEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                </div>
-                            </div>
-
-                            <button type="submit" id="btnForgotSendOtp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Send Verification Code (OTP එවන්න)</span>
-                                <i class="fa-regular fa-paper-plane text-xs"></i>
-                            </button>
-
-                            <div class="relative flex py-1 items-center">
-                                <div class="flex-grow border-t border-slate-700/60"></div>
-                                <span class="flex-shrink mx-3 text-[11px] text-slate-500 font-medium">හෝ (OR)</span>
-                                <div class="flex-grow border-t border-slate-700/60"></div>
-                            </div>
-
-                            <button type="button" id="btnFirebaseResetLink" class="w-full py-3 px-4 rounded-xl bg-[#131d2e] hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-500/50 text-cyan-300 font-semibold text-xs shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <i class="fa-brands fa-google text-xs text-amber-400"></i>
-                                <span>Send Direct Reset Link (Gmail එකට කෙලින්ම Link එකක් එවන්න)</span>
-                            </button>
-                        </div>
-
-                        <!-- Step 2: Enter OTP & New Strong Password -->
-                        <div id="forgotStep2" class="hidden space-y-4">
-                            <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="forgot-otp-notice">
-                                📧 මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී.<br>
-                                <span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>
-                            </div>
-
-                            <!-- OTP Input -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-shield-halved text-sm"></i>
-                                    </span>
-                                    <input type="text" id="forgotOtp" maxlength="6" placeholder="000000" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-cyan-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 text-base text-center tracking-[0.5em] font-extrabold font-mono shadow-inner">
-                                </div>
-                            </div>
-
-                            <!-- New Password -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">New Password</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-lock text-sm"></i>
-                                    </span>
-                                    <input type="password" id="forgotNewPassword" oninput="checkForgotPassStrength(this.value)" placeholder="Create strong new password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                    <button type="button" onclick="togglePasswordVisibility('forgotNewPassword', 'forgotNewEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                        <i id="forgotNewEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Strength Bar -->
-                                <div class="mt-2.5">
-                                    <div class="h-1.5 w-full bg-[#171f33] rounded-full overflow-hidden flex border border-slate-800">
-                                        <div id="forgotStrengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
-                                        <span id="forgotStrengthText">මුරපදයේ ශක්තිය (Password Strength)</span>
-                                        <span>අවම 8+ අකුරු</span>
-                                    </div>
-                                </div>
-
-                                <ul class="text-[11px] text-slate-400 space-y-1 mt-2.5 pl-1 font-medium" id="forgotChecklist">
-                                    <li id="fRuleLen" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> අවම වශයෙන් අකුරු 8ක් (8+ characters)</li>
-                                    <li id="fRuleLetter" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> ඉංග්‍රීසි අකුරු (Letters: A-Z, a-z)</li>
-                                    <li id="fRuleNum" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> අංක (Numbers: 0-9)</li>
-                                </ul>
-                            </div>
-
-                            <!-- Confirm New Password -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Confirm New Password</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-lock text-sm"></i>
-                                    </span>
-                                    <input type="password" id="forgotConfirmPassword" placeholder="Confirm your new password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                    <button type="button" onclick="togglePasswordVisibility('forgotConfirmPassword', 'forgotConfirmEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                        <i id="forgotConfirmEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Reset Button -->
-                            <button type="button" id="btnResetPasswordSubmit" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Reset &amp; Set New Password (නව මුරපදය සුරකින්න)</span>
-                                <i class="fa-solid fa-check text-xs"></i>
-                            </button>
-
-                            <!-- Resend & Back -->
-                            <div class="flex items-center justify-between pt-1">
-                                <button type="button" id="btnBackToForgotStep1" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors">
-                                    <i class="fa-solid fa-arrow-left mr-1"></i> ආපසු (Change Email)
-                                </button>
-                                <button type="button" id="btnResendForgotOtp" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors">
-                                    නැවත OTP එවන්න (<span id="forgotResendTimer">60s</span>)
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-            </div>
-
-            <!-- PayHere Required Bilingual Policy Links -->
-            <div class="mt-6 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400/90">
-                <button type="button" onclick="openPolicyModal('terms')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Terms &amp; Conditions (කොන්දේසි)</button>
-                <span>•</span>
-                <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Privacy Policy (පෞද්ගලිකත්වය)</button>
-                <span>•</span>
-                <button type="button" onclick="openPolicyModal('refund')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Return Policy (මුදල් ආපසු)</button>
-            </div>
-
-            <!-- Developer Attribution Footer -->
-            <div class="mt-4 text-center">
-                <p class="text-[11px] text-gray-500 font-medium">&copy; 2026 CapZone Studio. Powered by <span class="text-blue-400 font-semibold">Kaveez Developer Team</span>.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
-
-    <!-- Beautiful Centered Robot Verification Modal -->
-    <div id="robotVerificationModal" class="fixed inset-0 z-[150] hidden items-center justify-center pointer-events-none">
-        <div id="robotModalBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 transition-opacity duration-300 pointer-events-auto" onclick="closeRobotModal()"></div>
-        <div id="robotModalContent" class="relative w-full max-w-sm mx-4 bg-[#0a0f1c] border border-rose-500/30 rounded-3xl p-7 shadow-[0_0_50px_rgba(244,63,94,0.15)] transform scale-95 opacity-0 transition-all duration-300 pointer-events-auto">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-[#0a0f1c] rounded-full flex items-center justify-center border-4 border-[#030712] shadow-xl">
-                <div class="w-full h-full rounded-full bg-rose-500/10 flex items-center justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-rose-500/20 animate-ping"></div>
-                    <i class="fa-solid fa-robot text-3xl text-rose-500 relative z-10 animate-bounce" style="animation-duration: 2s;"></i>
-                </div>
-            </div>
-            <div class="mt-8 text-center">
-                <h3 class="text-xl font-bold text-white mb-2 tracking-wide">Verification Required</h3>
-                <p class="text-[13px] text-slate-300 leading-relaxed mb-6">
-                    කරුණාකර ඔබ රොබෝවරයෙකු නොවන බව තහවුරු කිරීමට <br><span class="text-rose-400 font-semibold">Security Check (Tick box)</span> එක සම්පූර්ණ කරන්න.
-                </p>
-                <button type="button" onclick="closeRobotModal()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold text-sm shadow-[0_4px_20px_rgba(244,63,94,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check text-xs"></i> <span>තේරුම් ගත්තා</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Tab Switching Logic
-        function switchTab(tabName) {
-            const tabs = ['signin', 'signup', 'forgot'];
-            tabs.forEach(t => {
-                const form = document.getElementById(t + 'Form');
-                if (form) form.classList.remove('active');
-            });
-
-            const tabSignInBtn = document.getElementById('tabSignIn');
-            const tabSignUpBtn = document.getElementById('tabSignUp');
-
-            if (tabName === 'signin') {
-                document.getElementById('signinForm').classList.add('active');
-                if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
-                if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
-                setTimeout(() => {
-                    if (typeof turnstile !== 'undefined') {
-                        const el = document.getElementById('cfTurnstileLogin');
-                        if (el && !el.querySelector('iframe')) {
-                            try {
-                                el.innerHTML = '';
-                                window.turnstileLoginWidgetId = turnstile.render('#cfTurnstileLogin', {
-                                    sitekey: '0x4AAAAAAFTt3WlfzARJ26K-',
-                                    theme: 'dark',
-                                    action: 'login',
-                                    callback: window.onTurnstileLoginSuccess,
-                                    'expired-callback': window.onTurnstileLoginExpired,
-                                    'error-callback': window.onTurnstileLoginError
-                                });
-                            } catch(e) {}
-                        }
-                    }
-                    if (window.isRobotVerified) {
-                        const st = document.getElementById('turnstileStatusLogin');
-                        if (st) st.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                    }
-                }, 60);
-            } else if (tabName === 'signup') {
-                document.getElementById('signupForm').classList.add('active');
-                if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
-                if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
-                setTimeout(() => {
-                    if (typeof turnstile !== 'undefined') {
-                        const el = document.getElementById('cfTurnstileSignup');
-                        if (el && !el.querySelector('iframe')) {
-                            try {
-                                el.innerHTML = '';
-                                window.turnstileSignupWidgetId = turnstile.render('#cfTurnstileSignup', {
-                                    sitekey: '0x4AAAAAAFTt3WlfzARJ26K-',
-                                    theme: 'dark',
-                                    action: 'signup',
-                                    callback: window.onTurnstileSignupSuccess,
-                                    'expired-callback': window.onTurnstileSignupExpired,
-                                    'error-callback': window.onTurnstileSignupError
-                                });
-                            } catch(e) {}
-                        }
-                    }
-                    if (window.isRobotVerified) {
-                        const st = document.getElementById('turnstileStatusSignup');
-                        if (st) st.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                    }
-                }, 60);
-            } else if (tabName === 'forgot') {
-                document.getElementById('forgotForm').classList.add('active');
-            }
+        const subType = user.subscription_type || 'none';
+        let subBadge = '';
+        if (subType === 'creator') {
+          subBadge = `<span class="px-2 py-0.5 bg-blue-500/15 text-blue-300 text-[10px] font-black rounded-lg border border-blue-500/30 uppercase tracking-wide">Creator</span>`;
+        } else if (subType === 'pro') {
+          subBadge = `<span class="px-2 py-0.5 bg-purple-500/15 text-purple-300 text-[10px] font-black rounded-lg border border-purple-500/30 uppercase tracking-wide">Pro</span>`;
+        } else if (subType === 'payg') {
+          subBadge = `<span class="px-2 py-0.5 bg-amber-500/15 text-amber-300 text-[10px] font-black rounded-lg border border-amber-500/30 uppercase tracking-wide">Pay As You Go</span>`;
+        } else {
+          subBadge = `<span class="px-2 py-0.5 bg-slate-700/50 text-slate-400 text-[10px] font-bold rounded-lg border border-slate-700">None (Own API)</span>`;
         }
 
-        // Toggle Password Visibility
-        window.togglePasswordVisibility = function(inputId, iconId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            if (!input || !icon) return;
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fa-regular fa-eye-slash text-sm';
-            } else {
-                input.type = 'password';
-                icon.className = 'fa-regular fa-eye text-sm';
-            }
+        const remaining = Math.max(0, (user.quota_limit || 0) - (user.quota_used || 0));
+        let quotaText = '';
+        if (subType === 'creator' || subType === 'pro') {
+          quotaText = `<div class="font-mono text-xs"><span class="text-white font-bold">${remaining}m</span> <span class="text-slate-400">/ ${user.quota_limit || 0}m left</span></div>`;
+        } else if (subType === 'payg') {
+          quotaText = `<span class="text-emerald-400 text-xs font-semibold">Wallet Billing</span>`;
+        } else {
+          quotaText = `<span class="text-slate-500 text-xs">Free (Own API Key)</span>`;
         }
 
-        // Strong Password Validation Helpers (Sinhala & English)
-        window.isPasswordStrong = function(val) {
-            if (!val || typeof val !== 'string') return false;
-            const hasLen = val.length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(val);
-            const hasNum = /[0-9]/.test(val);
-            return hasLen && hasLetter && hasNum;
-        };
+        const joinDate = user.joined ? new Date(user.joined).toLocaleDateString() : 'N/A';
 
-        // Live Password Strength Checker for Sign Up
-        window.checkPasswordStrength = function(val) {
-            const bar = document.getElementById('strengthBar');
-            const text = document.getElementById('strengthText');
-            const rLen = document.getElementById('ruleLen');
-            const rLetter = document.getElementById('ruleLetter');
-            const rNum = document.getElementById('ruleNum');
+        tr.innerHTML = `
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-[11px] font-bold text-white shrink-0">
+                ${user.email ? user.email.charAt(0).toUpperCase() : 'U'}
+              </div>
+              <div class="font-semibold text-white truncate max-w-[200px]" title="${user.email}">${user.email}</div>
+            </div>
+          </td>
+          <td class="py-3 px-4">${statusBadge}</td>
+          <td class="py-3 px-4">
+            <div class="flex items-center gap-2">
+              <span class="font-bold font-mono text-amber-400 text-xs">Rs. ${(user.balance || 0).toFixed(2)}</span>
+              <button onclick="quickTopUp('${user.email}', 100)" title="Quick +Rs. 100" class="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-colors">+100</button>
+              <button onclick="quickTopUp('${user.email}', 250)" title="Quick +Rs. 250" class="px-1.5 py-0.5 rounded bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 text-[10px] font-bold transition-colors">+250</button>
+            </div>
+          </td>
+          <td class="py-3 px-4">${subBadge}</td>
+          <td class="py-3 px-4">${quotaText}</td>
+          <td class="py-3 px-4 text-slate-300 font-semibold">${user.srt_count || 0}</td>
+          <td class="py-3 px-4 text-slate-400 text-[11px]">${joinDate}</td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <!-- Manage Button (ALWAYS VISIBLE) -->
+              <button onclick="openEdit('${user.email}')" class="px-2.5 py-1 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 hover:text-white rounded-lg text-xs font-bold border border-blue-500/30 transition-all flex items-center gap-1 shadow-sm">
+                <i data-lucide="sliders" class="w-3 h-3"></i> Manage
+              </button>
 
-            const hasLen = (val || '').length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(val || '');
-            const hasNum = /[0-9]/.test(val || '');
-            const hasSpecial = /[^A-Za-z0-9]/.test(val || '');
+              <!-- Quick Status Toggle Button -->
+              <button onclick="toggleUserStatus('${user.email}', ${!user.active})" title="${user.active ? 'Deactivate User' : 'Activate User'}" class="p-1 rounded-lg ${user.active ? 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30' : 'bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'} transition-all">
+                <i data-lucide="${user.active ? 'user-x' : 'user-check'}" class="w-3.5 h-3.5"></i>
+              </button>
 
-            function updateRuleUI(el, isValid) {
-                if (!el) return;
-                const icon = el.querySelector('i');
-                if (isValid) {
-                    el.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold transition-colors';
-                    if (icon) icon.className = 'fa-solid fa-circle-check text-[11px] text-emerald-400';
-                } else {
-                    el.className = 'flex items-center gap-1.5 text-slate-400 transition-colors';
-                    if (icon) icon.className = 'fa-regular fa-circle text-[10px] text-slate-500';
-                }
-            }
+              <!-- Delete User Button -->
+              <button onclick="confirmDeleteUser('${user.email}')" title="Delete User" class="p-1 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-all">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
 
-            updateRuleUI(rLen, hasLen);
-            updateRuleUI(rLetter, hasLetter);
-            updateRuleUI(rNum, hasNum);
+      if (window.lucide) lucide.createIcons();
+    }
 
-            if (!val || val.length === 0) {
-                if (bar) { bar.style.width = '0%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
-                if (text) { text.innerText = 'මුරපදයේ ශක්තිය (Password Strength)'; text.className = 'text-slate-400'; }
-                return;
-            }
+    function quickAddToEditBalance(amount) {
+      const el = document.getElementById('editBalance');
+      const cur = parseFloat(el.value || 0);
+      el.value = (cur + amount).toFixed(2);
+    }
 
-            let score = 0;
-            if (val.length >= 6) score++;
-            if (hasLen) score++;
-            if (hasLetter) score++;
-            if (hasNum) score++;
-            if (hasSpecial) score++;
+    async function quickTopUp(email, amount) {
+      email = (email || '').toLowerCase().trim();
+      const user = allUsers.find(u => (u.email || '').toLowerCase() === email);
+      if (!user) return;
+      const newBal = (user.balance || 0) + amount;
+      let updatedUser = { ...user, balance: newBal };
 
-            if (!hasLen || !hasLetter || !hasNum) {
-                if (bar) {
-                    bar.style.width = val.length < 6 ? '25%' : '40%';
-                    bar.className = 'h-full transition-all duration-300 bg-red-500';
-                }
-                if (text) {
-                    text.innerText = 'දුර්වල මුරපදයකි (අවම වශයෙන් අකුරු 8ක්, අකුරු සහ අංක අවශ්‍යයි)';
-                    text.className = 'text-red-400 font-bold';
-                }
-            } else if (score >= 4 && hasSpecial) {
-                if (bar) {
-                    bar.style.width = '100%';
-                    bar.className = 'h-full transition-all duration-300 bg-emerald-500';
-                }
-                if (text) {
-                    text.innerText = 'විශිෂ්ට ශක්තිමත් මුරපදයකි (Very Strong Password) ✓';
-                    text.className = 'text-emerald-400 font-bold';
-                }
-            } else {
-                if (bar) {
-                    bar.style.width = '75%';
-                    bar.className = 'h-full transition-all duration-300 bg-emerald-500';
-                }
-                if (text) {
-                    text.innerText = 'ශක්තිමත් මුරපදයකි (Strong Password) ✓';
-                    text.className = 'text-emerald-400 font-bold';
-                }
-            }
-        };
-
-        // Live Password Strength Checker for Forgot Password
-        window.checkForgotPassStrength = function(val) {
-            const bar = document.getElementById('forgotStrengthBar');
-            const text = document.getElementById('forgotStrengthText');
-            const rLen = document.getElementById('fRuleLen');
-            const rLetter = document.getElementById('fRuleLetter');
-            const rNum = document.getElementById('fRuleNum');
-
-            const hasLen = (val || '').length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(val || '');
-            const hasNum = /[0-9]/.test(val || '');
-
-            function updateRuleUI(el, isValid) {
-                if (!el) return;
-                const icon = el.querySelector('i');
-                if (isValid) {
-                    el.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold transition-colors';
-                    if (icon) icon.className = 'fa-solid fa-circle-check text-[11px] text-emerald-400';
-                } else {
-                    el.className = 'flex items-center gap-1.5 text-slate-400 transition-colors';
-                    if (icon) icon.className = 'fa-regular fa-circle text-[10px] text-slate-500';
-                }
-            }
-
-            updateRuleUI(rLen, hasLen);
-            updateRuleUI(rLetter, hasLetter);
-            updateRuleUI(rNum, hasNum);
-
-            if (!val || val.length === 0) {
-                if (bar) { bar.style.width = '0%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
-                if (text) { text.innerText = 'මුරපදයේ ශක්තිය (Password Strength)'; text.className = 'text-slate-400'; }
-                return;
-            }
-
-            if (!hasLen || !hasLetter || !hasNum) {
-                if (bar) { bar.style.width = '35%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
-                if (text) { text.innerText = 'දුර්වල මුරපදයකි (අවම වශයෙන් අකුරු 8ක්, අකුරු සහ අංක අවශ්‍යයි)'; text.className = 'text-red-400 font-bold'; }
-            } else {
-                if (bar) { bar.style.width = '100%'; bar.className = 'h-full transition-all duration-300 bg-emerald-500'; }
-                if (text) { text.innerText = 'ශක්තිමත් මුරපදයකි (Strong Password) ✓'; text.className = 'text-emerald-400 font-bold'; }
-            }
-        };
-
-        // Account Conflict Modal Controls
-        window.openAccountConflictModal = function({ email, isGoogle, message }) {
-            const modal = document.getElementById('accountConflictModal');
-            const msgEl = document.getElementById('conflictModalMessage');
-            if (!modal) return;
-
-            window._conflictTargetEmail = email;
-
-            if (msgEl) {
-                if (isGoogle) {
-                    msgEl.innerHTML = `<strong>${email}</strong> යන Gmail ලිපිනයෙන් දැනටමත් අපගේ පද්ධතියට <strong>Google</strong> හරහා සම්බන්ධ වී ඇත.<br><br>ඔබට නැවත වෙනම Username සහ Password සාදා ලියාපදිංචි විය නොහැක. කරුණාකර පහත <strong>'Sign in with Google'</strong> බොත්තම ක්ලික් කර පිවිසෙන්න.`;
-                } else {
-                    msgEl.innerHTML = `<strong>${email}</strong> යන Gmail ලිපිනයෙන් දැනටමත් CapZone ගිණුමක් ලියාපදිංචි වී ඇත.<br><br>කරුණාකර ඔබගේ පවතින මුරපදය ඇතුළත් කර Login වන්න. මුරපදය අමතක නම් 'Forgot Password' භාවිතා කරන්න.`;
-                }
-            }
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                const card = modal.querySelector('.scale-95');
-                if (card) {
-                    card.classList.remove('scale-95');
-                    card.classList.add('scale-100');
-                }
-            }, 10);
-        };
-
-        window.closeAccountConflictModal = function() {
-            const modal = document.getElementById('accountConflictModal');
-            if (!modal) return;
-            modal.classList.add('opacity-0');
-            const card = modal.querySelector('.scale-100');
-            if (card) {
-                card.classList.remove('scale-100');
-                card.classList.add('scale-95');
-            }
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        };
-
-        window.setLoading = function(button, isLoading) {
-            if (!button) return;
-            if (isLoading) {
-                button.dataset.origHtml = button.innerHTML;
-                button.disabled = true;
-                button.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
-                button.classList.add('opacity-70', 'cursor-not-allowed');
-            } else {
-                button.disabled = false;
-                button.innerHTML = button.dataset.origHtml || button.innerHTML;
-                button.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
+      try {
+        const data = await apiPost('/api/admin/srt-update-user', { email: email, updates: { balance: newBal } });
+        if (data && data.success && data.user) {
+          updatedUser = data.user;
         }
+      } catch (err) {
+        console.warn('Backend update error, updating local state:', err);
+      }
 
-        // Beautiful Robot Modal Logic
-        window.showRobotModal = function() {
-            const modal = document.getElementById('robotVerificationModal');
-            const backdrop = document.getElementById('robotModalBackdrop');
-            const content = document.getElementById('robotModalContent');
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            // Force reflow for animation
-            void modal.offsetWidth;
-            
-            backdrop.classList.remove('opacity-0');
-            backdrop.classList.add('opacity-100');
-            
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        };
+      broadcastUserUpdate(email, updatedUser);
+      showToast(`+Rs. ${amount} added to ${email}`, 'success');
+      renderTable();
+      updateStats();
+      fetchUsers();
+    }
 
-        window.closeRobotModal = function() {
-            const modal = document.getElementById('robotVerificationModal');
-            const backdrop = document.getElementById('robotModalBackdrop');
-            const content = document.getElementById('robotModalContent');
-            
-            backdrop.classList.remove('opacity-100');
-            backdrop.classList.add('opacity-0');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 300);
-        };
+    async function toggleUserStatus(email, newStatus) {
+      email = (email || '').toLowerCase().trim();
+      const user = allUsers.find(u => (u.email || '').toLowerCase() === email);
+      let updatedUser = user ? { ...user, active: newStatus } : { email: email, active: newStatus };
 
-        // Toast Notification Function
-        window.showToast = function(message, type = 'info') {
-            const container = document.getElementById('toastContainer');
-            if (!container) return;
-            const toast = document.createElement('div');
-            
-            let bgClass = type === 'success' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300' 
-                        : type === 'error' ? 'bg-red-500/20 border-red-500/50 text-red-300' 
-                        : 'bg-[#182033] border-slate-700 text-white';
-            
-            toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold backdrop-blur-md transition-all duration-300 transform translate-y-4 opacity-0 border ${bgClass}`;
-            
-            const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
-            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
-            
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-4', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+      try {
+        const data = await apiPost('/api/admin/srt-update-user', { email: email, updates: { active: newStatus } });
+        if (data && data.success && data.user) {
+          updatedUser = data.user;
         }
-    </script>
+      } catch (err) {
+        console.warn('Backend update error, updating local state:', err);
+      }
 
-    <!-- Firebase Authentication Logic -->
-    <script type="module">
-        import { 
-            auth, 
-            loginWithGoogle, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            sendPasswordResetEmail, 
-            setPersistence, 
-            browserLocalPersistence, 
-            browserSessionPersistence, 
-            onAuthStateChanged 
-        } from './firebase-config.js?v=2.5';
+      broadcastUserUpdate(email, updatedUser);
+      showToast(`User is now ${newStatus ? 'Active' : 'Deactivated'}`, 'success');
+      renderTable();
+      updateStats();
+      fetchUsers();
+    }
 
-        // Global safeguard: prevent background IndexedDB closing errors
-        window.addEventListener('unhandledrejection', (event) => {
-            if (event.reason && (event.reason.message || '').includes('Database is closing')) {
-                console.warn("Handled harmless background IndexedDB event:", event.reason);
-                event.preventDefault();
-            }
+    async function confirmDeleteUser(email) {
+      email = (email || '').toLowerCase().trim();
+      if (!confirm(`Are you sure you want to permanently delete user:\n${email}?`)) return;
+      try {
+        await apiPost('/api/admin/srt-delete-user', { email: email });
+      } catch (err) {
+        console.warn('Backend delete error:', err);
+      }
+
+      allUsers = allUsers.filter(u => (u.email || '').toLowerCase() !== email);
+      localStorage.setItem('capzone_admin_cached_users', JSON.stringify(allUsers));
+      try {
+        const bc = new BroadcastChannel('capzone_realtime_sync');
+        bc.postMessage({ type: 'USER_DELETED', email: email });
+      } catch(e) {}
+      localStorage.setItem('capzone_admin_sync', JSON.stringify({ email: email, timestamp: Date.now(), deleted: true }));
+
+      showToast(`User ${email} deleted`, 'success');
+      renderTable();
+      updateStats();
+      fetchUsers();
+    }
+
+    function openEdit(email) {
+      email = (email || '').toLowerCase().trim();
+      const user = allUsers.find(u => (u.email || '').toLowerCase() === email);
+      if (!user) return;
+      currentEditEmail = email;
+      document.getElementById('editUserEmail').innerText = email;
+      document.getElementById('editStatus').value = user.active ? 'true' : 'false';
+      document.getElementById('editBalance').value = (user.balance || 0).toFixed(2);
+      document.getElementById('editSub').value = user.subscription_type || 'none';
+      document.getElementById('editQuotaUsed').value = user.quota_used || 0;
+      document.getElementById('editQuotaLimit').value = user.quota_limit || 0;
+      
+      const modal = document.getElementById('editModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('editModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveUser() {
+      const email = (currentEditEmail || '').toLowerCase().trim();
+      const active = document.getElementById('editStatus').value === 'true';
+      const balance = parseFloat(document.getElementById('editBalance').value) || 0;
+      const subscription_type = document.getElementById('editSub').value;
+      const quota_used = parseInt(document.getElementById('editQuotaUsed').value) || 0;
+      const quota_limit = parseInt(document.getElementById('editQuotaLimit').value) || 0;
+      
+      const existingUser = allUsers.find(u => (u.email || '').toLowerCase() === email) || {};
+      let updatedUser = { 
+        ...existingUser,
+        email: email, 
+        active: active, 
+        balance: balance, 
+        subscription_type: subscription_type, 
+        quota_used: quota_used, 
+        quota_limit: quota_limit 
+      };
+
+      try {
+        const data = await apiPost('/api/admin/srt-update-user', { 
+          email: email, 
+          updates: { active, balance, subscription_type, quota_used, quota_limit } 
         });
-
-        const API_BASE_URL = (function() {
-            const proto = window.location.protocol;
-            const host = window.location.hostname || '';
-            const port = window.location.port || '';
-
-            // If directly served by local node server on port 6039
-            if ((host === 'localhost' || host === '127.0.0.1') && port === '6039') {
-                return '';
-            }
-
-            // If running on local environment (file: or port 5500 Live Server, etc.)
-            if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) {
-                return 'http://localhost:6039';
-            }
-
-            // If running on production website domain (capzone.top, etc.)
-            if (host.includes('capzone.top') || host.includes('web.app') || host.includes('firebaseapp.com')) {
-                return 'https://capzone.kaveez.top';
-            }
-
-            if (host.includes('capzone.kaveez.top')) {
-                return '';
-            }
-
-            return 'https://capzone.kaveez.top';
-        })();
-
-        // Resilient API caller with local -> VPS automatic fallback
-        async function apiFetch(endpoint, options = {}) {
-            const primaryUrl = `${API_BASE_URL}${endpoint}`;
-            try {
-                const res = await fetch(primaryUrl, options);
-                if (!res.ok && res.status === 404 && API_BASE_URL && API_BASE_URL.includes('localhost')) {
-                    const fallbackUrl = `https://capzone.kaveez.top${endpoint}`;
-                    return await fetch(fallbackUrl, options);
-                }
-                return res;
-            } catch (err) {
-                if (API_BASE_URL !== 'https://capzone.kaveez.top') {
-                    try {
-                        const fallbackUrl = `https://capzone.kaveez.top${endpoint}`;
-                        return await fetch(fallbackUrl, options);
-                    } catch (fallbackErr) {}
-                }
-                throw err;
-            }
+        if (data && data.success && data.user) {
+          updatedUser = data.user;
         }
+      } catch (err) {
+        console.warn('Backend save error, updating local state:', err);
+      }
 
-        async function notifyBackend(user, method, password = '') {
-            if (!user || !user.email) return;
-            const normEmail = user.email.toLowerCase().trim();
-            const uName = user.displayName || localStorage.getItem('capzone_user_name') || normEmail.split('@')[0];
-            try {
-                localStorage.setItem('capzone_login_timestamp', Date.now());
-                localStorage.setItem('capzone_user_email', normEmail);
-                if (uName) localStorage.setItem('capzone_user_name', uName);
+      broadcastUserUpdate(email, updatedUser);
+      closeModal();
+      showToast('User settings saved successfully!', 'success');
+      renderTable();
+      updateStats();
+      fetchUsers();
+    }
 
-                // 1. Instant Real-Time Cross-Tab Synchronization with Admin Panel
-                try {
-                    const syncPayload = {
-                        email: normEmail,
-                        timestamp: Date.now(),
-                        user: { 
-                            email: normEmail, 
-                            name: uName, 
-                            auth_provider: method === 'Google' ? 'google' : 'email',
-                            is_google: method === 'Google',
-                            active: true
-                        }
-                    };
-                    localStorage.setItem('capzone_admin_sync', JSON.stringify(syncPayload));
-                    
-                    const bc = new BroadcastChannel('capzone_realtime_sync');
-                    bc.postMessage({ type: 'USER_UPDATED', email: normEmail, user: syncPayload.user });
-                } catch(e) {}
+    function openCreateUserModal() {
+      document.getElementById('newEmail').value = '';
+      document.getElementById('newBalance').value = '250';
+      document.getElementById('newSub').value = 'payg';
+      const modal = document.getElementById('createUserModal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) lucide.createIcons();
+    }
 
-                // 2. Persist to Node Backend Database
-                await apiFetch('/api/save-user', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        email: normEmail, 
-                        name: uName, 
-                        displayName: uName,
-                        phone: user.phoneNumber, 
-                        method, 
-                        password 
-                    })
-                });
-            } catch (e) {
-                console.warn("Backend sync notice:", e.message);
-            }
-        }
+    function closeCreateUserModal() {
+      const modal = document.getElementById('createUserModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
 
+    async function submitNewUser() {
+      const email = document.getElementById('newEmail').value.trim().toLowerCase();
+      const balance = parseFloat(document.getElementById('newBalance').value) || 0;
+      const sub = document.getElementById('newSub').value;
 
+      if (!email || !email.includes('@')) {
+        showToast('Please enter a valid email address', 'warning');
+        return;
+      }
 
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                localStorage.setItem('capzone_user_email', user.email);
-                if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
-            }
+      let quota_limit = 0;
+      if (sub === 'creator') quota_limit = 120;
+      if (sub === 'pro') quota_limit = 300;
+
+      let newUser = {
+        email: email,
+        balance: balance,
+        subscription_type: sub,
+        quota_limit: quota_limit,
+        quota_used: 0,
+        active: true,
+        srt_count: 0,
+        joined: new Date().toISOString()
+      };
+
+      try {
+        const data = await apiPost('/api/admin/srt-create-user', {
+          email: email,
+          updates: {
+            balance: balance,
+            subscription_type: sub,
+            quota_limit: quota_limit,
+            quota_used: 0,
+            active: true
+          }
         });
+        if (data && data.success && data.user) {
+          newUser = data.user;
+        }
+      } catch (err) {
+        console.warn('Backend create user error, saving locally:', err);
+      }
 
-        // Expose apiFetch globally for security routines
-        window.apiFetch = apiFetch;
+      broadcastUserUpdate(email, newUser);
+      closeCreateUserModal();
+      showToast(`User ${email} created successfully!`, 'success');
+      renderTable();
+      updateStats();
+      fetchUsers();
+    }
 
-        // Background Turnstile Backend Handshake
-        window.syncTurnstileBackend = async function(token) {
-            if (!token) return;
-            try {
-                const res = await apiFetch(`/api/turnstile/verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: token })
-                });
-                const data = await res.json().catch(() => ({}));
-                if (res.ok && data.success) {
-                    window.isRobotVerified = true;
-                }
-            } catch (err) {
-                console.warn("Backend Turnstile sync notice (client verified):", err.message);
-            }
+    // Auto-init on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      fetchUsers();
+      // Periodically check server health
+      setInterval(checkServerHealth, 20000);
+
+      // 1. Real-time Cross-tab Sync Listener (Instant update when user pays or tests demo)
+      try {
+        const bc = new BroadcastChannel('capzone_realtime_sync');
+        bc.onmessage = (event) => {
+          if (event.data && (event.data.type === 'USER_UPDATED' || event.data.type === 'PAYMENT_COMPLETED')) {
+            const toastMsg = event.data.type === 'PAYMENT_COMPLETED' 
+              ? `⚡ Payment Update: ${event.data.email || 'User'} credited (Rs. ${event.data.amount || ''})`
+              : `⚡ User Synced: ${event.data.email || 'User'} logged in / updated`;
+            showToast(toastMsg, 'success');
+            fetchUsers();
+          }
         };
+      } catch (e) {}
 
-        // If Turnstile already verified before module finished loading, trigger sync
-        if (window.isRobotVerified && (window.turnstileLoginToken || window.turnstileSignupToken)) {
-            window.syncTurnstileBackend(window.turnstileLoginToken || window.turnstileSignupToken);
+      window.addEventListener('storage', (e) => {
+        if (e.key === 'capzone_admin_sync' || e.key === 'capzone_payment_sync' || e.key === 'capzone_balance_update' || e.key === 'capzone_user_email' || e.key === 'capzone_user_profile') {
+          fetchUsers();
         }
+      });
 
-        function highlightRobotWidget(widgetId) {
-            const el = document.getElementById(widgetId);
-            if (!el) return;
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/50');
-            setTimeout(() => {
-                el.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/50');
-            }, 2500);
-        }
+      window.addEventListener('focus', () => {
+        fetchUsers();
+      });
 
-        // Google Sign-In Handler
-        async function handleGoogleSignIn(btn) {
-            const action = (btn && btn.id === 'btnGoogleSignUp') ? 'signup' : 'login';
-            if (typeof window.isUserRobotVerified === 'function' && !window.isUserRobotVerified(action)) {
-                const targetWidget = (action === 'signup') ? 'turnstileWidgetSignup' : 'turnstileWidgetLogin';
-                highlightRobotWidget(targetWidget);
-                if (typeof window.showRobotModal === 'function') {
-                    window.showRobotModal();
-                } else {
-                    showToast('Please complete the Cloudflare Turnstile verification before proceeding.', 'error');
-                }
-                return;
-            }
+      // Periodically refresh user database every 8 seconds
+      setInterval(fetchUsers, 8000);
 
-            setLoading(btn, true);
-            try {
-                if (window.location.protocol === 'file:') {
-                    showToast('Google Sign-In requires a secure web environment.', 'error');
-                    setLoading(btn, false);
-                    return;
-                }
-                if (!auth) {
-                    showToast('Authentication module failed to initialize. Please check your browser settings or disable adblockers.', 'error');
-                    setLoading(btn, false);
-                    return;
-                }
-                try {
-                    const rememberEl = document.getElementById('remember-me');
-                    const remember = rememberEl ? rememberEl.checked : true;
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                } catch (pErr) {
-                    console.warn("Persistence set skipped:", pErr);
-                }
-                const result = await loginWithGoogle();
-                if (result && result.user) {
-                    localStorage.setItem('capzone_user_email', result.user.email);
-                    if (result.user.displayName) localStorage.setItem('capzone_user_name', result.user.displayName);
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-                    await notifyBackend(result.user, 'Google');
-                    showToast('Google login successful!', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                }
-            } catch (error) {
-                console.error("Google Sign-In Error:", error);
-                setLoading(btn, false);
-                if (error.code === 'auth/popup-closed-by-user') {
-                    showToast("Login cancelled by user", 'info');
-                } else if (error.code === 'auth/popup-blocked') {
-                    showToast("Login popup was blocked by browser. Please allow popups.", 'error');
-                } else if (error.message && error.message.includes('Database is closing')) {
-                    if (auth.currentUser) {
-                        localStorage.setItem('capzone_user_email', auth.currentUser.email);
-                        window.location.href = 'dashboard.html';
-                        return;
-                    }
-                    showToast("Please click Google Login again to complete sign-in.", 'info');
-                } else {
-                    showToast("Google Login Failed: " + error.message, 'error');
-                }
-            }
-        }
-
-        const btnGoogleLogin = document.getElementById('btnGoogleLogin');
-        if (btnGoogleLogin) btnGoogleLogin.addEventListener('click', () => handleGoogleSignIn(btnGoogleLogin));
-
-        const btnGoogleSignUp = document.getElementById('btnGoogleSignUp');
-        if (btnGoogleSignUp) btnGoogleSignUp.addEventListener('click', () => handleGoogleSignIn(btnGoogleSignUp));
-
-        // Helper to normalize username or email
-        function resolveUserEmail(input) {
-            const raw = (input || '').trim();
-            if (!raw) return '';
-            if (raw.includes('@')) return raw.toLowerCase();
-            return `${raw.toLowerCase()}@capzone.studio`;
-        }
-
-        // Email/Username and Password Sign-In
-        document.getElementById('signInFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const inputVal = document.getElementById('signinEmail').value.trim();
-            const password = document.getElementById('signinPassword').value;
-            const btn = document.getElementById('btnSignIn');
-
-            // Enforce Robot Verification before login
-            if (!window.isUserRobotVerified('login')) {
-                highlightRobotWidget('turnstileWidgetLogin');
-                window.showRobotModal();
-                return;
-            }
-
-            // Admin portal navigation
-            const lowerInput = inputVal.toLowerCase();
-            if (lowerInput === 'admin' || lowerInput === 'cz-admin') {
-                window.location.href = 'admin.html';
-                return;
-            }
-
-            if (!inputVal) {
-                showToast("Please enter your Email or Username!", "error");
-                return;
-            }
-
-            setLoading(btn, true);
-
-            try {
-                try {
-                    const rememberEl = document.getElementById('remember-me');
-                    const remember = rememberEl ? rememberEl.checked : true;
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                } catch (pErr) {
-                    console.warn("Persistence set skipped:", pErr);
-                }
-
-                // Determine target emails to try (direct email, or username normalized)
-                let candidateEmails = [];
-                if (inputVal.includes('@')) {
-                    candidateEmails.push(inputVal.toLowerCase());
-                } else {
-                    candidateEmails.push(`${lowerInput}@capzone.studio`);
-                    candidateEmails.push(`${lowerInput}@gmail.com`);
-                }
-
-                let loggedInUser = null;
-                let lastError = null;
-
-                for (const candidate of candidateEmails) {
-                    try {
-                        const result = await signInWithEmailAndPassword(auth, candidate, password);
-                        if (result && result.user) {
-                            loggedInUser = result.user;
-                            break;
-                        }
-                    } catch (attemptErr) {
-                        lastError = attemptErr;
-                    }
-                }
-
-                if (loggedInUser) {
-                    localStorage.setItem('capzone_user_email', loggedInUser.email);
-                    if (loggedInUser.displayName) {
-                        localStorage.setItem('capzone_user_name', loggedInUser.displayName);
-                    } else if (!inputVal.includes('@')) {
-                        localStorage.setItem('capzone_user_name', inputVal);
-                    }
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-                    await notifyBackend(loggedInUser, 'Email', password);
-                    showToast('Login successful!', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                } else {
-                    const srvRes = await apiFetch(`/api/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ identifier: inputVal, password })
-                    });
-                    const srvData = await srvRes.json();
-                    if (srvRes.ok && srvData.success && srvData.user) {
-                        localStorage.setItem('capzone_user_email', srvData.user.email);
-                        localStorage.setItem('capzone_user_name', srvData.user.name || inputVal);
-                        localStorage.setItem('capzone_login_timestamp', Date.now());
-                        await notifyBackend(srvData.user, 'Email', password);
-                        showToast('Login successful!', 'success');
-                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                        return;
-                    } else {
-                        throw new Error(srvData.error || (lastError ? lastError.message : 'Authentication failed'));
-                    }
-                }
-            } catch (error) {
-                console.error("Login Error:", error);
-                let msg = error.message;
-                if (error.code === 'auth/invalid-credential' || msg.includes('invalid-credential') || error.code === 'auth/wrong-password') {
-                    msg = "මුරපදය හෝ Email/Username වැරදියි. Account එකක් නැත්නම් කරුණාකර Sign Up වන්න.";
-                } else if (error.code === 'auth/user-not-found') {
-                    msg = "Account එකක් හමු නොවිණි. කරුණාකර Sign Up හරහා නව Account එකක් සාදන්න.";
-                }
-                showToast(msg, 'error');
-                setLoading(btn, false);
-            }
+      // Auto-populate Quota Limit when Subscription Plan changes in Edit Modal
+      const editSubEl = document.getElementById('editSub');
+      if (editSubEl) {
+        editSubEl.addEventListener('change', (e) => {
+          const plan = e.target.value;
+          const quotaLimitInput = document.getElementById('editQuotaLimit');
+          const quotaUsedInput = document.getElementById('editQuotaUsed');
+          if (plan === 'creator') {
+            quotaLimitInput.value = '120';
+            quotaUsedInput.value = '0';
+          } else if (plan === 'pro') {
+            quotaLimitInput.value = '300';
+            quotaUsedInput.value = '0';
+          } else {
+            quotaLimitInput.value = '0';
+            quotaUsedInput.value = '0';
+          }
         });
-
-        // State Tracking for OTP Workflows
-        let currentSignupData = { email: '', name: '', password: '' };
-        let currentForgotEmail = '';
-        let signupTimerInterval = null;
-        let forgotTimerInterval = null;
-
-        // Modal Action Button Listeners
-        const btnConflictGoogleLogin = document.getElementById('btnConflictGoogleLogin');
-        if (btnConflictGoogleLogin) {
-            btnConflictGoogleLogin.addEventListener('click', () => {
-                closeAccountConflictModal();
-                const mainGoogleBtn = document.getElementById('btnGoogleLogin');
-                handleGoogleSignIn(mainGoogleBtn || btnConflictGoogleLogin);
-            });
-        }
-
-        const btnConflictGoToLogin = document.getElementById('btnConflictGoToLogin');
-        if (btnConflictGoToLogin) {
-            btnConflictGoToLogin.addEventListener('click', () => {
-                closeAccountConflictModal();
-                switchTab('signin');
-                if (window._conflictTargetEmail) {
-                    const signinEmailInput = document.getElementById('signinEmail');
-                    if (signinEmailInput) {
-                        signinEmailInput.value = window._conflictTargetEmail;
-                        signinEmailInput.focus();
-                    }
-                }
-            });
-        }
-
-        // Helper: Start 60-Second Resend Countdown
-        function startResendTimer(timerSpanId, buttonId, intervalVarName) {
-            const span = document.getElementById(timerSpanId);
-            const btn = document.getElementById(buttonId);
-            if (!span || !btn) return;
-            
-            let timeLeft = 60;
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            span.innerText = `${timeLeft}s`;
-
-            if (intervalVarName === 'signup' && signupTimerInterval) clearInterval(signupTimerInterval);
-            if (intervalVarName === 'forgot' && forgotTimerInterval) clearInterval(forgotTimerInterval);
-
-            const timer = setInterval(() => {
-                timeLeft--;
-                span.innerText = `${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    span.innerText = 'Now';
-                }
-            }, 1000);
-
-            if (intervalVarName === 'signup') signupTimerInterval = timer;
-            if (intervalVarName === 'forgot') forgotTimerInterval = timer;
-        }
-
-        // -------------------------------------------------------------------------
-        // 1. SIGN-UP SUBMIT: VERIFY STRENGTH & SEND GMAIL OTP
-        // -------------------------------------------------------------------------
-        document.getElementById('signUpFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('signupName').value.trim();
-            const rawEmail = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const btn = document.getElementById('btnSignUp');
-
-            // Enforce Robot Verification before sign-up
-            if (!window.isUserRobotVerified('signup')) {
-                highlightRobotWidget('turnstileWidgetSignup');
-                window.showRobotModal();
-                return;
-            }
-
-            if (!rawEmail) {
-                showToast("කරුණාකර වලංගු Email ලිපිනයක් ඇතුළත් කරන්න!", "error");
-                return;
-            }
-
-            const email = rawEmail.toLowerCase();
-
-            // Strict Strong Password Enforcement (Min 8 chars, Letters & Numbers)
-            if (!window.isPasswordStrong(password)) {
-                showToast("⚠️ මුරපදය ප්‍රමාණවත් තරම් ශක්තිමත් නැත! කරුණාකර අවම වශයෙන් අකුරු 8ක්, ඉංග්‍රීසි අකුරු සහ අංක (numbers) ඇතුළත් කරන්න.", "error");
-                const pwdInput = document.getElementById('signupPassword');
-                if (pwdInput) {
-                    pwdInput.focus();
-                    pwdInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/30');
-                    setTimeout(() => pwdInput.classList.remove('border-red-500', 'ring-2', 'ring-red-500/30'), 3000);
-                }
-                return;
-            }
-
-            setLoading(btn, true);
-
-            try {
-                const res = await apiFetch(`/api/auth/send-signup-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, name, password })
-                });
-
-                const data = await res.json();
-
-                if (res.status === 409 || data.conflict) {
-                    // Email already exists or is a Google account!
-                    openAccountConflictModal({
-                        email: email,
-                        isGoogle: data.isGoogle,
-                        message: data.message
-                    });
-                    return;
-                }
-
-                if (!res.ok || !data.success) {
-                    showToast(data.error || "OTP කේතය යැවීමට නොහැකි විය. කරුණාකර පසුව නැවත උත්සාහ කරන්න.", "error");
-                    return;
-                }
-
-                // Success! Save state & switch to OTP verification step
-                currentSignupData = { email, name, password };
-                document.getElementById('signup-fields').classList.add('hidden');
-                const otpFields = document.getElementById('signup-otp-fields');
-                otpFields.classList.remove('hidden');
-
-                const otpMsg = document.getElementById('otp-message');
-                if (otpMsg) {
-                    otpMsg.innerHTML = `📧 සත්‍යාපන කේතය (OTP) <strong>${email}</strong> වෙත යවන ලදී.<br><span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>`;
-                }
-
-                startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
-                showToast("සත්‍යාපන කේතය (OTP) ඔබගේ Gmail වෙත යවන ලදී!", "success");
-
-                const otpInput = document.getElementById('signupOtp');
-                if (otpInput) {
-                    otpInput.value = '';
-                    otpInput.focus();
-                }
-
-            } catch (err) {
-                console.error("Sign-up OTP request error:", err);
-                showToast("Server Connection Error: " + err.message, "error");
-            } finally {
-                setLoading(btn, false);
-            }
-        });
-
-        // -------------------------------------------------------------------------
-        // 2. VERIFY SIGN-UP OTP & ACTIVATE ACCOUNT
-        // -------------------------------------------------------------------------
-        const btnVerifyOtpEl = document.getElementById('btnVerifyOtp');
-        if (btnVerifyOtpEl) {
-            btnVerifyOtpEl.addEventListener('click', async () => {
-                const otpVal = (document.getElementById('signupOtp').value || '').trim();
-                if (!otpVal || otpVal.length !== 6) {
-                    showToast("කරුණාකර ඉලක්කම් 6ක OTP කේතය නිවැරදිව ඇතුළත් කරන්න.", "error");
-                    return;
-                }
-
-                setLoading(btnVerifyOtpEl, true);
-
-                try {
-                    const res = await apiFetch(`/api/auth/verify-signup-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentSignupData.email,
-                            otp: otpVal,
-                            name: currentSignupData.name,
-                            password: currentSignupData.password
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok || !data.success) {
-                        showToast(data.error || "ඇතුළත් කළ OTP කේතය වැරදියි. කරුණාකර නැවත උත්සාහ කරන්න.", "error");
-                        setLoading(btnVerifyOtpEl, false);
-                        return;
-                    }
-
-                    // Successful OTP Verification! Log in via Firebase client
-                    try {
-                        const rememberEl = document.getElementById('remember-me');
-                        const remember = rememberEl ? rememberEl.checked : true;
-                        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                    } catch (pErr) {}
-
-                    try {
-                        await signInWithEmailAndPassword(auth, currentSignupData.email, currentSignupData.password);
-                    } catch(fbLoginErr) {
-                        console.warn("Direct Firebase login fallback:", fbLoginErr.message);
-                    }
-
-                    localStorage.setItem('capzone_user_email', currentSignupData.email);
-                    if (currentSignupData.name) localStorage.setItem('capzone_user_name', currentSignupData.name);
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-
-                    await notifyBackend(data.user || { email: currentSignupData.email }, 'Email Sign Up', currentSignupData.password);
-
-                    showToast("🎉 ඔබගේ CapZone ගිණුම සාර්ථකව සත්‍යාපනය විය! Studio වෙත පිවිසෙමින් පවතී...", "success");
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
-
-                } catch (err) {
-                    console.error("OTP verification error:", err);
-                    showToast("සත්‍යාපනය අසාර්ථක විය: " + err.message, "error");
-                    setLoading(btnVerifyOtpEl, false);
-                }
-            });
-        }
-
-        // Resend Sign-Up OTP
-        const btnResendSignupOtp = document.getElementById('btnResendSignupOtp');
-        if (btnResendSignupOtp) {
-            btnResendSignupOtp.addEventListener('click', async () => {
-                if (!currentSignupData.email) return;
-                setLoading(btnResendSignupOtp, true);
-                try {
-                    const res = await apiFetch(`/api/auth/send-signup-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentSignupData.email,
-                            name: currentSignupData.name,
-                            password: currentSignupData.password
-                        })
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        showToast("නව OTP කේතයක් නැවත යවන ලදී!", "success");
-                        startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
-                    } else {
-                        showToast(data.error || "නැවත OTP යැවීම අසාර්ථක විය.", "error");
-                    }
-                } catch(e) {
-                    showToast("Error: " + e.message, "error");
-                } finally {
-                    setLoading(btnResendSignupOtp, false);
-                }
-            });
-        }
-
-        // Back to Sign-Up Details
-        const btnBackToSignupEl = document.getElementById('btnBackToSignup');
-        if (btnBackToSignupEl) {
-            btnBackToSignupEl.addEventListener('click', () => {
-                document.getElementById('signup-otp-fields')?.classList.add('hidden');
-                document.getElementById('signup-fields')?.classList.remove('hidden');
-            });
-        }
-
-        // -------------------------------------------------------------------------
-        // 3. FORGOT PASSWORD: STEP 1 - SEND RESET OTP
-        // -------------------------------------------------------------------------
-        document.getElementById('forgotFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = (document.getElementById('forgotEmail').value || '').trim().toLowerCase();
-            const btn = document.getElementById('btnForgotSendOtp');
-
-            if (!email) {
-                showToast("කරුණාකර ඔබගේ ලියාපදිංචි Email ලිපිනය ඇතුළත් කරන්න!", "error");
-                return;
-            }
-
-            setLoading(btn, true);
-
-            try {
-                const res = await apiFetch(`/api/auth/send-forgot-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-
-                const data = await res.json().catch(() => ({}));
-
-                if (res.ok && data.success) {
-                    // OTP Sent! Switch to Step 2
-                    currentForgotEmail = email;
-                    document.getElementById('forgotStep1').classList.add('hidden');
-                    const step2 = document.getElementById('forgotStep2');
-                    step2.classList.remove('hidden');
-
-                    const notice = document.getElementById('forgot-otp-notice');
-                    if (notice) {
-                        const googleNote = data.isGoogle ? '<span class="text-cyan-400 font-semibold block mb-1">ℹ️ ඔබගේ ගිණුම Google මඟින් සම්බන්ධ කර ඇත. නව මුරපදය සැකසීමෙන් පසු ඔබට Email &amp; Password මඟින්ද Login විය හැක.</span>' : '';
-                        notice.innerHTML = `${googleNote}📧 මුරපදය නැවත සකසන OTP කේතය <strong>${email}</strong> වෙත එවා ඇත.<br><span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>`;
-                    }
-
-                    startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
-                    showToast("මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී!", "success");
-
-                    const forgotOtpInput = document.getElementById('forgotOtp');
-                    if (forgotOtpInput) {
-                        forgotOtpInput.value = '';
-                        forgotOtpInput.focus();
-                    }
-                    return;
-                }
-
-                // If backend returned Google conflict notice or failed, offer direct Firebase Reset Email
-                if (data.isGoogle || !res.ok) {
-                    try {
-                        if (auth) {
-                            await sendPasswordResetEmail(auth, email);
-                            showToast("📧 Google Firebase මඟින් මුරපදය Reset කිරීමේ Link එක ඔබගේ Gmail වෙත යවන ලදී! කරුණාකර Inbox පරීක්ෂා කරන්න.", "success");
-                            return;
-                        }
-                    } catch(fbErr){}
-                }
-
-                showToast(data.error || "මෙම Email ලිපිනය සහිත ගිණුමක් හමු නොවීය.", "error");
-
-            } catch (error) {
-                console.error("Forgot password OTP error:", error);
-                try {
-                    if (auth) {
-                        await sendPasswordResetEmail(auth, email);
-                        showToast("📧 Google Firebase මඟින් මුරපදය Reset කිරීමේ Link එක ඔබගේ Gmail වෙත යවන ලදී! කරුණාකර Inbox පරීක්ෂා කරන්න.", "success");
-                        return;
-                    }
-                } catch(e){}
-                showToast("Error: " + error.message, 'error');
-            } finally {
-                setLoading(btn, false);
-            }
-        });
-
-        // Direct Firebase Password Reset Email Link Button
-        const btnFirebaseResetLink = document.getElementById('btnFirebaseResetLink');
-        if (btnFirebaseResetLink) {
-            btnFirebaseResetLink.addEventListener('click', async () => {
-                const email = (document.getElementById('forgotEmail').value || '').trim().toLowerCase();
-                if (!email) {
-                    showToast("කරුණාකර ඔබගේ ලියාපදිංචි Email ලිපිනය ඇතුළත් කරන්න!", "error");
-                    return;
-                }
-                setLoading(btnFirebaseResetLink, true);
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    showToast("📧 Google Firebase මඟින් Password Reset Link එකක් " + email + " වෙත සාර්ථකව යවන ලදී! කරුණාකර ඔබගේ Inbox හෝ Spam පරීක්ෂා කරන්න.", "success");
-                } catch (fbErr) {
-                    console.error("Firebase reset email error:", fbErr);
-                    let msg = fbErr.message;
-                    if (fbErr.code === 'auth/user-not-found') msg = "මෙම Email ලිපිනය සහිත ගිණුමක් Firebase හි හමු නොවීය.";
-                    showToast("Firebase Error: " + msg, "error");
-                } finally {
-                    setLoading(btnFirebaseResetLink, false);
-                }
-            });
-        }
-
-        // -------------------------------------------------------------------------
-        // 4. FORGOT PASSWORD: STEP 2 - VERIFY OTP & RESET PASSWORD
-        // -------------------------------------------------------------------------
-        const btnResetPasswordSubmit = document.getElementById('btnResetPasswordSubmit');
-        if (btnResetPasswordSubmit) {
-            btnResetPasswordSubmit.addEventListener('click', async () => {
-                const otpVal = (document.getElementById('forgotOtp').value || '').trim();
-                const newPassword = document.getElementById('forgotNewPassword').value;
-                const confirmPassword = document.getElementById('forgotConfirmPassword').value;
-
-                if (!otpVal || otpVal.length !== 6) {
-                    showToast("කරුණාකර ඉලක්කම් 6ක OTP කේතය ඇතුළත් කරන්න.", "error");
-                    return;
-                }
-
-                if (!window.isPasswordStrong(newPassword)) {
-                    showToast("⚠️ නව මුරපදය ප්‍රමාණවත් තරම් ශක්තිමත් නැත! කරුණාකර අවම වශයෙන් අකුරු 8ක්, ඉංග්‍රීසි අකුරු සහ අංක (numbers) ඇතුළත් කරන්න.", "error");
-                    return;
-                }
-
-                if (newPassword !== confirmPassword) {
-                    showToast("මුරපද දෙක එකිනෙකට නොගැලපේ (Passwords do not match)!", "error");
-                    return;
-                }
-
-                setLoading(btnResetPasswordSubmit, true);
-
-                try {
-                    const res = await apiFetch(`/api/auth/verify-and-reset-password`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentForgotEmail,
-                            otp: otpVal,
-                            newPassword: newPassword
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok || !data.success) {
-                        showToast(data.error || "මුරපදය යාවත්කාලීන කිරීම අසාර්ථක විය.", "error");
-                        setLoading(btnResetPasswordSubmit, false);
-                        return;
-                    }
-
-                    showToast("✅ මුරපදය සාර්ථකව වෙනස් කරන ලදී! කරුණාකර නව මුරපදයෙන් Login වන්න.", "success");
-
-                    // Reset Forgot Form State
-                    document.getElementById('forgotStep2').classList.add('hidden');
-                    document.getElementById('forgotStep1').classList.remove('hidden');
-                    document.getElementById('forgotEmail').value = '';
-                    document.getElementById('forgotOtp').value = '';
-                    document.getElementById('forgotNewPassword').value = '';
-                    document.getElementById('forgotConfirmPassword').value = '';
-
-                    // Switch to Sign In tab and prefill
-                    switchTab('signin');
-                    const signinEmailInput = document.getElementById('signinEmail');
-                    const signinPasswordInput = document.getElementById('signinPassword');
-                    if (signinEmailInput) signinEmailInput.value = currentForgotEmail;
-                    if (signinPasswordInput) {
-                        signinPasswordInput.value = '';
-                        signinPasswordInput.focus();
-                    }
-
-                } catch (err) {
-                    console.error("Reset password error:", err);
-                    showToast("Error: " + err.message, "error");
-                } finally {
-                    setLoading(btnResetPasswordSubmit, false);
-                }
-            });
-        }
-
-        // Resend Forgot Password OTP
-        const btnResendForgotOtp = document.getElementById('btnResendForgotOtp');
-        if (btnResendForgotOtp) {
-            btnResendForgotOtp.addEventListener('click', async () => {
-                if (!currentForgotEmail) return;
-                setLoading(btnResendForgotOtp, true);
-                try {
-                    const res = await apiFetch(`/api/auth/send-forgot-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: currentForgotEmail })
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        showToast("නව OTP කේතයක් නැවත යවන ලදී!", "success");
-                        startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
-                    } else {
-                        showToast(data.error || "නැවත OTP යැවීම අසාර්ථක විය.", "error");
-                    }
-                } catch(e) {
-                    showToast("Error: " + e.message, "error");
-                } finally {
-                    setLoading(btnResendForgotOtp, false);
-                }
-            });
-        }
-
-        // Back to Forgot Step 1
-        const btnBackToForgotStep1 = document.getElementById('btnBackToForgotStep1');
-        if (btnBackToForgotStep1) {
-            btnBackToForgotStep1.addEventListener('click', () => {
-                document.getElementById('forgotStep2')?.classList.add('hidden');
-                document.getElementById('forgotStep1')?.classList.remove('hidden');
-            });
-        }
-
-        // Preloader transition handler
-        window.dismissPreloader = function(reason) {
-            const preloader = document.getElementById('capzonePreloader');
-            const statusText = document.getElementById('preloaderStatusText');
-            if (statusText) {
-                statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">CapZone Studio Ready!</span>';
-            }
-            if (preloader && preloader.style.display !== 'none' && !preloader.classList.contains('fade-out')) {
-                preloader.classList.add('fade-out');
-                setTimeout(() => { preloader.style.display = 'none'; }, 450);
-            }
-        };
-    </script>
-
-    <!-- ========================================================================= -->
-    <!-- ACCOUNT CONFLICT & GOOGLE LOGIN ADVICE MODAL (Bilingual Sinhala / English) -->
-    <!-- ========================================================================= -->
-    <div id="accountConflictModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
-        <div class="relative w-full max-w-md bg-[#111728] border border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.8)] text-center transform scale-95 transition-transform duration-300 overflow-hidden">
-            <!-- Ambient Glow -->
-            <div class="absolute -top-12 -left-12 w-36 h-36 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none"></div>
-
-            <!-- Glowing Badge Icon -->
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600/20 to-cyan-500/20 border border-cyan-400/40 text-cyan-400 flex items-center justify-center text-2xl shadow-lg mx-auto mb-4">
-                <i class="fa-solid fa-user-shield"></i>
-            </div>
-
-            <h3 class="text-xl font-extrabold text-white tracking-tight">දැනටමත් ලියාපදිංචි වූ ගිණුමකි</h3>
-            <p class="text-xs text-cyan-400 font-bold uppercase tracking-wider mt-0.5">Account Already Registered</p>
-
-            <div class="mt-4 p-4 rounded-2xl bg-[#172033]/80 border border-slate-700/60 text-slate-300 text-xs sm:text-sm leading-relaxed text-left">
-                <p id="conflictModalMessage" class="text-slate-200 font-medium"></p>
-                <div class="mt-2.5 pt-2.5 border-t border-slate-700/50 flex items-center gap-2 text-[11px] text-amber-400 font-medium">
-                    <i class="fa-solid fa-circle-info shrink-0"></i>
-                    <span>ඔබ මීට පෙර Google මඟින් Login වූයේ නම් පහත Google බොත්තම ක්ලික් කරන්න.</span>
-                </div>
-            </div>
-
-            <!-- Modal Action Buttons -->
-            <div class="mt-6 space-y-2.5">
-                <!-- Direct Google Login Trigger -->
-                <button type="button" id="btnConflictGoogleLogin" class="w-full flex items-center justify-center py-3.5 px-4 rounded-xl border border-white/20 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-lg gap-2.5 active:scale-[0.98]">
-                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span>Sign in with Google (Google මඟින් පිවිසෙන්න)</span>
-                </button>
-
-                <!-- Regular Login Switch -->
-                <button type="button" id="btnConflictGoToLogin" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md active:scale-[0.98] transition-all">
-                    <span>මුරපදය මඟින් Login වන්න (Login with Password)</span>
-                </button>
-
-                <!-- Close Modal -->
-                <button type="button" onclick="closeAccountConflictModal()" class="w-full py-2.5 text-xs text-slate-400 hover:text-white transition-colors font-semibold">
-                    <span>අවලංගු කරන්න (Close)</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Universal Bilingual Policy Modal Script -->
-    <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
-
-    <!-- ========================================================================= -->
-    <!-- 🛡️ CAPZONE STUDIO - CLOUDFLARE TURNSTILE & NETWORK GATE CONTROLLER -->
-    <!-- Keeps preloader visible until Cloudflare tick is fully loaded & network ready -->
-    <!-- ========================================================================= -->
-    <script>
-        (function() {
-            var dismissed = false;
-
-            window.dismissPreloader = function(reason) {
-                if (dismissed) return;
-                dismissed = true;
-
-                var preloader = document.getElementById('capzonePreloader');
-                var statusText = document.getElementById('preloaderStatusText');
-                if (statusText) {
-                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">CapZone Studio Ready!</span>';
-                }
-
-                setTimeout(function() {
-                    if (preloader) {
-                        preloader.classList.add('fade-out');
-                        setTimeout(function() {
-                            preloader.style.display = 'none';
-                        }, 450);
-                    }
-                }, 220);
-            };
-
-            function updatePreloaderStatus(text, iconClass) {
-                var statusText = document.getElementById('preloaderStatusText');
-                if (statusText && !dismissed) {
-                    statusText.innerHTML = '<i class="' + (iconClass || 'fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]') + '"></i><span>' + text + '</span>';
-                }
-            }
-
-            // Step 1: Update status to indicate Cloudflare network handshake
-            updatePreloaderStatus('Connecting to CapZone Studio Security Network...');
-
-            // Step 2: Check for Turnstile readiness
-            function checkTurnstileReadiness() {
-                if (dismissed) return;
-
-                // If already verified (tick complete & backend validated)
-                if (window.isRobotVerified || window.turnstileLoginToken || (typeof window.isUserRobotVerified === 'function' && window.isUserRobotVerified('login'))) {
-                    updatePreloaderStatus('Security Verified. Opening CapZone Studio...', 'fa-solid fa-circle-check text-emerald-400 text-[11px]');
-                    setTimeout(function() { window.dismissPreloader('verified'); }, 200);
-                    return;
-                }
-
-                // If Cloudflare Turnstile iframe has established its network and loaded into container
-                var container = document.getElementById('cfTurnstileLogin');
-                if (container && container.querySelector('iframe')) {
-                    updatePreloaderStatus('Cloudflare Security Network Initialized...', 'fa-solid fa-shield-halved text-cyan-400 text-[11px]');
-                    // Give auto-tick 450ms to finish verification, or dismiss so user can interact
-                    setTimeout(function() {
-                        if (!dismissed) {
-                            window.dismissPreloader('iframe_ready');
-                        }
-                    }, 450);
-                }
-            }
-
-            var checkTimer = setInterval(function() {
-                checkTurnstileReadiness();
-                if (dismissed) clearInterval(checkTimer);
-            }, 100);
-
-            // Hook into Turnstile API ready event
-            if (typeof turnstile !== 'undefined' && turnstile.ready) {
-                try {
-                    turnstile.ready(function() {
-                        updatePreloaderStatus('Cloudflare Security Network Initialized...');
-                        checkTurnstileReadiness();
-                    });
-                } catch(e) {}
-            }
-
-            // Fallback safety timeout (4s) so slow networks / blocked CDNs never trap user
-            setTimeout(function() {
-                if (!dismissed) {
-                    window.dismissPreloader('safety_timeout');
-                }
-            }, 4000);
-        })();
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>
