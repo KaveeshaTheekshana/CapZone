@@ -315,8 +315,7 @@
       try {
         let uEmail = email || window.currentUserEmail || localStorage.getItem('capzone_user_email');
         if (!uEmail || uEmail === 'creator@capzone.ai' || uEmail === 'creator@capzone.local') {
-          uEmail = 'kaveeshatd@gmail.com';
-          localStorage.setItem('capzone_user_email', uEmail);
+          return;
         }
         uEmail = uEmail.toLowerCase().trim();
         window.currentUserEmail = uEmail;
@@ -493,13 +492,31 @@
       }
 
       if (!user) {
-        // No active session or user logged out/deleted -> Purge storage and redirect to login
-        localStorage.removeItem('capzone_user_email');
-        localStorage.removeItem('capzone_user_name');
-        localStorage.removeItem('capzone_user_profile');
-        localStorage.removeItem('capzone_login_timestamp');
-        window.location.replace('login.html');
-        return;
+        const savedEmail = localStorage.getItem('capzone_user_email');
+        if (savedEmail && savedEmail.includes('@')) {
+          // User is authenticated via Email/Password backend session!
+          window.currentUserEmail = savedEmail;
+          const savedName = localStorage.getItem('capzone_user_name') || savedEmail.split('@')[0];
+          const profileName = document.getElementById('profileName');
+          const profileEmail = document.getElementById('profileEmail');
+          const profileInitial = document.getElementById('profileInitial');
+          const navProfileName = document.getElementById('navProfileName');
+          if (profileName) profileName.textContent = savedName;
+          if (profileEmail) profileEmail.textContent = savedEmail;
+          if (profileInitial) profileInitial.textContent = savedName.charAt(0).toUpperCase();
+          if (navProfileName) navProfileName.textContent = savedName;
+
+          if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+          window.fetchUserProfile(savedEmail);
+        } else {
+          // No session exists at all -> redirect to login
+          localStorage.removeItem('capzone_user_email');
+          localStorage.removeItem('capzone_user_name');
+          localStorage.removeItem('capzone_user_profile');
+          localStorage.removeItem('capzone_login_timestamp');
+          window.location.replace('login.html');
+          return;
+        }
       } else {
         const profileName = document.getElementById('profileName');
         const profileEmail = document.getElementById('profileEmail');
