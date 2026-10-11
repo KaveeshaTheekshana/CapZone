@@ -3,6 +3,35 @@
 
 <head>
     <meta charset="utf-8" />
+    <script>
+    (function(){
+      var h=(window.location.hostname||"").toLowerCase();
+      var p=window.location.protocol;
+      var d=atob("Y2Fwem9uZS50b3A=");
+      var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
+      if(p==="file:"||!ok){
+        try{if(window.stop)window.stop();}catch(e){}
+        try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
+        document.write("");
+        return;
+      }
+      document.addEventListener("contextmenu",function(e){e.preventDefault();return false;},{passive:false});
+      document.addEventListener("keydown",function(e){
+        if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&["I","i","J","j","C","c"].includes(e.key))||(e.ctrlKey&&["u","U","s","S"].includes(e.key))){
+          e.preventDefault();e.stopPropagation();return false;
+        }
+      },true);
+      if(h!=="localhost"&&h!=="127.0.0.1"){
+        var noop=function(){};
+        window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
+      }
+      setInterval(function(){
+        var s=Date.now();
+        (function(){}).constructor("debugger")();
+        if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
+      },1800);
+    })();
+    </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>CapZone</title>
     <meta name="description"
