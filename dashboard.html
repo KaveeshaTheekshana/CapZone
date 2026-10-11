@@ -4,6 +4,35 @@
 <head>
   <meta charset="utf-8" />
   <script>
+    (function(){
+      var h=(window.location.hostname||"").toLowerCase();
+      var p=window.location.protocol;
+      var d=atob("Y2Fwem9uZS50b3A=");
+      var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
+      if(p==="file:"||!ok){
+        try{if(window.stop)window.stop();}catch(e){}
+        try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
+        document.write("");
+        return;
+      }
+      document.addEventListener("contextmenu",function(e){e.preventDefault();return false;},{passive:false});
+      document.addEventListener("keydown",function(e){
+        if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&["I","i","J","j","C","c"].includes(e.key))||(e.ctrlKey&&["u","U","s","S"].includes(e.key))){
+          e.preventDefault();e.stopPropagation();return false;
+        }
+      },true);
+      if(h!=="localhost"&&h!=="127.0.0.1"){
+        var noop=function(){};
+        window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
+      }
+      setInterval(function(){
+        var s=Date.now();
+        (function(){}).constructor("debugger")();
+        if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
+      },1800);
+    })();
+  </script>
+  <script>
 
     window.API_BASE_URL = (function () {
       const h = window.location.hostname || '';
@@ -19,13 +48,11 @@
       return url.trim();
     };
 
-
     (function enforceHumanVerification() {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
       const isVerified = sessionStorage.getItem('capzone_robot_verified');
       const email = localStorage.getItem('capzone_user_email');
       if (!isLocal && (!isVerified || !email)) {
-        console.warn("[CyberShield] Direct access blocked: Turnstile verification required.");
         window.location.replace('login.html');
       }
     })();
@@ -3937,7 +3964,7 @@
       try {
         const userEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
         const headers = { 'x-user-email': userEmail };
-        const res = await fetch(`${API_BASE_URL}/api/generate-srt?clientId=${clientId}`, {
+        const res = await fetch(`${API_BASE_URL}/api/gateway?op=srt_generate&clientId=${clientId}`, {
           method: 'POST',
           body: formData,
           headers: headers,
@@ -4210,8 +4237,8 @@
       const es = setupProgressTracker(clientId, type, barId);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/${type === 'fb' ? 'facebook-download' : 'tiktok-download'}`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url, clientId, format, qualityLevel })
+        const res = await fetch(`${API_BASE_URL}/api/gateway?op=${type === 'fb' ? 'fb_dl' : 'tt_dl'}`, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: type === 'fb' ? 'fb_dl' : 'tt_dl', url, clientId, format, qualityLevel })
         });
         const data = await res.json();
         es.close();
@@ -4340,7 +4367,8 @@
       formData.append('image', fileInput.files[0]);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/remove-bg?clientId=${clientId}`, { method: 'POST', body: formData });
+        formData.append('op', 'bg_remove');
+        const res = await fetch(`${API_BASE_URL}/api/gateway?op=bg_remove&clientId=${clientId}`, { method: 'POST', body: formData });
         const data = await res.json();
 
         if (data.success) {
