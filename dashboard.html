@@ -35,11 +35,29 @@
   <script>
 
     window.API_BASE_URL = (function () {
-      const h = window.location.hostname || '';
-      if (!h || h === 'localhost' || h === '127.0.0.1') return '';
-      const _s = [50, 46, 46, 42, 41, 96, 117, 117, 57, 59, 42, 32, 53, 52, 63, 116, 49, 59, 44, 63, 63, 32, 116, 46, 53, 42];
-      const _t = _s.map(b => String.fromCharCode(b ^ 0x5a)).join('');
-      return (window.location.origin === _t) ? '' : _t;
+      const proto = window.location.protocol;
+      const host = window.location.hostname || '';
+      const port = window.location.port || '';
+
+      if ((host === 'localhost' || host === '127.0.0.1') && port === '6039') {
+        return '';
+      }
+
+      // If running on local environment (file: or port 5500 Live Server, etc.)
+      if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) {
+        return 'http://localhost:6039';
+      }
+
+      // If running on production website domain (capzone.top, etc.)
+      if (host.includes('capzone.top') || host.includes('web.app') || host.includes('firebaseapp.com')) {
+        return 'https://capzone.kaveez.top';
+      }
+
+      if (host.includes('capzone.kaveez.top')) {
+        return '';
+      }
+
+      return 'https://capzone.kaveez.top';
     })();
 
     window.formatMediaUrl = function (url) {
@@ -521,15 +539,26 @@
         if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
         window.fetchUserProfile(user.email);
 
-        // Fetch saved API key from backend
+        // Fetch saved API key from backend & sync user profile with Admin
+        const userMethod = (user.providerData && user.providerData.some(p => p.providerId === 'google.com')) ? 'Google' : 'Email';
         fetch(`${window.API_BASE_URL || ''}/api/save-user`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: user.email })
+          body: JSON.stringify({ 
+            email: user.email,
+            name: uName,
+            displayName: uName,
+            method: userMethod
+          })
         }).then(res => {
           if (!res.ok) throw new Error('HTTP ' + res.status);
           return res.json();
         }).then(data => {
+          try {
+            const bc = new BroadcastChannel('capzone_realtime_sync');
+            bc.postMessage({ type: 'USER_UPDATED', email: user.email, user: { email: user.email, name: uName, auth_provider: userMethod.toLowerCase() } });
+            localStorage.setItem('capzone_admin_sync', JSON.stringify({ email: user.email, timestamp: Date.now() }));
+          } catch(e) {}
           if (data && data.api_key && data.api_key !== 'default') {
             if (typeof window.syncApiKeys === 'function') window.syncApiKeys(data.api_key);
           } else {
