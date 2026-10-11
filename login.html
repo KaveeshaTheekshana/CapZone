@@ -108,6 +108,23 @@
             background: #1f293d;
             border-radius: 4px;
         }
+        .turnstile-clip-box {
+            height: 65px !important;
+            max-height: 65px !important;
+            overflow: hidden !important;
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .turnstile-clip-box iframe {
+            height: 65px !important;
+            max-height: 65px !important;
+            overflow: hidden !important;
+            border: none !important;
+        }
         #capzonePreloader {
             position: fixed;
             top: 0;
@@ -320,10 +337,22 @@
                         </div>
 
                         <!-- Official Cloudflare Turnstile Human Verification Container -->
-                        <div id="turnstileWidgetLogin" class="p-3 rounded-xl bg-[#171f33]/90 border border-slate-700/80 shadow-md flex flex-col items-center justify-center transition-all select-none">
-                            <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-action="login" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
-                            <div id="turnstileStatusLogin" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
-                                <i class="fa-solid fa-shield-halved text-blue-400"></i> Cloudflare Turnstile Verification
+                        <div id="turnstileWidgetLogin" class="p-3.5 rounded-2xl bg-gradient-to-b from-[#131b2e]/95 to-[#0e1626]/95 border border-cyan-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center transition-all duration-300 select-none relative overflow-hidden group">
+                            <!-- Top Security Header Bar -->
+                            <div class="flex items-center justify-between w-full max-w-[300px] mb-2 px-1">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                                    <span class="text-[11px] font-bold text-slate-200 tracking-wide flex items-center gap-1">
+                                        <i class="fa-solid fa-shield-halved text-cyan-400"></i> Cloudflare Shield
+                                    </span>
+                                </div>
+                                <div id="turnstileStatusLogin" class="text-[10px] text-slate-400 font-mono tracking-wider font-semibold">
+                                    CLICK TO VERIFY
+                                </div>
+                            </div>
+                            <!-- Turnstile Widget Box (Clean 65px Clip to hide red testing bar) -->
+                            <div class="turnstile-clip-box rounded-xl bg-[#151f33] border border-slate-700/60 shadow-inner">
+                                <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="0x4AAAAAAFTt3WlfzARJ26K-" data-action="login" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
                             </div>
                         </div>
 
@@ -436,10 +465,22 @@
                             </div>
 
                             <!-- Official Cloudflare Turnstile Human Verification Container -->
-                            <div id="turnstileWidgetSignup" class="p-3 rounded-xl bg-[#171f33]/90 border border-slate-700/80 shadow-md flex flex-col items-center justify-center transition-all select-none">
-                                <div id="cfTurnstileSignup" class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-action="signup" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
-                                <div id="turnstileStatusSignup" class="text-[11px] text-slate-400 mt-1 flex items-center gap-1.5 font-medium">
-                                    <i class="fa-solid fa-shield-halved text-blue-400"></i> Cloudflare Turnstile Verification
+                            <div id="turnstileWidgetSignup" class="p-3.5 rounded-2xl bg-gradient-to-b from-[#131b2e]/95 to-[#0e1626]/95 border border-cyan-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center transition-all duration-300 select-none relative overflow-hidden group">
+                                <!-- Top Security Header Bar -->
+                                <div class="flex items-center justify-between w-full max-w-[300px] mb-2 px-1">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                                        <span class="text-[11px] font-bold text-slate-200 tracking-wide flex items-center gap-1">
+                                            <i class="fa-solid fa-shield-halved text-cyan-400"></i> Cloudflare Shield
+                                        </span>
+                                    </div>
+                                    <div id="turnstileStatusSignup" class="text-[10px] text-slate-400 font-mono tracking-wider font-semibold">
+                                        CLICK TO VERIFY
+                                    </div>
+                                </div>
+                                <!-- Turnstile Widget Box (Clean 65px Clip to hide red testing bar) -->
+                                <div class="turnstile-clip-box rounded-xl bg-[#151f33] border border-slate-700/60 shadow-inner">
+                                    <div id="cfTurnstileSignup" class="cf-turnstile" data-sitekey="0x4AAAAAAFTt3WlfzARJ26K-" data-action="signup" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
                                 </div>
                             </div>
 
@@ -687,7 +728,7 @@
                         if (el && !el.hasChildNodes()) {
                             try {
                                 turnstile.render('#cfTurnstileLogin', {
-                                    sitekey: '1x00000000000000000000AA',
+                                    sitekey: '0x4AAAAAAFTt3WlfzARJ26K-',
                                     theme: 'dark',
                                     callback: window.onTurnstileLoginSuccess,
                                     'expired-callback': window.onTurnstileLoginExpired,
@@ -707,7 +748,7 @@
                         if (el && !el.hasChildNodes()) {
                             try {
                                 turnstile.render('#cfTurnstileSignup', {
-                                    sitekey: '1x00000000000000000000AA',
+                                    sitekey: '0x4AAAAAAFTt3WlfzARJ26K-',
                                     theme: 'dark',
                                     callback: window.onTurnstileSignupSuccess,
                                     'expired-callback': window.onTurnstileSignupExpired,
@@ -1069,14 +1110,14 @@
             }
         }
 
-        // Redirect if already logged in AND human verification verified
+        // Reset verification state on landing to prevent auto-pass from previous sessions
+        sessionStorage.removeItem('capzone_robot_verified');
+        window.isRobotVerified = false;
+
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 localStorage.setItem('capzone_user_email', user.email);
                 if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
-                if (sessionStorage.getItem('capzone_robot_verified')) {
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                }
             }
         });
 
@@ -1093,27 +1134,19 @@
             const statusEl = document.getElementById('turnstileStatusLogin');
             const widget = document.getElementById('turnstileWidgetLogin');
 
-            // 1. Immediately confirm verification on client since Cloudflare issued valid token
+            // 1. Confirm verification on client
             window.isRobotVerified = true;
             sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
 
             if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                statusEl.innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>`;
             }
             if (widget) {
-                widget.classList.remove('border-slate-700/80', 'border-rose-500');
-                widget.classList.add('border-emerald-500/50', 'bg-[#14232c]/90');
+                widget.classList.remove('border-cyan-500/25', 'border-rose-500', 'from-[#131b2e]/95');
+                widget.classList.add('border-emerald-500/60', 'from-[#0e2424]/95', 'shadow-[0_0_25px_rgba(16,185,129,0.25)]');
             }
             if (typeof window.dismissPreloader === 'function') {
                 window.dismissPreloader('turnstile_verified');
-            }
-
-            // If user was already signed in, navigate to dashboard immediately
-            if (auth && auth.currentUser) {
-                localStorage.setItem('capzone_user_email', auth.currentUser.email);
-                if (auth.currentUser.displayName) localStorage.setItem('capzone_user_name', auth.currentUser.displayName);
-                setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                return;
             }
 
             // 2. Perform backend verification handshake (tolerant)
@@ -1140,7 +1173,7 @@
             sessionStorage.removeItem('capzone_robot_verified');
             const statusEl = document.getElementById('turnstileStatusLogin');
             if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400 font-medium">Verification expired. Please retry.</span>`;
+                statusEl.innerHTML = `<span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> RETRY</span>`;
             }
             if (typeof turnstile !== 'undefined' && turnstile.reset) {
                 try { turnstile.reset('#cfTurnstileLogin'); } catch(e){}
@@ -1154,7 +1187,7 @@
             sessionStorage.removeItem('capzone_robot_verified');
             const statusEl = document.getElementById('turnstileStatusLogin');
             if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-medium">Cloudflare security check failed.</span>`;
+                statusEl.innerHTML = `<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> FAILED</span>`;
             }
         };
 
@@ -1169,11 +1202,11 @@
             sessionStorage.setItem('capzone_robot_verified', 'cf_live_' + Date.now());
 
             if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400"></i> <span class="text-emerald-400 font-semibold">Human Verified by Cloudflare</span>`;
+                statusEl.innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>`;
             }
             if (widget) {
-                widget.classList.remove('border-slate-700/80', 'border-rose-500');
-                widget.classList.add('border-emerald-500/50', 'bg-[#14232c]/90');
+                widget.classList.remove('border-cyan-500/25', 'border-rose-500', 'from-[#131b2e]/95');
+                widget.classList.add('border-emerald-500/60', 'from-[#0e2424]/95', 'shadow-[0_0_25px_rgba(16,185,129,0.25)]');
             }
 
             try {
@@ -1198,7 +1231,7 @@
             sessionStorage.removeItem('capzone_robot_verified');
             const statusEl = document.getElementById('turnstileStatusSignup');
             if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-400"></i> <span class="text-amber-400 font-medium">Verification expired. Please retry.</span>`;
+                statusEl.innerHTML = `<span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> RETRY</span>`;
             }
             if (typeof turnstile !== 'undefined' && turnstile.reset) {
                 try { turnstile.reset('#cfTurnstileSignup'); } catch(e){}
@@ -1211,7 +1244,7 @@
             sessionStorage.removeItem('capzone_robot_verified');
             const statusEl = document.getElementById('turnstileStatusSignup');
             if (statusEl) {
-                statusEl.innerHTML = `<i class="fa-solid fa-circle-xmark text-rose-400"></i> <span class="text-rose-400 font-medium">Cloudflare security check failed.</span>`;
+                statusEl.innerHTML = `<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> FAILED</span>`;
             }
         };
 
