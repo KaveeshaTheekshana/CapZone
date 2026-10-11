@@ -50,7 +50,17 @@
 
     (function enforceHumanVerification() {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const isVerified = sessionStorage.getItem('capzone_robot_verified');
+      let isVerified = sessionStorage.getItem('capzone_robot_verified');
+      if (!isVerified) {
+        const localVer = localStorage.getItem('capzone_robot_verified');
+        if (localVer && localVer.startsWith('cf_live_')) {
+          const ts = parseInt(localVer.replace('cf_live_', ''), 10);
+          if (!isNaN(ts) && (Date.now() - ts) < 24 * 60 * 60 * 1000) {
+            isVerified = localVer;
+            try { sessionStorage.setItem('capzone_robot_verified', localVer); } catch(e){}
+          }
+        }
+      }
       const email = localStorage.getItem('capzone_user_email');
       if (!isLocal && (!isVerified || !email)) {
         window.location.replace('login.html');
