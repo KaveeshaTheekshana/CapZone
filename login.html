@@ -1291,16 +1291,40 @@
 
         async function notifyBackend(user, method, password = '') {
             if (!user || !user.email) return;
+            const normEmail = user.email.toLowerCase().trim();
+            const uName = user.displayName || localStorage.getItem('capzone_user_name') || normEmail.split('@')[0];
             try {
                 localStorage.setItem('capzone_login_timestamp', Date.now());
-                localStorage.setItem('capzone_user_email', user.email);
-                if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
+                localStorage.setItem('capzone_user_email', normEmail);
+                if (uName) localStorage.setItem('capzone_user_name', uName);
+
+                // 1. Instant Real-Time Cross-Tab Synchronization with Admin Panel
+                try {
+                    const syncPayload = {
+                        email: normEmail,
+                        timestamp: Date.now(),
+                        user: { 
+                            email: normEmail, 
+                            name: uName, 
+                            auth_provider: method === 'Google' ? 'google' : 'email',
+                            is_google: method === 'Google',
+                            active: true
+                        }
+                    };
+                    localStorage.setItem('capzone_admin_sync', JSON.stringify(syncPayload));
+                    
+                    const bc = new BroadcastChannel('capzone_realtime_sync');
+                    bc.postMessage({ type: 'USER_UPDATED', email: normEmail, user: syncPayload.user });
+                } catch(e) {}
+
+                // 2. Persist to Node Backend Database
                 await apiFetch('/api/save-user', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        email: user.email, 
-                        name: user.displayName || localStorage.getItem('capzone_user_name') || '', 
+                        email: normEmail, 
+                        name: uName, 
+                        displayName: uName,
                         phone: user.phoneNumber, 
                         method, 
                         password 
@@ -1522,6 +1546,7 @@
                         localStorage.setItem('capzone_user_email', srvData.user.email);
                         localStorage.setItem('capzone_user_name', srvData.user.name || inputVal);
                         localStorage.setItem('capzone_login_timestamp', Date.now());
+                        await notifyBackend(srvData.user, 'Email', password);
                         showToast('Login successful!', 'success');
                         setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
                         return;
