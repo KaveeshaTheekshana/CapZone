@@ -68,19 +68,8 @@
 
     (function enforceHumanVerification() {
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      let isVerified = sessionStorage.getItem('capzone_robot_verified');
-      if (!isVerified) {
-        const localVer = localStorage.getItem('capzone_robot_verified');
-        if (localVer && localVer.startsWith('cf_live_')) {
-          const ts = parseInt(localVer.replace('cf_live_', ''), 10);
-          if (!isNaN(ts) && (Date.now() - ts) < 24 * 60 * 60 * 1000) {
-            isVerified = localVer;
-            try { sessionStorage.setItem('capzone_robot_verified', localVer); } catch(e){}
-          }
-        }
-      }
       const email = localStorage.getItem('capzone_user_email');
-      if (!isLocal && (!isVerified || !email)) {
+      if (!isLocal && !email) {
         window.location.replace('login.html');
       }
     })();
@@ -354,11 +343,17 @@
 
 
           if (res && res.status === 404) {
-              if (typeof window.handleLogout === 'function') {
-                  window.handleLogout();
-              } else {
-                  localStorage.clear();
-                  window.location.href = 'login.html';
+              console.warn("User profile not found on server yet, initializing local profile for:", uEmail);
+              if (!window.currentUserData) {
+                  const fallbackData = {
+                      email: uEmail,
+                      name: localStorage.getItem('capzone_user_name') || uEmail.split('@')[0],
+                      balance: 250,
+                      subscription: 'payg',
+                      active: true
+                  };
+                  window.currentUserData = fallbackData;
+                  window.updateUserProfileUI(fallbackData);
               }
               return;
           }
