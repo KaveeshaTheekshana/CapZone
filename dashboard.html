@@ -341,8 +341,8 @@
           }).catch(() => null);
 
 
-          if (res && (res.status === 404 || res.status === 401 || res.status === 403)) {
-              console.warn("User account not found on server or removed by Admin:", uEmail);
+          if (res && res.status === 403) {
+              console.warn("User account deactivated or blacklisted by Admin:", uEmail);
               localStorage.removeItem('capzone_user_email');
               localStorage.removeItem('capzone_user_name');
               localStorage.removeItem('capzone_user_profile');
@@ -351,6 +351,41 @@
               try { await signOut(auth); } catch(e){}
               window.location.replace('login.html');
               return;
+          }
+
+          if (res && res.status === 404) {
+              let body = {};
+              try { body = await res.json(); } catch(e){}
+              if (body.deleted === true || body.active === false) {
+                  console.warn("User account removed by Admin:", uEmail);
+                  localStorage.removeItem('capzone_user_email');
+                  localStorage.removeItem('capzone_user_name');
+                  localStorage.removeItem('capzone_user_profile');
+                  localStorage.removeItem('capzone_cached_user_' + uEmail);
+                  localStorage.removeItem('capzone_login_timestamp');
+                  try { await signOut(auth); } catch(e){}
+                  window.location.replace('login.html');
+                  return;
+              }
+              // Not deleted, just needs sync to backend
+              try {
+                  const saveRes = await fetchFn(`${window.API_BASE_URL || ''}/api/save-user`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                          email: uEmail,
+                          name: localStorage.getItem('capzone_user_name') || uEmail.split('@')[0]
+                      })
+                  });
+                  if (saveRes && saveRes.ok) {
+                      const savedData = await saveRes.json();
+                      if (savedData && savedData.user) {
+                          window.currentUserData = savedData.user;
+                          window.updateUserProfileUI(savedData.user);
+                          return;
+                      }
+                  }
+              } catch(syncErr){}
           }
 
           if (res && res.ok) {
