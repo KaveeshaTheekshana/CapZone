@@ -970,7 +970,7 @@
 
     <!-- Projects History Sidebar (Responsive on Mobile & Desktop) -->
     <aside id="projectsSidebar" class="w-full lg:w-80 flex-shrink-0 hidden lg:block order-2 lg:order-1">
-      <div class="glass-panel rounded-3xl h-full min-h-[350px] lg:min-h-[calc(100vh-10rem)] p-5 lg:p-6 flex flex-col">
+      <div class="glass-panel rounded-3xl h-auto lg:h-full min-h-0 lg:min-h-[calc(100vh-10rem)] p-4 sm:p-5 lg:p-6 flex flex-col">
         <!-- Header with Count & Refresh -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
@@ -1010,7 +1010,7 @@
 
         <!-- Project Cards Container (Vertical layout on both Mobile & Desktop) -->
         <div id="recentProjectsContainer"
-          class="flex flex-col space-y-2.5 overflow-y-auto hide-scrollbar flex-1 max-h-[70vh] lg:max-h-[calc(100vh-18rem)] pr-1 pt-1">
+          class="flex flex-col space-y-2.5 overflow-y-auto hide-scrollbar flex-1 max-h-[calc(100dvh-13rem)] lg:max-h-[calc(100vh-18rem)] pr-1 pt-1 pb-32 lg:pb-4">
           <!-- Default Empty state -->
           <div class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
             <div
@@ -1312,7 +1312,7 @@
       </div>
 
       <p class="text-[11px] text-gray-400">&copy; 2026 CapZone Subtitle Studio. All rights reserved. Powered by <span
-          class="text-blue-400">KaveezCloud AI Engine</span>.</p>
+          class="text-blue-400">Kaveez Developer Team</span>.</p>
     </div>
   </footer>
 
@@ -4533,60 +4533,6 @@
       initWallpapers();
     }
   </script>
-
-
-
-  <!-- ENHANCED MOBILE BOTTOM FLOATING NAVIGATION BAR -->
-  <div class="fixed bottom-4 inset-x-4 z-40 sm:hidden">
-    <div
-      class="glass-panel rounded-[24px] px-2 py-2.5 flex items-center justify-between border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.9)] backdrop-blur-2xl bg-[#0b0f19]/90 relative overflow-hidden">
-      <!-- Active indicator pill -->
-      <div
-        class="absolute inset-y-2 left-2 w-[calc(20%-8px)] rounded-xl bg-white/10 border border-white/5 pointer-events-none transition-all duration-300"
-        id="mobileNavIndicator"></div>
-
-      <a href="dashboard.html"
-        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-indigo-400 group">
-        <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
-          <i data-lucide="home" class="w-5 h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]"></i>
-        </div>
-        <span class="text-[9px] font-bold tracking-wide">Home</span>
-      </a>
-
-      <button onclick="openToolWithIntercept('srtModal', event)"
-        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
-        <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
-          <i data-lucide="subtitles" class="w-5 h-5 group-hover:text-purple-400 transition-colors"></i>
-        </div>
-        <span class="text-[9px] font-medium">Auto SRT</span>
-      </button>
-
-      <div class="relative z-10 flex flex-col items-center justify-center w-[20%] -mt-6">
-        <button onclick="document.getElementById('studioGrid').scrollIntoView({behavior: 'smooth'})"
-          class="w-12 h-12 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 p-[2px] shadow-[0_0_20px_rgba(99,102,241,0.5)] transform hover:scale-110 active:scale-95 transition-all">
-          <div class="w-full h-full rounded-full bg-[#0b0f19] flex items-center justify-center">
-            <i data-lucide="plus" class="w-6 h-6 text-white"></i>
-          </div>
-        </button>
-      </div>
-
-      <a href="editor.html"
-        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
-        <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
-          <i data-lucide="scissors" class="w-5 h-5 group-hover:text-blue-400 transition-colors"></i>
-        </div>
-        <span class="text-[9px] font-medium">Editor</span>
-      </a>
-
-      <button onclick="openModal('profileModal', event)"
-        class="relative z-10 flex flex-col items-center justify-center gap-1 w-[20%] text-gray-400 hover:text-white transition-colors group">
-        <div class="p-1.5 rounded-lg transition-colors group-hover:bg-white/5">
-          <i data-lucide="user" class="w-5 h-5 group-hover:text-emerald-400 transition-colors"></i>
-        </div>
-        <span class="text-[9px] font-medium">Profile</span>
-      </button>
-    </div>
-  </div>
 
   <!-- Video Edit Under Development Popup Modal -->
   <div id="videoEditDevModal"
