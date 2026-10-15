@@ -9,6 +9,8 @@ import {
   browserPopupRedirectResolver,
   GoogleAuthProvider, 
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -30,7 +32,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth with browserPopupRedirectResolver and multi-layer persistence
+// Initialize Auth with multi-layer persistence and popupRedirectResolver
 let auth;
 try {
   auth = initializeAuth(app, {
@@ -52,14 +54,39 @@ try {
     }
   }
 }
+if (!auth) {
+  try {
+    auth = getAuth(app);
+  } catch(e) {}
+}
 
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-// Reliable Google Login Helper that explicitly passes browserPopupRedirectResolver
+// Resilient Google Login Helper: tries popup first, then explicit resolver, and supports redirect fallback
 async function loginWithGoogle() {
   if (!auth) throw new Error("Authentication module failed to initialize. Please check network/adblocker.");
-  return await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+  try {
+    return await signInWithPopup(auth, googleProvider);
+  } catch (error) {
+    console.warn("Primary Google popup error:", error.code, error.message);
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+      console.log("Popup blocked. Switching to signInWithRedirect...");
+      await signInWithRedirect(auth, googleProvider);
+      return null;
+    }
+    // Try with browserPopupRedirectResolver explicitly if resolver wasn't attached
+    try {
+      return await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
+    } catch (err2) {
+      if (err2.code === 'auth/popup-blocked') {
+        console.log("Secondary popup blocked. Switching to signInWithRedirect...");
+        await signInWithRedirect(auth, googleProvider);
+        return null;
+      }
+      throw error;
+    }
+  }
 }
 
 export { 
@@ -68,6 +95,8 @@ export {
   googleProvider, 
   loginWithGoogle,
   signInWithPopup, 
+  signInWithRedirect,
+  getRedirectResult,
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
