@@ -19,7 +19,13 @@ import {
   signOut 
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const firebaseConfig = {
+let dynamicConfig = null;
+try {
+  const saved = localStorage.getItem('capzone_firebase_config');
+  if (saved) dynamicConfig = JSON.parse(saved);
+} catch (e) {}
+
+const defaultFirebaseConfig = {
   apiKey: "AIzaSyDfOe9hCH1G74b96Q7DI-v6c_96AIe-_QE",
   authDomain: "capzone-e601c.firebaseapp.com",
   projectId: "capzone-e601c",
@@ -28,6 +34,8 @@ const firebaseConfig = {
   appId: "1:1037276369412:web:6d00e5a3c2e3cb22cb9b51",
   measurementId: "G-1C7KGVGZB4"
 };
+
+const firebaseConfig = (dynamicConfig && dynamicConfig.apiKey) ? dynamicConfig : defaultFirebaseConfig;
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
