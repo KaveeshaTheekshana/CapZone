@@ -4,33 +4,33 @@
 <head>
   <meta charset="utf-8" />
   <script>
-    (function(){
-      var h=(window.location.hostname||"").toLowerCase();
-      var p=window.location.protocol;
-      var d=atob("Y2Fwem9uZS50b3A=");
-      var isLocal=(h==="localhost"||h==="127.0.0.1"||h.startsWith("192.168.")||h.startsWith("10.")||h.startsWith("172.")||!h);
-      var ok=(isLocal||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top"||h.endsWith(".firebaseapp.com")||h.endsWith(".web.app"));
-      if(p!=="file:"&&!ok){
-        try{if(window.stop)window.stop();}catch(e){}
-        try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
+    (function () {
+      var h = (window.location.hostname || "").toLowerCase();
+      var p = window.location.protocol;
+      var d = atob("Y2Fwem9uZS50b3A=");
+      var isLocal = (h === "localhost" || h === "127.0.0.1" || h.startsWith("192.168.") || h.startsWith("10.") || h.startsWith("172.") || !h);
+      var ok = (isLocal || h === d || (h.length > d.length && h.slice(-d.length - 1) === "." + d) || h === "capzone.kaveez.top" || h.endsWith(".firebaseapp.com") || h.endsWith(".web.app"));
+      if (p !== "file:" && !ok) {
+        try { if (window.stop) window.stop(); } catch (e) { }
+        try { document.documentElement.innerHTML = ""; if (document.head) document.head.innerHTML = ""; if (document.body) document.body.innerHTML = ""; } catch (e) { }
         document.write("");
         return;
       }
-      document.addEventListener("contextmenu",function(e){e.preventDefault();return false;},{passive:false});
-      document.addEventListener("keydown",function(e){
-        if(e.key==="F12"||(e.ctrlKey&&e.shiftKey&&["I","i","J","j","C","c"].includes(e.key))||(e.ctrlKey&&["u","U","s","S"].includes(e.key))){
-          e.preventDefault();e.stopPropagation();return false;
+      document.addEventListener("contextmenu", function (e) { e.preventDefault(); return false; }, { passive: false });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "F12" || (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c"].includes(e.key)) || (e.ctrlKey && ["u", "U", "s", "S"].includes(e.key))) {
+          e.preventDefault(); e.stopPropagation(); return false;
         }
-      },true);
+      }, true);
 
       // 🛡️ Live Server Auto-Refresh Loop Shield (Protects port 5500, 5501, 5502 from constant refresh)
       var port = window.location.port;
       if (port === '5502' || port === '5500' || port === '5501') {
         var OriginalWebSocket = window.WebSocket;
         if (OriginalWebSocket) {
-          window.WebSocket = function(url, protocols) {
+          window.WebSocket = function (url, protocols) {
             var ws = protocols ? new OriginalWebSocket(url, protocols) : new OriginalWebSocket(url);
-            ws.addEventListener('message', function(e) {
+            ws.addEventListener('message', function (e) {
               if (e.data === 'reload') {
                 var now = Date.now();
                 var lastReload = parseInt(sessionStorage.getItem('cz_live_reload_stamp') || '0', 10);
@@ -359,50 +359,50 @@
 
 
           if (res && res.status === 403) {
-              console.warn("User account deactivated or blacklisted by Admin:", uEmail);
+            console.warn("User account deactivated or blacklisted by Admin:", uEmail);
+            localStorage.removeItem('capzone_user_email');
+            localStorage.removeItem('capzone_user_name');
+            localStorage.removeItem('capzone_user_profile');
+            localStorage.removeItem('capzone_cached_user_' + uEmail);
+            localStorage.removeItem('capzone_login_timestamp');
+            try { await signOut(auth); } catch (e) { }
+            window.location.replace('login.html');
+            return;
+          }
+
+          if (res && res.status === 404) {
+            let body = {};
+            try { body = await res.json(); } catch (e) { }
+            if (body.deleted === true || body.active === false) {
+              console.warn("User account removed by Admin:", uEmail);
               localStorage.removeItem('capzone_user_email');
               localStorage.removeItem('capzone_user_name');
               localStorage.removeItem('capzone_user_profile');
               localStorage.removeItem('capzone_cached_user_' + uEmail);
               localStorage.removeItem('capzone_login_timestamp');
-              try { await signOut(auth); } catch(e){}
+              try { await signOut(auth); } catch (e) { }
               window.location.replace('login.html');
               return;
-          }
-
-          if (res && res.status === 404) {
-              let body = {};
-              try { body = await res.json(); } catch(e){}
-              if (body.deleted === true || body.active === false) {
-                  console.warn("User account removed by Admin:", uEmail);
-                  localStorage.removeItem('capzone_user_email');
-                  localStorage.removeItem('capzone_user_name');
-                  localStorage.removeItem('capzone_user_profile');
-                  localStorage.removeItem('capzone_cached_user_' + uEmail);
-                  localStorage.removeItem('capzone_login_timestamp');
-                  try { await signOut(auth); } catch(e){}
-                  window.location.replace('login.html');
+            }
+            // Not deleted, just needs sync to backend
+            try {
+              const saveRes = await fetchFn(`${window.API_BASE_URL || ''}/api/save-user`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  email: uEmail,
+                  name: localStorage.getItem('capzone_user_name') || uEmail.split('@')[0]
+                })
+              });
+              if (saveRes && saveRes.ok) {
+                const savedData = await saveRes.json();
+                if (savedData && savedData.user) {
+                  window.currentUserData = savedData.user;
+                  window.updateUserProfileUI(savedData.user);
                   return;
+                }
               }
-              // Not deleted, just needs sync to backend
-              try {
-                  const saveRes = await fetchFn(`${window.API_BASE_URL || ''}/api/save-user`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                          email: uEmail,
-                          name: localStorage.getItem('capzone_user_name') || uEmail.split('@')[0]
-                      })
-                  });
-                  if (saveRes && saveRes.ok) {
-                      const savedData = await saveRes.json();
-                      if (savedData && savedData.user) {
-                          window.currentUserData = savedData.user;
-                          window.updateUserProfileUI(savedData.user);
-                          return;
-                      }
-                  }
-              } catch(syncErr){}
+            } catch (syncErr) { }
           }
 
           if (res && res.ok) {
@@ -413,7 +413,7 @@
               localStorage.removeItem('capzone_user_name');
               localStorage.removeItem('capzone_user_profile');
               localStorage.removeItem('capzone_cached_user_' + uEmail);
-              try { await signOut(auth); } catch(e){}
+              try { await signOut(auth); } catch (e) { }
               window.location.replace('login.html');
               return;
             }
@@ -591,7 +591,7 @@
         fetch(`${window.API_BASE_URL || ''}/api/save-user`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             email: user.email,
             name: uName,
             displayName: uName,
@@ -605,7 +605,7 @@
             const bc = new BroadcastChannel('capzone_realtime_sync');
             bc.postMessage({ type: 'USER_UPDATED', email: user.email, user: { email: user.email, name: uName, auth_provider: userMethod.toLowerCase() } });
             localStorage.setItem('capzone_admin_sync', JSON.stringify({ email: user.email, timestamp: Date.now() }));
-          } catch(e) {}
+          } catch (e) { }
           if (data && data.api_key && data.api_key !== 'default') {
             if (typeof window.syncApiKeys === 'function') window.syncApiKeys(data.api_key);
           } else {
@@ -1017,7 +1017,8 @@
 
     <!-- Projects History Sidebar (Responsive on Mobile & Desktop) -->
     <aside id="projectsSidebar" class="w-full lg:w-80 flex-shrink-0 hidden lg:block order-2 lg:order-1">
-      <div class="glass-panel rounded-3xl h-auto lg:h-full min-h-0 lg:min-h-[calc(100vh-10rem)] p-4 sm:p-5 lg:p-6 flex flex-col">
+      <div
+        class="glass-panel rounded-3xl h-auto lg:h-full min-h-0 lg:min-h-[calc(100vh-10rem)] p-4 sm:p-5 lg:p-6 flex flex-col">
         <!-- Header with Count & Refresh -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
@@ -1481,7 +1482,7 @@
             </button>
           </div>
           <p class="text-[10px] text-slate-400 mt-2">
-            💡 Pay-Per-Video වීඩියෝ සඳහා ඔබේ මුදල් මෙහි සුරැකී පවතී.
+            💡 Pay-Per-Video සඳහා ඔබේ මුදල් මෙහි සුරැකී පවතී.
           </p>
         </div>
 
@@ -1543,8 +1544,7 @@
             <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 text-amber-400"></i>
             <div>
               <p class="font-bold text-[11px]">System Platform Limits</p>
-              <p class="text-[10px] text-amber-200/80">Max Video Duration: 30 Mins | Max Upload Size: 500 MB (Gemini AI
-                limit)</p>
+              <p class="text-[10px] text-amber-200/80">Max Video Duration: 30 Mins | Max Upload Size: 500 MB</p>
             </div>
           </div>
         </div>
@@ -2376,8 +2376,9 @@
 
       <div class="mt-8 text-center text-xs text-slate-500">
         All plans are subject to Fair Use Policy.<br />
-        Need unlimited enterprise access? <a href="https://wa.me/94760246304?text=Hello%20Admin%2C%20I%20am%20interested%20in%20CapZone%20Enterprise%20Access." target="_blank"
-          class="text-purple-400 hover:underline">Contact Admin (WhatsApp)</a>
+        Need unlimited enterprise access? <a
+          href="https://wa.me/94760246304?text=Hello%20Admin%2C%20I%20am%20interested%20in%20CapZone%20Enterprise%20Access."
+          target="_blank" class="text-purple-400 hover:underline">Contact Admin (WhatsApp)</a>
       </div>
 
       <!-- PayHere Required Bilingual Policy Links -->
@@ -3386,7 +3387,7 @@
         if (statusEl) statusEl.innerText = 'Rejected';
         if (alertEl) {
           alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/15 border border-red-500/30 text-red-300 flex items-start gap-2.5';
-          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 500 MB upload limit (Gemini AI limit). Video rejected.</div>`;
+          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 500 MB upload limit. Video rejected.</div>`;
         }
         if (submitBtn) submitBtn.disabled = true;
         if (window.lucide) window.lucide.createIcons();
@@ -3848,7 +3849,7 @@
       }
       if (!currentSrtFile) { showPopup('Please upload a file!', 'Error', 'error'); return; }
       if (currentSrtFile.size > 500 * 1024 * 1024) {
-        showPopup('කරුණාකර 500MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න. (Max 500MB Gemini upload limit)', 'File Too Large', 'error');
+        showPopup('කරුණාකර 500MB ට වඩා කුඩා වීඩියෝවක් ලබා දෙන්න. (Max 500MB upload limit)', 'File Too Large', 'error');
         return;
       }
       if (window.currentMediaDuration && window.currentMediaDuration > 1800) {
@@ -4182,10 +4183,10 @@
               window.currentSrtPollInterval = null;
               return;
             }
-            if (isPollDone) { 
-              clearInterval(window.currentSrtPollInterval); 
+            if (isPollDone) {
+              clearInterval(window.currentSrtPollInterval);
               window.currentSrtPollInterval = null;
-              return; 
+              return;
             }
             pollCount++;
             if (pollCount > maxPolls) {
