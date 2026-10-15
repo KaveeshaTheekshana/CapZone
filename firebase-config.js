@@ -27,7 +27,7 @@ try {
 
 const defaultFirebaseConfig = {
   apiKey: "AIzaSyDfOe9hCH1G74b96Q7DI-v6c_96AIe-_QE",
-  authDomain: "capzone.top",
+  authDomain: "capzone-e601c.firebaseapp.com",
   projectId: "capzone-e601c",
   storageBucket: "capzone-e601c.firebasestorage.app",
   messagingSenderId: "1037276369412",
