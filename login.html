@@ -455,14 +455,16 @@
         import {
             auth,
             loginWithGoogle,
-            googleProvider,
+            googleProvider
+        } from './firebase-config.js?v=3.5';
+        import {
             signInWithRedirect,
             getRedirectResult,
             setPersistence,
             browserLocalPersistence,
             browserSessionPersistence,
             onAuthStateChanged
-        } from './firebase-config.js?v=2.6';
+        } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 
         // Global safeguard: prevent background IndexedDB closing errors
         window.addEventListener('unhandledrejection', (event) => {
@@ -720,6 +722,26 @@
                     preloader.style.display = 'none';
                 }, 350);
             }, 250);
+        })();
+    </script>
+
+    <!-- Global Preloader Failsafe (guarantees screen never stays stuck) -->
+    <script>
+        (function() {
+            function hidePreloader() {
+                const preloader = document.getElementById('capzonePreloader');
+                if (preloader && preloader.style.display !== 'none') {
+                    preloader.classList.add('fade-out');
+                    setTimeout(() => { preloader.style.display = 'none'; }, 350);
+                }
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', () => setTimeout(hidePreloader, 300));
+            } else {
+                setTimeout(hidePreloader, 300);
+            }
+            // Absolute failsafe fallback after 1.2s
+            setTimeout(hidePreloader, 1200);
         })();
     </script>
 </body>
