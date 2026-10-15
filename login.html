@@ -7,8 +7,9 @@
       var h=(window.location.hostname||"").toLowerCase();
       var p=window.location.protocol;
       var d=atob("Y2Fwem9uZS50b3A=");
-      var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
-      if(p==="file:"||!ok){
+      var isLocal=(h==="localhost"||h==="127.0.0.1"||h.startsWith("192.168.")||h.startsWith("10.")||h.startsWith("172.")||!h);
+      var ok=(isLocal||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top"||h.endsWith(".firebaseapp.com")||h.endsWith(".web.app"));
+      if(p!=="file:"&&!ok){
         try{if(window.stop)window.stop();}catch(e){}
         try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
         document.write("");
@@ -20,19 +21,10 @@
           e.preventDefault();e.stopPropagation();return false;
         }
       },true);
-      if(h!=="localhost"&&h!=="127.0.0.1"){
-        var noop=function(){};
-        window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
-      }
-      setInterval(function(){
-        var s=Date.now();
-        (function(){}).constructor("debugger")();
-        if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
-      },1800);
     })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapZone - Video & Subtitle Studio Login</title>
+    <title>CapZone - Video & Subtitle Studio | Google Authentication</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -42,12 +34,13 @@
                 extend: {
                     colors: {
                         theme: {
-                            bg: '#090d16',
-                            card: '#111728',
-                            cardHover: '#161f36',
-                            border: '#1f293d',
-                            primary: '#1a56db',
-                            primaryHover: '#1546b8',
+                            bg: '#080c15',
+                            card: '#0f172a',
+                            cardHover: '#131e36',
+                            border: '#1e293b',
+                            primary: '#2563eb',
+                            primaryHover: '#1d4ed8',
+                            cyan: '#06b6d4',
                             textMuted: '#94a3b8'
                         }
                     },
@@ -58,198 +51,6 @@
             }
         }
     </script>
-    <!-- 🛡️ CapZone High-Reliability Cloudflare Turnstile Core Controller -->
-    <script>
-        (function() {
-            window.isRobotVerified = false;
-            window.turnstileLoginToken = null;
-            window.turnstileSignupToken = null;
-            window.turnstileLoginWidgetId = null;
-            window.turnstileSignupWidgetId = null;
-
-            // Enforce live Cloudflare Turnstile tick without cached bypass
-            try {
-                sessionStorage.removeItem('capzone_robot_verified');
-                localStorage.removeItem('capzone_robot_verified');
-            } catch(e) {}
-
-            window.markTurnstileVerified = function(token, source) {
-                if (!token) return;
-                window.isRobotVerified = true;
-                if (source === 'signup') {
-                    window.turnstileSignupToken = token;
-                } else {
-                    window.turnstileLoginToken = token;
-                }
-                try {
-                    const stamp = 'cf_live_' + Date.now();
-                    sessionStorage.setItem('capzone_robot_verified', stamp);
-                    localStorage.setItem('capzone_robot_verified', stamp);
-                } catch(e) {}
-
-                // Update UI on both Login and Signup widgets immediately
-                const loginStatus = document.getElementById('turnstileStatusLogin');
-                const loginWidget = document.getElementById('turnstileWidgetLogin');
-                if (loginStatus) {
-                    loginStatus.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                }
-                if (loginWidget) {
-                    loginWidget.classList.remove('border-cyan-500/25', 'border-rose-500', 'from-[#131b2e]/95');
-                    loginWidget.classList.add('border-emerald-500/60', 'from-[#0e2424]/95', 'shadow-[0_0_25px_rgba(16,185,129,0.25)]');
-                }
-
-                const signupStatus = document.getElementById('turnstileStatusSignup');
-                const signupWidget = document.getElementById('turnstileWidgetSignup');
-                if (signupStatus) {
-                    signupStatus.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                }
-                if (signupWidget) {
-                    signupWidget.classList.remove('border-cyan-500/25', 'border-rose-500', 'from-[#131b2e]/95');
-                    signupWidget.classList.add('border-emerald-500/60', 'from-[#0e2424]/95', 'shadow-[0_0_25px_rgba(16,185,129,0.25)]');
-                }
-
-                if (typeof window.dismissPreloader === 'function') {
-                    window.dismissPreloader('turnstile_verified');
-                }
-
-                if (typeof window.syncTurnstileBackend === 'function') {
-                    window.syncTurnstileBackend(token);
-                }
-            };
-
-            window.isUserRobotVerified = function(action) {
-                if (action === 'signup') {
-                    if (window.turnstileSignupToken && typeof window.turnstileSignupToken === 'string' && window.turnstileSignupToken.length > 5) {
-                        return true;
-                    }
-                    if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                        try {
-                            const tok = turnstile.getResponse('#cfTurnstileSignup');
-                            if (tok && typeof tok === 'string' && tok.length > 5) {
-                                window.turnstileSignupToken = tok;
-                                return true;
-                            }
-                        } catch(e) {}
-                    }
-                    const signupInput = document.querySelector('#signUpFormElement [name="cf-turnstile-response"]') || 
-                                        document.querySelector('#cfTurnstileSignup [name="cf-turnstile-response"]');
-                    if (signupInput && signupInput.value && signupInput.value.length > 5) {
-                        window.turnstileSignupToken = signupInput.value;
-                        return true;
-                    }
-                    return false;
-                } else {
-                    if (window.turnstileLoginToken && typeof window.turnstileLoginToken === 'string' && window.turnstileLoginToken.length > 5) {
-                        return true;
-                    }
-                    if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                        try {
-                            const tok = turnstile.getResponse('#cfTurnstileLogin') || turnstile.getResponse();
-                            if (tok && typeof tok === 'string' && tok.length > 5) {
-                                window.turnstileLoginToken = tok;
-                                return true;
-                            }
-                        } catch(e) {}
-                    }
-                    const loginInput = document.querySelector('#signInFormElement [name="cf-turnstile-response"]') || 
-                                       document.querySelector('#cfTurnstileLogin [name="cf-turnstile-response"]');
-                    if (loginInput && loginInput.value && loginInput.value.length > 5) {
-                        window.turnstileLoginToken = loginInput.value;
-                        return true;
-                    }
-                    return false;
-                }
-            };
-
-            // Callbacks defined before Turnstile API script parses HTML
-            window.onTurnstileLoginSuccess = function(token) {
-                console.log("[Turnstile] Login verified callback triggered");
-                window.markTurnstileVerified(token, 'login');
-            };
-
-            window.onTurnstileSignupSuccess = function(token) {
-                console.log("[Turnstile] Signup verified callback triggered");
-                window.markTurnstileVerified(token, 'signup');
-            };
-
-            window.onTurnstileLoginExpired = function() {
-                console.warn("[Turnstile] Login token expired");
-                window.turnstileLoginToken = null;
-                window.isRobotVerified = false;
-                try { sessionStorage.removeItem('capzone_robot_verified'); } catch(e){}
-                const statusEl = document.getElementById('turnstileStatusLogin');
-                if (statusEl) {
-                    statusEl.innerHTML = '<span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> RETRY</span>';
-                }
-                if (typeof turnstile !== 'undefined' && turnstile.reset) {
-                    try { turnstile.reset('#cfTurnstileLogin'); } catch(e){}
-                }
-            };
-
-            window.onTurnstileLoginError = function() {
-                console.error("[Turnstile] Login challenge error");
-                const statusEl = document.getElementById('turnstileStatusLogin');
-                if (statusEl && !window.isRobotVerified) {
-                    statusEl.innerHTML = '<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> RETRY</span>';
-                }
-            };
-
-            window.onTurnstileSignupExpired = function() {
-                window.turnstileSignupToken = null;
-                window.isRobotVerified = false;
-                try { sessionStorage.removeItem('capzone_robot_verified'); } catch(e){}
-                const statusEl = document.getElementById('turnstileStatusSignup');
-                if (statusEl) {
-                    statusEl.innerHTML = '<span class="text-amber-400 font-bold flex items-center gap-1"><i class="fa-solid fa-triangle-exclamation"></i> RETRY</span>';
-                }
-                if (typeof turnstile !== 'undefined' && turnstile.reset) {
-                    try { turnstile.reset('#cfTurnstileSignup'); } catch(e){}
-                }
-            };
-
-            window.onTurnstileSignupError = function() {
-                const statusEl = document.getElementById('turnstileStatusSignup');
-                if (statusEl && !window.isRobotVerified) {
-                    statusEl.innerHTML = '<span class="text-rose-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> RETRY</span>';
-                }
-            };
-
-            // Active Sentinel Watcher to catch token from DOM/Turnstile API instantly
-            setInterval(function() {
-                if (window.isRobotVerified && (window.turnstileLoginToken || window.turnstileSignupToken)) {
-                    return;
-                }
-                if (typeof turnstile !== 'undefined' && typeof turnstile.getResponse === 'function') {
-                    try {
-                        const lToken = turnstile.getResponse('#cfTurnstileLogin');
-                        if (lToken && typeof lToken === 'string' && lToken.length > 5) {
-                            window.markTurnstileVerified(lToken, 'login');
-                            return;
-                        }
-                        const sToken = turnstile.getResponse('#cfTurnstileSignup');
-                        if (sToken && typeof sToken === 'string' && sToken.length > 5) {
-                            window.markTurnstileVerified(sToken, 'signup');
-                            return;
-                        }
-                    } catch(e) {}
-                }
-                const lInput = document.querySelector('#cfTurnstileLogin [name="cf-turnstile-response"]') || 
-                              document.querySelector('#signInFormElement [name="cf-turnstile-response"]');
-                if (lInput && lInput.value && lInput.value.length > 5) {
-                    window.markTurnstileVerified(lInput.value, 'login');
-                    return;
-                }
-                const sInput = document.querySelector('#cfTurnstileSignup [name="cf-turnstile-response"]') || 
-                              document.querySelector('#signUpFormElement [name="cf-turnstile-response"]');
-                if (sInput && sInput.value && sInput.value.length > 5) {
-                    window.markTurnstileVerified(sInput.value, 'signup');
-                    return;
-                }
-            }, 200);
-        })();
-    </script>
-    <!-- Official Cloudflare Turnstile API -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Google Fonts: Plus Jakarta Sans & Inter -->
@@ -263,57 +64,25 @@
         }
         body {
             font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-            background-color: #090d16;
+            background-color: #080c15;
             color: #ffffff;
             margin: 0;
             padding: 0;
+            overflow-x: hidden;
         }
-        @keyframes centerModalZoom {
-            0% { opacity: 0; transform: scale(0.88); }
-            100% { opacity: 1; transform: scale(1); }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
         }
-        .center-modal-anim {
-            animation: centerModalZoom 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
-            transform-origin: center center !important;
-            margin: auto !important;
+        .float-anim {
+            animation: floatSlow 5s ease-in-out infinite;
         }
-        @keyframes slideUpFade {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.65; transform: scale(1.05); }
         }
-        .tab-content {
-            display: none;
-        }
-        .tab-content.active {
-            display: block;
-            animation: slideUpFade 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #090d16;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1f293d;
-            border-radius: 4px;
-        }
-        .turnstile-clip-box {
-            height: 65px !important;
-            max-height: 65px !important;
-            overflow: hidden !important;
-            position: relative;
-            width: 100%;
-            max-width: 300px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-        .turnstile-clip-box iframe {
-            height: 65px !important;
-            max-height: 65px !important;
-            overflow: hidden !important;
-            border: none !important;
+        .pulse-glow {
+            animation: pulseGlow 6s ease-in-out infinite;
         }
         #capzonePreloader {
             position: fixed;
@@ -324,68 +93,78 @@
             width: 100vw;
             height: 100vh;
             z-index: 99999;
-            background: #090d16;
+            background: #080c15;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             opacity: 1;
             visibility: visible;
-            margin: auto;
-            padding: 1rem;
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease;
+            transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.35s ease;
         }
         #capzonePreloader.fade-out {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
+        .preloader-ring {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-top-color: #06b6d4;
+            border-right-color: #3b82f6;
+            animation: preloaderSpin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+        }
         @keyframes preloaderSpin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        @keyframes preloaderProgress {
-            0% { transform: translateX(-100%); }
-            50% { transform: translateX(20%); }
-            100% { transform: translateX(100%); }
+        .google-btn-shimmer {
+            position: relative;
+            overflow: hidden;
         }
-        .preloader-ring {
-            width: 76px;
-            height: 76px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, 0.08);
-            border-top-color: #06b6d4;
-            border-right-color: #2563eb;
-            animation: preloaderSpin 0.9s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
+        .google-btn-shimmer::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(60deg, transparent 30%, rgba(255, 255, 255, 0.25) 50%, transparent 70%);
+            transform: rotate(25deg) translateY(-100%);
+            transition: transform 0.75s ease;
         }
-        .preloader-bar-fill {
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, #2563eb, #06b6d4, #3b82f6);
-            animation: preloaderProgress 1.4s ease-in-out infinite;
+        .google-btn-shimmer:hover::after {
+            transform: rotate(25deg) translateY(100%);
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c15;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-center items-center relative overflow-x-hidden bg-[#090d16] selection:bg-blue-600 selection:text-white">
+<body class="min-h-screen flex flex-col justify-center items-center relative bg-[#080c15] selection:bg-blue-600 selection:text-white py-6 sm:py-10 px-4">
 
-    <!-- High-Performance Ambient Radial Glows (Zero GPU Lag / Zero CPU overhead) -->
-    <div class="fixed top-[-10%] left-[20%] w-[500px] h-[500px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(37,99,235,0.18) 0%, rgba(9,13,22,0) 70%); transform: translateZ(0);"></div>
-    <div class="fixed bottom-[-10%] right-[15%] w-[450px] h-[450px] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(6,182,212,0.15) 0%, rgba(9,13,22,0) 70%); transform: translateZ(0);"></div>
+    <!-- High-Performance Ambient Radial Glows -->
+    <div class="fixed top-[-10%] left-[15%] w-[550px] h-[550px] rounded-full pointer-events-none pulse-glow" style="background: radial-gradient(circle, rgba(37,99,235,0.22) 0%, rgba(8,12,21,0) 70%);"></div>
+    <div class="fixed bottom-[-10%] right-[15%] w-[500px] h-[500px] rounded-full pointer-events-none pulse-glow" style="background: radial-gradient(circle, rgba(6,182,212,0.18) 0%, rgba(8,12,21,0) 70%); animation-delay: 2s;"></div>
 
-    <!-- CapZone Premium Preloader (Smooth fade-out when page is fully ready) -->
+    <!-- CapZone Fast Smooth Preloader -->
     <div id="capzonePreloader">
         <div class="relative flex items-center justify-center mb-6">
-            <!-- Background Radial Glow -->
             <div class="absolute -inset-6 bg-gradient-to-r from-blue-600/30 via-cyan-500/30 to-indigo-600/30 rounded-full blur-2xl animate-pulse pointer-events-none"></div>
-            <!-- Outer Spinning Gradient Ring -->
             <div class="preloader-ring"></div>
-            <!-- Center Brand Logo Icon -->
-            <div class="absolute w-12 h-12 rounded-2xl bg-[#111728] border border-white/15 p-1.5 flex items-center justify-center shadow-lg shadow-cyan-500/10">
+            <div class="absolute w-12 h-12 rounded-2xl bg-[#0f172a] border border-white/15 p-1.5 flex items-center justify-center shadow-lg shadow-cyan-500/10">
                 <img src="logo.jpg" class="w-full h-full object-cover rounded-xl" alt="CapZone Logo">
             </div>
         </div>
-        
-        <!-- Branding Titles -->
         <div class="text-center">
             <div class="text-xl font-extrabold tracking-tight text-white flex items-center justify-center gap-2">
                 <span>CapZone</span>
@@ -393,809 +172,216 @@
             </div>
             <p id="preloaderStatusText" class="text-xs text-slate-400 font-medium mt-2 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]"></i>
-                <span>Loading CapZone Studio...</span>
+                <span>Opening CapZone AI Studio...</span>
             </p>
-        </div>
-
-        <!-- Shimmering Progress Bar -->
-        <div class="w-48 h-1 bg-white/10 rounded-full overflow-hidden mt-5 relative">
-            <div class="preloader-bar-fill rounded-full"></div>
         </div>
     </div>
 
     <!-- MAIN APP CONTAINER -->
-    <!-- Desktop (Image 2): Centered dual-panel split card -->
-    <!-- Mobile (Image 1): Top video editing wallpaper banner with rounded bottom-sheet login form -->
-    <main class="w-full max-w-none lg:max-w-5xl xl:max-w-6xl min-h-screen lg:min-h-0 lg:my-8 lg:rounded-[32px] overflow-hidden lg:border lg:border-white/10 lg:shadow-[0_25px_80px_rgba(0,0,0,0.7)] bg-[#101626] grid grid-cols-1 lg:grid-cols-12 relative z-10">
+    <main class="w-full max-w-5xl rounded-[32px] overflow-hidden border border-white/10 shadow-[0_25px_80px_rgba(0,0,0,0.8)] bg-[#0d1424] grid grid-cols-1 lg:grid-cols-12 relative z-10 backdrop-blur-xl">
 
         <!-- ========================================================================= -->
-        <!-- LEFT PANEL (VISUAL / WALLPAPER SIDE) -->
-        <!-- Mobile: Banner with login_mobile_bg.jpg -->
-        <!-- Desktop: Visual panel with login_desktop_bg.jpg -->
+        <!-- LEFT PANEL (BRAND SHOWCASE & VISUAL HERO) -->
         <!-- ========================================================================= -->
-        <section class="w-full lg:col-span-5 xl:col-span-6 relative h-[270px] sm:h-[320px] lg:h-auto lg:min-h-[720px] bg-[url('login_mobile_bg.jpg')] lg:bg-[url('login_desktop_bg.jpg')] bg-cover bg-center flex flex-col justify-between p-6 sm:p-8 lg:p-12 overflow-hidden select-none">
-            
-            <!-- Dark Contrast Overlays for Crisp Text Legibility -->
-            <div class="absolute inset-0 bg-gradient-to-b from-[#090d16]/70 via-transparent to-[#101626] lg:bg-gradient-to-t lg:from-[#0b101d] lg:via-[#0b101d]/50 lg:to-black/30 pointer-events-none"></div>
+        <section class="w-full lg:col-span-6 relative min-h-[300px] lg:min-h-[640px] bg-[url('login_mobile_bg.jpg')] lg:bg-[url('login_desktop_bg.jpg')] bg-cover bg-center flex flex-col justify-between p-6 sm:p-10 lg:p-12 overflow-hidden select-none">
+            <!-- Cinematic Dark Contrast Overlays -->
+            <div class="absolute inset-0 bg-gradient-to-b from-[#080c15]/75 via-[#080c15]/45 to-[#0d1424] lg:bg-gradient-to-t lg:from-[#0d1424] lg:via-[#090e1a]/60 lg:to-black/35 pointer-events-none"></div>
             <div class="absolute inset-0 bg-blue-900/10 mix-blend-color-dodge pointer-events-none"></div>
 
             <!-- Top Header Branding -->
             <div class="relative z-10 flex items-center justify-between w-full">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 p-1 flex items-center justify-center shadow-lg group hover:scale-105 transition-transform">
-                        <img src="logo.jpg" class="w-full h-full object-cover rounded-lg" alt="CapZone Logo">
+                    <div class="w-11 h-11 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 p-1 flex items-center justify-center shadow-lg shadow-cyan-500/10 hover:scale-105 transition-transform">
+                        <img src="logo.jpg" class="w-full h-full object-cover rounded-xl" alt="CapZone Logo">
                     </div>
                     <div>
-                        <span class="text-xl font-extrabold tracking-tight text-white block leading-none drop-shadow">CapZone</span>
-                        <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 mt-1 block drop-shadow">CapZone Studio</span>
+                        <span class="text-xl font-extrabold tracking-tight text-white block leading-none">CapZone</span>
+                        <span class="text-[10px] uppercase font-extrabold tracking-widest text-cyan-400 mt-1 block">Video &amp; Subtitle Studio</span>
                     </div>
                 </div>
 
                 <!-- Studio Tag Pill -->
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-slate-200 shadow-md">
-                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                    <span>CapZone Studio</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/15 text-[11px] font-semibold text-slate-200 shadow-md">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span>AI Engine 2.0 Ready</span>
                 </div>
             </div>
 
-            <!-- Desktop Bottom Hero Content (Hidden on small mobile banner to keep clean) -->
-            <div class="relative z-10 hidden lg:block mt-auto pt-16">
-                <h2 class="text-3xl xl:text-4xl font-extrabold text-white leading-[1.2] drop-shadow-lg tracking-tight">
-                    Discover Dimensional <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300">Excellence</span>
+            <!-- Left Showcase Content -->
+            <div class="relative z-10 mt-auto pt-10 lg:pt-16">
+                <!-- Glowing Feature Badge -->
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-xs font-bold mb-4 shadow-[0_0_20px_rgba(6,182,212,0.25)]">
+                    <i class="fa-solid fa-wand-magic-sparkles text-cyan-400 text-xs"></i>
+                    <span>Next-Gen Video Intelligence</span>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl xl:text-4xl font-extrabold text-white leading-[1.25] tracking-tight">
+                    Subtitles &amp; AI Studio <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300">
+                        Synchronized to Perfection
+                    </span>
                 </h2>
-                <p class="text-slate-200/90 text-xs xl:text-sm mt-3.5 leading-relaxed max-w-md drop-shadow font-normal">
-                    Generate millisecond-accurate Sinhala subtitles, bypass watermarks, remove backgrounds, and craft viral scripts tailored to elevate your vision.
+                
+                <p class="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed max-w-md font-normal">
+                    Meta MMS Forced Alignment 2.0 acoustic neural engine provides word-by-word accuracy up to 30-minute videos with Sinhala Unicode support.
                 </p>
 
-                <!-- 3 Dots Indicator (Matching Reference Image 2) -->
-                <div class="flex items-center gap-2 mt-7">
-                    <span class="w-7 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.9)]"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
-                    <span class="w-1.5 h-1.5 rounded-full bg-white/40"></span>
+                <!-- Feature Mini Tags -->
+                <div class="grid grid-cols-2 gap-2.5 mt-6 pt-5 border-t border-white/10">
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-200 bg-white/5 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10">
+                        <i class="fa-solid fa-microphone-lines text-cyan-400"></i>
+                        <span>Meta MMS Acoustic</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-200 bg-white/5 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10">
+                        <i class="fa-solid fa-stopwatch text-sky-400"></i>
+                        <span>30-Min High Precision</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-200 bg-white/5 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10">
+                        <i class="fa-solid fa-language text-indigo-400"></i>
+                        <span>Sinhala Unicode / FM</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-200 bg-white/5 backdrop-blur-md px-3 py-2 rounded-xl border border-white/10">
+                        <i class="fa-solid fa-cloud-arrow-up text-emerald-400"></i>
+                        <span>Cloud Auto Sync</span>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- ========================================================================= -->
-        <!-- RIGHT PANEL (DYNAMIC FORM AREA) -->
-        <!-- Mobile: Rounded Bottom-Sheet Card (-mt-8) -->
-        <!-- Desktop: Split card right pane -->
+        <!-- RIGHT PANEL (AUTHENTICATION CONSOLE - GOOGLE ONLY) -->
         <!-- ========================================================================= -->
-        <section class="w-full lg:col-span-7 xl:col-span-6 -mt-8 lg:mt-0 rounded-t-[32px] sm:rounded-t-[36px] lg:rounded-none bg-[#111728] border-t lg:border-t-0 border-white/10 lg:border-l lg:border-white/5 p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative z-20 shadow-[0_-15px_40px_rgba(0,0,0,0.7)] lg:shadow-none min-h-[calc(100vh-240px)] lg:min-h-0">
+        <section class="w-full lg:col-span-6 bg-[#0f172a] p-6 sm:p-10 lg:p-12 flex flex-col justify-between relative z-20">
             
-            <div class="w-full max-w-md mx-auto my-auto py-2">
-                
-                <!-- Welcome Title Header (Matching Reference Image 2) -->
-                <div class="mb-6">
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Welcome!</h1>
-                    <p class="text-slate-400 text-xs sm:text-sm mt-1.5 font-medium">Sign in to Access CapZone Video Studio.</p>
-                </div>
+            <div class="w-full max-w-md mx-auto my-auto py-4">
 
-                <!-- Sleek Tab Switcher -->
-                <div class="flex items-center w-full border-b border-slate-700/70 mb-7">
-                    <button id="tabSignIn" onclick="switchTab('signin')" class="flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center">
-                        Login
-                    </button>
-                    <button id="tabSignUp" onclick="switchTab('signup')" class="flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center">
-                        Sign Up
-                    </button>
-                </div>
-
-                <!-- ========================================================================= -->
-                <!-- FORM 1: SIGN IN -->
-                <!-- ========================================================================= -->
-                <div id="signinForm" class="tab-content active space-y-4">
-                    <form id="signInFormElement" class="space-y-4">
-                        <!-- Email / Username Input -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address or Username</label>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-regular fa-envelope text-sm"></i>
-                                </span>
-                                <input type="text" id="signinEmail" required placeholder="creator@example.com / username" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                            </div>
-                        </div>
-
-                        <!-- Password Input -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <label class="block text-xs font-semibold text-slate-300">Password</label>
-                                <button type="button" onclick="switchTab('forgot')" class="text-xs font-semibold text-blue-400 hover:text-blue-300 transition-colors">Forgot password?</button>
-                            </div>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                    <i class="fa-solid fa-lock text-sm"></i>
-                                </span>
-                                <input type="password" id="signinPassword" required placeholder="••••••••" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                <button type="button" onclick="togglePasswordVisibility('signinPassword', 'signinEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                    <i id="signinEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Remember Me -->
-                        <div class="flex items-center pt-0.5 pb-1">
-                            <label class="flex items-center cursor-pointer group">
-                                <div class="relative flex items-center justify-center w-4 h-4 rounded bg-[#171f33] border border-slate-700 group-hover:border-blue-500 transition-colors">
-                                    <input type="checkbox" id="remember-me" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
-                                    <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                                </div>
-                                <span class="ml-2.5 text-xs font-medium text-slate-400 group-hover:text-white transition-colors">Remember me on this device</span>
-                            </label>
-                        </div>
-
-                        <!-- Official Cloudflare Turnstile Human Verification Container -->
-                        <div id="turnstileWidgetLogin" class="p-3.5 rounded-2xl bg-gradient-to-b from-[#131b2e]/95 to-[#0e1626]/95 border border-cyan-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center transition-all duration-300 select-none relative overflow-hidden group">
-                            <!-- Top Security Header Bar -->
-                            <div class="flex items-center justify-between w-full max-w-[300px] mb-2 px-1">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                                    <span class="text-[11px] font-bold text-slate-200 tracking-wide flex items-center gap-1">
-                                        <i class="fa-solid fa-shield-halved text-cyan-400"></i> Cloudflare Shield
-                                    </span>
-                                </div>
-                                <div id="turnstileStatusLogin" class="text-[10px] text-slate-400 font-mono tracking-wider font-semibold">
-                                    CLICK TO VERIFY
-                                </div>
-                            </div>
-                            <!-- Turnstile Widget Box (Clean 65px Clip to hide red testing bar) -->
-                            <div class="turnstile-clip-box rounded-xl bg-[#151f33] border border-slate-700/60 shadow-inner">
-                                <div id="cfTurnstileLogin" class="cf-turnstile" data-sitekey="0x4AAAAAAFTt3WlfzARJ26K-" data-action="login" data-theme="dark" data-callback="onTurnstileLoginSuccess" data-expired-callback="onTurnstileLoginExpired" data-error-callback="onTurnstileLoginError"></div>
-                            </div>
-                        </div>
-
-                        <!-- Primary Sign In Button -->
-                        <button type="submit" id="btnSignIn" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                            <span>Sign In</span>
-                        </button>
-                    </form>
-
-                    <!-- OR Divider -->
-                    <div class="relative flex items-center justify-center py-2">
-                        <div class="border-t border-slate-700/60 w-full"></div>
-                        <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
+                <!-- Welcome Header -->
+                <div class="text-center sm:text-left mb-8">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/25 text-blue-400 text-xs font-semibold mb-3">
+                        <i class="fa-brands fa-google text-blue-400"></i>
+                        <span>One-Click Secure Authentication</span>
                     </div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                        Welcome to CapZone
+                    </h1>
+                    <p class="text-slate-400 text-xs sm:text-sm mt-2 font-medium">
+                        Sign in or sign up with your Google account to access your projects, AI subtitles, and editing tools.
+                    </p>
+                </div>
 
-                    <!-- Google Sign In Button (Matching Reference Image 2) -->
-                    <button type="button" id="btnGoogleLogin" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
-                        <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
+                <!-- Google Authentication Box -->
+                <div class="space-y-5">
+                    
+                    <!-- Main Google Sign In / Sign Up Button -->
+                    <button type="button" id="btnGoogleAuth" class="google-btn-shimmer w-full flex items-center justify-center py-4 px-6 rounded-2xl bg-white hover:bg-slate-50 text-slate-900 font-bold text-base transition-all duration-300 shadow-[0_10px_30px_rgba(255,255,255,0.15)] hover:shadow-[0_15px_35px_rgba(59,130,246,0.35)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] gap-3.5 border border-slate-200 group">
+                        <!-- Official Multi-Color Google G SVG Icon -->
+                        <svg class="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                             <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                             <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                             <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                         </svg>
-                        <span>Sign In With Google</span>
+                        <span id="googleBtnText" class="tracking-wide">Continue with Google</span>
+                        <div id="googleBtnSpinner" class="hidden">
+                            <i class="fa-solid fa-circle-notch fa-spin text-slate-800 text-sm"></i>
+                        </div>
                     </button>
 
-                    <div class="text-center pt-3">
-                        <p class="text-xs text-slate-400 font-medium">Don't have an account? <button type="button" onclick="switchTab('signup')" class="text-blue-400 hover:text-white font-bold transition-colors">Sign Up</button></p>
-                    </div>
-                </div>
-
-                <!-- ========================================================================= -->
-                <!-- FORM 2: SIGN UP -->
-                <!-- ========================================================================= -->
-                <div id="signupForm" class="tab-content space-y-4">
-                    <form id="signUpFormElement" class="space-y-4">
-                        <div id="signup-fields" class="space-y-4">
-                            <!-- Full Name -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Full Name</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-regular fa-user text-sm"></i>
-                                    </span>
-                                    <input type="text" id="signupName" required placeholder="Alex Morgan" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                </div>
+                    <!-- Remember Me Option -->
+                    <div class="flex items-center justify-center sm:justify-start pt-1">
+                        <label class="flex items-center cursor-pointer group select-none">
+                            <div class="relative flex items-center justify-center w-4 h-4 rounded bg-[#172033] border border-slate-700 group-hover:border-blue-500 transition-colors">
+                                <input type="checkbox" id="rememberMe" checked class="opacity-0 absolute w-full h-full cursor-pointer peer">
+                                <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
                             </div>
-
-                            <!-- Email -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Email Address</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-regular fa-envelope text-sm"></i>
-                                    </span>
-                                    <input type="text" id="signupEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                </div>
-                            </div>
-
-                            <!-- Password with Live Strength Indicator & Checklist (Matching Image 2) -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Password</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-lock text-sm"></i>
-                                    </span>
-                                    <input type="password" id="signupPassword" oninput="checkPasswordStrength(this.value)" required placeholder="Create strong password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                    <button type="button" onclick="togglePasswordVisibility('signupPassword', 'signupEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                        <i id="signupEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Strength Bar -->
-                                <div class="mt-2.5">
-                                    <div class="h-1.5 w-full bg-[#171f33] rounded-full overflow-hidden flex border border-slate-800">
-                                        <div id="strengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
-                                        <span id="strengthText">මුරපදයේ ශක්තිය (Password Strength)</span>
-                                        <span>අවම 8+ අකුරු</span>
-                                    </div>
-                                </div>
-
-                                <!-- Password Checklist with Live Sinhala Indicators -->
-                                <ul class="text-[11px] text-slate-400 space-y-1.5 mt-2.5 pl-1 font-medium" id="signupChecklist">
-                                    <li id="ruleLen" class="flex items-center gap-1.5 text-slate-400 transition-colors">
-                                        <i class="fa-regular fa-circle text-[10px]"></i>
-                                        <span>අවම වශයෙන් අකුරු 8ක් තිබිය යුතුය (8+ characters)</span>
-                                    </li>
-                                    <li id="ruleLetter" class="flex items-center gap-1.5 text-slate-400 transition-colors">
-                                        <i class="fa-regular fa-circle text-[10px]"></i>
-                                        <span>ඉංග්‍රීසි අකුරු අඩංගු විය යුතුය (Letters: A-Z, a-z)</span>
-                                    </li>
-                                    <li id="ruleNum" class="flex items-center gap-1.5 text-slate-400 transition-colors">
-                                        <i class="fa-regular fa-circle text-[10px]"></i>
-                                        <span>අංක අඩංගු විය යුතුය (Numbers: 0-9)</span>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Terms Checkbox -->
-                            <div class="flex items-start pt-1">
-                                <div class="relative flex items-center justify-center w-4 h-4 mt-0.5 rounded bg-[#171f33] border border-slate-700 transition-colors">
-                                    <input type="checkbox" required id="terms" class="opacity-0 absolute w-full h-full cursor-pointer peer">
-                                    <i class="fa-solid fa-check text-[10px] text-white opacity-0 peer-checked:opacity-100 transition-opacity"></i>
-                                </div>
-                                <label for="terms" class="ml-2.5 text-xs text-slate-400 leading-relaxed">
-                                    I agree to the <a href="#" onclick="openPolicyModal('terms'); return false;" class="text-blue-400 hover:text-white font-semibold transition-colors">Terms</a> and <a href="#" onclick="openPolicyModal('privacy'); return false;" class="text-blue-400 hover:text-white font-semibold transition-colors">Privacy Policy</a>.
-                                </label>
-                            </div>
-
-                            <!-- Official Cloudflare Turnstile Human Verification Container -->
-                            <div id="turnstileWidgetSignup" class="p-3.5 rounded-2xl bg-gradient-to-b from-[#131b2e]/95 to-[#0e1626]/95 border border-cyan-500/25 shadow-[0_10px_25px_rgba(0,0,0,0.5)] flex flex-col items-center justify-center transition-all duration-300 select-none relative overflow-hidden group">
-                                <!-- Top Security Header Bar -->
-                                <div class="flex items-center justify-between w-full max-w-[300px] mb-2 px-1">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                                        <span class="text-[11px] font-bold text-slate-200 tracking-wide flex items-center gap-1">
-                                            <i class="fa-solid fa-shield-halved text-cyan-400"></i> Cloudflare Shield
-                                        </span>
-                                    </div>
-                                    <div id="turnstileStatusSignup" class="text-[10px] text-slate-400 font-mono tracking-wider font-semibold">
-                                        CLICK TO VERIFY
-                                    </div>
-                                </div>
-                                <!-- Turnstile Widget Box (Clean 65px Clip to hide red testing bar) -->
-                                <div class="turnstile-clip-box rounded-xl bg-[#151f33] border border-slate-700/60 shadow-inner">
-                                    <div id="cfTurnstileSignup" data-sitekey="0x4AAAAAAFTt3WlfzARJ26K-" data-action="signup" data-theme="dark" data-callback="onTurnstileSignupSuccess" data-expired-callback="onTurnstileSignupExpired" data-error-callback="onTurnstileSignupError"></div>
-                                </div>
-                            </div>
-
-                            <!-- Primary Sign Up Button -->
-                            <button type="submit" id="btnSignUp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Sign Up &amp; Get OTP</span>
-                                <i class="fa-solid fa-arrow-right text-xs"></i>
-                            </button>
-
-                            <!-- Divider -->
-                            <div class="relative flex items-center justify-center py-1">
-                                <div class="border-t border-slate-700/60 w-full"></div>
-                                <span class="bg-[#111728] px-3 text-[11px] uppercase text-slate-400 font-bold tracking-wider absolute">or</span>
-                            </div>
-
-                            <!-- Google Sign Up Button -->
-                            <button type="button" id="btnGoogleSignUp" class="w-full flex items-center justify-center py-3 px-4 rounded-xl border border-slate-200/90 bg-white hover:bg-slate-50 text-slate-800 font-bold text-sm transition-all shadow-md gap-2.5 active:scale-[0.98]">
-                                <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                                </svg>
-                                <span>Sign Up With Google</span>
-                            </button>
-                        </div>
-
-                        <!-- OTP Section (Hidden initially) -->
-                        <div id="signup-otp-fields" class="hidden space-y-4">
-                            <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="otp-message">
-                                📧 සත්‍යාපන කේතය ඔබගේ Gmail වෙත යවන ලදී.<br>
-                                <span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-shield-halved text-sm"></i>
-                                    </span>
-                                    <input type="text" id="signupOtp" maxlength="6" placeholder="000000" class="w-full pl-10 pr-4 py-3.5 rounded-xl border border-slate-700/80 bg-[#171f33] text-cyan-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 text-lg text-center tracking-[0.5em] font-extrabold font-mono shadow-inner">
-                                </div>
-                            </div>
-                            <button type="button" id="btnVerifyOtp" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Verify &amp; Create Account (ගිණුම සක්‍රිය කරන්න)</span>
-                                <i class="fa-solid fa-check text-xs"></i>
-                            </button>
-                            <div class="flex items-center justify-between pt-1">
-                                <button type="button" id="btnBackToSignup" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors">
-                                    <i class="fa-solid fa-arrow-left mr-1"></i> තොරතුරු වෙනස් කිරීමට ආපසු
-                                </button>
-                                <button type="button" id="btnResendSignupOtp" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors">
-                                    නැවත OTP එකක් එවන්න (<span id="signupResendTimer">60s</span>)
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-
-                    <div class="text-center pt-2">
-                        <p class="text-xs text-slate-400 font-medium">Already have an account? <button type="button" onclick="switchTab('signin')" class="text-blue-400 hover:text-white font-bold transition-colors">Login</button></p>
-                    </div>
-                </div>
-
-                <!-- ========================================================================= -->
-                <!-- FORM 3: FORGOT PASSWORD (2-STEP VERIFICATION) -->
-                <!-- ========================================================================= -->
-                <div id="forgotForm" class="tab-content space-y-4">
-                    <div>
-                        <button type="button" onclick="switchTab('signin')" class="text-xs font-bold text-blue-400 hover:text-white transition-colors inline-flex items-center gap-1.5 mb-4">
-                            <i class="fa-solid fa-arrow-left"></i> Return to Login
-                        </button>
-                        <h2 class="text-2xl font-extrabold text-white mb-1 tracking-tight">Recover Account</h2>
-                        <p class="text-slate-400 text-xs font-medium">Reset your password securely with Gmail OTP verification.</p>
+                            <span class="ml-2.5 text-xs font-medium text-slate-400 group-hover:text-white transition-colors">
+                                Remember my Google session on this device
+                            </span>
+                        </label>
                     </div>
 
-                    <!-- Step 1: Request OTP -->
-                    <form id="forgotFormElement" class="space-y-4">
-                        <div id="forgotStep1" class="space-y-4">
+                    <!-- Trust & Benefits Grid -->
+                    <div class="mt-8 pt-6 border-t border-slate-800/80 space-y-3">
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-[#131d31]/70 border border-slate-800">
+                            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                                <i class="fa-solid fa-bolt text-xs"></i>
+                            </div>
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Registered Email Address</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-regular fa-envelope text-sm"></i>
-                                    </span>
-                                    <input type="email" id="forgotEmail" required placeholder="creator@example.com" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                </div>
+                                <h4 class="text-xs font-bold text-white">Instant 1-Click Access</h4>
+                                <p class="text-[11px] text-slate-400">No passwords or OTP verification codes to wait for.</p>
                             </div>
-
-                            <button type="submit" id="btnForgotSendOtp" class="w-full py-3.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg shadow-blue-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Send Verification Code (OTP එවන්න)</span>
-                                <i class="fa-regular fa-paper-plane text-xs"></i>
-                            </button>
-
-                            <div class="relative flex py-1 items-center">
-                                <div class="flex-grow border-t border-slate-700/60"></div>
-                                <span class="flex-shrink mx-3 text-[11px] text-slate-500 font-medium">හෝ (OR)</span>
-                                <div class="flex-grow border-t border-slate-700/60"></div>
-                            </div>
-
-                            <button type="button" id="btnFirebaseResetLink" class="w-full py-3 px-4 rounded-xl bg-[#131d2e] hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-500/50 text-cyan-300 font-semibold text-xs shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <i class="fa-brands fa-google text-xs text-amber-400"></i>
-                                <span>Send Direct Reset Link (Gmail එකට කෙලින්ම Link එකක් එවන්න)</span>
-                            </button>
                         </div>
 
-                        <!-- Step 2: Enter OTP & New Strong Password -->
-                        <div id="forgotStep2" class="hidden space-y-4">
-                            <div class="p-4 bg-[#171f33] border border-blue-500/40 rounded-xl text-xs sm:text-sm text-slate-200 shadow-inner" id="forgot-otp-notice">
-                                📧 මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී.<br>
-                                <span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-[#131d31]/70 border border-slate-800">
+                            <div class="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                                <i class="fa-solid fa-shield-halved text-xs"></i>
                             </div>
-
-                            <!-- OTP Input -->
                             <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Enter Verification Code (6-Digit OTP)</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-shield-halved text-sm"></i>
-                                    </span>
-                                    <input type="text" id="forgotOtp" maxlength="6" placeholder="000000" class="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-cyan-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-600 text-base text-center tracking-[0.5em] font-extrabold font-mono shadow-inner">
-                                </div>
-                            </div>
-
-                            <!-- New Password -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">New Password</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-lock text-sm"></i>
-                                    </span>
-                                    <input type="password" id="forgotNewPassword" oninput="checkForgotPassStrength(this.value)" placeholder="Create strong new password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                    <button type="button" onclick="togglePasswordVisibility('forgotNewPassword', 'forgotNewEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                        <i id="forgotNewEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                    </button>
-                                </div>
-
-                                <!-- Strength Bar -->
-                                <div class="mt-2.5">
-                                    <div class="h-1.5 w-full bg-[#171f33] rounded-full overflow-hidden flex border border-slate-800">
-                                        <div id="forgotStrengthBar" class="h-full w-0 transition-all duration-300 bg-red-500"></div>
-                                    </div>
-                                    <div class="flex items-center justify-between text-[11px] mt-1 text-slate-400 font-medium">
-                                        <span id="forgotStrengthText">මුරපදයේ ශක්තිය (Password Strength)</span>
-                                        <span>අවම 8+ අකුරු</span>
-                                    </div>
-                                </div>
-
-                                <ul class="text-[11px] text-slate-400 space-y-1 mt-2.5 pl-1 font-medium" id="forgotChecklist">
-                                    <li id="fRuleLen" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> අවම වශයෙන් අකුරු 8ක් (8+ characters)</li>
-                                    <li id="fRuleLetter" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> ඉංග්‍රීසි අකුරු (Letters: A-Z, a-z)</li>
-                                    <li id="fRuleNum" class="flex items-center gap-1.5 text-slate-400 transition-colors"><i class="fa-regular fa-circle text-[10px]"></i> අංක (Numbers: 0-9)</li>
-                                </ul>
-                            </div>
-
-                            <!-- Confirm New Password -->
-                            <div>
-                                <label class="block text-xs font-semibold text-slate-300 mb-2">Confirm New Password</label>
-                                <div class="relative">
-                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                                        <i class="fa-solid fa-lock text-sm"></i>
-                                    </span>
-                                    <input type="password" id="forgotConfirmPassword" placeholder="Confirm your new password" class="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-700/80 bg-[#171f33] text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all placeholder:text-slate-500 text-sm shadow-inner">
-                                    <button type="button" onclick="togglePasswordVisibility('forgotConfirmPassword', 'forgotConfirmEyeIcon')" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors">
-                                        <i id="forgotConfirmEyeIcon" class="fa-regular fa-eye text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Reset Button -->
-                            <button type="button" id="btnResetPasswordSubmit" class="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                                <span>Reset &amp; Set New Password (නව මුරපදය සුරකින්න)</span>
-                                <i class="fa-solid fa-check text-xs"></i>
-                            </button>
-
-                            <!-- Resend & Back -->
-                            <div class="flex items-center justify-between pt-1">
-                                <button type="button" id="btnBackToForgotStep1" class="text-xs text-slate-400 hover:text-white font-semibold transition-colors">
-                                    <i class="fa-solid fa-arrow-left mr-1"></i> ආපසු (Change Email)
-                                </button>
-                                <button type="button" id="btnResendForgotOtp" class="text-xs text-blue-400 hover:text-blue-300 font-semibold transition-colors">
-                                    නැවත OTP එවන්න (<span id="forgotResendTimer">60s</span>)
-                                </button>
+                                <h4 class="text-xs font-bold text-white">Google OAuth 2.0 Security</h4>
+                                <p class="text-[11px] text-slate-400">Your account is protected by official Google enterprise security.</p>
                             </div>
                         </div>
-                    </form>
+
+                        <div class="flex items-center gap-3 p-3 rounded-xl bg-[#131d31]/70 border border-slate-800">
+                            <div class="w-8 h-8 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                                <i class="fa-solid fa-arrows-rotate text-xs"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-white">Real-Time Panel Synchronization</h4>
+                                <p class="text-[11px] text-slate-400">Projects, export history, and subscriptions sync instantly.</p>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
-            </div>
+                <!-- Footer Legal Policies -->
+                <div class="mt-8 pt-6 border-t border-slate-800/80 text-center">
+                    <p class="text-[11px] text-slate-400 leading-relaxed">
+                        By continuing, you agree to CapZone's
+                        <button type="button" onclick="openPolicyModal('terms')" class="text-blue-400 hover:text-white font-semibold underline underline-offset-2 transition-colors">Terms of Service</button>, 
+                        <button type="button" onclick="openPolicyModal('privacy')" class="text-blue-400 hover:text-white font-semibold underline underline-offset-2 transition-colors">Privacy Policy</button>, and 
+                        <button type="button" onclick="openPolicyModal('refund')" class="text-blue-400 hover:text-white font-semibold underline underline-offset-2 transition-colors">Refund Policy</button>.
+                    </p>
+                    <p class="text-[10px] text-slate-400 mt-2 font-mono">
+                        CapZone Video &amp; Subtitle Studio v2.0 • Secured by Google OAuth
+                    </p>
+                </div>
 
-            <!-- PayHere Required Bilingual Policy Links -->
-            <div class="mt-6 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-3 text-[11px] text-slate-400/90">
-                <button type="button" onclick="openPolicyModal('terms')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Terms &amp; Conditions (කොන්දේසි)</button>
-                <span>•</span>
-                <button type="button" onclick="openPolicyModal('privacy')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Privacy Policy (පෞද්ගලිකත්වය)</button>
-                <span>•</span>
-                <button type="button" onclick="openPolicyModal('refund')" class="hover:text-white transition-colors bg-transparent border-0 cursor-pointer">Return Policy (මුදල් ආපසු)</button>
-            </div>
-
-            <!-- Developer Attribution Footer -->
-            <div class="mt-4 text-center">
-                <p class="text-[11px] text-gray-500 font-medium">&copy; 2026 CapZone Studio. Powered by <span class="text-blue-400 font-semibold">Kaveez Developer Team</span>.</p>
             </div>
         </section>
 
     </main>
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+    <!-- Global Toast Notifications Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[99999] flex flex-col gap-2.5 pointer-events-none max-w-sm w-full px-4"></div>
 
-    <!-- Beautiful Centered Robot Verification Modal -->
-    <div id="robotVerificationModal" class="fixed inset-0 z-[150] hidden items-center justify-center pointer-events-none">
-        <div id="robotModalBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-md opacity-0 transition-opacity duration-300 pointer-events-auto" onclick="closeRobotModal()"></div>
-        <div id="robotModalContent" class="relative w-full max-w-sm mx-4 bg-[#0a0f1c] border border-rose-500/30 rounded-3xl p-7 shadow-[0_0_50px_rgba(244,63,94,0.15)] transform scale-95 opacity-0 transition-all duration-300 pointer-events-auto">
-            <div class="absolute -top-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-[#0a0f1c] rounded-full flex items-center justify-center border-4 border-[#030712] shadow-xl">
-                <div class="w-full h-full rounded-full bg-rose-500/10 flex items-center justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 bg-rose-500/20 animate-ping"></div>
-                    <i class="fa-solid fa-robot text-3xl text-rose-500 relative z-10 animate-bounce" style="animation-duration: 2s;"></i>
-                </div>
-            </div>
-            <div class="mt-8 text-center">
-                <h3 class="text-xl font-bold text-white mb-2 tracking-wide">Verification Required</h3>
-                <p class="text-[13px] text-slate-300 leading-relaxed mb-6">
-                    කරුණාකර ඔබ රොබෝවරයෙකු නොවන බව තහවුරු කිරීමට <br><span class="text-rose-400 font-semibold">Security Check (Tick box)</span> එක සම්පූර්ණ කරන්න.
-                </p>
-                <button type="button" onclick="closeRobotModal()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700 text-white font-bold text-sm shadow-[0_4px_20px_rgba(244,63,94,0.4)] active:scale-95 transition-all flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-check text-xs"></i> <span>තේරුම් ගත්තා</span>
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Universal Bilingual Policy Modal Script -->
+    <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
 
-    <script>
-        // Tab Switching Logic
-        function switchTab(tabName) {
-            const tabs = ['signin', 'signup', 'forgot'];
-            tabs.forEach(t => {
-                const form = document.getElementById(t + 'Form');
-                if (form) form.classList.remove('active');
-            });
+    <!-- ========================================================================= -->
+    <!-- 🔥 CORE AUTHENTICATION LOGIC & REAL-TIME DASHBOARD/PANEL SYNC -->
+    <!-- ========================================================================= -->
+    <script type="module">
+        import { 
+            auth, 
+            loginWithGoogle, 
+            googleProvider,
+            signInWithRedirect,
+            getRedirectResult,
+            setPersistence, 
+            browserLocalPersistence, 
+            browserSessionPersistence, 
+            onAuthStateChanged 
+        } from './firebase-config.js?v=2.6';
 
-            const tabSignInBtn = document.getElementById('tabSignIn');
-            const tabSignUpBtn = document.getElementById('tabSignUp');
-
-            if (tabName === 'signin') {
-                document.getElementById('signinForm').classList.add('active');
-                if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
-                if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
-                setTimeout(() => {
-                    if (typeof turnstile !== 'undefined') {
-                        const el = document.getElementById('cfTurnstileLogin');
-                        if (el && !el.querySelector('iframe')) {
-                            try {
-                                el.innerHTML = '';
-                                window.turnstileLoginWidgetId = turnstile.render('#cfTurnstileLogin', {
-                                    sitekey: '0x4AAAAAAFTt3WlfzARJ26K-',
-                                    theme: 'dark',
-                                    action: 'login',
-                                    callback: window.onTurnstileLoginSuccess,
-                                    'expired-callback': window.onTurnstileLoginExpired,
-                                    'error-callback': window.onTurnstileLoginError
-                                });
-                            } catch(e) {}
-                        }
-                    }
-                    if (window.isRobotVerified) {
-                        const st = document.getElementById('turnstileStatusLogin');
-                        if (st) st.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                    }
-                }, 60);
-            } else if (tabName === 'signup') {
-                document.getElementById('signupForm').classList.add('active');
-                if (tabSignUpBtn) tabSignUpBtn.className = "flex-1 text-sm font-bold text-white border-b-2 border-blue-500 pb-3 transition-all text-center";
-                if (tabSignInBtn) tabSignInBtn.className = "flex-1 text-sm font-semibold text-slate-400 hover:text-white border-b-2 border-transparent pb-3 transition-all text-center";
-                setTimeout(() => {
-                    if (typeof turnstile !== 'undefined') {
-                        const el = document.getElementById('cfTurnstileSignup');
-                        if (el && !el.querySelector('iframe')) {
-                            try {
-                                el.innerHTML = '';
-                                window.turnstileSignupWidgetId = turnstile.render('#cfTurnstileSignup', {
-                                    sitekey: '0x4AAAAAAFTt3WlfzARJ26K-',
-                                    theme: 'dark',
-                                    action: 'signup',
-                                    callback: window.onTurnstileSignupSuccess,
-                                    'expired-callback': window.onTurnstileSignupExpired,
-                                    'error-callback': window.onTurnstileSignupError
-                                });
-                            } catch(e) {}
-                        }
-                    }
-                    if (window.isRobotVerified) {
-                        const st = document.getElementById('turnstileStatusSignup');
-                        if (st) st.innerHTML = '<span class="text-emerald-400 font-bold flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> VERIFIED</span>';
-                    }
-                }, 60);
-            } else if (tabName === 'forgot') {
-                document.getElementById('forgotForm').classList.add('active');
+        // Global safeguard: prevent background IndexedDB closing errors
+        window.addEventListener('unhandledrejection', (event) => {
+            if (event.reason && (event.reason.message || '').includes('Database is closing')) {
+                console.warn("Handled harmless background IndexedDB event:", event.reason);
+                event.preventDefault();
             }
-        }
-
-        // Toggle Password Visibility
-        window.togglePasswordVisibility = function(inputId, iconId) {
-            const input = document.getElementById(inputId);
-            const icon = document.getElementById(iconId);
-            if (!input || !icon) return;
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.className = 'fa-regular fa-eye-slash text-sm';
-            } else {
-                input.type = 'password';
-                icon.className = 'fa-regular fa-eye text-sm';
-            }
-        }
-
-        // Strong Password Validation Helpers (Sinhala & English)
-        window.isPasswordStrong = function(val) {
-            if (!val || typeof val !== 'string') return false;
-            const hasLen = val.length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(val);
-            const hasNum = /[0-9]/.test(val);
-            return hasLen && hasLetter && hasNum;
-        };
-
-        // Live Password Strength Checker for Sign Up
-        window.checkPasswordStrength = function(val) {
-            const bar = document.getElementById('strengthBar');
-            const text = document.getElementById('strengthText');
-            const rLen = document.getElementById('ruleLen');
-            const rLetter = document.getElementById('ruleLetter');
-            const rNum = document.getElementById('ruleNum');
-
-            const hasLen = (val || '').length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(val || '');
-            const hasNum = /[0-9]/.test(val || '');
-            const hasSpecial = /[^A-Za-z0-9]/.test(val || '');
-
-            function updateRuleUI(el, isValid) {
-                if (!el) return;
-                const icon = el.querySelector('i');
-                if (isValid) {
-                    el.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold transition-colors';
-                    if (icon) icon.className = 'fa-solid fa-circle-check text-[11px] text-emerald-400';
-                } else {
-                    el.className = 'flex items-center gap-1.5 text-slate-400 transition-colors';
-                    if (icon) icon.className = 'fa-regular fa-circle text-[10px] text-slate-500';
-                }
-            }
-
-            updateRuleUI(rLen, hasLen);
-            updateRuleUI(rLetter, hasLetter);
-            updateRuleUI(rNum, hasNum);
-
-            if (!val || val.length === 0) {
-                if (bar) { bar.style.width = '0%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
-                if (text) { text.innerText = 'මුරපදයේ ශක්තිය (Password Strength)'; text.className = 'text-slate-400'; }
-                return;
-            }
-
-            let score = 0;
-            if (val.length >= 6) score++;
-            if (hasLen) score++;
-            if (hasLetter) score++;
-            if (hasNum) score++;
-            if (hasSpecial) score++;
-
-            if (!hasLen || !hasLetter || !hasNum) {
-                if (bar) {
-                    bar.style.width = val.length < 6 ? '25%' : '40%';
-                    bar.className = 'h-full transition-all duration-300 bg-red-500';
-                }
-                if (text) {
-                    text.innerText = 'දුර්වල මුරපදයකි (අවම වශයෙන් අකුරු 8ක්, අකුරු සහ අංක අවශ්‍යයි)';
-                    text.className = 'text-red-400 font-bold';
-                }
-            } else if (score >= 4 && hasSpecial) {
-                if (bar) {
-                    bar.style.width = '100%';
-                    bar.className = 'h-full transition-all duration-300 bg-emerald-500';
-                }
-                if (text) {
-                    text.innerText = 'විශිෂ්ට ශක්තිමත් මුරපදයකි (Very Strong Password) ✓';
-                    text.className = 'text-emerald-400 font-bold';
-                }
-            } else {
-                if (bar) {
-                    bar.style.width = '75%';
-                    bar.className = 'h-full transition-all duration-300 bg-emerald-500';
-                }
-                if (text) {
-                    text.innerText = 'ශක්තිමත් මුරපදයකි (Strong Password) ✓';
-                    text.className = 'text-emerald-400 font-bold';
-                }
-            }
-        };
-
-        // Live Password Strength Checker for Forgot Password
-        window.checkForgotPassStrength = function(val) {
-            const bar = document.getElementById('forgotStrengthBar');
-            const text = document.getElementById('forgotStrengthText');
-            const rLen = document.getElementById('fRuleLen');
-            const rLetter = document.getElementById('fRuleLetter');
-            const rNum = document.getElementById('fRuleNum');
-
-            const hasLen = (val || '').length >= 8;
-            const hasLetter = /[a-zA-Z]/.test(val || '');
-            const hasNum = /[0-9]/.test(val || '');
-
-            function updateRuleUI(el, isValid) {
-                if (!el) return;
-                const icon = el.querySelector('i');
-                if (isValid) {
-                    el.className = 'flex items-center gap-1.5 text-emerald-400 font-semibold transition-colors';
-                    if (icon) icon.className = 'fa-solid fa-circle-check text-[11px] text-emerald-400';
-                } else {
-                    el.className = 'flex items-center gap-1.5 text-slate-400 transition-colors';
-                    if (icon) icon.className = 'fa-regular fa-circle text-[10px] text-slate-500';
-                }
-            }
-
-            updateRuleUI(rLen, hasLen);
-            updateRuleUI(rLetter, hasLetter);
-            updateRuleUI(rNum, hasNum);
-
-            if (!val || val.length === 0) {
-                if (bar) { bar.style.width = '0%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
-                if (text) { text.innerText = 'මුරපදයේ ශක්තිය (Password Strength)'; text.className = 'text-slate-400'; }
-                return;
-            }
-
-            if (!hasLen || !hasLetter || !hasNum) {
-                if (bar) { bar.style.width = '35%'; bar.className = 'h-full transition-all duration-300 bg-red-500'; }
-                if (text) { text.innerText = 'දුර්වල මුරපදයකි (අවම වශයෙන් අකුරු 8ක්, අකුරු සහ අංක අවශ්‍යයි)'; text.className = 'text-red-400 font-bold'; }
-            } else {
-                if (bar) { bar.style.width = '100%'; bar.className = 'h-full transition-all duration-300 bg-emerald-500'; }
-                if (text) { text.innerText = 'ශක්තිමත් මුරපදයකි (Strong Password) ✓'; text.className = 'text-emerald-400 font-bold'; }
-            }
-        };
-
-        // Account Conflict Modal Controls
-        window.openAccountConflictModal = function({ email, isGoogle, message }) {
-            const modal = document.getElementById('accountConflictModal');
-            const msgEl = document.getElementById('conflictModalMessage');
-            if (!modal) return;
-
-            window._conflictTargetEmail = email;
-
-            if (msgEl) {
-                if (isGoogle) {
-                    msgEl.innerHTML = `<strong>${email}</strong> යන Gmail ලිපිනයෙන් දැනටමත් අපගේ පද්ධතියට <strong>Google</strong> හරහා සම්බන්ධ වී ඇත.<br><br>ඔබට නැවත වෙනම Username සහ Password සාදා ලියාපදිංචි විය නොහැක. කරුණාකර පහත <strong>'Sign in with Google'</strong> බොත්තම ක්ලික් කර පිවිසෙන්න.`;
-                } else {
-                    msgEl.innerHTML = `<strong>${email}</strong> යන Gmail ලිපිනයෙන් දැනටමත් CapZone ගිණුමක් ලියාපදිංචි වී ඇත.<br><br>කරුණාකර ඔබගේ පවතින මුරපදය ඇතුළත් කර Login වන්න. මුරපදය අමතක නම් 'Forgot Password' භාවිතා කරන්න.`;
-                }
-            }
-
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                const card = modal.querySelector('.scale-95');
-                if (card) {
-                    card.classList.remove('scale-95');
-                    card.classList.add('scale-100');
-                }
-            }, 10);
-        };
-
-        window.closeAccountConflictModal = function() {
-            const modal = document.getElementById('accountConflictModal');
-            if (!modal) return;
-            modal.classList.add('opacity-0');
-            const card = modal.querySelector('.scale-100');
-            if (card) {
-                card.classList.remove('scale-100');
-                card.classList.add('scale-95');
-            }
-            setTimeout(() => { modal.classList.add('hidden'); }, 300);
-        };
-
-        window.setLoading = function(button, isLoading) {
-            if (!button) return;
-            if (isLoading) {
-                button.dataset.origHtml = button.innerHTML;
-                button.disabled = true;
-                button.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Processing...`;
-                button.classList.add('opacity-70', 'cursor-not-allowed');
-            } else {
-                button.disabled = false;
-                button.innerHTML = button.dataset.origHtml || button.innerHTML;
-                button.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
-        }
-
-        // Beautiful Robot Modal Logic
-        window.showRobotModal = function() {
-            const modal = document.getElementById('robotVerificationModal');
-            const backdrop = document.getElementById('robotModalBackdrop');
-            const content = document.getElementById('robotModalContent');
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            // Force reflow for animation
-            void modal.offsetWidth;
-            
-            backdrop.classList.remove('opacity-0');
-            backdrop.classList.add('opacity-100');
-            
-            content.classList.remove('scale-95', 'opacity-0');
-            content.classList.add('scale-100', 'opacity-100');
-        };
-
-        window.closeRobotModal = function() {
-            const modal = document.getElementById('robotVerificationModal');
-            const backdrop = document.getElementById('robotModalBackdrop');
-            const content = document.getElementById('robotModalContent');
-            
-            backdrop.classList.remove('opacity-100');
-            backdrop.classList.add('opacity-0');
-            
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }, 300);
-        };
+        });
 
         // Toast Notification Function
         window.showToast = function(message, type = 'info') {
@@ -1209,7 +395,7 @@
             
             toast.className = `pointer-events-auto flex items-center gap-3 px-4 py-3 rounded-xl shadow-2xl text-xs font-semibold backdrop-blur-md transition-all duration-300 transform translate-y-4 opacity-0 border ${bgClass}`;
             
-            const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+            const icon = type === 'success' ? 'fa-circle-check text-emerald-400' : type === 'error' ? 'fa-triangle-exclamation text-rose-400' : 'fa-circle-info text-cyan-400';
             toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
             
             container.appendChild(toast);
@@ -1221,56 +407,26 @@
             setTimeout(() => {
                 toast.classList.add('opacity-0', 'translate-y-2');
                 setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-    </script>
-
-    <!-- Firebase Authentication Logic -->
-    <script type="module">
-        import { 
-            auth, 
-            loginWithGoogle, 
-            signInWithEmailAndPassword, 
-            createUserWithEmailAndPassword, 
-            sendPasswordResetEmail, 
-            setPersistence, 
-            browserLocalPersistence, 
-            browserSessionPersistence, 
-            onAuthStateChanged 
-        } from './firebase-config.js?v=2.5';
-
-        // Global safeguard: prevent background IndexedDB closing errors
-        window.addEventListener('unhandledrejection', (event) => {
-            if (event.reason && (event.reason.message || '').includes('Database is closing')) {
-                console.warn("Handled harmless background IndexedDB event:", event.reason);
-                event.preventDefault();
-            }
-        });
+            }, 3500);
+        };
 
         const API_BASE_URL = (function() {
             const proto = window.location.protocol;
             const host = window.location.hostname || '';
             const port = window.location.port || '';
 
-            // If directly served by local node server on port 6039
             if ((host === 'localhost' || host === '127.0.0.1') && port === '6039') {
                 return '';
             }
-
-            // If running on local environment (file: or port 5500 Live Server, etc.)
             if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) {
                 return 'http://localhost:6039';
             }
-
-            // If running on production website domain (capzone.top, etc.)
             if (host.includes('capzone.top') || host.includes('web.app') || host.includes('firebaseapp.com')) {
                 return 'https://capzone.kaveez.top';
             }
-
             if (host.includes('capzone.kaveez.top')) {
                 return '';
             }
-
             return 'https://capzone.kaveez.top';
         })();
 
@@ -1295,14 +451,21 @@
             }
         }
 
-        async function notifyBackend(user, method, password = '') {
+        // =========================================================================
+        // 🔄 Real-Time Synchronization with Node Backend, Admin Panel & Dashboard
+        // =========================================================================
+        async function notifyBackend(user) {
             if (!user || !user.email) return;
             const normEmail = user.email.toLowerCase().trim();
             const uName = user.displayName || localStorage.getItem('capzone_user_name') || normEmail.split('@')[0];
+
             try {
+                const stamp = 'cf_live_' + Date.now();
                 localStorage.setItem('capzone_login_timestamp', Date.now());
                 localStorage.setItem('capzone_user_email', normEmail);
                 if (uName) localStorage.setItem('capzone_user_name', uName);
+                localStorage.setItem('capzone_robot_verified', stamp);
+                sessionStorage.setItem('capzone_robot_verified', stamp);
 
                 // 1. Instant Real-Time Cross-Tab Synchronization with Admin Panel
                 try {
@@ -1312,8 +475,8 @@
                         user: { 
                             email: normEmail, 
                             name: uName, 
-                            auth_provider: method === 'Google' ? 'google' : 'email',
-                            is_google: method === 'Google',
+                            auth_provider: 'google',
+                            is_google: true,
                             active: true
                         }
                     };
@@ -1321,9 +484,11 @@
                     
                     const bc = new BroadcastChannel('capzone_realtime_sync');
                     bc.postMessage({ type: 'USER_UPDATED', email: normEmail, user: syncPayload.user });
-                } catch(e) {}
+                } catch(bcErr) {
+                    console.warn("BroadcastChannel sync notice:", bcErr);
+                }
 
-                // 2. Persist to Node Backend Database
+                // 2. Persist to Node Backend Database via /api/save-user
                 await apiFetch('/api/save-user', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1331,9 +496,9 @@
                         email: normEmail, 
                         name: uName, 
                         displayName: uName,
-                        phone: user.phoneNumber, 
-                        method, 
-                        password 
+                        phone: user.phoneNumber || '', 
+                        method: 'Google',
+                        is_google: true
                     })
                 });
             } catch (e) {
@@ -1341,859 +506,131 @@
             }
         }
 
+        function setGoogleLoading(isLoading) {
+            const btn = document.getElementById('btnGoogleAuth');
+            const text = document.getElementById('googleBtnText');
+            const spinner = document.getElementById('googleBtnSpinner');
+            if (!btn || !text || !spinner) return;
 
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                localStorage.setItem('capzone_user_email', user.email);
-                if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
+            if (isLoading) {
+                btn.disabled = true;
+                btn.classList.add('opacity-80', 'cursor-wait');
+                text.textContent = 'Signing in with Google...';
+                spinner.classList.remove('hidden');
+            } else {
+                btn.disabled = false;
+                btn.classList.remove('opacity-80', 'cursor-wait');
+                text.textContent = 'Continue with Google';
+                spinner.classList.add('hidden');
             }
-        });
-
-        // Expose apiFetch globally for security routines
-        window.apiFetch = apiFetch;
-
-        // Background Turnstile Backend Handshake
-        window.syncTurnstileBackend = async function(token) {
-            if (!token) return;
-            try {
-                const res = await apiFetch(`/api/turnstile/verify`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: token })
-                });
-                const data = await res.json().catch(() => ({}));
-                if (res.ok && data.success) {
-                    window.isRobotVerified = true;
-                }
-            } catch (err) {
-                console.warn("Backend Turnstile sync notice (client verified):", err.message);
-            }
-        };
-
-        // If Turnstile already verified before module finished loading, trigger sync
-        if (window.isRobotVerified && (window.turnstileLoginToken || window.turnstileSignupToken)) {
-            window.syncTurnstileBackend(window.turnstileLoginToken || window.turnstileSignupToken);
         }
 
-        function highlightRobotWidget(widgetId) {
-            const el = document.getElementById(widgetId);
-            if (!el) return;
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            el.classList.add('border-rose-500', 'ring-2', 'ring-rose-500/50');
-            setTimeout(() => {
-                el.classList.remove('border-rose-500', 'ring-2', 'ring-rose-500/50');
-            }, 2500);
-        }
-
-        // Google Sign-In Handler
-        async function handleGoogleSignIn(btn) {
-            const action = (btn && btn.id === 'btnGoogleSignUp') ? 'signup' : 'login';
-            if (typeof window.isUserRobotVerified === 'function' && !window.isUserRobotVerified(action)) {
-                const targetWidget = (action === 'signup') ? 'turnstileWidgetSignup' : 'turnstileWidgetLogin';
-                highlightRobotWidget(targetWidget);
-                if (typeof window.showRobotModal === 'function') {
-                    window.showRobotModal();
-                } else {
-                    showToast('Please complete the Cloudflare Turnstile verification before proceeding.', 'error');
-                }
-                return;
-            }
-
-            setLoading(btn, true);
+        // =========================================================================
+        // 🚀 Google Sign-In Action Handler
+        // =========================================================================
+        async function handleGoogleSignIn() {
+            setGoogleLoading(true);
             try {
                 if (window.location.protocol === 'file:') {
-                    showToast('Google Sign-In requires a secure web environment.', 'error');
-                    setLoading(btn, false);
+                    showToast('Google Sign-In requires a web server environment (e.g. http://localhost:6039)', 'error');
+                    setGoogleLoading(false);
                     return;
                 }
                 if (!auth) {
-                    showToast('Authentication module failed to initialize. Please check your browser settings or disable adblockers.', 'error');
-                    setLoading(btn, false);
+                    showToast('Authentication module initializing... Please try again.', 'error');
+                    setGoogleLoading(false);
                     return;
                 }
+
+                // Configure Persistence (Local vs Session)
+                const rememberEl = document.getElementById('rememberMe');
+                const remember = rememberEl ? rememberEl.checked : true;
                 try {
-                    const rememberEl = document.getElementById('remember-me');
-                    const remember = rememberEl ? rememberEl.checked : true;
                     await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
                 } catch (pErr) {
                     console.warn("Persistence set skipped:", pErr);
                 }
+
                 const result = await loginWithGoogle();
                 if (result && result.user) {
-                    const stamp = 'cf_live_' + Date.now();
-                    localStorage.setItem('capzone_robot_verified', stamp);
-                    sessionStorage.setItem('capzone_robot_verified', stamp);
-                    localStorage.setItem('capzone_user_email', result.user.email);
-                    if (result.user.displayName) localStorage.setItem('capzone_user_name', result.user.displayName);
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-                    await notifyBackend(result.user, 'Google');
-                    showToast('Google login successful!', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                    await notifyBackend(result.user);
+                    showToast(`Welcome, ${result.user.displayName || result.user.email}! Redirecting...`, 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 400);
+                } else if (result === null) {
+                    // Redirect was triggered
+                    showToast('Redirecting to Google Sign-In...', 'info');
                 }
             } catch (error) {
                 console.error("Google Sign-In Error:", error);
-                setLoading(btn, false);
+                setGoogleLoading(false);
                 if (error.code === 'auth/popup-closed-by-user') {
                     showToast("Login cancelled by user", 'info');
                 } else if (error.code === 'auth/popup-blocked') {
-                    showToast("Login popup was blocked by browser. Please allow popups.", 'error');
+                    showToast("Popup blocked by browser. Switching to redirect sign-in...", 'info');
+                    try {
+                        await signInWithRedirect(auth, googleProvider);
+                    } catch(redirErr) {
+                        showToast("Please allow popups or redirects for Google Login.", 'error');
+                    }
+                } else if (error.code === 'auth/unauthorized-domain') {
+                    showToast("Firebase domain notice: Please use http://localhost:6039 or add domain to Firebase console.", 'error');
                 } else if (error.message && error.message.includes('Database is closing')) {
                     if (auth.currentUser) {
-                        localStorage.setItem('capzone_user_email', auth.currentUser.email);
+                        await notifyBackend(auth.currentUser);
                         window.location.href = 'dashboard.html';
                         return;
                     }
                     showToast("Please click Google Login again to complete sign-in.", 'info');
                 } else {
-                    showToast("Google Login Failed: " + error.message, 'error');
+                    showToast("Google Login Failed: " + (error.message || error), 'error');
                 }
             }
         }
 
-        const btnGoogleLogin = document.getElementById('btnGoogleLogin');
-        if (btnGoogleLogin) btnGoogleLogin.addEventListener('click', () => handleGoogleSignIn(btnGoogleLogin));
-
-        const btnGoogleSignUp = document.getElementById('btnGoogleSignUp');
-        if (btnGoogleSignUp) btnGoogleSignUp.addEventListener('click', () => handleGoogleSignIn(btnGoogleSignUp));
-
-        // Helper to normalize username or email
-        function resolveUserEmail(input) {
-            const raw = (input || '').trim();
-            if (!raw) return '';
-            if (raw.includes('@')) return raw.toLowerCase();
-            return `${raw.toLowerCase()}@capzone.studio`;
+        const btnGoogle = document.getElementById('btnGoogleAuth');
+        if (btnGoogle) {
+            btnGoogle.addEventListener('click', handleGoogleSignIn);
         }
 
-        // Email/Username and Password Sign-In
-        document.getElementById('signInFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const inputVal = document.getElementById('signinEmail').value.trim();
-            const password = document.getElementById('signinPassword').value;
-            const btn = document.getElementById('btnSignIn');
-
-            // Enforce Robot Verification before login
-            if (!window.isUserRobotVerified('login')) {
-                highlightRobotWidget('turnstileWidgetLogin');
-                window.showRobotModal();
-                return;
-            }
-
-            // Admin portal navigation
-            const lowerInput = inputVal.toLowerCase();
-            if (lowerInput === 'admin' || lowerInput === 'cz-admin') {
-                window.location.href = 'admin.html';
-                return;
-            }
-
-            if (!inputVal) {
-                showToast("Please enter your Email or Username!", "error");
-                return;
-            }
-
-            setLoading(btn, true);
-
+        // 🛡️ Automatic Google Redirect Handler (Captures redirect login on page load)
+        (async function checkGoogleRedirectResult() {
+            if (!auth || typeof getRedirectResult !== 'function') return;
             try {
-                try {
-                    const rememberEl = document.getElementById('remember-me');
-                    const remember = rememberEl ? rememberEl.checked : true;
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                } catch (pErr) {
-                    console.warn("Persistence set skipped:", pErr);
-                }
-
-                // Determine target emails to try (direct email, or username normalized)
-                let candidateEmails = [];
-                if (inputVal.includes('@')) {
-                    candidateEmails.push(inputVal.toLowerCase());
-                } else {
-                    candidateEmails.push(`${lowerInput}@capzone.studio`);
-                    candidateEmails.push(`${lowerInput}@gmail.com`);
-                }
-
-                let loggedInUser = null;
-                let lastError = null;
-
-                for (const candidate of candidateEmails) {
-                    try {
-                        const result = await signInWithEmailAndPassword(auth, candidate, password);
-                        if (result && result.user) {
-                            loggedInUser = result.user;
-                            break;
-                        }
-                    } catch (attemptErr) {
-                        lastError = attemptErr;
-                    }
-                }
-
-                if (loggedInUser) {
-                    const stamp = 'cf_live_' + Date.now();
-                    localStorage.setItem('capzone_robot_verified', stamp);
-                    sessionStorage.setItem('capzone_robot_verified', stamp);
-                    localStorage.setItem('capzone_user_email', loggedInUser.email);
-                    if (loggedInUser.displayName) {
-                        localStorage.setItem('capzone_user_name', loggedInUser.displayName);
-                    } else if (!inputVal.includes('@')) {
-                        localStorage.setItem('capzone_user_name', inputVal);
-                    }
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-                    await notifyBackend(loggedInUser, 'Email', password);
-                    showToast('Login successful!', 'success');
+                const redirResult = await getRedirectResult(auth);
+                if (redirResult && redirResult.user) {
+                    await notifyBackend(redirResult.user);
+                    showToast('Google login successful!', 'success');
                     setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                } else {
-                    const srvRes = await apiFetch(`/api/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ identifier: inputVal, password })
-                    });
-                    const srvData = await srvRes.json();
-                    if (srvRes.ok && srvData.success && srvData.user) {
-                        const stamp = 'cf_live_' + Date.now();
-                        localStorage.setItem('capzone_robot_verified', stamp);
-                        sessionStorage.setItem('capzone_robot_verified', stamp);
-                        localStorage.setItem('capzone_user_email', srvData.user.email);
-                        localStorage.setItem('capzone_user_name', srvData.user.name || inputVal);
-                        localStorage.setItem('capzone_login_timestamp', Date.now());
-                        await notifyBackend(srvData.user, 'Email', password);
-                        showToast('Login successful!', 'success');
-                        setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
-                        return;
-                    } else {
-                        throw new Error(srvData.error || (lastError ? lastError.message : 'Authentication failed'));
-                    }
                 }
-            } catch (error) {
-                console.error("Login Error:", error);
-                let msg = error.message;
-                if (error.code === 'auth/invalid-credential' || msg.includes('invalid-credential') || error.code === 'auth/wrong-password') {
-                    msg = "මුරපදය හෝ Email/Username වැරදියි. Account එකක් නැත්නම් කරුණාකර Sign Up වන්න.";
-                } else if (error.code === 'auth/user-not-found') {
-                    msg = "Account එකක් හමු නොවිණි. කරුණාකර Sign Up හරහා නව Account එකක් සාදන්න.";
-                }
-                showToast(msg, 'error');
-                setLoading(btn, false);
+            } catch (redirErr) {
+                console.warn("Google redirect check notice:", redirErr);
+            }
+        })();
+
+        // Keep local storage email updated if already authenticated
+        onAuthStateChanged(auth, async (user) => {
+            if (user && user.email) {
+                localStorage.setItem('capzone_user_email', user.email.toLowerCase().trim());
+                if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
             }
         });
 
-        // State Tracking for OTP Workflows
-        let currentSignupData = { email: '', name: '', password: '' };
-        let currentForgotEmail = '';
-        let signupTimerInterval = null;
-        let forgotTimerInterval = null;
-
-        // Modal Action Button Listeners
-        const btnConflictGoogleLogin = document.getElementById('btnConflictGoogleLogin');
-        if (btnConflictGoogleLogin) {
-            btnConflictGoogleLogin.addEventListener('click', () => {
-                closeAccountConflictModal();
-                const mainGoogleBtn = document.getElementById('btnGoogleLogin');
-                handleGoogleSignIn(mainGoogleBtn || btnConflictGoogleLogin);
-            });
-        }
-
-        const btnConflictGoToLogin = document.getElementById('btnConflictGoToLogin');
-        if (btnConflictGoToLogin) {
-            btnConflictGoToLogin.addEventListener('click', () => {
-                closeAccountConflictModal();
-                switchTab('signin');
-                if (window._conflictTargetEmail) {
-                    const signinEmailInput = document.getElementById('signinEmail');
-                    if (signinEmailInput) {
-                        signinEmailInput.value = window._conflictTargetEmail;
-                        signinEmailInput.focus();
-                    }
-                }
-            });
-        }
-
-        // Helper: Start 60-Second Resend Countdown
-        function startResendTimer(timerSpanId, buttonId, intervalVarName) {
-            const span = document.getElementById(timerSpanId);
-            const btn = document.getElementById(buttonId);
-            if (!span || !btn) return;
-            
-            let timeLeft = 60;
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-            span.innerText = `${timeLeft}s`;
-
-            if (intervalVarName === 'signup' && signupTimerInterval) clearInterval(signupTimerInterval);
-            if (intervalVarName === 'forgot' && forgotTimerInterval) clearInterval(forgotTimerInterval);
-
-            const timer = setInterval(() => {
-                timeLeft--;
-                span.innerText = `${timeLeft}s`;
-                if (timeLeft <= 0) {
-                    clearInterval(timer);
-                    btn.disabled = false;
-                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    span.innerText = 'Now';
-                }
-            }, 1000);
-
-            if (intervalVarName === 'signup') signupTimerInterval = timer;
-            if (intervalVarName === 'forgot') forgotTimerInterval = timer;
-        }
-
-        // -------------------------------------------------------------------------
-        // 1. SIGN-UP SUBMIT: VERIFY STRENGTH & SEND GMAIL OTP
-        // -------------------------------------------------------------------------
-        document.getElementById('signUpFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('signupName').value.trim();
-            const rawEmail = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value;
-            const btn = document.getElementById('btnSignUp');
-
-            // Enforce Robot Verification before sign-up
-            if (!window.isUserRobotVerified('signup')) {
-                highlightRobotWidget('turnstileWidgetSignup');
-                window.showRobotModal();
-                return;
-            }
-
-            if (!rawEmail) {
-                showToast("කරුණාකර වලංගු Email ලිපිනයක් ඇතුළත් කරන්න!", "error");
-                return;
-            }
-
-            const email = rawEmail.toLowerCase();
-
-            // Strict Strong Password Enforcement (Min 8 chars, Letters & Numbers)
-            if (!window.isPasswordStrong(password)) {
-                showToast("⚠️ මුරපදය ප්‍රමාණවත් තරම් ශක්තිමත් නැත! කරුණාකර අවම වශයෙන් අකුරු 8ක්, ඉංග්‍රීසි අකුරු සහ අංක (numbers) ඇතුළත් කරන්න.", "error");
-                const pwdInput = document.getElementById('signupPassword');
-                if (pwdInput) {
-                    pwdInput.focus();
-                    pwdInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/30');
-                    setTimeout(() => pwdInput.classList.remove('border-red-500', 'ring-2', 'ring-red-500/30'), 3000);
-                }
-                return;
-            }
-
-            setLoading(btn, true);
-
-            try {
-                const res = await apiFetch(`/api/auth/send-signup-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, name, password })
-                });
-
-                const data = await res.json();
-
-                if (res.status === 409 || data.conflict) {
-                    // Email already exists or is a Google account!
-                    openAccountConflictModal({
-                        email: email,
-                        isGoogle: data.isGoogle,
-                        message: data.message
-                    });
-                    return;
-                }
-
-                if (!res.ok || !data.success) {
-                    showToast(data.error || "OTP කේතය යැවීමට නොහැකි විය. කරුණාකර පසුව නැවත උත්සාහ කරන්න.", "error");
-                    return;
-                }
-
-                // Success! Save state & switch to OTP verification step
-                currentSignupData = { email, name, password };
-                document.getElementById('signup-fields').classList.add('hidden');
-                const otpFields = document.getElementById('signup-otp-fields');
-                otpFields.classList.remove('hidden');
-
-                const otpMsg = document.getElementById('otp-message');
-                if (otpMsg) {
-                    otpMsg.innerHTML = `📧 සත්‍යාපන කේතය (OTP) <strong>${email}</strong> වෙත යවන ලදී.<br><span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>`;
-                }
-
-                startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
-                showToast("සත්‍යාපන කේතය (OTP) ඔබගේ Gmail වෙත යවන ලදී!", "success");
-
-                const otpInput = document.getElementById('signupOtp');
-                if (otpInput) {
-                    otpInput.value = '';
-                    otpInput.focus();
-                }
-
-            } catch (err) {
-                console.error("Sign-up OTP request error:", err);
-                showToast("Server Connection Error: " + err.message, "error");
-            } finally {
-                setLoading(btn, false);
-            }
-        });
-
-        // -------------------------------------------------------------------------
-        // 2. VERIFY SIGN-UP OTP & ACTIVATE ACCOUNT
-        // -------------------------------------------------------------------------
-        const btnVerifyOtpEl = document.getElementById('btnVerifyOtp');
-        if (btnVerifyOtpEl) {
-            btnVerifyOtpEl.addEventListener('click', async () => {
-                const otpVal = (document.getElementById('signupOtp').value || '').trim();
-                if (!otpVal || otpVal.length !== 6) {
-                    showToast("කරුණාකර ඉලක්කම් 6ක OTP කේතය නිවැරදිව ඇතුළත් කරන්න.", "error");
-                    return;
-                }
-
-                setLoading(btnVerifyOtpEl, true);
-
-                try {
-                    const res = await apiFetch(`/api/auth/verify-signup-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentSignupData.email,
-                            otp: otpVal,
-                            name: currentSignupData.name,
-                            password: currentSignupData.password
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok || !data.success) {
-                        showToast(data.error || "ඇතුළත් කළ OTP කේතය වැරදියි. කරුණාකර නැවත උත්සාහ කරන්න.", "error");
-                        setLoading(btnVerifyOtpEl, false);
-                        return;
-                    }
-
-                    // Successful OTP Verification! Log in via Firebase client
-                    try {
-                        const rememberEl = document.getElementById('remember-me');
-                        const remember = rememberEl ? rememberEl.checked : true;
-                        await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                    } catch (pErr) {}
-
-                    try {
-                        await signInWithEmailAndPassword(auth, currentSignupData.email, currentSignupData.password);
-                    } catch(fbLoginErr) {
-                        console.warn("Direct Firebase login fallback:", fbLoginErr.message);
-                    }
-
-                    const stamp = 'cf_live_' + Date.now();
-                    localStorage.setItem('capzone_robot_verified', stamp);
-                    sessionStorage.setItem('capzone_robot_verified', stamp);
-                    localStorage.setItem('capzone_user_email', currentSignupData.email);
-                    if (currentSignupData.name) localStorage.setItem('capzone_user_name', currentSignupData.name);
-                    localStorage.setItem('capzone_login_timestamp', Date.now());
-
-                    await notifyBackend(data.user || { email: currentSignupData.email }, 'Email Sign Up', currentSignupData.password);
-
-                    showToast("🎉 ඔබගේ CapZone ගිණුම සාර්ථකව සත්‍යාපනය විය! Studio වෙත පිවිසෙමින් පවතී...", "success");
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 600);
-
-                } catch (err) {
-                    console.error("OTP verification error:", err);
-                    showToast("සත්‍යාපනය අසාර්ථක විය: " + err.message, "error");
-                    setLoading(btnVerifyOtpEl, false);
-                }
-            });
-        }
-
-        // Resend Sign-Up OTP
-        const btnResendSignupOtp = document.getElementById('btnResendSignupOtp');
-        if (btnResendSignupOtp) {
-            btnResendSignupOtp.addEventListener('click', async () => {
-                if (!currentSignupData.email) return;
-                setLoading(btnResendSignupOtp, true);
-                try {
-                    const res = await apiFetch(`/api/auth/send-signup-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentSignupData.email,
-                            name: currentSignupData.name,
-                            password: currentSignupData.password
-                        })
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        showToast("නව OTP කේතයක් නැවත යවන ලදී!", "success");
-                        startResendTimer('signupResendTimer', 'btnResendSignupOtp', 'signup');
-                    } else {
-                        showToast(data.error || "නැවත OTP යැවීම අසාර්ථක විය.", "error");
-                    }
-                } catch(e) {
-                    showToast("Error: " + e.message, "error");
-                } finally {
-                    setLoading(btnResendSignupOtp, false);
-                }
-            });
-        }
-
-        // Back to Sign-Up Details
-        const btnBackToSignupEl = document.getElementById('btnBackToSignup');
-        if (btnBackToSignupEl) {
-            btnBackToSignupEl.addEventListener('click', () => {
-                document.getElementById('signup-otp-fields')?.classList.add('hidden');
-                document.getElementById('signup-fields')?.classList.remove('hidden');
-            });
-        }
-
-        // -------------------------------------------------------------------------
-        // 3. FORGOT PASSWORD: STEP 1 - SEND RESET OTP
-        // -------------------------------------------------------------------------
-        document.getElementById('forgotFormElement').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = (document.getElementById('forgotEmail').value || '').trim().toLowerCase();
-            const btn = document.getElementById('btnForgotSendOtp');
-
-            if (!email) {
-                showToast("කරුණාකර ඔබගේ ලියාපදිංචි Email ලිපිනය ඇතුළත් කරන්න!", "error");
-                return;
-            }
-
-            setLoading(btn, true);
-
-            try {
-                const res = await apiFetch(`/api/auth/send-forgot-otp`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email })
-                });
-
-                const data = await res.json().catch(() => ({}));
-
-                if (res.ok && data.success) {
-                    // OTP Sent! Switch to Step 2
-                    currentForgotEmail = email;
-                    document.getElementById('forgotStep1').classList.add('hidden');
-                    const step2 = document.getElementById('forgotStep2');
-                    step2.classList.remove('hidden');
-
-                    const notice = document.getElementById('forgot-otp-notice');
-                    if (notice) {
-                        const googleNote = data.isGoogle ? '<span class="text-cyan-400 font-semibold block mb-1">ℹ️ ඔබගේ ගිණුම Google මඟින් සම්බන්ධ කර ඇත. නව මුරපදය සැකසීමෙන් පසු ඔබට Email &amp; Password මඟින්ද Login විය හැක.</span>' : '';
-                        notice.innerHTML = `${googleNote}📧 මුරපදය නැවත සකසන OTP කේතය <strong>${email}</strong> වෙත එවා ඇත.<br><span class="text-amber-400 mt-1 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Inbox එකේ නැත්නම් Spam folder එක check කරන්න. විනාඩියකින් පසු සත්‍යාපන කේතය වලංගු නොවේ.</span>`;
-                    }
-
-                    startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
-                    showToast("මුරපදය නැවත සකසන OTP කේතය ඔබගේ Gmail වෙත යවන ලදී!", "success");
-
-                    const forgotOtpInput = document.getElementById('forgotOtp');
-                    if (forgotOtpInput) {
-                        forgotOtpInput.value = '';
-                        forgotOtpInput.focus();
-                    }
-                    return;
-                }
-
-                // If backend returned Google conflict notice or failed, offer direct Firebase Reset Email
-                if (data.isGoogle || !res.ok) {
-                    try {
-                        if (auth) {
-                            await sendPasswordResetEmail(auth, email);
-                            showToast("📧 Google Firebase මඟින් මුරපදය Reset කිරීමේ Link එක ඔබගේ Gmail වෙත යවන ලදී! කරුණාකර Inbox පරීක්ෂා කරන්න.", "success");
-                            return;
-                        }
-                    } catch(fbErr){}
-                }
-
-                showToast(data.error || "මෙම Email ලිපිනය සහිත ගිණුමක් හමු නොවීය.", "error");
-
-            } catch (error) {
-                console.error("Forgot password OTP error:", error);
-                try {
-                    if (auth) {
-                        await sendPasswordResetEmail(auth, email);
-                        showToast("📧 Google Firebase මඟින් මුරපදය Reset කිරීමේ Link එක ඔබගේ Gmail වෙත යවන ලදී! කරුණාකර Inbox පරීක්ෂා කරන්න.", "success");
-                        return;
-                    }
-                } catch(e){}
-                showToast("Error: " + error.message, 'error');
-            } finally {
-                setLoading(btn, false);
-            }
-        });
-
-        // Direct Firebase Password Reset Email Link Button
-        const btnFirebaseResetLink = document.getElementById('btnFirebaseResetLink');
-        if (btnFirebaseResetLink) {
-            btnFirebaseResetLink.addEventListener('click', async () => {
-                const email = (document.getElementById('forgotEmail').value || '').trim().toLowerCase();
-                if (!email) {
-                    showToast("කරුණාකර ඔබගේ ලියාපදිංචි Email ලිපිනය ඇතුළත් කරන්න!", "error");
-                    return;
-                }
-                setLoading(btnFirebaseResetLink, true);
-                try {
-                    await sendPasswordResetEmail(auth, email);
-                    showToast("📧 Google Firebase මඟින් Password Reset Link එකක් " + email + " වෙත සාර්ථකව යවන ලදී! කරුණාකර ඔබගේ Inbox හෝ Spam පරීක්ෂා කරන්න.", "success");
-                } catch (fbErr) {
-                    console.error("Firebase reset email error:", fbErr);
-                    let msg = fbErr.message;
-                    if (fbErr.code === 'auth/user-not-found') msg = "මෙම Email ලිපිනය සහිත ගිණුමක් Firebase හි හමු නොවීය.";
-                    showToast("Firebase Error: " + msg, "error");
-                } finally {
-                    setLoading(btnFirebaseResetLink, false);
-                }
-            });
-        }
-
-        // -------------------------------------------------------------------------
-        // 4. FORGOT PASSWORD: STEP 2 - VERIFY OTP & RESET PASSWORD
-        // -------------------------------------------------------------------------
-        const btnResetPasswordSubmit = document.getElementById('btnResetPasswordSubmit');
-        if (btnResetPasswordSubmit) {
-            btnResetPasswordSubmit.addEventListener('click', async () => {
-                const otpVal = (document.getElementById('forgotOtp').value || '').trim();
-                const newPassword = document.getElementById('forgotNewPassword').value;
-                const confirmPassword = document.getElementById('forgotConfirmPassword').value;
-
-                if (!otpVal || otpVal.length !== 6) {
-                    showToast("කරුණාකර ඉලක්කම් 6ක OTP කේතය ඇතුළත් කරන්න.", "error");
-                    return;
-                }
-
-                if (!window.isPasswordStrong(newPassword)) {
-                    showToast("⚠️ නව මුරපදය ප්‍රමාණවත් තරම් ශක්තිමත් නැත! කරුණාකර අවම වශයෙන් අකුරු 8ක්, ඉංග්‍රීසි අකුරු සහ අංක (numbers) ඇතුළත් කරන්න.", "error");
-                    return;
-                }
-
-                if (newPassword !== confirmPassword) {
-                    showToast("මුරපද දෙක එකිනෙකට නොගැලපේ (Passwords do not match)!", "error");
-                    return;
-                }
-
-                setLoading(btnResetPasswordSubmit, true);
-
-                try {
-                    const res = await apiFetch(`/api/auth/verify-and-reset-password`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            email: currentForgotEmail,
-                            otp: otpVal,
-                            newPassword: newPassword
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok || !data.success) {
-                        showToast(data.error || "මුරපදය යාවත්කාලීන කිරීම අසාර්ථක විය.", "error");
-                        setLoading(btnResetPasswordSubmit, false);
-                        return;
-                    }
-
-                    showToast("✅ මුරපදය සාර්ථකව වෙනස් කරන ලදී! කරුණාකර නව මුරපදයෙන් Login වන්න.", "success");
-
-                    // Reset Forgot Form State
-                    document.getElementById('forgotStep2').classList.add('hidden');
-                    document.getElementById('forgotStep1').classList.remove('hidden');
-                    document.getElementById('forgotEmail').value = '';
-                    document.getElementById('forgotOtp').value = '';
-                    document.getElementById('forgotNewPassword').value = '';
-                    document.getElementById('forgotConfirmPassword').value = '';
-
-                    // Switch to Sign In tab and prefill
-                    switchTab('signin');
-                    const signinEmailInput = document.getElementById('signinEmail');
-                    const signinPasswordInput = document.getElementById('signinPassword');
-                    if (signinEmailInput) signinEmailInput.value = currentForgotEmail;
-                    if (signinPasswordInput) {
-                        signinPasswordInput.value = '';
-                        signinPasswordInput.focus();
-                    }
-
-                } catch (err) {
-                    console.error("Reset password error:", err);
-                    showToast("Error: " + err.message, "error");
-                } finally {
-                    setLoading(btnResetPasswordSubmit, false);
-                }
-            });
-        }
-
-        // Resend Forgot Password OTP
-        const btnResendForgotOtp = document.getElementById('btnResendForgotOtp');
-        if (btnResendForgotOtp) {
-            btnResendForgotOtp.addEventListener('click', async () => {
-                if (!currentForgotEmail) return;
-                setLoading(btnResendForgotOtp, true);
-                try {
-                    const res = await apiFetch(`/api/auth/send-forgot-otp`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: currentForgotEmail })
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        showToast("නව OTP කේතයක් නැවත යවන ලදී!", "success");
-                        startResendTimer('forgotResendTimer', 'btnResendForgotOtp', 'forgot');
-                    } else {
-                        showToast(data.error || "නැවත OTP යැවීම අසාර්ථක විය.", "error");
-                    }
-                } catch(e) {
-                    showToast("Error: " + e.message, "error");
-                } finally {
-                    setLoading(btnResendForgotOtp, false);
-                }
-            });
-        }
-
-        // Back to Forgot Step 1
-        const btnBackToForgotStep1 = document.getElementById('btnBackToForgotStep1');
-        if (btnBackToForgotStep1) {
-            btnBackToForgotStep1.addEventListener('click', () => {
-                document.getElementById('forgotStep2')?.classList.add('hidden');
-                document.getElementById('forgotStep1')?.classList.remove('hidden');
-            });
-        }
-
-        // Preloader transition handler
-        window.dismissPreloader = function(reason) {
+        // =========================================================================
+        // ⚡ Smooth Fast Preloader Dismissal (No Cloudflare Wait Loops)
+        // =========================================================================
+        (function dismissPreloaderFast() {
             const preloader = document.getElementById('capzonePreloader');
-            const statusText = document.getElementById('preloaderStatusText');
-            if (statusText) {
-                statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">CapZone Studio Ready!</span>';
-            }
-            if (preloader && preloader.style.display !== 'none' && !preloader.classList.contains('fade-out')) {
+            if (!preloader) return;
+            
+            // Fast smooth reveal
+            setTimeout(() => {
                 preloader.classList.add('fade-out');
-                setTimeout(() => { preloader.style.display = 'none'; }, 450);
-            }
-        };
-    </script>
-
-    <!-- ========================================================================= -->
-    <!-- ACCOUNT CONFLICT & GOOGLE LOGIN ADVICE MODAL (Bilingual Sinhala / English) -->
-    <!-- ========================================================================= -->
-    <div id="accountConflictModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden opacity-0 transition-opacity duration-300">
-        <div class="relative w-full max-w-md bg-[#111728] border border-cyan-500/40 rounded-3xl p-6 sm:p-8 shadow-[0_25px_70px_rgba(0,0,0,0.8)] text-center transform scale-95 transition-transform duration-300 overflow-hidden">
-            <!-- Ambient Glow -->
-            <div class="absolute -top-12 -left-12 w-36 h-36 bg-blue-600/20 rounded-full blur-2xl pointer-events-none"></div>
-            <div class="absolute -bottom-12 -right-12 w-36 h-36 bg-cyan-500/20 rounded-full blur-2xl pointer-events-none"></div>
-
-            <!-- Glowing Badge Icon -->
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600/20 to-cyan-500/20 border border-cyan-400/40 text-cyan-400 flex items-center justify-center text-2xl shadow-lg mx-auto mb-4">
-                <i class="fa-solid fa-user-shield"></i>
-            </div>
-
-            <h3 class="text-xl font-extrabold text-white tracking-tight">දැනටමත් ලියාපදිංචි වූ ගිණුමකි</h3>
-            <p class="text-xs text-cyan-400 font-bold uppercase tracking-wider mt-0.5">Account Already Registered</p>
-
-            <div class="mt-4 p-4 rounded-2xl bg-[#172033]/80 border border-slate-700/60 text-slate-300 text-xs sm:text-sm leading-relaxed text-left">
-                <p id="conflictModalMessage" class="text-slate-200 font-medium"></p>
-                <div class="mt-2.5 pt-2.5 border-t border-slate-700/50 flex items-center gap-2 text-[11px] text-amber-400 font-medium">
-                    <i class="fa-solid fa-circle-info shrink-0"></i>
-                    <span>ඔබ මීට පෙර Google මඟින් Login වූයේ නම් පහත Google බොත්තම ක්ලික් කරන්න.</span>
-                </div>
-            </div>
-
-            <!-- Modal Action Buttons -->
-            <div class="mt-6 space-y-2.5">
-                <!-- Direct Google Login Trigger -->
-                <button type="button" id="btnConflictGoogleLogin" class="w-full flex items-center justify-center py-3.5 px-4 rounded-xl border border-white/20 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm transition-all shadow-lg gap-2.5 active:scale-[0.98]">
-                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-                    </svg>
-                    <span>Sign in with Google (Google මඟින් පිවිසෙන්න)</span>
-                </button>
-
-                <!-- Regular Login Switch -->
-                <button type="button" id="btnConflictGoToLogin" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md active:scale-[0.98] transition-all">
-                    <span>මුරපදය මඟින් Login වන්න (Login with Password)</span>
-                </button>
-
-                <!-- Close Modal -->
-                <button type="button" onclick="closeAccountConflictModal()" class="w-full py-2.5 text-xs text-slate-400 hover:text-white transition-colors font-semibold">
-                    <span>අවලංගු කරන්න (Close)</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Universal Bilingual Policy Modal Script -->
-    <script src="public/policies-modal.js?v=2.5" onerror="this.onerror=null;this.src='policies-modal.js?v=2.5';"></script>
-
-    <!-- ========================================================================= -->
-    <!-- 🛡️ CAPZONE STUDIO - CLOUDFLARE TURNSTILE & NETWORK GATE CONTROLLER -->
-    <!-- Keeps preloader visible until Cloudflare tick is fully loaded & network ready -->
-    <!-- ========================================================================= -->
-    <script>
-        (function() {
-            var dismissed = false;
-
-            window.dismissPreloader = function(reason) {
-                if (dismissed) return;
-                dismissed = true;
-
-                var preloader = document.getElementById('capzonePreloader');
-                var statusText = document.getElementById('preloaderStatusText');
-                if (statusText) {
-                    statusText.innerHTML = '<i class="fa-solid fa-circle-check text-emerald-400 text-[11px]"></i><span class="text-emerald-400 font-semibold">CapZone Studio Ready!</span>';
-                }
-
-                setTimeout(function() {
-                    if (preloader) {
-                        preloader.classList.add('fade-out');
-                        setTimeout(function() {
-                            preloader.style.display = 'none';
-                        }, 450);
-                    }
-                }, 220);
-            };
-
-            function updatePreloaderStatus(text, iconClass) {
-                var statusText = document.getElementById('preloaderStatusText');
-                if (statusText && !dismissed) {
-                    statusText.innerHTML = '<i class="' + (iconClass || 'fa-solid fa-circle-notch fa-spin text-cyan-400 text-[10px]') + '"></i><span>' + text + '</span>';
-                }
-            }
-
-            // Step 1: Update status to indicate Cloudflare network handshake
-            updatePreloaderStatus('Connecting to CapZone Studio Security Network...');
-
-            // Step 2: Check for Turnstile readiness
-            function checkTurnstileReadiness() {
-                if (dismissed) return;
-
-                // If already verified (tick complete & backend validated)
-                if (window.isRobotVerified || window.turnstileLoginToken || (typeof window.isUserRobotVerified === 'function' && window.isUserRobotVerified('login'))) {
-                    updatePreloaderStatus('Security Verified. Opening CapZone Studio...', 'fa-solid fa-circle-check text-emerald-400 text-[11px]');
-                    setTimeout(function() { window.dismissPreloader('verified'); }, 200);
-                    return;
-                }
-
-                // If Cloudflare Turnstile iframe has established its network and loaded into container
-                var container = document.getElementById('cfTurnstileLogin');
-                if (container && container.querySelector('iframe')) {
-                    updatePreloaderStatus('Cloudflare Security Network Initialized...', 'fa-solid fa-shield-halved text-cyan-400 text-[11px]');
-                    // Give auto-tick 450ms to finish verification, or dismiss so user can interact
-                    setTimeout(function() {
-                        if (!dismissed) {
-                            window.dismissPreloader('iframe_ready');
-                        }
-                    }, 450);
-                }
-            }
-
-            var checkTimer = setInterval(function() {
-                checkTurnstileReadiness();
-                if (dismissed) clearInterval(checkTimer);
-            }, 100);
-
-            // Hook into Turnstile API ready event
-            if (typeof turnstile !== 'undefined' && turnstile.ready) {
-                try {
-                    turnstile.ready(function() {
-                        updatePreloaderStatus('Cloudflare Security Network Initialized...');
-                        checkTurnstileReadiness();
-                    });
-                } catch(e) {}
-            }
-
-            // Fallback safety timeout (4s) so slow networks / blocked CDNs never trap user
-            setTimeout(function() {
-                if (!dismissed) {
-                    window.dismissPreloader('safety_timeout');
-                }
-            }, 4000);
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                }, 350);
+            }, 250);
         })();
     </script>
 </body>
