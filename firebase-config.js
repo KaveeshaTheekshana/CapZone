@@ -68,6 +68,48 @@ if (!auth) {
   } catch (e) { }
 }
 
+// =========================================================================
+// 🌐 Dedicated Tab Authentication Interceptor
+// Forces Google Auth to open as a dedicated TAB inside the SAME browser window
+// instead of a floating popup window, with CapZone branding.
+// =========================================================================
+if (typeof window !== 'undefined' && !window.__capzone_auth_tab_interceptor_set) {
+  window.__capzone_auth_tab_interceptor_set = true;
+  const _nativeWindowOpen = window.open;
+  window.open = function (url, target, features) {
+    const isAuth = !url || url === 'about:blank' || (typeof url === 'string' && (url.includes('google') || url.includes('auth') || url.includes('firebase')));
+    if (isAuth || (features && (features.includes('width=') || features.includes('height=')))) {
+      // By omitting features, modern browsers open it as a dedicated new TAB in the same window
+      const authTab = _nativeWindowOpen.call(window, url || 'about:blank', target);
+      if (authTab) {
+        try {
+          if (!url || url === 'about:blank') {
+            authTab.document.title = "CapZone - Google Sign-In";
+            if (authTab.document.body) {
+              authTab.document.body.style.backgroundColor = "#080c15";
+              authTab.document.body.style.color = "#ffffff";
+              authTab.document.body.style.fontFamily = "sans-serif";
+              authTab.document.body.style.display = "flex";
+              authTab.document.body.style.alignItems = "center";
+              authTab.document.body.style.justifyContent = "center";
+              authTab.document.body.style.height = "100vh";
+              authTab.document.body.style.margin = "0";
+              authTab.document.body.innerHTML = `
+                <div style="text-align: center;">
+                  <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #ffffff;">CapZone</h2>
+                  <p style="margin: 0; font-size: 14px; color: #94a3b8;">Connecting to Google Authentication...</p>
+                </div>
+              `;
+            }
+          }
+        } catch (e) {}
+      }
+      return authTab;
+    }
+    return _nativeWindowOpen.call(window, url, target, features);
+  };
+}
+
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
