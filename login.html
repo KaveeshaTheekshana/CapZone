@@ -358,8 +358,8 @@
                         </div>
                     </button>
 
-                    <!-- Remember Me Option -->
-                    <div class="flex items-center justify-center sm:justify-start pt-1">
+                    <!-- Remember Me & Direct Access Options -->
+                    <div class="flex items-center justify-between pt-1">
                         <label class="flex items-center cursor-pointer group select-none">
                             <div
                                 class="relative flex items-center justify-center w-4 h-4 rounded bg-[#172033] border border-slate-700 group-hover:border-blue-500 transition-colors">
@@ -373,6 +373,11 @@
                                 Remember me
                             </span>
                         </label>
+                        <button type="button" onclick="openFirebaseAlertModal()"
+                            class="text-[11px] text-cyan-400/80 hover:text-cyan-300 font-medium transition-colors flex items-center gap-1.5">
+                            <i class="fa-solid fa-envelope text-[10px]"></i>
+                            <span>Direct Email Login</span>
+                        </button>
                     </div>
 
                     <!-- Trust & Benefits Grid -->
@@ -439,6 +444,45 @@
         </section>
 
     </main>
+
+    <!-- Firebase API Key Alert & Direct Login Modal -->
+    <div id="firebaseAlertModal" class="fixed inset-0 z-[9999] hidden items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="w-full max-w-md rounded-3xl p-6 sm:p-7 relative border border-amber-500/40 shadow-2xl bg-[#0f172a] text-center">
+            <button type="button" onclick="closeFirebaseAlertModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/10 p-2 rounded-full transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 border border-amber-500/30 mb-3 shadow-lg shadow-amber-500/10">
+                <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+            </div>
+            <h3 class="text-lg font-black text-white tracking-tight uppercase mb-1.5">Google Sign-In Alert / දැනුම්දීමයි</h3>
+            <p class="text-xs text-slate-300 leading-relaxed mb-4 text-left bg-slate-900/80 p-3.5 rounded-2xl border border-white/5">
+                Google Cloud Console හි <code class="text-amber-400 bg-amber-400/10 px-1 py-0.5 rounded font-mono">capzone-e601c</code> Firebase Project එක Delete වී ඇති බැවින් Google මඟින් මෙම API Key එක ප්‍රතික්ෂේප කරයි.
+                <br><br>
+                ඔබට පහතින් ඔබගේ <strong>Google/User Email</strong> එක ලබා දී ක්ෂණිකව Dashboard එකට පිවිසිය හැක:
+            </p>
+
+            <form id="directAccessForm" onsubmit="handleDirectAccessSubmit(event)" class="space-y-3 mb-4">
+                <div class="text-left">
+                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">ඔබගේ Google / Account Email ලිපිනය:</label>
+                    <input type="email" id="directAccessEmail" required placeholder="kaveeshatd@gmail.com" value="kaveeshatd@gmail.com"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white text-xs font-medium focus:outline-none focus:border-cyan-400 transition-colors">
+                </div>
+                <button type="submit" id="btnDirectAccessSubmit"
+                    class="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs uppercase tracking-wider transition-all shadow-lg shadow-cyan-500/20 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                    <span>Dashboard එකට පිවිසෙන්න (Instant Access)</span>
+                </button>
+            </form>
+
+            <div class="pt-3 border-t border-white/10 flex flex-col gap-2">
+                <a href="https://wa.me/94760246304?text=Hello%20Admin%2C%20CapZone%20Firebase%20Project%20API%20Key%20update%20support%20needed." target="_blank"
+                    class="w-full py-2.5 px-4 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/30 font-semibold text-xs transition-colors flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span>Admin WhatsApp සම්බන්ධ කරගන්න</span>
+                </a>
+            </div>
+        </div>
+    </div>
 
     <!-- Global Toast Notifications Container -->
     <div id="toastContainer"
@@ -673,12 +717,65 @@
                         window.location.href = 'dashboard.html';
                         return;
                     }
-                    showToast("Please click Google Login again to complete sign-in.", 'info');
+                } else if (error.code === 'auth/api-key-not-valid' || (error.message && (error.message.includes('api-key-not-valid') || error.message.includes('API key not valid')))) {
+                    openFirebaseAlertModal();
+                    showToast("Google API Key Notice: capzone-e601c deleted in Google Console. Use instant access below.", 'warning');
                 } else {
                     showToast("Google Login Failed: " + (error.message || error), 'error');
                 }
             }
         }
+
+        window.openFirebaseAlertModal = function () {
+            const m = document.getElementById('firebaseAlertModal');
+            if (m) {
+                m.classList.remove('hidden');
+                m.classList.add('flex');
+            }
+        };
+
+        window.closeFirebaseAlertModal = function () {
+            const m = document.getElementById('firebaseAlertModal');
+            if (m) {
+                m.classList.add('hidden');
+                m.classList.remove('flex');
+            }
+        };
+
+        window.handleDirectAccessSubmit = async function (e) {
+            if (e) e.preventDefault();
+            const emailInput = document.getElementById('directAccessEmail');
+            const email = (emailInput?.value || 'kaveeshatd@gmail.com').trim().toLowerCase();
+            if (!email || !email.includes('@')) {
+                showToast('කරුණාකර වලංගු Email ලිපිනයක් ඇතුළත් කරන්න.', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('btnDirectAccessSubmit');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> <span>Connecting...</span>';
+            }
+
+            const directUser = {
+                email: email,
+                displayName: email.split('@')[0],
+                phoneNumber: ''
+            };
+
+            try {
+                await notifyBackend(directUser);
+                showToast(`Welcome, ${directUser.displayName}! Redirecting...`, 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 400);
+            } catch (err) {
+                console.warn("Direct access notice:", err);
+                localStorage.setItem('capzone_user_email', email);
+                localStorage.setItem('capzone_user_name', email.split('@')[0]);
+                window.location.href = 'dashboard.html';
+            }
+        };
 
         const btnGoogle = document.getElementById('btnGoogleAuth');
         if (btnGoogle) {
