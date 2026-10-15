@@ -662,14 +662,10 @@
                     return;
                 }
 
-                // Configure Persistence (Local vs Session)
+                // Configure Persistence (Non-blocking so user-click gesture opens separate popup immediately)
                 const rememberEl = document.getElementById('rememberMe');
                 const remember = rememberEl ? rememberEl.checked : true;
-                try {
-                    await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);
-                } catch (pErr) {
-                    console.warn("Persistence set skipped:", pErr);
-                }
+                setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence).catch(() => {});
 
                 const result = await loginWithGoogle();
                 if (result && result.user) {
