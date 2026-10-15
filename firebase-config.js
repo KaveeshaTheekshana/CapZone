@@ -1,33 +1,33 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-  initializeAuth, 
-  getAuth, 
-  browserLocalPersistence, 
+import {
+  initializeAuth,
+  getAuth,
+  browserLocalPersistence,
   browserSessionPersistence,
-  indexedDBLocalPersistence, 
-  inMemoryPersistence, 
+  indexedDBLocalPersistence,
+  inMemoryPersistence,
   browserPopupRedirectResolver,
-  GoogleAuthProvider, 
-  signInWithPopup, 
+  GoogleAuthProvider,
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  signInWithEmailAndPassword, 
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   setPersistence,
-  onAuthStateChanged, 
-  signOut 
+  onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 let dynamicConfig = null;
 try {
   const saved = localStorage.getItem('capzone_firebase_config');
   if (saved) dynamicConfig = JSON.parse(saved);
-} catch (e) {}
+} catch (e) { }
 
 const defaultFirebaseConfig = {
   apiKey: "AIzaSyDfOe9hCH1G74b96Q7DI-v6c_96AIe-_QE",
-  authDomain: "capzone-e601c.firebaseapp.com",
+  authDomain: "capzone.top",
   projectId: "capzone-e601c",
   storageBucket: "capzone-e601c.firebasestorage.app",
   messagingSenderId: "1037276369412",
@@ -53,9 +53,9 @@ try {
   } catch (e2) {
     console.warn("Auth init failed, falling back to inMemory:", e2);
     try {
-      auth = initializeAuth(app, { 
+      auth = initializeAuth(app, {
         persistence: inMemoryPersistence,
-        popupRedirectResolver: browserPopupRedirectResolver 
+        popupRedirectResolver: browserPopupRedirectResolver
       });
     } catch (e3) {
       console.error("Critical Auth Init Failure:", e3);
@@ -65,7 +65,7 @@ try {
 if (!auth) {
   try {
     auth = getAuth(app);
-  } catch(e) {}
+  } catch (e) { }
 }
 
 const googleProvider = new GoogleAuthProvider();
@@ -97,21 +97,21 @@ async function loginWithGoogle() {
   }
 }
 
-export { 
+export {
   app,
-  auth, 
-  googleProvider, 
+  auth,
+  googleProvider,
   loginWithGoogle,
-  signInWithPopup, 
+  signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
-  signInWithEmailAndPassword, 
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
   setPersistence,
   browserLocalPersistence,
   browserSessionPersistence,
   browserPopupRedirectResolver,
-  onAuthStateChanged, 
-  signOut 
+  onAuthStateChanged,
+  signOut
 };
