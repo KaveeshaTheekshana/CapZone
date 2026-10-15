@@ -8,8 +8,9 @@
       var h=(window.location.hostname||"").toLowerCase();
       var p=window.location.protocol;
       var d=atob("Y2Fwem9uZS50b3A=");
-      var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
-      if(p==="file:"||!ok){
+      var isLocal=(h==="localhost"||h==="127.0.0.1"||h.startsWith("192.168.")||h.startsWith("10.")||h.startsWith("172.")||!h);
+      var ok=(isLocal||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top"||h.endsWith(".firebaseapp.com")||h.endsWith(".web.app"));
+      if(p!=="file:"&&!ok){
         try{if(window.stop)window.stop();}catch(e){}
         try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
         document.write("");
@@ -21,15 +22,31 @@
           e.preventDefault();e.stopPropagation();return false;
         }
       },true);
-      if(h!=="localhost"&&h!=="127.0.0.1"){
-        var noop=function(){};
-        window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
+
+      // 🛡️ Live Server Auto-Refresh Loop Shield (Protects port 5500, 5501, 5502 from constant refresh)
+      var port = window.location.port;
+      if (port === '5502' || port === '5500' || port === '5501') {
+        var OriginalWebSocket = window.WebSocket;
+        if (OriginalWebSocket) {
+          window.WebSocket = function(url, protocols) {
+            var ws = protocols ? new OriginalWebSocket(url, protocols) : new OriginalWebSocket(url);
+            ws.addEventListener('message', function(e) {
+              if (e.data === 'reload') {
+                var now = Date.now();
+                var lastReload = parseInt(sessionStorage.getItem('cz_live_reload_stamp') || '0', 10);
+                if (now - lastReload < 10000) {
+                  e.stopImmediatePropagation();
+                  console.warn('[CapZone Shield] Neutralized Live Server rapid auto-refresh loop.');
+                } else {
+                  sessionStorage.setItem('cz_live_reload_stamp', now.toString());
+                }
+              }
+            }, true);
+            return ws;
+          };
+          window.WebSocket.prototype = OriginalWebSocket.prototype;
+        }
       }
-      setInterval(function(){
-        var s=Date.now();
-        (function(){}).constructor("debugger")();
-        if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
-      },1800);
     })();
   </script>
   <script>
@@ -2359,7 +2376,7 @@
 
       <div class="mt-8 text-center text-xs text-slate-500">
         All plans are subject to Fair Use Policy.<br />
-        Need unlimited enterprise access? <a href="https://wa.me/94760246304" target="_blank"
+        Need unlimited enterprise access? <a href="https://wa.me/94760246304?text=Hello%20Admin%2C%20I%20am%20interested%20in%20CapZone%20Enterprise%20Access." target="_blank"
           class="text-purple-400 hover:underline">Contact Admin (WhatsApp)</a>
       </div>
 
@@ -2505,7 +2522,7 @@
       </div>
 
       <div class="flex gap-3">
-        <a href="https://wa.me/94760246304" target="_blank"
+        <a id="developerWarningWhatsappBtn" href="https://wa.me/94760246304" target="_blank"
           class="flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center gap-2">
           <i data-lucide="message-circle" class="w-4 h-4"></i> WhatsApp
         </a>
@@ -2756,16 +2773,22 @@
       }
     };
     window.showDeveloperWarning = function (msg) {
-      let message = msg || 'පද්ධතියේ තාක්ෂණික දෝෂයක් ඇති විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
-      const lower = String(message).toLowerCase();
-      if (lower.includes('error') || lower.includes('failed') || lower.includes('http') || lower.includes('exception') || lower.includes('{') || lower.includes('fetch') || lower.includes('syntax')) {
-        message = 'පද්ධතියේ තාක්ෂණික දෝෂයක් ඇති විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
+      let rawMsg = msg || '';
+      let displayMessage = rawMsg;
+      if (!displayMessage || displayMessage.trim() === '') {
+        displayMessage = 'උපසිරැසි ජනනය කිරීම අසාර්ථක විය. කරුණාකර developer සම්බන්ධ කරගන්න: 0760246304';
       }
-      showPopup(message, 'දැනුම්දීමයි / Warning', 'warning');
+      showPopup(displayMessage, 'දැනුම්දීමයි / Warning', 'warning');
       const modal = document.getElementById('developerWarningModal');
       const textEl = document.getElementById('developerWarningMessage');
+      const waBtn = document.getElementById('developerWarningWhatsappBtn');
       if (modal) {
-        if (textEl) textEl.innerText = message;
+        if (textEl) textEl.innerText = displayMessage;
+        if (waBtn) {
+          const userEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || '';
+          const waText = encodeURIComponent(`Hello Developer, මට CapZone එකේදී මෙම ගැටලුව ඇති විය:\n\n👤 User: ${userEmail}\n⚠️ දෝෂ විස්තරය: ${displayMessage}\n\nකරුණාකර මෙය පරීක්ෂා කර සහය වන්න.`);
+          waBtn.href = `https://wa.me/94760246304?text=${waText}`;
+        }
         modal.style.display = 'flex';
         try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
       }
@@ -3880,6 +3903,7 @@
       formData.append('title', srtOriginalName);
       formData.append('email', currentUserEmail);
       formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
+      formData.append('fontFormat', document.getElementById('srtLanguage').value === 'en' ? 'unicode' : 'legacy');
       formData.append('wordsLimit', document.getElementById('srtWordsLimit')?.value || '1');
 
       const customApiKeySrt = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
@@ -3951,7 +3975,14 @@
           downloadFileName: downloadFileName
         };
 
-        // Populate and display Celebratory Congratulations Box (No auto-download!)
+        const cardDlBtn = document.getElementById('srtDirectDownloadCardBtn');
+        if (cardDlBtn) {
+          cardDlBtn.href = blobUrl;
+          cardDlBtn.setAttribute('download', downloadFileName);
+          cardDlBtn.style.display = 'inline-flex';
+        }
+
+        // Populate and display Celebratory Congratulations Box
         const celebrationBox = document.getElementById('srtCelebrationContainer');
         const detailsEl = document.getElementById('srtCelebrationDetails');
         if (celebrationBox) {
@@ -3972,6 +4003,7 @@
               </div>
             `;
           }
+          try { celebrationBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) { }
         }
 
         // Hide cancel button and default action row
