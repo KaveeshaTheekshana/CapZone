@@ -80,7 +80,14 @@
     window.formatMediaUrl = function (url) {
       if (!url || typeof url !== 'string') return '';
       if (url.startsWith('blob:') || url.startsWith('data:')) return url;
-      return url.trim();
+      let clean = url.trim();
+      if (clean.includes('localhost:6039') || clean.includes('127.0.0.1:6039')) {
+        clean = clean.replace(/https?:\/\/(localhost|127\.0\.0\.1):6039/gi, API_BASE_URL);
+      }
+      if (clean.startsWith('/')) {
+        clean = `${API_BASE_URL}${clean}`;
+      }
+      return clean;
     };
 
     (function enforceHumanVerification() {
@@ -358,12 +365,14 @@
           }).catch(() => null);
 
 
-          if (res && res.status === 403) {
+          if (res && (res.status === 403 || res.status === 401)) {
             console.warn("User account deactivated or blacklisted by Admin:", uEmail);
             localStorage.removeItem('capzone_user_email');
             localStorage.removeItem('capzone_user_name');
             localStorage.removeItem('capzone_user_profile');
             localStorage.removeItem('capzone_cached_user_' + uEmail);
+            localStorage.removeItem('capzone_projects_' + uEmail);
+            localStorage.removeItem('capzone_deleted_keys_' + uEmail);
             localStorage.removeItem('capzone_login_timestamp');
             try { await signOut(auth); } catch (e) { }
             window.location.replace('login.html');
@@ -373,36 +382,19 @@
           if (res && res.status === 404) {
             let body = {};
             try { body = await res.json(); } catch (e) { }
-            if (body.deleted === true || body.active === false) {
+            if (body.deleted === true || body.active === false || !body.email) {
               console.warn("User account removed by Admin:", uEmail);
               localStorage.removeItem('capzone_user_email');
               localStorage.removeItem('capzone_user_name');
               localStorage.removeItem('capzone_user_profile');
               localStorage.removeItem('capzone_cached_user_' + uEmail);
+              localStorage.removeItem('capzone_projects_' + uEmail);
+              localStorage.removeItem('capzone_deleted_keys_' + uEmail);
               localStorage.removeItem('capzone_login_timestamp');
               try { await signOut(auth); } catch (e) { }
               window.location.replace('login.html');
               return;
             }
-            // Not deleted, just needs sync to backend
-            try {
-              const saveRes = await fetchFn(`${window.API_BASE_URL || ''}/api/save-user`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  email: uEmail,
-                  name: localStorage.getItem('capzone_user_name') || uEmail.split('@')[0]
-                })
-              });
-              if (saveRes && saveRes.ok) {
-                const savedData = await saveRes.json();
-                if (savedData && savedData.user) {
-                  window.currentUserData = savedData.user;
-                  window.updateUserProfileUI(savedData.user);
-                  return;
-                }
-              }
-            } catch (syncErr) { }
           }
 
           if (res && res.ok) {
@@ -632,6 +624,9 @@
       scroll-behavior: smooth;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
     body {
@@ -642,7 +637,7 @@
       font-family: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
     }
 
-    /* Hardware-Accelerated Glass Engine (Zero CPU bottleneck) */
+    /* Hardware-Accelerated Glass Engine (Zero CPU bottleneck, pure 120 FPS) */
     .glass-panel {
       background: rgba(11, 15, 25, 0.72);
       backdrop-filter: blur(16px);
@@ -652,6 +647,7 @@
       box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.45);
       transform: translate3d(0, 0, 0);
       backface-visibility: hidden;
+      contain: layout style;
     }
 
     .glass-card {
@@ -662,7 +658,9 @@
       border-top: 1px solid rgba(255, 255, 255, 0.25);
       box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       transform: translate3d(0, 0, 0);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+      contain: layout style;
+      backface-visibility: hidden;
     }
 
     .glass-card:hover {
@@ -672,13 +670,14 @@
 
     /* Studio Card Interactive Styling */
     .studio-tool-card {
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+      transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
       transform: translate3d(0, 0, 0);
-      will-change: transform;
+      contain: layout style;
+      backface-visibility: hidden;
     }
 
     .studio-tool-card:hover {
-      transform: translateY(-4px) scale(1.008);
+      transform: translate3d(0, -4px, 0) scale(1.008);
       box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(99, 102, 241, 0.18);
     }
 
@@ -787,15 +786,21 @@
       transition: background-color 5000s ease-in-out 0s;
     }
 
-    /* Project 3D Cards */
+    /* Project Cards - Ultra-Smooth 120FPS GPU Accelerated */
     .project-3d-card {
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-      will-change: transform;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      contain: style;
+      transform: translate3d(0, 0, 0);
+      overflow: visible;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
     }
 
     .project-3d-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.6), 0 0 18px rgba(99, 102, 241, 0.2);
+      background: rgba(255, 255, 255, 0.075);
+      border-color: rgba(99, 102, 241, 0.45);
+      transform: translate3d(0, -2px, 0);
+      box-shadow: 0 10px 24px -4px rgba(0, 0, 0, 0.5), 0 0 16px rgba(99, 102, 241, 0.2);
     }
 
     /* Mobile Ultra-Smooth 60FPS Performance Engine */
@@ -829,11 +834,9 @@
         background: #0b0f19 !important;
       }
 
-      /* 2. Optimize Project Cards: eliminate laggy hover 3D transforms & memory leaks */
+      /* 2. Optimize Project Cards: eliminate clipping and lag */
       .project-3d-card {
-        contain: content;
-        content-visibility: auto;
-        contain-intrinsic-size: 66px;
+        overflow: visible !important;
         will-change: auto !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
         transform: none !important;
@@ -956,15 +959,15 @@
           id="navPlanTag">Pay-Per-Video</span>
       </button>
 
-      <!-- Plans / Subscription Button -->
+      <!-- Plans / Subscription Button (Visible on Both Mobile & Desktop) -->
       <button onclick="openToolWithIntercept('subscriptionModal', event)"
-        class="hidden sm:flex items-center gap-1.5 sm:gap-2 px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-amber-500/15 border border-amber-500/30 hover:border-amber-500/60 transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.2)] hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] group"
+        class="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 lg:px-4 py-1.5 lg:py-2 rounded-full glass-input hover:bg-amber-500/15 border border-amber-500/40 hover:border-amber-500/70 transition-all duration-300 shadow-[0_0_15px_rgba(245,158,11,0.25)] hover:shadow-[0_0_20px_rgba(245,158,11,0.45)] group shrink-0"
         title="View Pricing Plans">
         <div
-          class="w-6 h-6 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-          <i data-lucide="zap" class="w-3.5 h-3.5 text-white"></i>
+          class="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform shrink-0">
+          <i data-lucide="zap" class="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white fill-white"></i>
         </div>
-        <span class="text-xs font-bold text-amber-100 hidden sm:inline tracking-wider uppercase">Plans</span>
+        <span class="text-[10px] sm:text-xs font-bold text-amber-100 tracking-wider uppercase">Plans</span>
       </button>
 
       <!-- KaveezCloud AI Setup Button -->
@@ -1016,9 +1019,9 @@
 
 
     <!-- Projects History Sidebar (Responsive on Mobile & Desktop) -->
-    <aside id="projectsSidebar" class="w-full lg:w-80 flex-shrink-0 hidden lg:block order-2 lg:order-1">
+    <aside id="projectsSidebar" class="w-full lg:w-80 flex-shrink-0 hidden lg:flex flex-col order-2 lg:order-1 self-stretch">
       <div
-        class="glass-panel rounded-3xl h-auto lg:h-full min-h-0 lg:min-h-[calc(100vh-10rem)] p-4 sm:p-5 lg:p-6 flex flex-col">
+        class="glass-panel rounded-3xl h-full flex-1 flex flex-col p-4 sm:p-5 lg:p-6 sticky top-24 max-h-[calc(100vh-7rem)]">
         <!-- Header with Count & Refresh -->
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
@@ -1050,7 +1053,6 @@
           <button onclick="window.filterProjects('Subtitle')"
             class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all"
             data-filter="Subtitle">SRTs</button>
-
           <button onclick="window.filterProjects('Image')"
             class="project-filter-btn px-2.5 py-1 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-all"
             data-filter="Image">Images</button>
@@ -1058,7 +1060,7 @@
 
         <!-- Project Cards Container (Vertical layout on both Mobile & Desktop) -->
         <div id="recentProjectsContainer"
-          class="flex flex-col space-y-2.5 overflow-y-auto hide-scrollbar flex-1 max-h-[calc(100dvh-13rem)] lg:max-h-[calc(100vh-18rem)] pr-1 pt-1 pb-32 lg:pb-4">
+          class="flex flex-col space-y-2.5 overflow-y-auto hide-scrollbar flex-1 min-h-0 pr-1 pt-1 pb-4">
           <!-- Default Empty state -->
           <div class="flex flex-col items-center justify-center py-12 opacity-70 w-full flex-shrink-0">
             <div
@@ -1979,7 +1981,7 @@
 
         <!-- 5-Item Steps Checklist -->
         <div class="space-y-4 mb-7 text-left relative z-10">
-          <!-- Step 1: Separating audio -->
+          <!-- Step 1: Preparing Audio Track -->
           <div id="stepSeparatingAudio"
             class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
@@ -1989,10 +1991,10 @@
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
             </span>
-            <span class="step-label">Separating audio</span>
+            <span class="step-label">Preparing Audio Track</span>
           </div>
 
-          <!-- Step 2: Uploading audio -->
+          <!-- Step 2: Acoustic Analysis -->
           <div id="stepUploadingAudio"
             class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
@@ -2002,10 +2004,10 @@
                 <polyline points="22 4 12 14.01 9 11.01"></polyline>
               </svg>
             </span>
-            <span class="step-label">Uploading audio</span>
+            <span class="step-label">Neural Acoustic Analysis</span>
           </div>
 
-          <!-- Step 3: Generating captions -->
+          <!-- Step 3: Speech Recognition -->
           <div id="stepGeneratingCaptions" class="transition-all">
             <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
               <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
@@ -2015,27 +2017,27 @@
                     d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                 </svg>
               </span>
-              <span class="step-label">Generating captions</span>
+              <span class="step-label">KaveezCloud Speech Recognition</span>
             </div>
             <div id="srtPartsCount" class="text-xs text-purple-300/70 ml-8 mt-1 font-normal">0 of 4 parts done</div>
           </div>
 
-          <!-- Step 4: Aligning word timing -->
+          <!-- Step 4: Precision Timeline Synchronization -->
           <div id="stepAligningTiming"
             class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
               <div class="w-4 h-4 rounded-full border border-zinc-600"></div>
             </span>
-            <span class="step-label">Aligning word timing</span>
+            <span class="step-label">Precision Timeline Synchronization</span>
           </div>
 
-          <!-- Step 5: All done -->
+          <!-- Step 5: Subtitles Ready -->
           <div id="stepAllDone"
             class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all">
             <span class="step-icon flex items-center justify-center w-5 h-5 shrink-0">
               <div class="w-4 h-4 rounded-full border border-zinc-600"></div>
             </span>
-            <span class="step-label">All done</span>
+            <span class="step-label">Subtitles Ready</span>
           </div>
         </div>
 
@@ -2879,68 +2881,68 @@
       if (s2) {
         if (activeStep > 2) {
           s2.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all';
-          s2.innerHTML = `${checkIcon}<span class="step-label">Uploading audio</span>`;
+          s2.innerHTML = `${checkIcon}<span class="step-label">Neural Acoustic Analysis</span>`;
         } else if (activeStep === 2) {
           s2.className = 'flex items-center gap-3 text-xs sm:text-sm font-semibold text-white transition-all';
-          s2.innerHTML = `${spinIcon}<span class="step-label">Uploading audio</span>`;
+          s2.innerHTML = `${spinIcon}<span class="step-label">Neural Acoustic Analysis</span>`;
         } else {
           s2.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
-          s2.innerHTML = `${pendingIcon}<span class="step-label">Uploading audio</span>`;
+          s2.innerHTML = `${pendingIcon}<span class="step-label">Neural Acoustic Analysis</span>`;
         }
       }
 
-      // Step 3: Generating captions
+      // Step 3: Speech Recognition
       const s3 = document.getElementById('stepGeneratingCaptions');
       const partText = options.partsText || (options.part !== undefined ? `${options.part} of ${options.totalParts || 4} parts done` : (activeStep >= 4 ? '4 of 4 parts done' : '0 of 4 parts done'));
       if (s3) {
         if (activeStep > 3) {
           s3.innerHTML = `
             <div class="flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium">
-              ${checkIcon}<span class="step-label">Generating captions</span>
+              ${checkIcon}<span class="step-label">KaveezCloud Speech Recognition</span>
             </div>
             <div id="srtPartsCount" class="text-xs text-purple-300/70 ml-8 mt-1 font-normal">${partText}</div>
           `;
         } else if (activeStep === 3) {
           s3.innerHTML = `
             <div class="flex items-center gap-3 text-xs sm:text-sm font-semibold text-white">
-              ${spinIcon}<span class="step-label">Generating captions</span>
+              ${spinIcon}<span class="step-label">KaveezCloud Speech Recognition</span>
             </div>
             <div id="srtPartsCount" class="text-xs text-purple-300/70 ml-8 mt-1 font-normal">${partText}</div>
           `;
         } else {
           s3.innerHTML = `
             <div class="flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal">
-              ${pendingIcon}<span class="step-label">Generating captions</span>
+              ${pendingIcon}<span class="step-label">KaveezCloud Speech Recognition</span>
             </div>
             <div id="srtPartsCount" class="text-xs text-zinc-400 ml-8 mt-1 font-normal">${partText}</div>
           `;
         }
       }
 
-      // Step 4: Aligning word timing
+      // Step 4: Precision Timeline Synchronization
       const s4 = document.getElementById('stepAligningTiming');
       if (s4) {
         if (activeStep > 4) {
           s4.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-400 font-medium transition-all';
-          s4.innerHTML = `${checkIcon}<span class="step-label">Aligning word timing</span>`;
+          s4.innerHTML = `${checkIcon}<span class="step-label">Precision Timeline Synchronization</span>`;
         } else if (activeStep === 4) {
           s4.className = 'flex items-center gap-3 text-xs sm:text-sm font-semibold text-white transition-all';
-          s4.innerHTML = `${spinIcon}<span class="step-label">Aligning word timing</span>`;
+          s4.innerHTML = `${spinIcon}<span class="step-label">Precision Timeline Synchronization</span>`;
         } else {
           s4.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
-          s4.innerHTML = `${pendingIcon}<span class="step-label">Aligning word timing</span>`;
+          s4.innerHTML = `${pendingIcon}<span class="step-label">Precision Timeline Synchronization</span>`;
         }
       }
 
-      // Step 5: All done
+      // Step 5: Subtitles Ready
       const s5 = document.getElementById('stepAllDone');
       if (s5) {
         if (activeStep >= 5) {
           s5.className = 'flex items-center gap-3 text-xs sm:text-sm text-emerald-300 font-bold transition-all';
-          s5.innerHTML = `${checkIcon}<span class="step-label text-white">All done</span>`;
+          s5.innerHTML = `${checkIcon}<span class="step-label text-white">Subtitles Ready</span>`;
         } else {
           s5.className = 'flex items-center gap-3 text-xs sm:text-sm text-zinc-500 font-normal transition-all';
-          s5.innerHTML = `${pendingIcon}<span class="step-label">All done</span>`;
+          s5.innerHTML = `${pendingIcon}<span class="step-label">Subtitles Ready</span>`;
         }
       }
 
@@ -4774,6 +4776,14 @@
         </div>
       </div>
 
+      <!-- Don't show again checkbox option -->
+      <div class="mt-4 mb-4 flex items-center justify-center gap-2.5 px-3.5 py-2.5 rounded-xl bg-white/[0.04] border border-white/10 hover:border-indigo-500/30 transition-all">
+        <input type="checkbox" id="dontShowNoticeAgain" class="w-4 h-4 rounded text-indigo-600 bg-white/10 border-white/20 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer">
+        <label for="dontShowNoticeAgain" class="text-xs text-slate-300 select-none cursor-pointer hover:text-white transition-colors font-medium">
+          මෙම පණිවිඩය නැවත නොපෙන්වන්න (Don't show again)
+        </label>
+      </div>
+
       <!-- Action Button -->
       <button onclick="closeNoticeModal()"
         class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-600 hover:from-indigo-500 to-purple-600 hover:to-purple-500 text-white font-bold text-base shadow-lg shadow-indigo-500/30 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20">
@@ -5306,8 +5316,8 @@
         let thumbnailHtml = '';
         if (hasThumb) {
           thumbnailHtml = `
-            <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/40 border border-white/15 flex-shrink-0 shadow-md relative flex items-center justify-center">
-              <img src="${formattedMedia}" alt="${p.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src='logo.jpg';">
+            <div class="w-11 h-11 rounded-xl overflow-hidden bg-neutral-900 border border-white/15 flex-shrink-0 shadow-md relative flex items-center justify-center [background-image:radial-gradient(#374151_1px,transparent_1px)] [background-size:8px_8px]">
+              <img src="${formattedMedia}" alt="${p.title}" class="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src='logo.jpg';">
             </div>`;
         } else if (displayType === 'Video' && formattedMedia) {
           thumbnailHtml = `
@@ -5324,22 +5334,21 @@
 
         // Preview hint tag
         let previewHint = '';
-        if (displayType === 'Video') previewHint = '<span class="text-[10px] text-blue-300 flex items-center gap-1 font-semibold"><i data-lucide="play" class="w-2.5 h-2.5"></i> Video</span>';
-        else if (displayType === 'Audio') previewHint = '<span class="text-[10px] text-emerald-300 flex items-center gap-1 font-semibold"><i data-lucide="music" class="w-2.5 h-2.5"></i> MP3</span>';
-        else if (displayType === 'Script') previewHint = '<span class="text-[10px] text-amber-300 flex items-center gap-1 font-semibold"><i data-lucide="file-text" class="w-2.5 h-2.5"></i> Script</span>';
-        else if (displayType === 'Subtitle') previewHint = '<span class="text-[10px] text-purple-300 flex items-center gap-1 font-semibold"><i data-lucide="subtitles" class="w-2.5 h-2.5"></i> SRT</span>';
-        else previewHint = '<span class="text-[10px] text-sky-300 flex items-center gap-1 font-semibold"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Image</span>';
+        if (displayType === 'Video') previewHint = '<span class="text-[10px] text-blue-300 flex items-center gap-1 font-semibold leading-tight"><i data-lucide="play" class="w-2.5 h-2.5"></i> Video</span>';
+        else if (displayType === 'Audio') previewHint = '<span class="text-[10px] text-emerald-300 flex items-center gap-1 font-semibold leading-tight"><i data-lucide="music" class="w-2.5 h-2.5"></i> MP3</span>';
+        else if (displayType === 'Script') previewHint = '<span class="text-[10px] text-amber-300 flex items-center gap-1 font-semibold leading-tight"><i data-lucide="file-text" class="w-2.5 h-2.5"></i> Script</span>';
+        else if (displayType === 'Subtitle') previewHint = '<span class="text-[10px] text-purple-300 flex items-center gap-1 font-semibold leading-tight"><i data-lucide="subtitles" class="w-2.5 h-2.5"></i> SRT</span>';
+        else previewHint = '<span class="text-[10px] text-sky-300 flex items-center gap-1 font-semibold leading-tight"><i data-lucide="eye" class="w-2.5 h-2.5"></i> Image</span>';
 
         htmlOut += `
-          <div class="project-3d-card w-full group relative p-3 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/50 transition-all duration-200 backdrop-blur-md overflow-hidden cursor-pointer shadow-md hover:shadow-indigo-500/15 active:scale-[0.99] flex items-center justify-between gap-3 min-h-[66px]" onclick="window.openProjectDetailsModal('${p.id}')">
+          <div class="project-3d-card w-full group relative p-3 sm:p-3.5 rounded-2xl cursor-pointer active:scale-[0.99] flex items-center justify-between gap-2.5 sm:gap-3 min-h-[80px] overflow-visible" onclick="window.openProjectDetailsModal('${p.id}')">
             <div class="flex items-center gap-3 min-w-0 flex-1">
               ${thumbnailHtml}
-              <div class="flex-1 min-w-0">
-                <h4 class="text-white text-xs sm:text-[13px] font-bold truncate group-hover:text-indigo-300 transition-colors leading-tight">${p.title || 'Untitled Project'}</h4>
-                <div class="flex items-center gap-2 mt-1 flex-wrap">
-                  <span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded leading-none ${colorClass}">${displayType}</span>
-                  ${previewHint}
-                  <span class="text-[10px] text-slate-400 flex items-center gap-1 leading-none"><i data-lucide="clock" class="w-2.5 h-2.5"></i> ${timeStr}</span>
+              <div class="flex-1 min-w-0 py-1 flex flex-col justify-center overflow-visible">
+                <h4 class="text-white text-xs sm:text-[13px] font-bold truncate group-hover:text-indigo-300 transition-colors leading-relaxed pb-0.5 block" title="${p.title || 'Untitled Project'}">${p.title || 'Untitled Project'}</h4>
+                <div class="flex items-center gap-2 flex-nowrap overflow-hidden mt-1">
+                  <span class="text-[9px] uppercase font-extrabold px-1.5 py-0.5 rounded leading-none shrink-0 ${colorClass}">${displayType}</span>
+                  <span class="text-[10px] text-slate-400 flex items-center gap-1 leading-none shrink-0"><i data-lucide="clock" class="w-2.5 h-2.5"></i> ${timeStr}</span>
                 </div>
               </div>
             </div>
@@ -5363,7 +5372,7 @@
       });
 
       container.innerHTML = htmlOut;
-      if (window.lucide) window.lucide.createIcons();
+      if (window.lucide) window.lucide.createIcons({ root: container });
     };
 
     // Switch between AI Studios and Projects History on Mobile
@@ -5855,6 +5864,9 @@
     };
 
     function openNoticeModal() {
+      if (localStorage.getItem('capzone_dismiss_notice_modal') === 'true') {
+        return;
+      }
       const modal = document.getElementById('capzoneNoticeModal');
       if (modal) {
         modal.classList.remove('opacity-0', 'pointer-events-none');
@@ -5868,6 +5880,10 @@
       }
     }
     function closeNoticeModal() {
+      const chk = document.getElementById('dontShowNoticeAgain');
+      if (chk && chk.checked) {
+        localStorage.setItem('capzone_dismiss_notice_modal', 'true');
+      }
       const modal = document.getElementById('capzoneNoticeModal');
       if (modal) {
         modal.classList.add('opacity-0', 'pointer-events-none');
@@ -5936,14 +5952,14 @@
   <!-- Ultra-Modern Mobile Glass Bottom Dock (CapZone iOS/Android App Style) -->
   <nav class="fixed bottom-3 left-3 right-3 z-40 block lg:hidden pointer-events-auto">
     <div
-      class="px-2 py-2 rounded-2xl glass-panel border border-white/20 bg-neutral-950/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9)] flex items-center justify-around">
+      class="px-1.5 py-2 rounded-2xl glass-panel border border-white/20 bg-neutral-950/90 backdrop-blur-2xl shadow-[0_10px_35px_rgba(0,0,0,0.9)] flex items-center justify-around">
       <button onclick="window.switchMobileView('studio')" id="mobileDockStudio"
-        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-indigo-400 transition-all active:scale-95">
+        class="flex flex-col items-center gap-1 py-1 px-2 rounded-xl text-indigo-400 transition-all active:scale-95">
         <i data-lucide="sparkles" class="w-5 h-5"></i>
         <span class="text-[10px] font-bold tracking-wide">Studios</span>
       </button>
       <button onclick="window.switchMobileView('projects')" id="mobileDockProjects"
-        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95 relative">
+        class="flex flex-col items-center gap-1 py-1 px-2 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95 relative">
         <i data-lucide="folder-kanban" class="w-5 h-5"></i>
         <span class="text-[10px] font-bold tracking-wide">Projects</span>
         <span id="mobileDockBadge"
@@ -5951,13 +5967,22 @@
           style="display: none;">0</span>
       </button>
 
+      <!-- Plans Dedicated Mobile Action Button -->
+      <button onclick="openToolWithIntercept('subscriptionModal', event)" id="mobileDockPlans"
+        class="flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-amber-400 hover:text-amber-300 transition-all active:scale-95">
+        <div class="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.5)]">
+          <i data-lucide="zap" class="w-3 h-3 text-white fill-white"></i>
+        </div>
+        <span class="text-[10px] font-extrabold tracking-wide text-amber-300 uppercase">Plans</span>
+      </button>
+
       <button onclick="showApiModal()"
-        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        class="flex flex-col items-center gap-1 py-1 px-2 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
         <i data-lucide="cpu" class="w-5 h-5"></i>
-        <span class="text-[10px] font-bold tracking-wide">Smart Setup</span>
+        <span class="text-[10px] font-bold tracking-wide">AI Setup</span>
       </button>
       <button onclick="openModal('profileModal')"
-        class="flex flex-col items-center gap-1 py-1.5 px-3 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
+        class="flex flex-col items-center gap-1 py-1 px-2 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
         <i data-lucide="user" class="w-5 h-5"></i>
         <span class="text-[10px] font-bold tracking-wide">Profile</span>
       </button>
@@ -6043,7 +6068,20 @@
         </div>
       </button>
 
-      <div class="w-full h-px bg-white/10 my-5"></div>
+      <div class="w-full h-px bg-white/10 my-4"></div>
+
+      <button
+        onclick="openToolWithIntercept('subscriptionModal', event); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex');"
+        class="w-full flex items-center gap-4 bg-gradient-to-r from-amber-500/15 to-orange-500/10 p-3.5 rounded-2xl hover:bg-amber-500/20 transition-all border border-amber-500/30 shadow-lg shadow-amber-500/10">
+        <div
+          class="w-11 h-11 rounded-xl bg-gradient-to-tr from-amber-500 to-orange-500 text-white flex items-center justify-center shadow-md shadow-amber-500/30">
+          <i data-lucide="zap" class="w-5 h-5 fill-white"></i>
+        </div>
+        <div class="text-left">
+          <h3 class="text-white font-bold text-sm flex items-center gap-2">VIP Pricing Plans <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-300 font-extrabold uppercase">Save 50%</span></h3>
+          <p class="text-amber-200/80 text-xs font-medium">Upgrade / View Subscriptions</p>
+        </div>
+      </button>
 
       <button
         onclick="openModal('wallpaperModal'); document.getElementById('mobileMenuOverlay').classList.add('hidden'); document.getElementById('mobileMenuOverlay').classList.remove('flex');"
