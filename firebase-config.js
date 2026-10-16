@@ -40,26 +40,18 @@ const firebaseConfig = (dynamicConfig && dynamicConfig.apiKey) ? dynamicConfig :
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Auth with multi-layer persistence and popupRedirectResolver
+// Initialize Auth with robust multi-layer persistence and popupRedirectResolver
 let auth;
 try {
   auth = initializeAuth(app, {
-    persistence: [browserLocalPersistence, indexedDBLocalPersistence, inMemoryPersistence],
+    persistence: [indexedDBLocalPersistence, browserLocalPersistence, inMemoryPersistence],
     popupRedirectResolver: browserPopupRedirectResolver
   });
 } catch (e) {
   try {
     auth = getAuth(app);
   } catch (e2) {
-    console.warn("Auth init failed, falling back to inMemory:", e2);
-    try {
-      auth = initializeAuth(app, {
-        persistence: inMemoryPersistence,
-        popupRedirectResolver: browserPopupRedirectResolver
-      });
-    } catch (e3) {
-      console.error("Critical Auth Init Failure:", e3);
-    }
+    console.warn("Auth init fallback notice:", e2);
   }
 }
 if (!auth) {
@@ -68,80 +60,42 @@ if (!auth) {
   } catch (e) { }
 }
 
-// =========================================================================
-// 🌐 Dedicated Tab Authentication Interceptor
-// Forces Google Auth to open as a dedicated TAB inside the SAME browser window
-// instead of a floating popup window, with CapZone branding.
-// =========================================================================
-if (typeof window !== 'undefined' && !window.__capzone_auth_tab_interceptor_set) {
-  window.__capzone_auth_tab_interceptor_set = true;
-  const _nativeWindowOpen = window.open;
-  window.open = function (url, target, features) {
-    const isAuth = !url || url === 'about:blank' || (typeof url === 'string' && (url.includes('google') || url.includes('auth') || url.includes('firebase')));
-    if (isAuth || (features && (features.includes('width=') || features.includes('height=')))) {
-      // By omitting features, modern browsers open it as a dedicated new TAB in the same window
-      const authTab = _nativeWindowOpen.call(window, url || 'about:blank', target);
-      if (authTab) {
-        try {
-          if (!url || url === 'about:blank') {
-            authTab.document.title = "CapZone - Google Sign-In";
-            if (authTab.document.body) {
-              authTab.document.body.style.backgroundColor = "#080c15";
-              authTab.document.body.style.color = "#ffffff";
-              authTab.document.body.style.fontFamily = "sans-serif";
-              authTab.document.body.style.display = "flex";
-              authTab.document.body.style.alignItems = "center";
-              authTab.document.body.style.justifyContent = "center";
-              authTab.document.body.style.height = "100vh";
-              authTab.document.body.style.margin = "0";
-              authTab.document.body.innerHTML = `
-                <div style="text-align: center;">
-                  <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #ffffff;">CapZone</h2>
-                  <p style="margin: 0; font-size: 14px; color: #94a3b8;">Connecting to Google Authentication...</p>
-                </div>
-              `;
-            }
-          }
-        } catch (e) {}
-      }
-      return authTab;
-    }
-    return _nativeWindowOpen.call(window, url, target, features);
-  };
-}
-
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-// Resilient Google Login Helper: tries popup first on desktop, direct redirect on mobile for instant 1st-click login
+// =========================================================================
+// 🚀 Universal Google Login Helper
+// Works seamlessly across BOTH Mobile & Desktop without 3rd-party cookie issues!
+// =========================================================================
 async function loginWithGoogle() {
   if (!auth) throw new Error("Authentication module failed to initialize. Please check network/adblocker.");
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
-  if (isMobile) {
-    console.log("[Auth] Mobile device detected: Direct top-level signInWithRedirect for instant 1st-tap login");
-    await signInWithRedirect(auth, googleProvider);
-    return null;
-  }
+  
+  // 1. Attempt native popup across ALL devices (Desktop & Mobile)
+  // This bypasses iOS Safari and Android Chrome cross-site tracking / 3rd-party cookie blocks!
   try {
-    return await signInWithPopup(auth, googleProvider);
+    const cred = await signInWithPopup(auth, googleProvider);
+    return cred;
   } catch (error) {
-    console.warn("Primary Google popup error:", error.code, error.message);
-    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
-      console.log("Popup blocked. Switching to signInWithRedirect...");
-      await signInWithRedirect(auth, googleProvider);
-      return null;
-    }
-    // Try with browserPopupRedirectResolver explicitly if resolver wasn't attached
-    try {
-      return await signInWithPopup(auth, googleProvider, browserPopupRedirectResolver);
-    } catch (err2) {
-      if (err2.code === 'auth/popup-blocked') {
-        console.log("Secondary popup blocked. Switching to signInWithRedirect...");
-        await signInWithRedirect(auth, googleProvider);
-        return null;
-      }
+    console.warn("[Auth] signInWithPopup notice:", error.code, error.message);
+
+    // If user deliberately closed the popup window, throw so caller displays a peaceful info toast
+    if (error.code === 'auth/popup-closed-by-user') {
       throw error;
     }
+
+    // 2. If popup is strictly blocked by the browser environment (e.g. restrictive in-app webview)
+    if (error.code === 'auth/popup-blocked' || error.code === 'auth/cancelled-popup-request') {
+      console.log("[Auth] Popup blocked by browser environment. Falling back to signInWithRedirect...");
+      try {
+        await signInWithRedirect(auth, googleProvider);
+        return null;
+      } catch (redirErr) {
+        console.error("[Auth] signInWithRedirect fallback error:", redirErr);
+        throw redirErr;
+      }
+    }
+
+    throw error;
   }
 }
 
