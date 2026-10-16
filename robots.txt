@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /login.html
+Allow: /dashboard.html
+Allow: /privacy.html
+Allow: /terms.html
+Allow: /logo.jpg
+Allow: /hero-bg.jpg
+
+# Disallow private internal APIs and admin console
+Disallow: /api/
+Disallow: /scratch/
+Disallow: /uploads/
+Disallow: /bin/
+Disallow: /admin.html
+Disallow: /admin
+
+# Googlebot directive
+User-agent: Googlebot
+Allow: /
+
+# Bingbot directive
+User-agent: Bingbot
+Allow: /
+
+Sitemap: https://capzone.top/sitemap.xml
+Host: https://capzone.top
