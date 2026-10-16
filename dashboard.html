@@ -479,14 +479,11 @@
             }
             if (data && data.email) {
               const dataStr = JSON.stringify(data);
-              const hasChanged = window._lastRenderedUserData !== dataStr;
               window.currentUserData = data;
               localStorage.setItem('capzone_cached_user_' + uEmail, dataStr);
               localStorage.setItem('capzone_user_profile', dataStr);
-              if (hasChanged) {
-                window._lastRenderedUserData = dataStr;
-                window.updateUserProfileUI(data);
-              }
+              window._lastRenderedUserData = dataStr;
+              window.updateUserProfileUI(data);
             }
           }
         } catch (err) {
@@ -699,12 +696,22 @@
     });
 
     window.handleLogout = () => {
+      const curEmail = (window.currentUserEmail || localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
       try {
         sessionStorage.setItem('capzone_just_logged_out', 'true');
         localStorage.removeItem('capzone_remember_me');
         localStorage.removeItem('capzone_user_email');
         localStorage.removeItem('capzone_user_name');
+        localStorage.removeItem('capzone_user_profile');
+        localStorage.removeItem('capzone_login_timestamp');
+        if (curEmail) {
+          localStorage.removeItem('capzone_cached_user_' + curEmail);
+          localStorage.removeItem('capzone_projects_' + curEmail);
+          localStorage.removeItem('capzone_deleted_keys_' + curEmail);
+        }
       } catch(e) {}
+      window.currentUserData = null;
+      window.currentUserEmail = null;
       signOut(auth).then(() => {
         window.location.replace('login.html');
       }).catch((error) => {
@@ -1050,7 +1057,7 @@
         <span class="text-[10px] sm:text-xs font-bold text-emerald-300 tracking-wider" id="navWalletText">Rs.
           0.00</span>
         <span
-          class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider hidden md:inline"
+          class="text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase tracking-wider inline-flex items-center ml-1 font-bold"
           id="navPlanTag">Pay-Per-Video</span>
       </button>
 
