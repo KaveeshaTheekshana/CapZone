@@ -83,8 +83,7 @@
   <script>
 
     window.API_BASE_URL = (function () {
-      const proto = window.location.protocol;
-      const host = window.location.hostname || '';
+      const host = (window.location.hostname || '').toLowerCase().trim();
       const port = window.location.port || '';
 
       // Direct access on live VPS backend:
@@ -93,13 +92,7 @@
       // Local dev directly on port 6039:
       if (port === '6039') return '';
 
-      // Local offline/dev environment (file://, localhost:5500, etc.):
-      if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) return 'http://localhost:6039';
-
-      // Local LAN testing (Phone connected to PC on 192.168.x.x):
-      if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) return `http://${host}:6039`;
-
-      // Hosted on GitHub Pages (*.github.io), Firebase (*.web.app), capzone.top, etc.:
+      // Hosted on GitHub Pages (*.github.io), Live Server 5500, file://, Firebase, capzone.top:
       return 'https://capzone.kaveez.top';
     })();
 
