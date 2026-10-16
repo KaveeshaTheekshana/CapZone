@@ -104,14 +104,6 @@
       return clean;
     };
 
-    (function enforceHumanVerification() {
-      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-      const email = localStorage.getItem('capzone_user_email');
-      if (!isLocal && !email) {
-        window.location.replace('login.html');
-      }
-    })();
-
     window.currentUserEmail = (localStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
 
     const originalFetch = window.fetch ? window.fetch.bind(window) : fetch;
@@ -413,7 +405,7 @@
           if (res && res.status === 404) {
             let body = {};
             try { body = await res.json(); } catch (e) { }
-            if (body.deleted === true || body.active === false || !body.email) {
+            if (body && (body.deleted === true || (body.active === false && body.error))) {
               console.warn("User account removed by Admin:", uEmail);
               localStorage.removeItem('capzone_user_email');
               localStorage.removeItem('capzone_user_name');
@@ -1847,6 +1839,71 @@
     </div>
   </div>
 
+  <!-- SRT AUDIO QUALITY ADVISORY POPUP (Sinhala) -->
+  <div id="srtAudioNoticeModal" class="fixed inset-0 z-[105] hidden items-center justify-center p-4 transition-all duration-300">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300 opacity-0 cursor-pointer"
+      id="srtAudioNoticeBackdrop" onclick="dismissSrtAudioNotice()"></div>
+
+    <!-- Modal Dialog Content -->
+    <div id="srtAudioNoticeContent"
+      class="glass-card w-full max-w-md rounded-3xl p-6 sm:p-8 relative transform scale-95 opacity-0 transition-all duration-300 shadow-[0_0_60px_rgba(168,85,247,0.35)] border border-purple-500/30 bg-gradient-to-b from-[#15152a]/98 via-[#0e101f]/98 to-[#090a14]/98 flex flex-col items-center text-center">
+      
+      <!-- Close Button -->
+      <button type="button" onclick="dismissSrtAudioNotice()"
+        class="absolute top-4 right-4 text-slate-400 hover:text-white bg-white/5 hover:bg-white/10 p-2 rounded-full transition-colors"
+        title="Close">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Advisory Badge -->
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-semibold mb-4">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="tracking-wide">හොඳම Subtitles සඳහා උපදෙසක්</span>
+      </div>
+
+      <!-- Animated Sound Equalizer Waves Icon -->
+      <div class="relative w-20 h-20 rounded-3xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-pink-500 flex items-center justify-center mb-5 shadow-xl shadow-purple-500/30 border border-white/20">
+        <div class="flex items-center gap-1.5 h-8">
+          <span class="w-1.5 bg-white rounded-full animate-pulse" style="height: 14px; animation-duration: 0.8s;"></span>
+          <span class="w-1.5 bg-white rounded-full animate-pulse" style="height: 28px; animation-duration: 0.6s;"></span>
+          <span class="w-1.5 bg-white rounded-full animate-pulse" style="height: 20px; animation-duration: 0.9s;"></span>
+          <span class="w-1.5 bg-white rounded-full animate-pulse" style="height: 32px; animation-duration: 0.7s;"></span>
+          <span class="w-1.5 bg-white rounded-full animate-pulse" style="height: 18px; animation-duration: 0.85s;"></span>
+        </div>
+      </div>
+
+      <!-- Modal Title -->
+      <h3 class="text-xl sm:text-2xl font-black text-white mb-2.5 tracking-tight">
+        පැහැදිලි හඬක් සහිත වීඩියෝවක් යොදන්න
+      </h3>
+
+      <!-- Sinhala Notice Message -->
+      <p class="text-sm text-slate-200 leading-relaxed mb-5 font-normal">
+        වීඩියෝවේ හඬ ඉතා <strong class="text-purple-300 font-bold">පැහැදිලිව සහ හොඳින් ඇසෙන</strong> වීඩියෝවක් හෝ ඕඩියෝවක් upload කිරීමට උත්සාහ කරන්න.
+      </p>
+      
+      <!-- Key Highlights -->
+      <div class="w-full p-3.5 rounded-2xl bg-white/[0.04] border border-white/10 mb-6 text-left space-y-2">
+        <div class="flex items-start gap-2.5 text-xs text-slate-300">
+          <i data-lucide="volume-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i>
+          <span>පසුබිම් ඝෝෂාව (Background Noise) අඩු වන තරමට AI එක මඟින් <strong class="text-emerald-300 font-semibold">100% නිවැරදිම Subtitles</strong> ලබා දේ.</span>
+        </div>
+        <div class="flex items-start gap-2.5 text-xs text-slate-300">
+          <i data-lucide="sparkles" class="w-4 h-4 text-purple-400 shrink-0 mt-0.5"></i>
+          <span>හඬ පැහැදිලි නැතිනම් සමහර වචන මඟහැරීමට හෝ වැරදීමට ඉඩ ඇත.</span>
+        </div>
+      </div>
+
+      <!-- Understood Button ("තේරුණා") -->
+      <button type="button" id="srtAudioNoticeDismissBtn" onclick="dismissSrtAudioNotice()"
+        class="w-full py-3.5 px-6 rounded-2xl font-black text-sm tracking-wide text-white bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-500 hover:via-indigo-500 hover:to-blue-500 shadow-[0_0_25px_rgba(168,85,247,0.4)] hover:shadow-[0_0_35px_rgba(168,85,247,0.6)] active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer">
+        <span>තේරුණා</span>
+        <i data-lucide="check" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
   <!-- SRT MODAL -->
   <div id="srtModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
     style="display: none;">
@@ -1868,7 +1925,7 @@
 
       <form id="srtForm" class="space-y-6">
         <div>
-          <div
+          <div id="srtDropzone"
             class="relative w-full border-2 border-dashed border-purple-500/30 rounded-2xl p-8 text-center hover:bg-purple-500/5 transition-colors cursor-pointer group"
             onclick="document.getElementById('srtVideoInput').click()">
             <input type="file" id="srtVideoInput" accept="video/*,audio/*" required class="hidden"
@@ -2504,7 +2561,7 @@
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full mt-1">
-          <a id="imgDownloadLink" href="#" download="nobg_image.png"
+          <a id="imgDownloadLink" href="#" download="CapZone_NoBg.png"
             class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 text-center shadow-lg shadow-emerald-500/20 transition-all active:scale-[0.98]">
             <i data-lucide="download" class="w-4 h-4"></i> Download Image
           </a>
@@ -2570,8 +2627,120 @@
   </div>
 
   <script>
+    // ==========================================
+    // 🏷️ CapZone Universal Media Renaming Engine
+    // ==========================================
+    function sanitizeMediaName(name) {
+      if (!name || typeof name !== 'string') return 'media';
+      // Strip directory paths and file extensions
+      let base = name.split('/').pop().split('\\').pop().replace(/\.[^/.]+$/, '');
+      // Strip any existing CapZone suffix/prefix to avoid duplicates like CapZone_CapZone
+      base = base.replace(/capzone/gi, '').replace(/[_\s-]+$/, '');
+      // Preserve Unicode Sinhala characters (\u0D80-\u0DFF), English letters, numbers, and dashes
+      base = base.replace(/[^\w\s\u0D80-\u0DFF-]/g, '').trim().replace(/\s+/g, '_').replace(/_+/g, '_');
+      base = base.replace(/^_+|_+$/g, '');
+      return base || 'media';
+    }
+
+    function buildCapZoneFileName({ originalName, type, lang, ext }) {
+      const base = sanitizeMediaName(originalName || 'media');
+      let cleanExt = (ext || '').replace(/^\./, '');
+
+      // 1. SRT Subtitle Files (Sinhala or English + CapZone)
+      if (type === 'srt' || cleanExt === 'srt') {
+        const rawLang = (lang || '').toLowerCase();
+        const langLabel = (rawLang.includes('english') || rawLang === 'en') ? 'English' : 'Sinhala';
+        return `${base}_${langLabel}_CapZone.srt`;
+      }
+
+      // 2. Background Remover Media
+      if (type === 'nobg' || type === 'background') {
+        const targetExt = cleanExt || 'png';
+        return `${base}_NoBg_CapZone.${targetExt}`;
+      }
+
+      // 3. Audio / MP3 Files
+      if (type === 'audio' || cleanExt === 'mp3') {
+        return `${base}_CapZone.mp3`;
+      }
+
+      // 4. Scripts / Text
+      if (type === 'script' || cleanExt === 'txt') {
+        return `${base}_Script_CapZone.txt`;
+      }
+
+      // 5. Default Media (Videos, etc.)
+      return `${base}_CapZone.${cleanExt || 'mp4'}`;
+    }
+
+    // ==========================================
+    // 🎙️ SRT Sinhala Audio Advisory Modal Controller
+    // ==========================================
+    function showSrtAudioNotice() {
+      const modal = document.getElementById('srtAudioNoticeModal');
+      const backdrop = document.getElementById('srtAudioNoticeBackdrop');
+      const content = document.getElementById('srtAudioNoticeContent');
+      if (!modal || !backdrop || !content) return;
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      if (window.lucide) window.lucide.createIcons();
+
+      requestAnimationFrame(() => {
+        backdrop.classList.remove('opacity-0');
+        backdrop.classList.add('opacity-100');
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      });
+    }
+
+    function dismissSrtAudioNotice() {
+      const modal = document.getElementById('srtAudioNoticeModal');
+      const backdrop = document.getElementById('srtAudioNoticeBackdrop');
+      const content = document.getElementById('srtAudioNoticeContent');
+      if (!modal || !backdrop || !content) return;
+
+      backdrop.classList.remove('opacity-100');
+      backdrop.classList.add('opacity-0');
+      content.classList.remove('scale-100', 'opacity-100');
+      content.classList.add('scale-95', 'opacity-0');
+
+      setTimeout(() => {
+        modal.classList.remove('flex');
+        modal.classList.add('hidden');
+      }, 250);
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
       try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
+
+      // Drag & drop support for SRT Dropzone
+      const dropzone = document.getElementById('srtDropzone');
+      if (dropzone) {
+        ['dragenter', 'dragover'].forEach(eventName => {
+          dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('border-purple-500', 'bg-purple-500/10');
+          }, false);
+        });
+        ['dragleave', 'drop'].forEach(eventName => {
+          dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('border-purple-500', 'bg-purple-500/10');
+          }, false);
+        });
+        dropzone.addEventListener('drop', (e) => {
+          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const input = document.getElementById('srtVideoInput');
+            if (input) {
+              input.files = e.dataTransfer.files;
+              updateSrtFileInfo(input);
+            }
+          }
+        }, false);
+      }
     });
 
     window.pendingToolModal = null;
@@ -3091,8 +3260,11 @@
 
               const fileInput = document.getElementById('enhanceImageInput');
               const origFile = (fileInput && fileInput.files && fileInput.files[0]) ? fileInput.files[0].name : '';
-              const baseName = origFile ? origFile.replace(/\.[^/.]+$/, "") : "image";
-              const downloadFileName = `nobg_${baseName}.png`;
+              const downloadFileName = buildCapZoneFileName({
+                originalName: origFile || 'Image',
+                type: 'nobg',
+                ext: 'png'
+              });
 
               const imgPreviewEl = document.getElementById('imgResultPreview');
               if (imgPreviewEl) {
@@ -3183,7 +3355,7 @@
               document.getElementById('scriptOutputPreview').value = data.data.scriptText;
               const blob = new Blob([data.data.scriptText], { type: 'text/plain' });
               document.getElementById('scraperSrtDownloadLink').href = URL.createObjectURL(blob);
-              document.getElementById('scraperSrtDownloadLink').download = `AI_Script_${Date.now()}.txt`;
+              document.getElementById('scraperSrtDownloadLink').download = buildCapZoneFileName({ originalName: `AI_Script_${Date.now()}`, type: 'script', ext: 'txt' });
             }
             // For Subtitles (SRT)
             if (stepsPrefix === 'srt') {
@@ -3410,6 +3582,15 @@
       currentSrtFile = input.files[0];
       const fileNameEl = document.getElementById('srtFileName');
       if (fileNameEl) fileNameEl.textContent = currentSrtFile.name;
+
+      // 🎙️ Show Sinhala Audio Clarity Advisory Popup ("හොඳින් පැහැදිලිව ඇසෙන වීඩියෝවක්...")
+      try {
+        if (typeof showSrtAudioNotice === 'function') {
+          showSrtAudioNotice();
+        }
+      } catch (e) {
+        console.warn('Audio notice warning:', e);
+      }
 
       const validationCard = document.getElementById('srtValidationCard');
       const submitBtn = document.getElementById('srtSubmitBtn');
@@ -4005,9 +4186,15 @@
         }
 
         const srtName = currentSrtFile ? currentSrtFile.name : (data.title || 'Video Subtitles');
-        const lang = (data.language || (document.getElementById('srtLanguage')?.value === 'en' ? 'English' : 'Sinhala'));
+        const rawLang = (data.language || (document.getElementById('srtLanguage')?.value === 'en' ? 'English' : 'Sinhala'));
+        const isEnglish = (rawLang.toLowerCase().includes('english') || rawLang === 'en');
+        const lang = isEnglish ? 'English' : 'Sinhala';
         window.lastGeneratedSrtContent = data.srt;
-        const downloadFileName = `${(currentSrtFile ? currentSrtFile.name : (data.title || 'subtitles')).replace(/\.[^/.]+$/, "")}_${lang.toLowerCase()}.srt`;
+        const downloadFileName = buildCapZoneFileName({
+          originalName: srtName,
+          type: 'srt',
+          lang: lang
+        });
         const blob = new Blob([data.srt], { type: 'text/plain;charset=utf-8' });
         const blobUrl = URL.createObjectURL(blob);
 
@@ -4466,12 +4653,19 @@
         const data = await res.json();
         es.close();
         if (data.downloadUrl) {
-          const finalDlUrl = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(data.filename)}`;
+          const isAudioFormat = (format === 'audio');
+          const ext = isAudioFormat ? 'mp3' : 'mp4';
+          const platformName = (type === 'fb' ? 'Facebook' : 'TikTok');
+          const rawTitle = data.filename ? data.filename.replace(/\.[^/.]+$/, "") : (data.title || `${platformName}_Media`);
+          const safeDlFilename = buildCapZoneFileName({
+            originalName: rawTitle,
+            type: isAudioFormat ? 'audio' : 'video',
+            ext: ext
+          });
+          const finalDlUrl = `${API_BASE_URL}/api/proxy-download?url=${encodeURIComponent(data.downloadUrl)}&filename=${encodeURIComponent(safeDlFilename)}`;
           if (!window._dlLogged) {
-            const isAudioFormat = (format === 'audio');
             const mediaType = isAudioFormat ? 'Audio' : 'Video';
-            const platformName = (type === 'fb' ? 'Facebook' : 'TikTok');
-            const projectTitle = `${platformName} ${isAudioFormat ? 'Audio' : 'Video'}${data.filename ? ' (' + data.filename + ')' : ''}`;
+            const projectTitle = `${platformName} ${isAudioFormat ? 'Audio' : 'Video'}${safeDlFilename ? ' (' + safeDlFilename + ')' : ''}`;
 
             window.saveToRecentProjects({
               id: data.projectId || undefined,
@@ -4482,7 +4676,7 @@
               payload: {
                 url: url,
                 downloadUrl: finalDlUrl,
-                filename: data.filename,
+                filename: safeDlFilename,
                 type: type,
                 format: format,
                 qualityLevel: qualityLevel
@@ -4492,8 +4686,11 @@
             setTimeout(() => window._dlLogged = false, 1000);
           }
           document.getElementById(barId).style.width = '100%';
-          document.getElementById(linkId).href = finalDlUrl;
-          document.getElementById(linkId).innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
+          const linkEl = document.getElementById(linkId);
+          linkEl.href = finalDlUrl;
+          linkEl.download = safeDlFilename;
+          linkEl.setAttribute('download', safeDlFilename);
+          linkEl.innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
           document.getElementById(resId).style.display = 'flex';
         } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
       } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
@@ -5648,7 +5845,13 @@
           const dlLink = document.getElementById('srtDownloadLink');
           if (dlLink) {
             dlLink.href = URL.createObjectURL(blob);
-            dlLink.download = `${p.title || 'subtitles'}.srt`;
+            const isEnglish = (p.metadata && p.metadata.toLowerCase().includes('english')) || (payload && payload.language && payload.language.toLowerCase().includes('english'));
+            const langLabel = isEnglish ? 'English' : 'Sinhala';
+            dlLink.download = buildCapZoneFileName({
+              originalName: p.title || 'Subtitles',
+              type: 'srt',
+              lang: langLabel
+            });
           }
           const resArea = document.getElementById('srtResultArea');
           if (resArea) resArea.style.display = 'block';
@@ -5689,8 +5892,13 @@
         const blob = new Blob([payload.srt], { type: 'text/plain;charset=utf-8' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        let srtTitle = (p.title || 'subtitles').replace(/[^a-zA-Z0-9_-]/g, '_');
-        if (!srtTitle.toLowerCase().endsWith('.srt')) srtTitle += '.srt';
+        const isEnglish = (p.metadata && p.metadata.toLowerCase().includes('english')) || (payload && payload.language && payload.language.toLowerCase().includes('english'));
+        const langLabel = isEnglish ? 'English' : 'Sinhala';
+        const srtTitle = buildCapZoneFileName({
+          originalName: p.title || 'Subtitles',
+          type: 'srt',
+          lang: langLabel
+        });
         a.download = srtTitle;
         document.body.appendChild(a);
         a.click();
@@ -5704,8 +5912,11 @@
         const blob = new Blob([payload.scriptText], { type: 'text/plain;charset=utf-8' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        let scriptTitle = (p.title || 'script').replace(/[^a-zA-Z0-9_-]/g, '_');
-        if (!scriptTitle.toLowerCase().endsWith('.txt')) scriptTitle += '.txt';
+        const scriptTitle = buildCapZoneFileName({
+          originalName: p.title || 'Script',
+          type: 'script',
+          ext: 'txt'
+        });
         a.download = scriptTitle;
         document.body.appendChild(a);
         a.click();
@@ -5718,13 +5929,20 @@
       const formattedMedia = window.formatMediaUrl(p.media_url);
       if (formattedMedia) {
         let ext = '.mp4';
-        if (p.type === 'Background' || (formattedMedia && formattedMedia.endsWith('.png'))) ext = '.png';
-        else if (p.type === 'Image' || (formattedMedia && (formattedMedia.endsWith('.jpg') || formattedMedia.endsWith('.jpeg')))) ext = '.jpg';
-        else if (p.type === 'Audio' || (formattedMedia && formattedMedia.endsWith('.mp3')) || (p.metadata && p.metadata.includes('MP3'))) ext = '.mp3';
-        else if (p.type === 'Subtitle' || (formattedMedia && formattedMedia.endsWith('.srt'))) ext = '.srt';
+        let mediaType = 'video';
+        if (p.type === 'Background' || (formattedMedia && formattedMedia.endsWith('.png'))) { ext = '.png'; mediaType = 'nobg'; }
+        else if (p.type === 'Image' || (formattedMedia && (formattedMedia.endsWith('.jpg') || formattedMedia.endsWith('.jpeg')))) { ext = '.jpg'; mediaType = 'image'; }
+        else if (p.type === 'Audio' || (formattedMedia && formattedMedia.endsWith('.mp3')) || (p.metadata && p.metadata.includes('MP3'))) { ext = '.mp3'; mediaType = 'audio'; }
+        else if (p.type === 'Subtitle' || (formattedMedia && formattedMedia.endsWith('.srt'))) { ext = '.srt'; mediaType = 'srt'; }
 
-        let cleanTitle = p.title ? p.title.replace(/[^a-zA-Z0-9_-]/g, '_') : 'capzone_project';
-        if (!cleanTitle.toLowerCase().endsWith(ext)) cleanTitle += ext;
+        const isEnglish = (p.metadata && p.metadata.toLowerCase().includes('english')) || (payload && payload.language && payload.language.toLowerCase().includes('english'));
+        const langLabel = isEnglish ? 'English' : 'Sinhala';
+        let cleanTitle = buildCapZoneFileName({
+          originalName: p.title || 'CapZone_Project',
+          type: mediaType,
+          lang: langLabel,
+          ext: ext.replace('.', '')
+        });
 
         fetch(formattedMedia)
           .then(res => res.blob())
