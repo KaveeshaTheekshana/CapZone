@@ -9,7 +9,7 @@
             var p = window.location.protocol;
             var d = atob("Y2Fwem9uZS50b3A=");
             var isLocal = (h === "localhost" || h === "127.0.0.1" || h.startsWith("192.168.") || h.startsWith("10.") || h.startsWith("172.") || !h);
-            var ok = (isLocal || h === d || (h.length > d.length && h.slice(-d.length - 1) === "." + d) || h === "capzone.kaveez.top" || h.endsWith(".firebaseapp.com") || h.endsWith(".web.app"));
+            var ok = (isLocal || h === d || (h.length > d.length && h.slice(-d.length - 1) === "." + d) || h === "capzone.kaveez.top" || h.endsWith(".firebaseapp.com") || h.endsWith(".web.app") || h.endsWith(".github.io") || h.includes("github"));
             if (p !== "file:" && !ok) {
                 try { if (window.stop) window.stop(); } catch (e) { }
                 try { document.documentElement.innerHTML = ""; if (document.head) document.head.innerHTML = ""; if (document.body) document.body.innerHTML = ""; } catch (e) { }
@@ -23,9 +23,52 @@
                 }
             }, true);
         })();
+
+        // ⚡ Clean URL Engine: Strips .html from browser address bar
+        (function cleanBrowserUrl() {
+            try {
+                if (window.history && window.history.replaceState && window.location.pathname.endsWith('.html')) {
+                    let cleanPath = window.location.pathname.replace(/\.html$/i, '');
+                    if (cleanPath === '/index') cleanPath = '/';
+                    const newUrl = cleanPath + window.location.search + window.location.hash;
+                    window.history.replaceState(null, document.title, newUrl);
+                }
+            } catch(e) {}
+        })();
+
+        // ⚡ Instant Remember Me / Auto-Login Check (Skips login screen immediately if remembered)
+        (function checkImmediateRememberMe() {
+            try {
+                const wasExplicitLogout = sessionStorage.getItem('capzone_just_logged_out') === 'true';
+                const isRemembered = localStorage.getItem('capzone_remember_me') !== 'false';
+                const savedEmail = localStorage.getItem('capzone_user_email');
+                if (!wasExplicitLogout && isRemembered && savedEmail && savedEmail.includes('@')) {
+                    console.log("[Auth] Active session remembered. Redirecting directly to dashboard...");
+                    window.location.replace('dashboard.html');
+                }
+            } catch (e) {}
+        })();
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CapZone - Video & Subtitle Studio | Google Authentication</title>
+    <title>CapZone - AI Video &amp; Subtitle Studio | Login &amp; Authentication</title>
+    <meta name="description"
+        content="Sign in to CapZone (කැප්සෝන්) - The #1 AI Video and Subtitle Studio in Sri Lanka. Instant one-click Google authentication to access precision subtitles, video background removal, and smart editing tools." />
+    <meta name="keywords"
+        content="CapZone, capzone, capzone.top, Cap Zone, CapZone login, CapZone sign in, CapZone AI, CapZone Subtitle Studio, Sinhala subtitle generator, Sinhala auto captions, Sinhala speech to text, කැප්සෝන්, KaveezCloud" />
+    <link rel="canonical" href="https://capzone.top/login" />
+    <link rel="icon" type="image/jpeg" href="logo.jpg" />
+
+    <!-- OpenGraph & Twitter for CapZone -->
+    <meta property="og:site_name" content="CapZone" />
+    <meta property="og:title" content="CapZone - AI Video &amp; Subtitle Studio" />
+    <meta property="og:description" content="Sign in to CapZone to access automatic Sinhala captions, background removal, and video editing." />
+    <meta property="og:image" content="https://capzone.top/logo.jpg" />
+    <meta property="og:url" content="https://capzone.top/login" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CapZone - AI Video &amp; Subtitle Studio" />
+    <meta name="twitter:description" content="Sign in to CapZone with Google for automatic Sinhala and English subtitles." />
+    <meta name="twitter:image" content="https://capzone.top/logo.jpg" />
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -481,11 +524,50 @@
     <!-- 🔥 CORE AUTHENTICATION LOGIC & REAL-TIME DASHBOARD/PANEL SYNC -->
     <!-- ========================================================================= -->
     <script type="module">
+        // Intercept window.open so the authentication screen opens in a separate TAB in the same browser window
+        // instead of a detached floating popup window, with CapZone branding.
+        if (typeof window !== 'undefined' && !window.__capzone_auth_tab_interceptor_set) {
+            window.__capzone_auth_tab_interceptor_set = true;
+            const _nativeWindowOpen = window.open;
+            window.open = function (url, target, features) {
+                const isAuth = !url || url === 'about:blank' || (typeof url === 'string' && (url.includes('google') || url.includes('auth') || url.includes('firebase')));
+                if (isAuth || (features && (features.includes('width=') || features.includes('height=')))) {
+                    // Omit features to force browser to open as a dedicated tab in the current window
+                    const authTab = _nativeWindowOpen.call(window, url || 'about:blank', target);
+                    if (authTab) {
+                        try {
+                            if (!url || url === 'about:blank') {
+                                authTab.document.title = "CapZone - Google Sign-In";
+                                if (authTab.document.body) {
+                                    authTab.document.body.style.backgroundColor = "#080c15";
+                                    authTab.document.body.style.color = "#ffffff";
+                                    authTab.document.body.style.fontFamily = "sans-serif";
+                                    authTab.document.body.style.display = "flex";
+                                    authTab.document.body.style.alignItems = "center";
+                                    authTab.document.body.style.justifyContent = "center";
+                                    authTab.document.body.style.height = "100vh";
+                                    authTab.document.body.style.margin = "0";
+                                    authTab.document.body.innerHTML = `
+                                        <div style="text-align: center;">
+                                            <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #ffffff;">CapZone</h2>
+                                            <p style="margin: 0; font-size: 14px; color: #94a3b8;">Connecting to Google Authentication...</p>
+                                        </div>
+                                    `;
+                                }
+                            }
+                        } catch (e) {}
+                    }
+                    return authTab;
+                }
+                return _nativeWindowOpen.call(window, url, target, features);
+            };
+        }
+
         import {
             auth,
             loginWithGoogle,
             googleProvider
-        } from './firebase-config.js?v=3.5';
+        } from './firebase-config.js?v=3.6';
         import {
             signInWithRedirect,
             getRedirectResult,
@@ -662,18 +744,20 @@
                     return;
                 }
 
-                // Configure Persistence (Non-blocking so user-click gesture opens separate popup immediately)
+                // Configure Persistence
                 const rememberEl = document.getElementById('rememberMe');
                 const remember = rememberEl ? rememberEl.checked : true;
                 setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence).catch(() => {});
+                localStorage.setItem('capzone_remember_me', remember ? 'true' : 'false');
+                sessionStorage.removeItem('capzone_just_logged_out');
 
                 const result = await loginWithGoogle();
                 if (result && result.user) {
                     await notifyBackend(result.user);
                     showToast(`Welcome, ${result.user.displayName || result.user.email}! Redirecting...`, 'success');
                     setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 400);
+                        window.location.replace('dashboard.html');
+                    }, 250);
                 } else if (result === null) {
                     // Redirect was triggered
                     showToast('Redirecting to Google Sign-In...', 'info');
@@ -684,7 +768,7 @@
                 if (error.code === 'auth/popup-closed-by-user') {
                     showToast("Login cancelled by user", 'info');
                 } else if (error.code === 'auth/popup-blocked') {
-                    showToast("Popup blocked by browser. Switching to redirect sign-in...", 'info');
+                    showToast("Redirecting to Google Sign-In...", 'info');
                     try {
                         await signInWithRedirect(auth, googleProvider);
                     } catch (redirErr) {
@@ -695,7 +779,7 @@
                 } else if (error.message && error.message.includes('Database is closing')) {
                     if (auth.currentUser) {
                         await notifyBackend(auth.currentUser);
-                        window.location.href = 'dashboard.html';
+                        window.location.replace('dashboard.html');
                         return;
                     }
                 } else {
@@ -733,20 +817,28 @@
             try {
                 const redirResult = await getRedirectResult(auth);
                 if (redirResult && redirResult.user) {
+                    localStorage.setItem('capzone_remember_me', 'true');
+                    sessionStorage.removeItem('capzone_just_logged_out');
                     await notifyBackend(redirResult.user);
-                    showToast('Google login successful!', 'success');
-                    setTimeout(() => { window.location.href = 'dashboard.html'; }, 300);
+                    showToast('Google login successful! Redirecting...', 'success');
+                    setTimeout(() => { window.location.replace('dashboard.html'); }, 200);
                 }
             } catch (redirErr) {
                 console.warn("Google redirect check notice:", redirErr);
             }
         })();
 
-        // Keep local storage email updated if already authenticated
+        // Keep local storage email updated & auto-redirect if already authenticated and remembered
         onAuthStateChanged(auth, async (user) => {
             if (user && user.email) {
                 localStorage.setItem('capzone_user_email', user.email.toLowerCase().trim());
                 if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
+                const wasExplicitLogout = sessionStorage.getItem('capzone_just_logged_out') === 'true';
+                const isRemembered = localStorage.getItem('capzone_remember_me') !== 'false';
+                if (!wasExplicitLogout && isRemembered) {
+                    console.log("[Auth] Active session recognized. Auto-redirecting to dashboard...");
+                    window.location.replace('dashboard.html');
+                }
             }
         });
 
