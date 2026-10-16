@@ -113,9 +113,15 @@ if (typeof window !== 'undefined' && !window.__capzone_auth_tab_interceptor_set)
 const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: 'select_account' });
 
-// Resilient Google Login Helper: tries popup first, then explicit resolver, and supports redirect fallback
+// Resilient Google Login Helper: tries popup first on desktop, direct redirect on mobile for instant 1st-click login
 async function loginWithGoogle() {
   if (!auth) throw new Error("Authentication module failed to initialize. Please check network/adblocker.");
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || (window.innerWidth <= 768);
+  if (isMobile) {
+    console.log("[Auth] Mobile device detected: Direct top-level signInWithRedirect for instant 1st-tap login");
+    await signInWithRedirect(auth, googleProvider);
+    return null;
+  }
   try {
     return await signInWithPopup(auth, googleProvider);
   } catch (error) {
