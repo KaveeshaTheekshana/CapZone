@@ -36,14 +36,19 @@
             } catch(e) {}
         })();
 
-        // ⚡ Instant Remember Me / Auto-Login Check (Skips login screen immediately if remembered)
+        // ⚡ Instant Remember Me / Auto-Login Check (Skips login screen only if user opted in)
         (function checkImmediateRememberMe() {
             try {
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('switch') === 'true' || urlParams.get('logout') === 'true' || urlParams.get('force') === 'true') {
+                    sessionStorage.setItem('capzone_just_logged_out', 'true');
+                    return;
+                }
                 const wasExplicitLogout = sessionStorage.getItem('capzone_just_logged_out') === 'true';
-                const isRemembered = localStorage.getItem('capzone_remember_me') !== 'false';
+                const isRemembered = localStorage.getItem('capzone_remember_me') === 'true';
                 const savedEmail = localStorage.getItem('capzone_user_email');
                 if (!wasExplicitLogout && isRemembered && savedEmail && savedEmail.includes('@')) {
-                    console.log("[Auth] Active session remembered. Redirecting directly to dashboard...");
+                    console.log("[Auth] Active session remembered. Redirecting to dashboard...");
                     window.location.replace('dashboard.html');
                 }
             } catch (e) {}
@@ -811,13 +816,26 @@
             btnGoogle.addEventListener('click', handleGoogleSignIn);
         }
 
+        // 🛡️ Remember Me Sync (Keep checkbox reactive & persistent)
+        const rememberEl = document.getElementById('rememberMe');
+        if (rememberEl) {
+            const savedState = localStorage.getItem('capzone_remember_me');
+            if (savedState !== null) {
+                rememberEl.checked = savedState === 'true';
+            }
+            rememberEl.addEventListener('change', () => {
+                localStorage.setItem('capzone_remember_me', rememberEl.checked ? 'true' : 'false');
+            });
+        }
+
         // 🛡️ Automatic Google Redirect Handler (Captures redirect login on page load)
         (async function checkGoogleRedirectResult() {
             if (!auth || typeof getRedirectResult !== 'function') return;
             try {
                 const redirResult = await getRedirectResult(auth);
                 if (redirResult && redirResult.user) {
-                    localStorage.setItem('capzone_remember_me', 'true');
+                    const remember = rememberEl ? rememberEl.checked : true;
+                    localStorage.setItem('capzone_remember_me', remember ? 'true' : 'false');
                     sessionStorage.removeItem('capzone_just_logged_out');
                     await notifyBackend(redirResult.user);
                     showToast('Google login successful! Redirecting...', 'success');
@@ -828,14 +846,16 @@
             }
         })();
 
-        // Keep local storage email updated & auto-redirect if already authenticated and remembered
+        // Keep local storage email updated & auto-redirect only if explicitly remembered
         onAuthStateChanged(auth, async (user) => {
             if (user && user.email) {
                 localStorage.setItem('capzone_user_email', user.email.toLowerCase().trim());
                 if (user.displayName) localStorage.setItem('capzone_user_name', user.displayName);
+                const urlParams = new URLSearchParams(window.location.search);
+                const isForce = urlParams.get('switch') === 'true' || urlParams.get('logout') === 'true' || urlParams.get('force') === 'true';
                 const wasExplicitLogout = sessionStorage.getItem('capzone_just_logged_out') === 'true';
-                const isRemembered = localStorage.getItem('capzone_remember_me') !== 'false';
-                if (!wasExplicitLogout && isRemembered) {
+                const isRemembered = localStorage.getItem('capzone_remember_me') === 'true';
+                if (!isForce && !wasExplicitLogout && isRemembered) {
                     console.log("[Auth] Active session recognized. Auto-redirecting to dashboard...");
                     window.location.replace('dashboard.html');
                 }
