@@ -85,13 +85,17 @@
       const host = window.location.hostname || '';
       const port = window.location.port || '';
 
-      if ((host === 'localhost' || host === '127.0.0.1') && port === '6039') {
+      if (port === '6039' || ((host === 'localhost' || host === '127.0.0.1') && port === '6039')) {
         return '';
       }
 
       // If running on local environment (file: or port 5500 Live Server, etc.)
       if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) {
         return 'http://localhost:6039';
+      }
+
+      if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
+        return port ? `http://${host}:${port}` : '';
       }
 
       // If running on production website domain (capzone.top, etc.)
@@ -427,17 +431,27 @@
 
 
           if (res && (res.status === 403 || res.status === 401)) {
-            console.warn("User account deactivated or blacklisted by Admin:", uEmail);
-            localStorage.removeItem('capzone_user_email');
-            localStorage.removeItem('capzone_user_name');
-            localStorage.removeItem('capzone_user_profile');
-            localStorage.removeItem('capzone_cached_user_' + uEmail);
-            localStorage.removeItem('capzone_projects_' + uEmail);
-            localStorage.removeItem('capzone_deleted_keys_' + uEmail);
-            localStorage.removeItem('capzone_login_timestamp');
-            try { await signOut(auth); } catch (e) { }
-            window.location.replace('login.html');
-            return;
+            let isExplicitDelete = false;
+            try {
+              const body = await res.json();
+              if (body && (body.deleted === true || (body.error && body.error.toLowerCase().includes('administrator')))) {
+                isExplicitDelete = true;
+              }
+            } catch (e) { }
+
+            if (isExplicitDelete) {
+              console.warn("User account deactivated or blacklisted by Admin:", uEmail);
+              localStorage.removeItem('capzone_user_email');
+              localStorage.removeItem('capzone_user_name');
+              localStorage.removeItem('capzone_user_profile');
+              localStorage.removeItem('capzone_cached_user_' + uEmail);
+              localStorage.removeItem('capzone_projects_' + uEmail);
+              localStorage.removeItem('capzone_deleted_keys_' + uEmail);
+              localStorage.removeItem('capzone_login_timestamp');
+              try { await signOut(auth); } catch (e) { }
+              window.location.replace('login.html');
+              return;
+            }
           }
 
           if (res && res.status === 404) {
