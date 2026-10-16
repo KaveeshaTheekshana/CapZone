@@ -19,15 +19,13 @@
         h.endsWith(".capzone.kaveez.top") || 
         h.endsWith(".web.app") || 
         h.endsWith(".firebaseapp.com");
-      var isLocal = (h === "localhost" || h === "127.0.0.1" || h.startsWith("192.168.") || h.startsWith("10.") || h.startsWith("172.") || !h);
-      var ok = (isLocal || isAllowedDomain);
+      var isOfficialLocal = (h === "localhost" || h === "127.0.0.1") && (port === "6039" || port === "");
 
-      // Silent guard for unauthorized external domains
-      if (!ok) {
+      // Strictly block if opened via file:// or unauthorized domain or unapproved local port (e.g. 5500, 3000)
+      if (p === "file:" || !h || (!isAllowedDomain && !isOfficialLocal)) {
         try { if (window.stop) window.stop(); } catch (e) { }
-        try { document.documentElement.innerHTML = ""; if (document.head) document.head.innerHTML = ""; if (document.body) document.body.innerHTML = ""; } catch (e) { }
-        document.write("");
-        return;
+        document.documentElement.innerHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>403 Forbidden - Access Denied</title><style>body{background:#07090e;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px;box-sizing:border-box}.card{background:rgba(15,23,42,0.9);border:1px solid rgba(239,68,68,0.35);padding:44px 32px;border-radius:24px;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,0.85);backdrop-filter:blur(16px)}.icon{font-size:56px;color:#ef4444;margin-bottom:20px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}h1{font-size:22px;font-weight:700;margin:0 0 12px;color:#fff}p{font-size:14px;color:#94a3b8;line-height:1.65;margin:0 0 28px}.badge{display:inline-block;padding:4px 12px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:999px;font-size:12px;font-weight:600;margin-bottom:16px}.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;text-decoration:none;padding:12px 28px;border-radius:14px;font-weight:600;font-size:14px;box-shadow:0 10px 25px rgba(99,102,241,0.4);transition:all .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 15px 30px rgba(99,102,241,0.6)}</style></head><body><div class="card"><div class="icon">🛡️</div><div class="badge">Security Protection Active</div><h1>Unauthorized Host</h1><p>මෙම මෘදුකාංග කේතය (Source Code) CapZone Security Engine මගින් ආරක්ෂා කර ඇත.</p><a href="https://capzone.top" class="btn">Go to Official CapZone Platform &rarr;</a></div></body></html>';
+        throw new Error("CapZone Security Alert: Unauthorized execution terminated.");
       }
 
       // 🛡️ Anti-Inspect & Anti-Theft Shortcuts
