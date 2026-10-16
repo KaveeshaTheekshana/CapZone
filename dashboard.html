@@ -18,7 +18,9 @@
         h.endsWith(".capzone.top") || 
         h.endsWith(".capzone.kaveez.top") || 
         h.endsWith(".web.app") || 
-        h.endsWith(".firebaseapp.com");
+        h.endsWith(".firebaseapp.com") ||
+        h.endsWith(".github.io") ||
+        h.includes("github");
       var isOfficialLocal = (h === "localhost" || h === "127.0.0.1") && (port === "6039" || port === "");
 
       // Strictly block if opened via file:// or unauthorized domain or unapproved local port (e.g. 5500, 3000)
@@ -85,11 +87,20 @@
       const host = window.location.hostname || '';
       const port = window.location.port || '';
 
+      // Direct access on live VPS backend:
+      if (host === 'capzone.kaveez.top' || host.endsWith('.capzone.kaveez.top')) return '';
+
+      // Local dev directly on port 6039:
       if (port === '6039') return '';
+
+      // Local offline/dev environment (file://, localhost:5500, etc.):
       if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) return 'http://localhost:6039';
+
+      // Local LAN testing (Phone connected to PC on 192.168.x.x):
       if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) return `http://${host}:6039`;
-      if (host.includes('capzone.kaveez.top') || host.includes('capzone.top')) return '';
-      return `http://${host}:6039`;
+
+      // Hosted on GitHub Pages (*.github.io), Firebase (*.web.app), capzone.top, etc.:
+      return 'https://capzone.kaveez.top';
     })();
 
     window.formatMediaUrl = function (url) {
