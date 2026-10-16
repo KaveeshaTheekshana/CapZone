@@ -885,7 +885,7 @@
         (function checkIndexAuthState() {
             try {
                 const savedEmail = localStorage.getItem('capzone_user_email');
-                const isRemembered = localStorage.getItem('capzone_remember_me') === 'true';
+                const isRemembered = localStorage.getItem('capzone_remember_me') !== 'false';
                 if (savedEmail && savedEmail.includes('@') && isRemembered) {
                     const navBtn = document.getElementById('navAuthBtn');
                     const navText = document.getElementById('navAuthText');
