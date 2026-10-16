@@ -353,9 +353,9 @@
         if (profilePayPerVideoSection) profilePayPerVideoSection.style.display = 'none';
 
         const profileQuotaUsed = document.getElementById('profileQuotaUsed');
-        if (profileQuotaUsed) profileQuotaUsed.innerText = `${quotaUsed} Mins`;
+        if (profileQuotaUsed) profileQuotaUsed.innerText = quotaUsed;
         const profileQuotaLimit = document.getElementById('profileQuotaLimit');
-        if (profileQuotaLimit) profileQuotaLimit.innerText = `${quotaLimit} Mins`;
+        if (profileQuotaLimit) profileQuotaLimit.innerText = quotaLimit;
         const profileQuotaRemaining = document.getElementById('profileQuotaRemaining');
         if (profileQuotaRemaining) profileQuotaRemaining.innerText = `${remainingQuota} Mins Left`;
 
@@ -516,9 +516,12 @@
         } else if (event.data && event.data.user) {
           const targetEmail = (event.data.email || event.data.user.email || '').toLowerCase().trim();
           if (!targetEmail || targetEmail === curEmail) {
-            window.currentUserData = { ...window.currentUserData, ...event.data.user };
-            localStorage.setItem('capzone_cached_user_' + curEmail, JSON.stringify(window.currentUserData));
-            window.updateUserProfileUI(window.currentUserData);
+            if (event.data.user.subscription_type !== undefined || event.data.user.balance !== undefined) {
+              window.currentUserData = { ...window.currentUserData, ...event.data.user };
+              localStorage.setItem('capzone_cached_user_' + curEmail, JSON.stringify(window.currentUserData));
+              localStorage.setItem('capzone_user_profile', JSON.stringify(window.currentUserData));
+              window.updateUserProfileUI(window.currentUserData);
+            }
           }
         }
         if (typeof window.fetchUserProfile === 'function') {
@@ -555,9 +558,12 @@
           } else if (syncData && syncData.user) {
             const targetEmail = (syncData.email || syncData.user.email || '').toLowerCase().trim();
             if (!targetEmail || targetEmail === curEmail) {
-              window.currentUserData = { ...window.currentUserData, ...syncData.user };
-              localStorage.setItem('capzone_cached_user_' + curEmail, JSON.stringify(window.currentUserData));
-              window.updateUserProfileUI(window.currentUserData);
+              if (syncData.user.subscription_type !== undefined || syncData.user.balance !== undefined) {
+                window.currentUserData = { ...window.currentUserData, ...syncData.user };
+                localStorage.setItem('capzone_cached_user_' + curEmail, JSON.stringify(window.currentUserData));
+                localStorage.setItem('capzone_user_profile', JSON.stringify(window.currentUserData));
+                window.updateUserProfileUI(window.currentUserData);
+              }
             }
           }
         } catch (err) { }
@@ -671,11 +677,12 @@
           return res.json();
         }).then(data => {
           if (!data) return;
-          try {
-            const bc = new BroadcastChannel('capzone_realtime_sync');
-            bc.postMessage({ type: 'USER_UPDATED', email: user.email, user: { email: user.email, name: uName, auth_provider: userMethod.toLowerCase() } });
-            localStorage.setItem('capzone_admin_sync', JSON.stringify({ email: user.email, timestamp: Date.now() }));
-          } catch (e) { }
+          if (data && data.user) {
+            window.currentUserData = { ...window.currentUserData, ...data.user };
+            localStorage.setItem('capzone_cached_user_' + user.email.toLowerCase().trim(), JSON.stringify(window.currentUserData));
+            localStorage.setItem('capzone_user_profile', JSON.stringify(window.currentUserData));
+            window.updateUserProfileUI(window.currentUserData);
+          }
           if (data && data.api_key && data.api_key !== 'default') {
             if (typeof window.syncApiKeys === 'function') window.syncApiKeys(data.api_key);
           } else {
