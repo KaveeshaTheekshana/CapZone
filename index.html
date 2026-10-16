@@ -418,9 +418,9 @@
 
             <!-- Action Button -->
             <div class="flex items-center gap-4">
-                <a href="login.html"
+                <a href="login.html" id="navAuthBtn"
                     class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all duration-300 backdrop-blur-sm">
-                    Sign In <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    <span id="navAuthText">Sign In</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
             </div>
         </div>
@@ -450,7 +450,7 @@
 
             <!-- CTA Buttons -->
             <div class="flex items-center gap-4 mb-24">
-                <a href="login.html"
+                <a href="login.html" id="heroCtaBtn"
                     class="bg-white hover:bg-gray-100 text-black px-7 py-3 rounded-full text-sm font-medium transition-all hover:scale-105">
                     Start Creating
                 </a>
@@ -880,6 +880,25 @@
                 setTimeout(() => preloader.style.display = 'none', 750);
             }
         }, 3000);
+
+        // Dynamic Auth State Check for Index Page
+        (function checkIndexAuthState() {
+            try {
+                const savedEmail = localStorage.getItem('capzone_user_email');
+                const isRemembered = localStorage.getItem('capzone_remember_me') === 'true';
+                if (savedEmail && savedEmail.includes('@') && isRemembered) {
+                    const navBtn = document.getElementById('navAuthBtn');
+                    const navText = document.getElementById('navAuthText');
+                    const heroCta = document.getElementById('heroCtaBtn');
+                    if (navBtn) navBtn.href = 'dashboard.html';
+                    if (navText) navText.textContent = 'Dashboard';
+                    if (heroCta) {
+                        heroCta.href = 'dashboard.html';
+                        heroCta.textContent = 'Open Studio';
+                    }
+                }
+            } catch (e) {}
+        })();
     </script>
 </body>
 
