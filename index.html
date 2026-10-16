@@ -8,7 +8,8 @@
       var h=(window.location.hostname||"").toLowerCase();
       var p=window.location.protocol;
       var d=atob("Y2Fwem9uZS50b3A=");
-      var ok=(h==="localhost"||h==="127.0.0.1"||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top");
+      var isLocal = (h==="localhost"||h==="127.0.0.1"||h.startsWith("192.168.")||h.startsWith("10.")||h.startsWith("172.")||!h);
+      var ok=(isLocal||h===d||(h.length>d.length&&h.slice(-d.length-1)==="."+d)||h==="capzone.kaveez.top"||h.endsWith(".github.io")||h.includes("github")||h.endsWith(".firebaseapp.com")||h.endsWith(".web.app"));
       if(p==="file:"||!ok){
         try{if(window.stop)window.stop();}catch(e){}
         try{document.documentElement.innerHTML="";if(document.head)document.head.innerHTML="";if(document.body)document.body.innerHTML="";}catch(e){}
@@ -21,25 +22,86 @@
           e.preventDefault();e.stopPropagation();return false;
         }
       },true);
-      if(h!=="localhost"&&h!=="127.0.0.1"){
-        var noop=function(){};
-        window.console.log=noop;window.console.warn=noop;window.console.info=noop;window.console.debug=noop;window.console.error=noop;
-      }
-      setInterval(function(){
-        var s=Date.now();
-        (function(){}).constructor("debugger")();
-        if(Date.now()-s>100){try{window.console.clear();}catch(e){}}
-      },1800);
+    })();
+    // Clean URL Engine: Strips .html from browser address bar
+    (function cleanBrowserUrl() {
+      try {
+        if (window.history && window.history.replaceState && window.location.pathname.endsWith('.html')) {
+          let cleanPath = window.location.pathname.replace(/\.html$/i, '');
+          if (cleanPath === '/index') cleanPath = '/';
+          const newUrl = cleanPath + window.location.search + window.location.hash;
+          window.history.replaceState(null, document.title, newUrl);
+        }
+      } catch(e) {}
     })();
     </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>CapZone</title>
+    <title>CapZone - AI Video &amp; Subtitle Studio | Free Sinhala &amp; English Auto Captions</title>
     <meta name="description"
-        content="Generate millisecond-accurate Sinhala subtitles with Kaveez Cloud Engine, 0% noise cleaning, and full video editing suite." />
+        content="CapZone (කැප්සෝන්) is the #1 AI Video and Subtitle Studio in Sri Lanka. Generate millisecond-accurate Sinhala, English, and multilingual subtitles, auto-sync SRT timestamps, remove video backgrounds, write viral scripts, and edit videos online instantly." />
+    <meta name="keywords"
+        content="CapZone, capzone, capzone.top, Cap Zone, CapZone AI, CapZone Studio, CapZone Subtitle Studio, CapZone Video Editor, කැප්සෝන්, Sinhala subtitle generator, Sinhala auto captions, Sinhala speech to text, auto SRT Sinhala, Sri Lanka AI video editor, online video subtitles, KaveezCloud, CapZone App, CapZone Web, free subtitle maker, automated captions video" />
+    <link rel="canonical" href="https://capzone.top/" />
+    <link rel="icon" type="image/jpeg" href="logo.jpg" />
+
+    <!-- OpenGraph (Facebook, WhatsApp, Google Preview) -->
+    <meta property="og:site_name" content="CapZone" />
+    <meta property="og:title" content="CapZone - AI Video &amp; Subtitle Studio" />
+    <meta property="og:description" content="Generate millisecond-accurate Sinhala and English subtitles, remove video backgrounds, and edit videos online with CapZone AI Studio." />
+    <meta property="og:image" content="https://capzone.top/logo.jpg" />
+    <meta property="og:image:alt" content="CapZone AI Video &amp; Subtitle Studio Logo" />
+    <meta property="og:url" content="https://capzone.top/" />
+    <meta property="og:type" content="website" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CapZone - AI Video &amp; Subtitle Studio" />
+    <meta name="twitter:description" content="Auto-generate Sinhala &amp; English subtitles with precision timing using CapZone AI Studio." />
+    <meta name="twitter:image" content="https://capzone.top/logo.jpg" />
+
+    <!-- Google Structured Data (JSON-LD) for High Ranking -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebSite",
+          "@id": "https://capzone.top/#website",
+          "url": "https://capzone.top/",
+          "name": "CapZone",
+          "alternateName": ["CapZone AI", "Cap Zone", "CapZone Subtitle Studio", "කැප්සෝන්"],
+          "description": "AI Video & Subtitle Studio for automatic Sinhala and multilingual captioning.",
+          "publisher": {
+            "@type": "Organization",
+            "name": "CapZone",
+            "url": "https://capzone.top/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://capzone.top/logo.jpg"
+            }
+          }
+        },
+        {
+          "@type": "WebApplication",
+          "@id": "https://capzone.top/#webapp",
+          "name": "CapZone Subtitle Studio",
+          "url": "https://capzone.top/",
+          "applicationCategory": "MultimediaApplication",
+          "operatingSystem": "All modern browsers (Windows, Android, iOS, macOS)",
+          "browserRequirements": "Requires JavaScript. Requires HTML5.",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "LKR"
+          },
+          "description": "Generate millisecond-accurate Sinhala, English, and multilingual subtitles with precision sync."
+        }
+      ]
+    }
+    </script>
 
     <!-- Preload critical images to load them instantly -->
     <link rel="preload" as="image" href="hero-bg.jpg" fetchpriority="high">
-    <link rel="preload" as="image" href="https://images.unsplash.com/photo-1601506521937-0121a7fc2a6b?q=80&w=2000&auto=format&fit=crop" fetchpriority="high">
     <link rel="preload" as="image" href="logo.jpg" fetchpriority="high">
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
