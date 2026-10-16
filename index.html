@@ -4,51 +4,53 @@
 <head>
     <meta charset="utf-8" />
     <script>
-    (function () {
-      // 🛡️ CapZone Anti-Theft, Anti-Copy & Domain Lock Shield
-      var h = (window.location.hostname || "").toLowerCase().trim();
-      var p = window.location.protocol;
-      var port = window.location.port || "";
-      var allowedHosts = [
-        "capzone.top",
-        "www.capzone.top",
-        "capzone.kaveez.top"
-      ];
-      var isAllowedDomain = allowedHosts.indexOf(h) !== -1 || 
-        h.endsWith(".capzone.top") || 
-        h.endsWith(".capzone.kaveez.top") || 
-        h.endsWith(".web.app") || 
-        h.endsWith(".firebaseapp.com");
-      var isOfficialLocal = (h === "localhost" || h === "127.0.0.1") && (port === "6039" || port === "");
+        (function () {
+            // 🛡️ CapZone Anti-Theft, Anti-Copy & Domain Lock Shield
+            var h = (window.location.hostname || "").toLowerCase().trim();
+            var p = window.location.protocol;
+            var port = window.location.port || "";
+            var allowedHosts = [
+                "capzone.top",
+                "www.capzone.top",
+                "capzone.kaveez.top"
+            ];
+            var isAllowedDomain = allowedHosts.indexOf(h) !== -1 ||
+                h.endsWith(".capzone.top") ||
+                h.endsWith(".capzone.kaveez.top") ||
+                h.endsWith(".web.app") ||
+                h.endsWith(".firebaseapp.com") ||
+                h.endsWith(".github.io") ||
+                h.includes("github");
+            var isOfficialLocal = (h === "localhost" || h === "127.0.0.1") && (port === "6039" || port === "");
 
-      // Strictly block if opened via file:// or unauthorized domain or unapproved local port (e.g. 5500, 3000)
-      if (p === "file:" || !h || (!isAllowedDomain && !isOfficialLocal)) {
-        try { if (window.stop) window.stop(); } catch (e) { }
-        document.documentElement.innerHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>403 Forbidden - Access Denied</title><style>body{background:#07090e;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px;box-sizing:border-box}.card{background:rgba(15,23,42,0.9);border:1px solid rgba(239,68,68,0.35);padding:44px 32px;border-radius:24px;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,0.85);backdrop-filter:blur(16px)}.icon{font-size:56px;color:#ef4444;margin-bottom:20px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}h1{font-size:22px;font-weight:700;margin:0 0 12px;color:#fff}p{font-size:14px;color:#94a3b8;line-height:1.65;margin:0 0 28px}.badge{display:inline-block;padding:4px 12px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:999px;font-size:12px;font-weight:600;margin-bottom:16px}.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;text-decoration:none;padding:12px 28px;border-radius:14px;font-weight:600;font-size:14px;box-shadow:0 10px 25px rgba(99,102,241,0.4);transition:all .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 15px 30px rgba(99,102,241,0.6)}</style></head><body><div class="card"><div class="icon">🛡️</div><div class="badge">Security Protection Active</div><h1>Unauthorized Host</h1><p>මෙම මෘදුකාංග කේතය (Source Code) CapZone Security Engine මගින් ආරක්ෂා කර ඇත.</p><a href="https://capzone.top" class="btn">Go to Official CapZone Platform &rarr;</a></div></body></html>';
-        throw new Error("CapZone Security Alert: Unauthorized execution terminated.");
-      }
+            // Strictly block if opened via file:// or unauthorized domain or unapproved local port (e.g. 5500, 3000)
+            if (p === "file:" || !h || (!isAllowedDomain && !isOfficialLocal)) {
+                try { if (window.stop) window.stop(); } catch (e) { }
+                document.documentElement.innerHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>403 Forbidden - Access Denied</title><style>body{background:#07090e;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px;box-sizing:border-box}.card{background:rgba(15,23,42,0.9);border:1px solid rgba(239,68,68,0.35);padding:44px 32px;border-radius:24px;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,0.85);backdrop-filter:blur(16px)}.icon{font-size:56px;color:#ef4444;margin-bottom:20px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}h1{font-size:22px;font-weight:700;margin:0 0 12px;color:#fff}p{font-size:14px;color:#94a3b8;line-height:1.65;margin:0 0 28px}.badge{display:inline-block;padding:4px 12px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:999px;font-size:12px;font-weight:600;margin-bottom:16px}.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;text-decoration:none;padding:12px 28px;border-radius:14px;font-weight:600;font-size:14px;box-shadow:0 10px 25px rgba(99,102,241,0.4);transition:all .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 15px 30px rgba(99,102,241,0.6)}</style></head><body><div class="card"><div class="icon">🛡️</div><div class="badge">Security Protection Active</div><h1>Unauthorized Host</h1><p>මෙම මෘදුකාංග කේතය (Source Code) CapZone Security Engine මගින් ආරක්ෂා කර ඇත.</p><a href="https://capzone.top" class="btn">Go to Official CapZone Platform &rarr;</a></div></body></html>';
+                throw new Error("CapZone Security Alert: Unauthorized execution terminated.");
+            }
 
-      // 🛡️ Anti-Inspect & Anti-Theft Shortcuts
-      document.addEventListener("contextmenu", function (e) { e.preventDefault(); return false; }, { passive: false });
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "F12" || 
-           (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c", "K", "k"].indexOf(e.key) !== -1) || 
-           (e.ctrlKey && ["u", "U", "s", "S"].indexOf(e.key) !== -1)) {
-          e.preventDefault(); e.stopPropagation(); return false;
-        }
-      }, true);
-    })();
-    // Clean URL Engine: Strips .html from browser address bar
-    (function cleanBrowserUrl() {
-      try {
-        if (window.history && window.history.replaceState && window.location.pathname.endsWith('.html')) {
-          let cleanPath = window.location.pathname.replace(/\.html$/i, '');
-          if (cleanPath === '/index') cleanPath = '/';
-          const newUrl = cleanPath + window.location.search + window.location.hash;
-          window.history.replaceState(null, document.title, newUrl);
-        }
-      } catch(e) {}
-    })();
+            // 🛡️ Anti-Inspect & Anti-Theft Shortcuts
+            document.addEventListener("contextmenu", function (e) { e.preventDefault(); return false; }, { passive: false });
+            document.addEventListener("keydown", function (e) {
+                if (e.key === "F12" ||
+                    (e.ctrlKey && e.shiftKey && ["I", "i", "J", "j", "C", "c", "K", "k"].indexOf(e.key) !== -1) ||
+                    (e.ctrlKey && ["u", "U", "s", "S"].indexOf(e.key) !== -1)) {
+                    e.preventDefault(); e.stopPropagation(); return false;
+                }
+            }, true);
+        })();
+        // Clean URL Engine: Strips .html from browser address bar
+        (function cleanBrowserUrl() {
+            try {
+                if (window.history && window.history.replaceState && window.location.pathname.endsWith('.html')) {
+                    let cleanPath = window.location.pathname.replace(/\.html$/i, '');
+                    if (cleanPath === '/index') cleanPath = '/';
+                    const newUrl = cleanPath + window.location.search + window.location.hash;
+                    window.history.replaceState(null, document.title, newUrl);
+                }
+            } catch (e) { }
+        })();
     </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <title>CapZone - AI Video &amp; Subtitle Studio | Free Sinhala &amp; English Auto Captions</title>
@@ -62,7 +64,8 @@
     <!-- OpenGraph (Facebook, WhatsApp, Google Preview) -->
     <meta property="og:site_name" content="CapZone" />
     <meta property="og:title" content="CapZone - AI Video &amp; Subtitle Studio" />
-    <meta property="og:description" content="Generate millisecond-accurate Sinhala and English subtitles, remove video backgrounds, and edit videos online with CapZone AI Studio." />
+    <meta property="og:description"
+        content="Generate millisecond-accurate Sinhala and English subtitles, remove video backgrounds, and edit videos online with CapZone AI Studio." />
     <meta property="og:image" content="https://capzone.top/logo.jpg" />
     <meta property="og:image:alt" content="CapZone AI Video &amp; Subtitle Studio Logo" />
     <meta property="og:url" content="https://capzone.top/" />
@@ -71,7 +74,8 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="CapZone - AI Video &amp; Subtitle Studio" />
-    <meta name="twitter:description" content="Auto-generate Sinhala &amp; English subtitles with precision timing using CapZone AI Studio." />
+    <meta name="twitter:description"
+        content="Auto-generate Sinhala &amp; English subtitles with precision timing using CapZone AI Studio." />
     <meta name="twitter:image" content="https://capzone.top/logo.jpg" />
 
     <!-- Google Structured Data (JSON-LD) for High Ranking -->
@@ -168,6 +172,7 @@
             direction: ltr;
             -webkit-font-smoothing: antialiased;
         }
+
         @media (max-width: 768px) {
             * {
                 backdrop-filter: none !important;
@@ -224,8 +229,8 @@
         .hero-bg.loaded::before {
             opacity: 1;
         }
-        
-        .hero-bg > div {
+
+        .hero-bg>div {
             position: relative;
             z-index: 10;
         }
@@ -259,7 +264,8 @@
         /* Mobile Ultra-Smooth Scrolling Engine */
         @media (max-width: 768px) {
             body {
-                background-attachment: scroll; /* Eliminates constant background re-rasterization on mobile scroll */
+                background-attachment: scroll;
+                /* Eliminates constant background re-rasterization on mobile scroll */
             }
 
             .glass-panel {
@@ -391,10 +397,12 @@
 <body class="bg-background text-on-surface antialiased selection:bg-primary-container selection:text-on-surface">
 
     <!-- CapZone Ultra-Premium Loading Screen -->
-    <div id="capzonePreloader" class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0b0f19] transition-opacity duration-700 pointer-events-auto">
+    <div id="capzonePreloader"
+        class="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0b0f19] transition-opacity duration-700 pointer-events-auto">
         <div class="relative flex items-center justify-center mb-6">
             <div class="absolute w-28 h-28 rounded-full bg-blue-500/20 blur-xl animate-pulse"></div>
-            <div class="w-16 h-16 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(37,99,235,0.4)]">
+            <div
+                class="w-16 h-16 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin flex items-center justify-center shadow-[0_0_25px_rgba(37,99,235,0.4)]">
                 <img src="logo.jpg" class="w-10 h-10 rounded-full object-cover" alt="CapZone Logo">
             </div>
         </div>
@@ -427,15 +435,16 @@
             <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-white/70">
                 <a href="#features"
                     class="hover:text-white hover:text-shadow-glow transition-all duration-300">Features</a>
-                <a href="#how-it-works"
-                    class="hover:text-white hover:text-shadow-glow transition-all duration-300">How It Works</a>
+                <a href="#how-it-works" class="hover:text-white hover:text-shadow-glow transition-all duration-300">How
+                    It Works</a>
             </nav>
 
             <!-- Action Button -->
             <div class="flex items-center gap-4">
                 <a href="login.html" id="navAuthBtn"
                     class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-5 py-2 rounded-full text-sm font-medium flex items-center gap-2 transition-all duration-300 backdrop-blur-sm">
-                    <span id="navAuthText">Sign In</span> <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+                    <span id="navAuthText">Sign In</span> <span
+                        class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </a>
             </div>
         </div>
@@ -725,7 +734,8 @@
                     <span class="material-symbols-outlined text-sm">route</span> Simple Workflow
                 </div>
                 <h2 class="text-3xl sm:text-5xl font-black text-white tracking-tight drop-shadow-lg">Create Subtitles in
-                    <span class="text-white/80 font-medium">3 Simple Steps</span></h2>
+                    <span class="text-white/80 font-medium">3 Simple Steps</span>
+                </h2>
             </div>
 
             <!-- Steps Grid -->
@@ -781,10 +791,15 @@
 
 
             <!-- PayHere Compliance Policy Links -->
-            <div class="flex items-center justify-center gap-6 sm:gap-10 py-3 text-xs sm:text-sm font-semibold tracking-wide">
-                <button type="button" onclick="openPolicyModal('terms')" class="text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">Terms &amp; Conditions</button>
-                <button type="button" onclick="openPolicyModal('privacy')" class="text-sky-400 hover:text-sky-300 transition-colors cursor-pointer">Privacy Policy</button>
-                <button type="button" onclick="openPolicyModal('refund')" class="text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">Return Policy</button>
+            <div
+                class="flex items-center justify-center gap-6 sm:gap-10 py-3 text-xs sm:text-sm font-semibold tracking-wide">
+                <button type="button" onclick="openPolicyModal('terms')"
+                    class="text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">Terms &amp;
+                    Conditions</button>
+                <button type="button" onclick="openPolicyModal('privacy')"
+                    class="text-sky-400 hover:text-sky-300 transition-colors cursor-pointer">Privacy Policy</button>
+                <button type="button" onclick="openPolicyModal('refund')"
+                    class="text-slate-400 hover:text-sky-400 transition-colors cursor-pointer">Return Policy</button>
             </div>
 
             <p class="text-[11px] text-white/50 mt-2">© 2026 CapZone Subtitle Studio. All rights reserved.
@@ -912,7 +927,7 @@
                         heroCta.textContent = 'Open Studio';
                     }
                 }
-            } catch (e) {}
+            } catch (e) { }
         })();
     </script>
 </body>
