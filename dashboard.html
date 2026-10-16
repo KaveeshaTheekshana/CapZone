@@ -85,29 +85,11 @@
       const host = window.location.hostname || '';
       const port = window.location.port || '';
 
-      if (port === '6039' || ((host === 'localhost' || host === '127.0.0.1') && port === '6039')) {
-        return '';
-      }
-
-      // If running on local environment (file: or port 5500 Live Server, etc.)
-      if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) {
-        return 'http://localhost:6039';
-      }
-
-      if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) {
-        return port ? `http://${host}:${port}` : '';
-      }
-
-      // If running on production website domain (capzone.top, etc.)
-      if (host.includes('capzone.top') || host.includes('web.app') || host.includes('firebaseapp.com')) {
-        return 'https://capzone.kaveez.top';
-      }
-
-      if (host.includes('capzone.kaveez.top')) {
-        return '';
-      }
-
-      return 'https://capzone.kaveez.top';
+      if (port === '6039') return '';
+      if (proto === 'file:' || host === 'localhost' || host === '127.0.0.1' || !host) return 'http://localhost:6039';
+      if (host.startsWith('192.168.') || host.startsWith('10.') || host.startsWith('172.')) return `http://${host}:6039`;
+      if (host.includes('capzone.kaveez.top') || host.includes('capzone.top')) return '';
+      return `http://${host}:6039`;
     })();
 
     window.formatMediaUrl = function (url) {
@@ -301,16 +283,16 @@
       if (navPlanTag) {
         if (subType === 'creator') {
           navPlanTag.innerText = `Creator (${remainingQuota}m left)`;
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
+          navPlanTag.className = "inline-block text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         } else if (subType === 'pro') {
           navPlanTag.innerText = `Pro (${remainingQuota}m left)`;
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
+          navPlanTag.className = "inline-block text-[9px] bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         } else if (subType === 'payg') {
           navPlanTag.innerText = 'Pay As You Go';
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
+          navPlanTag.className = "inline-block text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         } else {
           navPlanTag.innerText = 'Free (Own API)';
-          navPlanTag.className = "hidden md:inline-block text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
+          navPlanTag.className = "inline-block text-[9px] bg-slate-700/50 text-slate-400 border border-slate-600 px-1.5 py-0.5 rounded-full uppercase ml-1 font-bold";
         }
       }
 
@@ -592,12 +574,12 @@
       }
     });
 
-    // Polling engine: Checks server every 5 seconds with visibility guard (fast session revocation)
+    // Polling engine: Checks server every 2.5 seconds for instant cross-device sync
     setInterval(() => {
       if (document.visibilityState === 'visible' && typeof window.fetchUserProfile === 'function') {
         window.fetchUserProfile();
       }
-    }, 5000);
+    }, 2500);
 
     // Initial immediate fetch on page boot
     window.fetchUserProfile();
@@ -5459,12 +5441,7 @@
         });
         if (res.ok) {
           const serverProjects = await res.json();
-          const fetchedProjects = Array.isArray(serverProjects) ? serverProjects : (serverProjects.projects || []);
-
-          let localCached = [];
-          try { localCached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
-
-          const mergedMap = new Map();
+          const cleanProjects = [];
           fetchedProjects.forEach(p => {
             if (isDeletedItem(p)) {
               // Silently clean up ghost item from server
@@ -5476,41 +5453,12 @@
             if (item.payload && typeof item.payload === 'string') {
               try { item.payload = JSON.parse(item.payload); } catch (e) { }
             }
-            mergedMap.set(String(item.id), item);
+            cleanProjects.push(item);
           });
 
-          const unsyncedProjects = [];
-          localCached.forEach(p => {
-            if (isDeletedItem(p)) return;
-            const alreadyOnServer = mergedMap.has(String(p.id)) ||
-              fetchedProjects.some(sp => sp.type === p.type && (sp.title || '').trim().toLowerCase() === (p.title || '').trim().toLowerCase());
-            if (!alreadyOnServer && !p.synced) {
-              p.synced = true;
-              mergedMap.set(String(p.id), p);
-              unsyncedProjects.push(p);
-            }
-          });
-
-          // Upload any truly unsynced local projects to server so other devices see them
-          if (unsyncedProjects.length > 0) {
-            unsyncedProjects.forEach(up => {
-              fetch(`${API_BASE_URL}/api/user-projects`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-user-email': email },
-                body: JSON.stringify(up)
-              }).then(r => r.json()).then(data => {
-                if (data && data.id) {
-                  up.id = data.id;
-                  up.synced = true;
-                  localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
-                }
-              }).catch(() => { });
-            });
-          }
-
-          window.allProjects = Array.from(mergedMap.values()).filter(p => !isDeletedItem(p)).sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-
-          localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
+          cleanProjects.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
+          window.allProjects = cleanProjects;
+          localStorage.setItem(cacheKey, JSON.stringify(cleanProjects));
           window.renderRecentProjects();
         }
       } catch (e) {
