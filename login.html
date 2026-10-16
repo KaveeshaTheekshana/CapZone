@@ -639,6 +639,8 @@
                 window.currentUserEmail = normEmail;
                 localStorage.removeItem('capzone_projects_' + normEmail);
                 localStorage.removeItem('capzone_deleted_keys_' + normEmail);
+                localStorage.removeItem('capzone_cached_user_' + normEmail);
+                localStorage.removeItem('capzone_user_profile');
 
                 // 1. Instant Real-Time Cross-Tab Synchronization with Admin Panel
                 try {
