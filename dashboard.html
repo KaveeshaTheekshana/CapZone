@@ -3078,10 +3078,11 @@
       const lower = String(displayMsg).toLowerCase();
 
       // Normalize errors without exposing raw code stacktraces or numbers
-      if (type === 'error' || lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('weda na') || lower.includes('contact developer')) {
+      if (type === 'error' || lower.includes('error') || lower.includes('fail') || lower.includes('exception') || lower.includes('weda na')) {
         type = 'warning';
-        if (!lower.includes('quota') && !lower.includes('balance') && !lower.includes('subscription')) {
-          displayMsg = 'උපසිරැසි සැකසීමේදී ගැටලුවක් ඇති විය. කරුණාකර Admin WhatsApp හරහා සම්බන්ධ වන්න.';
+        // Only sanitize if it is a raw programmer error or stack trace
+        if (lower.includes('referenceerror') || lower.includes('typeerror') || lower.includes('syntaxerror') || lower.includes('yt-dlp command') || lower.includes('empty stdout') || lower.includes('internal server error')) {
+          displayMsg = 'තාක්ෂණික ගැටලුවක් ඇති විය. කරුණාකර නැවත උත්සාහ කරන්න.';
         }
       }
 
@@ -3293,6 +3294,25 @@
     }
     window.cancelSrtGeneration = cancelSrtGeneration;
 
+    function getFriendlyMediaError(type, rawError = '') {
+      const lower = String(rawError || '').toLowerCase();
+      const platformName = (type === 'fb' || type === 'facebook') ? 'Facebook' : 'TikTok';
+      if (!rawError || lower.includes('no url') || lower.includes('empty')) {
+        return `කරුණාකර වලංගු ${platformName} Link එකක් ඇතුළත් කරන්න.`;
+      }
+      if (lower.includes('private') || lower.includes('invalid url') || lower.includes('restricted') || lower.includes('unavailable') || lower.includes('not access') || lower.includes('could not access')) {
+        return `මෙම ${platformName} වීඩියෝව Private හෝ ලබාගත නොහැක. කරුණාකර Public Link එකක් උත්සාහ කරන්න.`;
+      }
+      if (lower.includes('slideshow') || lower.includes('photo')) {
+        return `මෙය Photo Slideshow එකකි. කරුණාකර 'Get MP3' බොත්තම ඔබා Audio ලබාගන්න.`;
+      }
+      if (lower.includes('timeout') || lower.includes('network') || lower.includes('failed to fetch')) {
+        return `සම්බන්ධතාවයේ ගැටලුවක් ඇති විය. කරුණාකර නැවත උත්සාහ කරන්න.`;
+      }
+      return `${platformName} වීඩියෝව බාගත කිරීමේදී ගැටලුවක් ඇති විය. කරුණාකර Link එක පරීක්ෂා කර නැවත උත්සාහ කරන්න.`;
+    }
+    window.getFriendlyMediaError = getFriendlyMediaError;
+
     function setupProgressTracker(clientId, stepsPrefix, barId) {
       const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
       if (stepsPrefix === 'srt') {
@@ -3353,8 +3373,13 @@
                 downloadLinkEl.href = downloadUrl;
                 downloadLinkEl.setAttribute('download', downloadFileName);
 
-                // Direct download trigger with blob fallback ensuring real PNG download
+                // Direct download trigger with blob fallback ensuring real PNG download (SINGLE DOWNLOAD ONLY)
                 downloadLinkEl.onclick = async function (e) {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (downloadLinkEl._isDownloading) return false;
+                  downloadLinkEl._isDownloading = true;
+
                   try {
                     const fetchRes = await fetch(previewUrl);
                     if (fetchRes.ok) {
@@ -3370,13 +3395,19 @@
                       setTimeout(() => {
                         window.URL.revokeObjectURL(blobUrl);
                         a.remove();
-                      }, 200);
-                      e.preventDefault();
+                        downloadLinkEl._isDownloading = false;
+                      }, 400);
                       return false;
+                    } else {
+                      window.location.href = downloadUrl;
+                      downloadLinkEl._isDownloading = false;
                     }
                   } catch (err) {
-                    console.log('[Download Direct Fallback]:', err);
+                    console.log('[Download Fallback]:', err);
+                    window.location.href = downloadUrl;
+                    downloadLinkEl._isDownloading = false;
                   }
+                  return false;
                 };
               }
 
@@ -3475,8 +3506,13 @@
               } else {
                 showPopup('උපසිරැසි ජනනය කිරීමේදී දෝෂයක් ඇති විය. කරුණාකර Admin WhatsApp හරහා සම්බන්ධ වන්න.', 'දැනුම්දීමයි / Notice', 'warning');
               }
+            } else if (stepsPrefix === 'fb' || stepsPrefix === 'tiktok') {
+              const friendlyMsg = getFriendlyMediaError(stepsPrefix, data.message);
+              showPopup(friendlyMsg, (stepsPrefix === 'fb' ? 'Facebook' : 'TikTok') + ' Notice', 'warning');
+            } else if (stepsPrefix === 'img') {
+              showPopup('පසුබිම ඉවත් කිරීමේදී දෝෂයක් ඇති විය. කරුණාකර වෙනත් ඡායාරූපයක් උත්සාහ කරන්න.', 'Notice', 'warning');
             } else {
-              showPopup(data.message || 'Failed', 'Error', 'error');
+              showPopup(data.message || 'දෝෂයක් ඇති විය', 'Notice', 'warning');
             }
             if (stepsPrefix === 'img') {
               document.getElementById('imageEnhanceBtn').disabled = false;
@@ -4766,9 +4802,19 @@
           linkEl.setAttribute('download', safeDlFilename);
           linkEl.innerHTML = `<span class="material-symbols-outlined">download</span> Download ${format === 'audio' ? 'Audio (MP3)' : 'Video (MP4)'}`;
           document.getElementById(resId).style.display = 'flex';
-        } else { showPopup(data.error || 'Failed', 'Error', 'error'); }
-      } catch (err) { es.close(); showPopup(err.message, 'Error', 'error'); }
-      finally { document.getElementById(btnId).disabled = false; }
+        } else {
+          document.getElementById(progId).style.display = 'none';
+          const friendlyErr = getFriendlyMediaError(type, data.error);
+          showPopup(friendlyErr, (type === 'fb' ? 'Facebook' : 'TikTok') + ' Notice', 'warning');
+        }
+      } catch (err) {
+        es.close();
+        document.getElementById(progId).style.display = 'none';
+        const friendlyErr = getFriendlyMediaError(type, err.message);
+        showPopup(friendlyErr, (type === 'fb' ? 'Facebook' : 'TikTok') + ' Notice', 'warning');
+      } finally {
+        document.getElementById(btnId).disabled = false;
+      }
     }
 
     function switchImageTab(tab) {
