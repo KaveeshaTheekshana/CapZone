@@ -313,7 +313,7 @@
 
       // Re-validate video if one is currently selected in SRT modal
       if (window.currentMediaDuration !== undefined && window.currentMediaDuration !== null && typeof validateAndDisplayVideoDetails === 'function') {
-        validateAndDisplayVideoDetails(window.currentMediaDuration, currentSrtFile ? currentSrtFile.size : 0);
+        validateAndDisplayVideoDetails(window.currentMediaDuration, (window.currentSrtFile ? window.currentSrtFile.size : 0));
       }
 
       if (window.lucide) window.lucide.createIcons();
@@ -1829,8 +1829,7 @@
               <i data-lucide="upload-cloud" class="w-8 h-8 text-purple-500"></i>
             </div>
             <p class="text-sm text-white font-bold" id="srtFileName">Click to Browse Media (MP4, MKV, MP3)</p>
-            <p class="text-xs text-slate-400 mt-2">⚡ System Limits: Max duration 30 minutes | Max upload 500 MB (Gemini
-              AI optimized)</p>
+            <p class="text-xs text-slate-400 mt-2">⚡ System Limits: Max duration 2 Hours (120 Mins) | Max upload 500 MB (KaveezCloud AI Engine)</p>
           </div>
         </div>
 
@@ -3318,7 +3317,77 @@
     window.clearUserApiKey = function () {};
     function saveApiKeys() {}
 
-        function validateAndDisplayVideoDetails(durationSecs, fileSize) {
+    let currentSrtFile = null;
+    window.currentSrtFile = null;
+
+    function updateSrtFileInfo(input) {
+      if (!input.files || !input.files[0]) return;
+      currentSrtFile = input.files[0];
+      window.currentSrtFile = currentSrtFile;
+      const fileNameEl = document.getElementById('srtFileName');
+      if (fileNameEl) fileNameEl.textContent = currentSrtFile.name;
+
+      const validationCard = document.getElementById('srtValidationCard');
+      const submitBtn = document.getElementById('srtSubmitBtn');
+      const alertEl = document.getElementById('srtValidationAlert');
+      const durationEl = document.getElementById('srtDetectedDuration');
+      const tierEl = document.getElementById('srtMatchedTier');
+      const statusEl = document.getElementById('srtAccountStatus');
+
+      if (validationCard) validationCard.style.display = 'block';
+
+      // 1. File size check (500MB max upload limit)
+      if (currentSrtFile.size > 500 * 1024 * 1024) {
+        if (durationEl) durationEl.innerText = '-';
+        if (tierEl) tierEl.innerText = 'Exceeds 500MB Limit';
+        if (statusEl) statusEl.innerText = 'Rejected';
+        if (alertEl) {
+          alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/15 border border-red-500/30 text-red-300 flex items-start gap-2.5';
+          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 500 MB upload limit. Video rejected.</div>`;
+        }
+        if (submitBtn) submitBtn.disabled = true;
+        if (window.lucide) window.lucide.createIcons();
+        return;
+      }
+
+      // 2. Pre-extract duration using HTML5 media element
+      if (durationEl) durationEl.innerText = 'Calculating duration...';
+      if (tierEl) tierEl.innerText = 'Analyzing...';
+      if (statusEl) statusEl.innerText = 'Checking...';
+      if (alertEl) {
+        alertEl.className = 'p-3 rounded-xl text-xs bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-2';
+        alertEl.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-purple-400 shrink-0"></i> <span>Reading video metadata before processing...</span>`;
+      }
+      if (window.lucide) window.lucide.createIcons();
+
+      const tempMedia = document.createElement((currentSrtFile.type && currentSrtFile.type.startsWith('audio')) ? 'audio' : 'video');
+      tempMedia.preload = 'metadata';
+      const objUrl = URL.createObjectURL(currentSrtFile);
+      tempMedia.src = objUrl;
+
+      tempMedia.onloadedmetadata = () => {
+        URL.revokeObjectURL(objUrl);
+        const durationSecs = tempMedia.duration;
+        window.currentMediaDuration = durationSecs;
+        validateAndDisplayVideoDetails(durationSecs, currentSrtFile.size);
+      };
+
+      tempMedia.onerror = () => {
+        URL.revokeObjectURL(objUrl);
+        window.currentMediaDuration = null;
+        if (durationEl) durationEl.innerText = 'Server (FFmpeg) Detection';
+        if (tierEl) tierEl.innerText = 'Calculated on upload';
+        if (alertEl) {
+          alertEl.className = 'p-3 rounded-xl text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-start gap-2';
+          alertEl.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <div>Duration & parameters will be verified by server FFmpeg on upload.</div>`;
+        }
+        if (submitBtn) submitBtn.disabled = false;
+        if (window.lucide) window.lucide.createIcons();
+      };
+    }
+    window.updateSrtFileInfo = updateSrtFileInfo;
+
+    function validateAndDisplayVideoDetails(durationSecs, fileSize) {
       const validationCard = document.getElementById('srtValidationCard');
       const submitBtn = document.getElementById('srtSubmitBtn');
       const alertEl = document.getElementById('srtValidationAlert');
@@ -3526,29 +3595,9 @@
       return new Blob([view], { type: 'audio/wav' });
     }
 
-    // Fast In-Browser Audio Extractor (Transforms 100MB video into 1-2MB lightweight audio)
+    // High-Speed Direct Upload (Delegates audio extraction to server multi-threaded FFmpeg for zero UI freezing)
     async function extractOptimizedAudio(file) {
-      if (!file || file.type.startsWith('audio/')) return file;
-      try {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) return file;
-        const arrayBuf = await file.arrayBuffer();
-        const ctx = new AudioContextClass();
-        const decoded = await ctx.decodeAudioData(arrayBuf);
-
-        // Render downsampled 16kHz mono using OfflineAudioContext
-        const offlineCtx = new OfflineAudioContext(1, Math.ceil(decoded.duration * 16000), 16000);
-        const source = offlineCtx.createBufferSource();
-        source.buffer = decoded;
-        source.connect(offlineCtx.destination);
-        source.start(0);
-        const resampled = await offlineCtx.startRendering();
-        const wavBlob = audioBufferToWavBlob(resampled, 16000);
-        return new File([wavBlob], `${file.name.replace(/\.[^/.]+$/, "")}.wav`, { type: 'audio/wav' });
-      } catch (err) {
-        console.warn('In-browser audio extraction notice, fallback to original:', err);
-        return file;
-      }
+      return file;
     }
 
     // Subtitle Word Limit Selector & Language Info Handlers
@@ -3656,24 +3705,32 @@
       // Optimize upload by extracting lightweight 16kHz mono audio from video if possible
       let fileToUpload = currentSrtFile;
       if (currentSrtFile && currentSrtFile.type && (currentSrtFile.type.startsWith('video/') || currentSrtFile.name.match(/\.(mp4|mov|avi|mkv|webm)$/i))) {
-        updateSrtStepUI(1, { percent: 5, statusMsg: 'ශ්‍රව්‍ය පථය විශ්ලේෂණය කරමින්... (5%)' });
-        try {
-          fileToUpload = await extractOptimizedAudio(currentSrtFile);
-        } catch (audioErr) {
-          console.warn('Audio extraction notice, fallback to original:', audioErr);
-          fileToUpload = currentSrtFile;
+        // Only run browser decoding if file is reasonable (<150MB) to avoid browser tab memory exhaustion
+        if (currentSrtFile.size <= 150 * 1024 * 1024) {
+          updateSrtStepUI(1, { percent: 5, statusMsg: 'ශ්‍රව්‍ය පථය විශ්ලේෂණය කරමින්... (5%)' });
+          try {
+            fileToUpload = await extractOptimizedAudio(currentSrtFile);
+          } catch (audioErr) {
+            console.warn('Audio extraction notice, fallback to original:', audioErr);
+            fileToUpload = currentSrtFile;
+          }
         }
       }
       if (window._isSrtCancelled) return;
 
-      if (fileToUpload.size > 95 * 1024 * 1024) {
+      const isDirectOrLocal = window.location.protocol === 'file:' || 
+        ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || 
+        window.location.port === '6039';
+      const maxAllowedBytes = isDirectOrLocal ? (500 * 1024 * 1024) : (95 * 1024 * 1024);
+
+      if (fileToUpload.size > maxAllowedBytes) {
         if (es) { try { es.close(); } catch (e) { } }
         document.getElementById('srtSubmitBtn').disabled = false;
         document.getElementById('srtForm').style.display = 'block';
         document.getElementById('srtProgressCard').style.display = 'none';
         document.getElementById('srtResultArea').style.display = 'none';
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
-        showPopup('ගොනුවේ ප්‍රමාණය විශාල වැඩිය (උපරිම 95MB). කරුණාකර කුඩා වීඩියෝවක් හෝ Audio ගොනුවක් ලබා දෙන්න.', 'Limit Exceeded', 'warning');
+        showPopup(`ගොනුවේ ප්‍රමාණය විශාල වැඩිය (උපරිම ${Math.round(maxAllowedBytes / (1024*1024))}MB). කරුණාකර කුඩා වීඩියෝවක් හෝ Audio ගොනුවක් ලබා දෙන්න.`, 'Limit Exceeded', 'warning');
         return;
       }
 
