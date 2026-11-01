@@ -968,20 +968,6 @@
       </div>
     </nav>
     <div class="flex items-center gap-1.5 sm:gap-2.5 lg:gap-4 ml-auto">
-      <!-- AI API Toggle -->
-      <div
-        class="flex items-center p-0.5 sm:p-1 rounded-full bg-black/50 border border-white/10 shadow-inner shrink-0"
-        id="apiToggleContainer">
-        <button onclick="toggleApi('server')" id="btnApiServer"
-          class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md">
-          <span class="sm:hidden">Cloud</span><span class="hidden sm:inline">Cloud API</span>
-        </button>
-        <button onclick="toggleApi('own')" id="btnApiOwn"
-          class="px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer">
-          <span class="sm:hidden">Custom</span><span class="hidden sm:inline">Custom API</span>
-        </button>
-      </div>
-
       <!-- Header Deactivated Status Indicator -->
       <span id="headerStatusBadge"
         class="hidden text-[10px] font-black uppercase px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 whitespace-nowrap">Deactivated</span>
@@ -1401,7 +1387,7 @@
         <p><strong>2. Services</strong><br>We provide an AI-powered service for generating Sinhala subtitles from video
           and audio files. We do not guarantee 100% accuracy and users must review generated subtitles.</p>
         <p><strong>3. User Accounts</strong><br>Users must provide accurate information when registering. You are
-          responsible for maintaining the security of your account and API keys.</p>
+          responsible for maintaining the security of your account.</p>
         <p><strong>4. Payments & Subscriptions</strong><br>Payments are processed securely via PayHere. Subscriptions
           grant you a specific minute quota per month. Pay-per-video credits are valid until consumed.</p>
         <p><strong>5. Acceptable Use</strong><br>You may not use our service to process illegal, copyrighted (without
@@ -1501,7 +1487,7 @@
             </span>
           </div>
           <p class="text-[10px] text-slate-400 mt-2">
-            💡 CapZone Facebook Meta MMS Engine මගින් උපසිරැසි සීමා රහිතව නොමිලේ (පැය 2 දක්වා) ලබාගත හැක.
+            💡 KaveezCloud AI Engine මගින් උපසිරැසි සීමා රහිතව නොමිලේ (පැය 2 දක්වා) ලබාගත හැක.
           </p>
         </div>
 
@@ -1516,37 +1502,6 @@
             </div>
           </div>
         </div>
-
-        <!-- 5. API Keys (Collapsible / Advanced) -->
-        <details class="group p-3 rounded-2xl bg-black/30 border border-white/5 text-xs">
-          <summary class="font-bold text-slate-300 cursor-pointer list-none flex items-center justify-between">
-            <span class="flex items-center gap-1.5"><i data-lucide="key" class="w-4 h-4 text-purple-400"></i> Personal
-              Gemini API Key (Free Subtitles)</span>
-            <i data-lucide="chevron-down" class="w-4 h-4 transition-transform group-open:rotate-180 text-slate-400"></i>
-          </summary>
-          <div class="mt-3 space-y-3 pt-3 border-t border-white/5">
-            <div>
-              <label class="text-[10px] font-bold text-slate-300 uppercase tracking-wider mb-1 block">Google Gemini API
-                Key</label>
-              <input type="text" id="userApiKey" autocomplete="off" placeholder="Paste your Gemini API key (AIzaSy...)"
-                class="input-fix w-full px-3 py-2 rounded-xl text-xs outline-none bg-slate-900 border border-slate-700 text-white font-mono" />
-              <p class="text-[10px] text-slate-400 mt-1">Get your free key from <a
-                  href="https://aistudio.google.com/app/apikey" target="_blank" class="text-indigo-400 underline">Google
-                  AI Studio</a>. Subtitles will be 100% free!</p>
-            </div>
-            <div class="flex gap-2">
-              <button id="saveApiKeyBtn" type="button"
-                onclick="saveApiKeys(); showPopup('Gemini API Key saved successfully!', 'Saved', 'success'); closeModal('profileModal')"
-                class="flex-1 py-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-bold text-xs rounded-xl shadow-md hover:from-indigo-600 hover:to-purple-600 transition-all">
-                Save API Key
-              </button>
-              <button id="clearApiKeyBtn" type="button" onclick="clearUserApiKey()"
-                class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-red-400 text-xs font-semibold rounded-xl border border-slate-700 transition-colors">
-                Clear
-              </button>
-            </div>
-          </div>
-        </details>
 
         <!-- 6. Sign Out Button -->
         <button id="logoutBtn" onclick="handleLogout()"
@@ -2712,143 +2667,16 @@
         if (event.preventDefault) event.preventDefault();
         if (event.stopPropagation) event.stopPropagation();
       }
-
-      // Non-AI media tools NEVER trigger API popup
-      if (['fbModal', 'tiktokModal', 'bgRemoverModal', 'wallpaperModal', 'qualityModal'].includes(modalId)) {
-        openModal(modalId, event);
-        return;
-      }
-
-      const apiType = localStorage.getItem('capzone_api_type') || 'server';
-      if (apiType) {
-        openModal(modalId, event);
-        return;
-      }
-
-      window.pendingToolModal = modalId;
-      showApiModal();
+      openModal(modalId, event);
     };
 
-    function checkApiConfiguration() {
-      // Kept for backward-compatibility but does not force popup on page load
-      const apiType = localStorage.getItem('capzone_api_type');
-      if (!apiType) {
-        localStorage.setItem('capzone_api_type', 'server');
-      }
-    }
-
-    function showApiModal() {
-      const modal = document.getElementById('apiConfigModal');
-      const content = document.getElementById('apiConfigContent');
-      if (!modal || !content) return;
-
-      const ownSection = document.getElementById('ownApiSection');
-      const optionsList = document.getElementById('apiOptionsList');
-      if (ownSection) ownSection.classList.add('hidden');
-      if (optionsList) optionsList.classList.remove('hidden');
-
-      modal.style.display = 'flex';
-      modal.classList.remove('hidden');
-      modal.classList.add('flex');
-      document.body.classList.add('overflow-hidden');
-      setTimeout(() => {
-        content.classList.remove('scale-95', 'opacity-0');
-        content.classList.add('scale-100', 'opacity-100');
-      }, 10);
-    }
-
-    function selectApiOption(type) {
-      if (type === 'server') {
-        localStorage.setItem('capzone_api_type', 'server');
-        if (typeof window.updateApiToggleUI === 'function') window.updateApiToggleUI();
-        closeApiModal();
-      } else if (type === 'own') {
-        const optionsList = document.getElementById('apiOptionsList');
-        if (optionsList) optionsList.classList.add('hidden');
-        const ownSection = document.getElementById('ownApiSection');
-        if (ownSection) ownSection.classList.remove('hidden');
-        document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.add('hidden'));
-        const currentKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
-        const keyInput = document.getElementById('geminiApiKeyInput');
-        if (keyInput) {
-          if (currentKey) keyInput.value = currentKey;
-          setTimeout(() => {
-            keyInput.focus();
-            keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 150);
-        }
-      }
-    }
-
-    function backToOptions() {
-      const ownSection = document.getElementById('ownApiSection');
-      if (ownSection) ownSection.classList.add('hidden');
-      const optionsList = document.getElementById('apiOptionsList');
-      if (optionsList) optionsList.classList.remove('hidden');
-      document.querySelectorAll('#apiConfigModal button[onclick^="selectApiOption"]').forEach(b => b.classList.remove('hidden'));
-    }
-
-    function cancelApiModal() {
-      if (!localStorage.getItem('capzone_api_type')) {
-        localStorage.setItem('capzone_api_type', 'server');
-      }
-      closeApiModal();
-    }
-
-    function saveApiKey() {
-      const keyInput = document.getElementById('geminiApiKeyInput');
-      if (!keyInput) return;
-      const key = keyInput.value.trim();
-      if (!key) {
-        if (typeof showPopup === 'function') {
-          showPopup('\u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0DC0\u0DBD\u0D82\u0D9C\u0DD4 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', '\u0D85\u0DC0\u0DC0\u0DCF\u0DAF\u0DBF\u0DBA\u0DD2', 'warning');
-        } else {
-          window.customAlert('Please enter a valid API key.');
-        }
-        return;
-      }
-      localStorage.setItem('capzone_api_type', 'own');
-      localStorage.setItem('capzone_gemini_key', key);
-      localStorage.setItem('gemini_api_key', key);
-
-      const profileInput = document.getElementById('userApiKey');
-      if (profileInput) {
-        profileInput.value = key;
-      }
-
-      if (typeof window.updateApiToggleUI === 'function') {
-        window.updateApiToggleUI();
-      }
-
-      closeApiModal();
-      if (typeof showPopup === 'function') {
-        showPopup('Private API Key \u0D91\u0D9A \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 \u0DC3\u0DD4\u0DBB\u0D87\u0D9A\u0DD2\u0DAB\u0DD2. \u0DAF\u0DB8\u0DCA Custom API Mode \u0DC3\u0D9A\u0DCA\u0DBB\u0DD3\u0DBA\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
-      }
-    }
-
-    function closeApiModal() {
-      const modal = document.getElementById('apiConfigModal');
-      const content = document.getElementById('apiConfigContent');
-      if (!modal || !content) return;
-
-      if (!localStorage.getItem('capzone_api_type')) {
-        localStorage.setItem('capzone_api_type', 'server');
-      }
-
-      content.classList.remove('scale-100', 'opacity-100');
-      content.classList.add('scale-95', 'opacity-0');
-
-      setTimeout(() => {
-        modal.classList.remove('flex');
-        modal.classList.add('hidden');
-        modal.style.display = 'none';
-        document.body.classList.remove('overflow-hidden');
-        if (window.pendingToolModal) {
-          if (typeof window.openModal === 'function') window.openModal(window.pendingToolModal);
-          window.pendingToolModal = null;
-        }
-      }, 300);
-    }
+    function checkApiConfiguration() {}
+    function showApiModal() {}
+    function selectApiOption() {}
+    function backToOptions() {}
+    function cancelApiModal() {}
+    function saveApiKey() {}
+    function closeApiModal() {}
 
     window.openModal = function (modalId, event) {
       if (event) {
@@ -3468,154 +3296,10 @@
       }
     };
 
-    window.clearUserApiKey = function () {
-      localStorage.removeItem('capzone_api_key');
-      localStorage.removeItem('capzone_gemini_key');
-      localStorage.removeItem('gemini_api_key');
-      localStorage.setItem('capzone_api_type', 'server');
+    window.clearUserApiKey = function () {};
+    function saveApiKeys() {}
 
-      const userApiKey = document.getElementById('userApiKey');
-      const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-      if (userApiKey) userApiKey.value = '';
-      if (geminiApiKeyInput) geminiApiKeyInput.value = '';
-
-      if (window.currentUserEmail) {
-        fetch(`${window.API_BASE_URL || ''}/api/save-api-key`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: window.currentUserEmail, api_key: '' })
-        }).catch(e => console.error("Could not clear API key", e));
-      }
-      if (typeof showPopup === 'function') showPopup('Gemini API Key removed.', 'Cleared', 'info');
-      closeModal('profileModal');
-      if (window.currentMediaDuration !== null && typeof validateAndDisplayVideoDetails === 'function') {
-        validateAndDisplayVideoDetails(window.currentMediaDuration, currentSrtFile ? currentSrtFile.size : 0);
-      }
-    };
-
-    function saveApiKeys() {
-      const geminiKey = document.getElementById('userApiKey')?.value?.trim() || document.getElementById('geminiApiKeyInput')?.value?.trim();
-
-      if (geminiKey && geminiKey !== 'default') {
-        window.syncApiKeys(geminiKey);
-
-        if (window.currentUserEmail) {
-          fetch(`${window.API_BASE_URL || ''}/api/save-api-key`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: window.currentUserEmail, api_key: geminiKey })
-          }).catch(e => console.error("Could not save API key", e));
-        }
-      } else {
-        window.clearUserApiKey();
-      }
-      if (window.currentMediaDuration !== null && typeof validateAndDisplayVideoDetails === 'function') {
-        validateAndDisplayVideoDetails(window.currentMediaDuration, currentSrtFile ? currentSrtFile.size : 0);
-      }
-    }
-
-    window.openApiKeySettings = function (event) {
-      if (typeof openModal === 'function') {
-        openModal('profileModal', event);
-      }
-      const details = document.querySelector('#profileModal details');
-      if (details) details.open = true;
-      setTimeout(() => {
-        const input = document.getElementById('userApiKey');
-        if (input) {
-          input.focus();
-          input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 250);
-    };
-    window.openSettingsModal = window.openApiKeySettings;
-
-    let currentSrtFile = null;
-    window.currentMediaDuration = null;
-
-    function formatTimeSec(seconds) {
-      if (isNaN(seconds) || seconds < 0) return '0s';
-      const m = Math.floor(seconds / 60);
-      const s = Math.floor(seconds % 60);
-      if (m > 0) return `${m}m ${s}s`;
-      return `${s}s`;
-    }
-
-    function updateSrtFileInfo(input) {
-      if (!input.files || !input.files[0]) return;
-      currentSrtFile = input.files[0];
-      const fileNameEl = document.getElementById('srtFileName');
-      if (fileNameEl) fileNameEl.textContent = currentSrtFile.name;
-
-      // 🎙️ Show Sinhala Audio Clarity Advisory Popup ("හොඳින් පැහැදිලිව ඇසෙන වීඩියෝවක්...")
-      try {
-        if (typeof showSrtAudioNotice === 'function') {
-          showSrtAudioNotice();
-        }
-      } catch (e) {
-        console.warn('Audio notice warning:', e);
-      }
-
-      const validationCard = document.getElementById('srtValidationCard');
-      const submitBtn = document.getElementById('srtSubmitBtn');
-      const alertEl = document.getElementById('srtValidationAlert');
-      const durationEl = document.getElementById('srtDetectedDuration');
-      const tierEl = document.getElementById('srtMatchedTier');
-      const statusEl = document.getElementById('srtAccountStatus');
-
-      if (validationCard) validationCard.style.display = 'block';
-
-      // 1. File size check (500MB max upload limit)
-      if (currentSrtFile.size > 500 * 1024 * 1024) {
-        if (durationEl) durationEl.innerText = '-';
-        if (tierEl) tierEl.innerText = 'Exceeds 500MB Limit';
-        if (statusEl) statusEl.innerText = 'Rejected';
-        if (alertEl) {
-          alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/15 border border-red-500/30 text-red-300 flex items-start gap-2.5';
-          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 500 MB upload limit. Video rejected.</div>`;
-        }
-        if (submitBtn) submitBtn.disabled = true;
-        if (window.lucide) window.lucide.createIcons();
-        return;
-      }
-
-      // 2. Pre-extract duration using HTML5 media element
-      if (durationEl) durationEl.innerText = 'Calculating duration...';
-      if (tierEl) tierEl.innerText = 'Analyzing...';
-      if (statusEl) statusEl.innerText = 'Checking...';
-      if (alertEl) {
-        alertEl.className = 'p-3 rounded-xl text-xs bg-slate-800 border border-slate-700 text-slate-300 flex items-center gap-2';
-        alertEl.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin text-purple-400 shrink-0"></i> <span>Reading video metadata before processing...</span>`;
-      }
-      if (window.lucide) window.lucide.createIcons();
-
-      const tempMedia = document.createElement(currentSrtFile.type.startsWith('audio') ? 'audio' : 'video');
-      tempMedia.preload = 'metadata';
-      const objUrl = URL.createObjectURL(currentSrtFile);
-      tempMedia.src = objUrl;
-
-      tempMedia.onloadedmetadata = () => {
-        URL.revokeObjectURL(objUrl);
-        const durationSecs = tempMedia.duration;
-        window.currentMediaDuration = durationSecs;
-        validateAndDisplayVideoDetails(durationSecs, currentSrtFile.size);
-      };
-
-      tempMedia.onerror = () => {
-        URL.revokeObjectURL(objUrl);
-        window.currentMediaDuration = null;
-        if (durationEl) durationEl.innerText = 'Server (FFmpeg) Detection';
-        if (tierEl) tierEl.innerText = 'Calculated on upload';
-        if (alertEl) {
-          alertEl.className = 'p-3 rounded-xl text-xs bg-amber-500/15 border border-amber-500/30 text-amber-300 flex items-start gap-2';
-          alertEl.innerHTML = `<i data-lucide="info" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i> <div>Duration & pricing tier will be inspected by server FFmpeg before SRT generation starts.</div>`;
-        }
-        if (submitBtn) submitBtn.disabled = false;
-        if (window.lucide) window.lucide.createIcons();
-      };
-    }
-
-    function validateAndDisplayVideoDetails(durationSecs, fileSize) {
+        function validateAndDisplayVideoDetails(durationSecs, fileSize) {
       const validationCard = document.getElementById('srtValidationCard');
       const submitBtn = document.getElementById('srtSubmitBtn');
       const alertEl = document.getElementById('srtValidationAlert');
@@ -3656,12 +3340,12 @@
         return;
       }
 
-      // 100% Free & Unlimited generation powered by Facebook Meta MMS Neural AI Engine
-      if (tierEl) tierEl.innerHTML = `<span class="text-emerald-400 font-bold">Facebook Meta MMS Neural Engine</span> <span class="text-emerald-300 text-xs font-semibold">(Up to 2 Hours)</span>`;
+      // 100% Free & Unlimited generation powered by KaveezCloud AI Engine
+      if (tierEl) tierEl.innerHTML = `<span class="text-emerald-400 font-bold">KaveezCloud AI Engine</span> <span class="text-emerald-300 text-xs font-semibold">(Up to 2 Hours)</span>`;
       if (statusEl) statusEl.innerHTML = `<span class="text-emerald-400 font-bold">● Free & Unlimited</span>`;
       if (alertEl) {
         alertEl.className = 'p-3 rounded-xl text-xs bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 flex items-start gap-2.5';
-        alertEl.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <div><strong>Ready to Generate:</strong> Spoken dialogue will be transcribed into Sinhala & English script with Facebook Meta MMS millisecond acoustic alignment. 100% Free for videos up to 2 hours!</div>`;
+        alertEl.innerHTML = `<i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400 shrink-0 mt-0.5"></i> <div><strong>Ready to Generate:</strong> Spoken dialogue will be transcribed into Sinhala & English script with KaveezCloud AI millisecond acoustic alignment. 100% Free for videos up to 2 hours!</div>`;
       }
       if (submitBtn) submitBtn.disabled = false;
       if (window.lucide) window.lucide.createIcons();
@@ -3930,15 +3614,9 @@
 
       const badge = document.getElementById('apiStatusBadge');
       if (badge) {
-        const type = localStorage.getItem('capzone_api_type');
-        badge.classList.remove('hidden', 'bg-purple-500/20', 'text-purple-300', 'border-purple-500/30', 'bg-indigo-500/20', 'text-indigo-300', 'border-indigo-500/30');
-        if (type === 'own') {
-          badge.textContent = 'Custom API';
-          badge.classList.add('bg-indigo-500/20', 'text-indigo-300', 'border-indigo-500/30');
-        } else {
-          badge.textContent = 'Cloud API';
-          badge.classList.add('bg-purple-500/20', 'text-purple-300', 'border-purple-500/30');
-        }
+        badge.classList.remove('hidden', 'bg-purple-500/20', 'text-purple-300', 'border-purple-500/30');
+        badge.textContent = 'KaveezCloud AI';
+        badge.classList.add('bg-indigo-500/20', 'text-indigo-300', 'border-indigo-500/30');
       }
 
       document.getElementById('srtResultArea').style.display = 'none';
@@ -3990,8 +3668,7 @@
       formData.append('fontFormat', document.getElementById('srtLanguage').value === 'en' ? 'unicode' : 'legacy');
       formData.append('wordsLimit', document.getElementById('srtWordsLimit')?.value || '1');
 
-      const customApiKeySrt = localStorage.getItem('capzone_api_type') === 'own' ? localStorage.getItem('capzone_gemini_key') : null;
-      if (customApiKeySrt) formData.append('apiKey', customApiKeySrt);
+      
 
       function renderSrtResult(data) {
         if (window._isSrtCancelled) return;
@@ -4843,12 +4520,11 @@
         class="p-4 sm:p-5 rounded-2xl bg-white/[0.04] border border-white/10 text-slate-200 text-sm leading-relaxed mb-6 text-left space-y-3 font-medium">
         <div class="flex items-start gap-2.5">
           <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 mt-2 shrink-0"></span>
-          <p><strong>Free ඕනෑම තරමක්</strong> මෙය භාවිත කිරීමට හැක. ඒ සඳහා ඔයාගෙම <strong>Gemini API Key</strong> එක use
-            කිරීමට හැක. එහි දෙන free trial version එක ඔයාට භාවිත කරන්න පුළුවන්.</p>
+          <p><strong>100% Free & Unlimited:</strong> KaveezCloud AI Engine මගින් ඕනෑම දිගු (පැය 2 දක්වා) වීඩියෝවක් සඳහා උපසිරැසි (SRT) සම්පූර්ණයෙන්ම නොමිලේ ජනනය කරගත හැක.</p>
         </div>
         <div class="flex items-start gap-2.5">
           <span class="inline-block w-2 h-2 rounded-full bg-purple-400 mt-2 shrink-0"></span>
-          <p>එහෙම නැති නම් ඔයාට අපේ <strong>KaveezCloud system</strong> එක මගින් ගෙවීමක් සිදු කර මෙය භාවිත කළ හැක.</p>
+          <p>කිසිදු API key එකක් අවශ්‍ය නොවන අතර සිංහල සහ ඉංග්‍රීසි මිශ්‍ර කතාබස් නිවැරදිව හඳුනාගෙන මිලි-තත්පර නිරවද්‍යතාවයෙන් උපසිරැසි සකස් වේ.</p>
         </div>
         <div class="flex items-start gap-2.5 pt-2 border-t border-white/10 text-xs text-amber-300 font-semibold">
           <i data-lucide="info" class="w-4 h-4 shrink-0 mt-0.5"></i>
@@ -4872,95 +4548,6 @@
       </button>
     </div>
   </div>
-
-  <!-- API Configuration Modal -->
-  <div id="apiConfigModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-4">
-    <div class="absolute inset-0 bg-black/80 backdrop-blur-md cursor-pointer" id="apiConfigBackdrop"
-      onclick="cancelApiModal()"></div>
-    <div
-      class="glass-card w-full max-w-lg rounded-2xl p-6 lg:p-8 relative z-10 transform scale-95 opacity-0 transition-all duration-300"
-      id="apiConfigContent">
-
-      <div class="flex items-center gap-4 mb-6 relative">
-        <div
-          class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
-          <i data-lucide="cpu" class="w-6 h-6 text-white"></i>
-        </div>
-        <div>
-          <h2 class="text-2xl font-black text-white tracking-wide">Processing Engine Setup</h2>
-          <p class="text-sm text-indigo-300">Configure high-speed processing</p>
-        </div>
-        <!-- Close button for API Modal -->
-        <button onclick="cancelApiModal()"
-          class="absolute top-0 right-0 p-2 text-gray-400 hover:text-white transition-colors">
-          <i data-lucide="x" class="w-5 h-5"></i>
-        </button>
-      </div>
-
-      <div id="apiOptionsList" class="space-y-4 mt-8">
-        <!-- Option 1: Own API -->
-        <button onclick="selectApiOption('own')"
-          class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-indigo-400 transition-all group flex items-start gap-4">
-          <div class="mt-1 flex-shrink-0">
-            <i data-lucide="key" class="w-5 h-5 text-indigo-400 group-hover:text-indigo-300"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white mb-1">Connect Custom Gemini API Key</h3>
-            <p class="text-xs text-gray-400">100% Free key from Google Studio. Unlimited requests & highest speed.
-            </p>
-          </div>
-        </button>
-
-        <!-- Option 2: Server API -->
-        <button onclick="selectApiOption('server')"
-          class="w-full text-left p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-purple-400 transition-all group flex items-start gap-4">
-          <div class="mt-1 flex-shrink-0">
-            <i data-lucide="server" class="w-5 h-5 text-purple-400 group-hover:text-purple-300"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white mb-1">Use Cloud API</h3>
-            <p class="text-xs text-gray-400">Default cloud processing. Ready out of the box, no API key required.</p>
-          </div>
-        </button>
-
-        <!-- Option 3: Cancel / Continue Free -->
-        <button onclick="cancelApiModal()"
-          class="w-full text-center py-2.5 rounded-xl border border-white/10 hover:bg-white/5 text-gray-400 hover:text-white text-xs font-semibold transition-colors">
-          Cancel & Continue with KaveezCloud Cloud
-        </button>
-      </div>
-
-      <!-- Own API Key Input Section (Hidden by default) -->
-      <div id="ownApiSection" class="hidden mt-6 pt-6 border-t border-white/10">
-        <label class="block text-xs font-bold text-gray-300 uppercase tracking-wider mb-2">Enter your Gemini API
-          Key</label>
-        <input type="text" id="geminiApiKeyInput" autocomplete="off"
-          style="background-color: rgba(15, 23, 42, 0.9) !important; color: #ffffff !important;"
-          class="w-full glass-input text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 mb-2"
-          placeholder="Paste Gemini API key here (AIzaSy...)">
-        <p class="text-[10px] text-gray-400 mb-4">Get your free key from Google Studio.</p>
-
-        <a href="https://aistudio.google.com/app/apikey" target="_blank"
-          class="w-full mb-4 flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 hover:bg-indigo-500/30 transition-colors text-sm font-bold">
-          Get Free Key
-        </a>
-
-        <div class="flex justify-between items-center gap-3">
-          <button onclick="cancelApiModal()"
-            class="px-4 py-2 rounded-lg text-sm font-semibold text-gray-400 hover:text-white transition-colors">Cancel</button>
-          <div class="flex items-center gap-2">
-            <button onclick="backToOptions()"
-              class="px-4 py-2 rounded-lg text-sm font-bold text-gray-300 hover:text-white transition-colors">Back</button>
-            <button onclick="saveApiKey()"
-              class="px-6 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold shadow-[0_0_15px_rgba(79,70,229,0.4)] transition-all">Save
-              & Continue</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
 
   <!-- Intelligent Project Details & Studio Modal -->
   <div id="projectDetailModal"
@@ -5849,157 +5436,10 @@
       });
     };
 
-    window.toggleApi = function (type) {
-      if (type === 'own') {
-        const existingKey = (localStorage.getItem('capzone_gemini_key') || localStorage.getItem('gemini_api_key') || '').trim();
-        if (!existingKey) {
-          // If private key is not entered: guide user directly to the private key input
-          if (typeof showPopup === 'function') {
-            showPopup('\u0D94\u0DB6 \u0DAD\u0DC0\u0DB8 Private API Key \u0D91\u0D9A\u0D9A\u0DCA \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB \u0DB1\u0DDC\u0DB8\u0DD0\u0DAD. \u0D9A\u0DBB\u0DD4\u0DAB\u0DCF\u0D9A\u0DBB \u0D94\u0DB6\u0DDA Private Key \u0D91\u0D9A \u0D87\u0DAD\u0DD4\u0DC5\u0DAD\u0DCA \u0D9A\u0DBB\u0DB1\u0DCD\u0DB1.', 'Private Key \u0D85\u0DC0\u0DC1\u0DDF\u0DBA\u0DD2', 'info');
-          }
-          if (typeof showApiModal === 'function') {
-            showApiModal();
-            if (typeof selectApiOption === 'function') {
-              selectApiOption('own');
-            }
-            setTimeout(() => {
-              const keyInput = document.getElementById('geminiApiKeyInput');
-              if (keyInput) {
-                keyInput.focus();
-                keyInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
-              }
-            }, 200);
-          }
-          return;
-        } else {
-          // Private key already entered: auto-switch smoothly!
-          localStorage.setItem('capzone_api_type', 'own');
-          updateApiToggleUI();
-          if (typeof showPopup === 'function') {
-            showPopup('Private Key \u0D91\u0D9A \u0DC4\u0DB3\u0DD4\u0DB1\u0DCF\u0D9C\u0DD0\u0DB1\u0DD2\u0DAB\u0DD2. \u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DC0 Custom API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
-          }
-          return;
-        }
-      }
-
-      // Switch to Server Cloud API
-      localStorage.setItem('capzone_api_type', 'server');
-      updateApiToggleUI();
-      if (typeof showPopup === 'function') {
-        showPopup('KaveezCloud Server Cloud API Mode \u0DC0\u0DD9\u0DAD \u0DB8\u0DCF\u0DBB\u0DD4 \u0DC0\u0DD2\u0DBF!', '\u0DC3\u0DCF\u0DBB\u0DDF\u0DAE\u0D9A\u0DBF', 'success');
-      }
-    };
-
-    window.updateApiToggleUI = function () {
-      const currentType = localStorage.getItem('capzone_api_type') || 'server';
-      const isServer = currentType === 'server';
-
-      // Desktop Toggle
-      const btnServer = document.getElementById('btnApiServer');
-      const btnOwn = document.getElementById('btnApiOwn');
-      if (btnServer && btnOwn) {
-        if (isServer) {
-          btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-          btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-        } else {
-          btnOwn.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-          btnServer.className = "px-2 sm:px-3 py-1 text-[9px] sm:text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-        }
-      }
-
-      // Mobile Toggle & Badge
-      const btnServerMob = document.getElementById('btnApiServerMobile');
-      const btnOwnMob = document.getElementById('btnApiOwnMobile');
-      const statusBadge = document.getElementById('mobileApiStatusBadge');
-      if (btnServerMob && btnOwnMob) {
-        if (isServer) {
-          btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-purple-500 text-white shadow-md";
-          btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-          if (statusBadge) {
-            statusBadge.innerText = "Cloud Active";
-            statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-300 border border-purple-500/40 font-semibold";
-          }
-        } else {
-          btnOwnMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all bg-emerald-500 text-white shadow-md";
-          btnServerMob.className = "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-full transition-all text-gray-400 hover:text-gray-200 cursor-pointer";
-          if (statusBadge) {
-            statusBadge.innerText = "Custom Active";
-            statusBadge.className = "text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 font-semibold";
-          }
-        }
-      }
-    };
-
-    function openNoticeModal() {
-      if (localStorage.getItem('capzone_dismiss_notice_modal') === 'true') {
-        return;
-      }
-      const modal = document.getElementById('capzoneNoticeModal');
-      if (modal) {
-        modal.classList.remove('opacity-0', 'pointer-events-none');
-        modal.classList.add('opacity-100', 'pointer-events-auto');
-        const box = modal.querySelector('div');
-        if (box) {
-          box.classList.remove('scale-95');
-          box.classList.add('scale-100');
-        }
-        if (window.lucide) lucide.createIcons();
-      }
-    }
-    function closeNoticeModal() {
-      const chk = document.getElementById('dontShowNoticeAgain');
-      if (chk && chk.checked) {
-        localStorage.setItem('capzone_dismiss_notice_modal', 'true');
-      }
-      const modal = document.getElementById('capzoneNoticeModal');
-      if (modal) {
-        modal.classList.add('opacity-0', 'pointer-events-none');
-        modal.classList.remove('opacity-100', 'pointer-events-auto');
-        const box = modal.querySelector('div');
-        if (box) {
-          box.classList.add('scale-95');
-          box.classList.remove('scale-100');
-        }
-      }
-    }
-    window.openNoticeModal = openNoticeModal;
-    window.closeNoticeModal = closeNoticeModal;
-
-    function openVideoEditDevModal(event) {
-      if (event) {
-        if (event.preventDefault) event.preventDefault();
-        if (event.stopPropagation) event.stopPropagation();
-      }
-      const modal = document.getElementById('videoEditDevModal');
-      if (modal) {
-        modal.classList.remove('opacity-0', 'pointer-events-none');
-        modal.classList.add('opacity-100', 'pointer-events-auto');
-        const box = modal.querySelector('div');
-        if (box) {
-          box.classList.remove('scale-95');
-          box.classList.add('scale-100');
-        }
-        if (window.lucide) lucide.createIcons();
-      }
-    }
-
-    function closeVideoEditDevModal() {
-      const modal = document.getElementById('videoEditDevModal');
-      if (modal) {
-        modal.classList.add('opacity-0', 'pointer-events-none');
-        modal.classList.remove('opacity-100', 'pointer-events-auto');
-        const box = modal.querySelector('div');
-        if (box) {
-          box.classList.add('scale-95');
-          box.classList.remove('scale-100');
-        }
-      }
-    }
-    window.openVideoEditDevModal = openVideoEditDevModal;
-    window.closeVideoEditDevModal = closeVideoEditDevModal;
+    window.toggleApi = function () {};
+    window.updateApiToggleUI = function () {};
 
     document.addEventListener('DOMContentLoaded', () => {
-      updateApiToggleUI();
       if (typeof window.loadAndRenderProjects === 'function') {
         window.loadAndRenderProjects();
       }
@@ -6034,20 +5474,7 @@
           style="display: none;">0</span>
       </button>
 
-      <!-- Plans Dedicated Mobile Action Button -->
-      <button onclick="openToolWithIntercept('subscriptionModal', event)" id="mobileDockPlans"
-        class="flex flex-col items-center gap-1 py-1 px-2.5 rounded-xl text-amber-400 hover:text-amber-300 transition-all active:scale-95">
-        <div class="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.5)]">
-          <i data-lucide="zap" class="w-3 h-3 text-white fill-white"></i>
-        </div>
-        <span class="text-[10px] font-extrabold tracking-wide text-amber-300 uppercase">Plans</span>
-      </button>
 
-      <button onclick="showApiModal()"
-        class="flex flex-col items-center gap-1 py-1 px-2 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
-        <i data-lucide="cpu" class="w-5 h-5"></i>
-        <span class="text-[10px] font-bold tracking-wide">AI Setup</span>
-      </button>
       <button onclick="openModal('profileModal')"
         class="flex flex-col items-center gap-1 py-1 px-2 rounded-xl text-gray-400 hover:text-white transition-all active:scale-95">
         <i data-lucide="user" class="w-5 h-5"></i>
