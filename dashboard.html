@@ -251,6 +251,18 @@
 
     window.currentUserData = null;
 
+    // Global Time Formatter Helper (seconds -> '2m 8s' / '1h 15m 20s')
+    window.formatTimeSec = function (seconds) {
+      if (isNaN(seconds) || seconds === null || seconds === undefined || seconds < 0) return '0s';
+      const totalSecs = Math.floor(seconds);
+      const hrs = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+      if (hrs > 0) return `${hrs}h ${mins}m ${secs}s`;
+      if (mins > 0) return `${mins}m ${secs}s`;
+      return `${secs}s`;
+    };
+
     // 1. Function to update all Dashboard UI elements with live user balance & subscription data
     window.updateUserProfileUI = function (data) {
       if (!data) return;
@@ -3387,6 +3399,18 @@
     }
     window.updateSrtFileInfo = updateSrtFileInfo;
 
+    function formatTimeSec(seconds) {
+      if (typeof window.formatTimeSec === 'function') return window.formatTimeSec(seconds);
+      if (isNaN(seconds) || seconds === null || seconds === undefined || seconds < 0) return '0s';
+      const totalSecs = Math.floor(seconds);
+      const hrs = Math.floor(totalSecs / 3600);
+      const mins = Math.floor((totalSecs % 3600) / 60);
+      const secs = totalSecs % 60;
+      if (hrs > 0) return `${hrs}h ${mins}m ${secs}s`;
+      if (mins > 0) return `${mins}m ${secs}s`;
+      return `${secs}s`;
+    }
+
     function validateAndDisplayVideoDetails(durationSecs, fileSize) {
       const validationCard = document.getElementById('srtValidationCard');
       const submitBtn = document.getElementById('srtSubmitBtn');
@@ -3595,9 +3619,37 @@
       return new Blob([view], { type: 'audio/wav' });
     }
 
-    // High-Speed Direct Upload (Delegates audio extraction to server multi-threaded FFmpeg for zero UI freezing)
+    // High-Speed Client-Side Audio Extraction (Extracts 16kHz Mono WAV to reduce 60MB video to ~4MB for instant Cloudflare-safe upload)
     async function extractOptimizedAudio(file) {
-      return file;
+      if (!file) return file;
+      if (file.type && file.type.startsWith('audio/')) return file;
+      if (file.name && file.name.match(/\.(mp3|wav|m4a|ogg|aac|flac)$/i)) return file;
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return file;
+        const audioCtx = new AudioContextClass();
+        const decodedBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+
+        // Resample & Downmix to 16kHz Mono
+        const targetRate = 16000;
+        const offlineCtx = new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(1, Math.ceil(decodedBuffer.duration * targetRate), targetRate);
+        const source = offlineCtx.createBufferSource();
+        source.buffer = decodedBuffer;
+        source.connect(offlineCtx.destination);
+        source.start(0);
+        const resampledBuffer = await offlineCtx.startRendering();
+
+        const wavBlob = audioBufferToWavBlob(resampledBuffer, 16000);
+        try { if (audioCtx.close) audioCtx.close(); } catch(e){}
+
+        const baseName = (file.name || 'audio').replace(/\.[^/.]+$/, '');
+        return new File([wavBlob], `${baseName}.wav`, { type: 'audio/wav' });
+      } catch (e) {
+        console.warn('In-browser audio extraction notice, uploading original media:', e);
+        return file;
+      }
     }
 
     // Subtitle Word Limit Selector & Language Info Handlers
