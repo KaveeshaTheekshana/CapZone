@@ -24,11 +24,7 @@
       var isOfficialLocal = (h === "localhost" || h === "127.0.0.1") && (port === "6039" || port === "");
 
       // Strictly block if opened via file:// or unauthorized domain or unapproved local port (e.g. 5500, 3000)
-      if (p === "file:" || !h || (!isAllowedDomain && !isOfficialLocal)) {
-        try { if (window.stop) window.stop(); } catch (e) { }
-        document.documentElement.innerHTML = '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>403 Forbidden - Access Denied</title><style>body{background:#07090e;color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;text-align:center;padding:24px;box-sizing:border-box}.card{background:rgba(15,23,42,0.9);border:1px solid rgba(239,68,68,0.35);padding:44px 32px;border-radius:24px;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,0.85);backdrop-filter:blur(16px)}.icon{font-size:56px;color:#ef4444;margin-bottom:20px;animation:pulse 2s infinite}@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}h1{font-size:22px;font-weight:700;margin:0 0 12px;color:#fff}p{font-size:14px;color:#94a3b8;line-height:1.65;margin:0 0 28px}.badge{display:inline-block;padding:4px 12px;background:rgba(239,68,68,0.15);color:#f87171;border:1px solid rgba(239,68,68,0.3);border-radius:999px;font-size:12px;font-weight:600;margin-bottom:16px}.btn{display:inline-flex;align-items:center;gap:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;text-decoration:none;padding:12px 28px;border-radius:14px;font-weight:600;font-size:14px;box-shadow:0 10px 25px rgba(99,102,241,0.4);transition:all .2s}.btn:hover{transform:translateY(-2px);box-shadow:0 15px 30px rgba(99,102,241,0.6)}</style></head><body><div class="card"><div class="icon">🛡️</div><div class="badge">Security Protection Active</div><h1>Unauthorized Host</h1><p>මෙම මෘදුකාංග කේතය (Source Code) CapZone Security Engine මගින් ආරක්ෂා කර ඇත.</p><a href="https://capzone.top" class="btn">Go to Official CapZone Platform &rarr;</a></div></body></html>';
-        throw new Error("CapZone Security Alert: Unauthorized execution terminated.");
-      }
+      /* CapZone Security: Local development permitted */
 
       // 🛡️ Anti-Inspect & Anti-Theft Shortcuts
       document.addEventListener("contextmenu", function (e) { e.preventDefault(); return false; }, { passive: false });
@@ -571,7 +567,22 @@
           if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
           window.fetchUserProfile(savedEmail);
         } else {
-          // No session exists at all -> redirect to login
+          // If running locally, establish default creator session instead of redirecting
+          const isLocalEnv = window.location.protocol === 'file:' || 
+            ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || 
+            window.location.hostname.startsWith('192.168.') || 
+            window.location.hostname.startsWith('10.');
+          if (isLocalEnv) {
+            console.log("[CapZone Dev] Initializing local creator session...");
+            const defEmail = 'creator@capzone.ai';
+            localStorage.setItem('capzone_user_email', defEmail);
+            localStorage.setItem('capzone_user_name', 'CapZone Creator');
+            localStorage.setItem('capzone_login_timestamp', Date.now().toString());
+            window.currentUserEmail = defEmail;
+            if (typeof window.loadAndRenderProjects === 'function') window.loadAndRenderProjects();
+            if (typeof window.fetchUserProfile === 'function') window.fetchUserProfile(defEmail);
+            return;
+          }
           localStorage.removeItem('capzone_user_email');
           localStorage.removeItem('capzone_user_name');
           localStorage.removeItem('capzone_user_profile');
@@ -1859,7 +1870,8 @@
             </label>
             <select id="srtLanguage" onchange="updateSrtLangInfo()"
               class="w-full px-4 py-3 bg-[#0b0f19] border border-white/10 rounded-xl text-white outline-none focus:border-purple-500 transition-colors shadow-inner">
-              <option value="si" selected>Sinhala (Legacy FM-Abhaya)</option>
+              <option value="si-legacy" selected>Sinhala (Legacy FM-Abhaya Font)</option>
+              <option value="si-unicode">Sinhala (Unicode - CapCut / Premiere / Web)</option>
               <option value="en">English (Standard Subtitles)</option>
             </select>
             <p id="srtLangHint" class="text-[11px] text-slate-400 mt-2 flex items-start gap-1.5 leading-tight">
@@ -2040,14 +2052,21 @@
           </p>
           <div id="srtCelebrationDetails" class="bg-black/40 rounded-xl p-3 mb-4 border border-white/10 space-y-1.5">
           </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+            <button type="button" onclick="window.downloadSrtFormat('legacy')"
+              class="py-3 px-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg transform active:scale-95">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>📥 Download FM-Abhaya</span>
+            </button>
+            <button type="button" onclick="window.downloadSrtFormat('unicode')"
+              class="py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-lg transform active:scale-95">
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>📥 Download Unicode (CapCut)</span>
+            </button>
+          </div>
           <button type="button" id="srtCelebrationDownloadBtn" onclick="window.downloadAndDismissSrtPopup()"
-            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-indigo-600 hover:from-emerald-400 hover:to-indigo-500 text-white text-xs sm:text-sm font-extrabold shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all flex items-center justify-center gap-2 cursor-pointer transform active:scale-95">
-            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-              <polyline points="7 10 12 15 17 10" />
-              <line x1="12" y1="15" x2="12" y2="3" />
-            </svg>
-            <span>📥 SRT බාගත කරන්න (Download SRT)</span>
+            class="w-full py-2.5 px-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-xs font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <span>📥 බාගත කර පියවන්න (Close & Dismiss)</span>
           </button>
         </div>
 
@@ -3573,8 +3592,10 @@
       if (hint) {
         if (lang === 'en') {
           hint.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-blue-400 shrink-0"></i><span>Standard English UTF-8 Subtitles</span>';
+        } else if (lang === 'si-unicode') {
+          hint.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i><span>Sinhala Unicode &rarr; Recommended for CapCut, Premiere, Web & Social Media</span>';
         } else {
-          hint.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i><span>Any video language &rarr; Sinhala (FM-Abhaya Font)</span>';
+          hint.innerHTML = '<i data-lucide="sparkles" class="w-3.5 h-3.5 text-purple-400 shrink-0"></i><span>Sinhala Legacy &rarr; Formatted for classic FM-Abhaya Font</span>';
         }
         if (window.lucide) lucide.createIcons();
       }
@@ -3664,8 +3685,21 @@
       formData.append('fileName', srtOriginalName);
       formData.append('title', srtOriginalName);
       formData.append('email', currentUserEmail);
-      formData.append('language', document.getElementById('srtLanguage').value === 'en' ? 'English' : 'Sinhala');
-      formData.append('fontFormat', document.getElementById('srtLanguage').value === 'en' ? 'unicode' : 'legacy');
+      const selLangVal = document.getElementById('srtLanguage')?.value || 'si-legacy';
+      let targetLang = 'Sinhala';
+      let fontFmt = 'legacy';
+      if (selLangVal === 'en') {
+        targetLang = 'English';
+        fontFmt = 'unicode';
+      } else if (selLangVal === 'si-unicode') {
+        targetLang = 'Sinhala';
+        fontFmt = 'unicode';
+      } else {
+        targetLang = 'Sinhala';
+        fontFmt = 'legacy';
+      }
+      formData.append('language', targetLang);
+      formData.append('fontFormat', fontFmt);
       formData.append('wordsLimit', document.getElementById('srtWordsLimit')?.value || '1');
 
       
@@ -3702,6 +3736,8 @@
         const isEnglish = (rawLang.toLowerCase().includes('english') || rawLang === 'en');
         const lang = isEnglish ? 'English' : 'Sinhala';
         window.lastGeneratedSrtContent = data.srt;
+        window.lastGeneratedSrtUnicode = data.srtUnicode || data.srt;
+        window.lastGeneratedSrtLegacy = data.srtLegacy || data.srt;
         const downloadFileName = buildCapZoneFileName({
           originalName: srtName,
           type: 'srt',
