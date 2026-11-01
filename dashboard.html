@@ -941,6 +941,8 @@
   <script type="text/javascript" src="https://www.payhere.lk/lib/payhere.js"></script>
   <!-- Universal Bilingual Policy Modal Script (PayHere Compliant) -->
   <script src="public/policies-modal.js"></script>
+  <!-- Sinhala Typography & Unicode-to-FM-Abhaya Dual Subtitle Engine -->
+  <script src="sinhala-converter.js"></script>
 </head>
 
 <body
@@ -2587,6 +2589,81 @@
     }
 
     // ==========================================
+    // 📥 Universal Dual Subtitle Downloader (FM-Abhaya & Unicode)
+    // ==========================================
+    window.downloadSrtFormat = function (format) {
+      try {
+        let content = '';
+        let extSuffix = '';
+
+        if (format === 'legacy') {
+          content = window.lastGeneratedSrtLegacy || '';
+          if (!content && window.lastGeneratedSrtUnicode && typeof window.convertUnicodeToLegacy === 'function') {
+            content = window.convertUnicodeToLegacy(window.lastGeneratedSrtUnicode);
+          }
+          if (!content) content = window.lastGeneratedSrtContent || '';
+          extSuffix = '_FM_Abhaya';
+        } else {
+          content = window.lastGeneratedSrtUnicode || window.lastGeneratedSrtContent || '';
+          extSuffix = '_Unicode_CapCut';
+        }
+
+        if (!content || !content.trim()) {
+          if (window._activeSrtDownload && window._activeSrtDownload.blobUrl) {
+            const dlAnchor = document.createElement('a');
+            dlAnchor.style.display = 'none';
+            dlAnchor.href = window._activeSrtDownload.blobUrl;
+            dlAnchor.download = window._activeSrtDownload.downloadFileName || `Subtitles${extSuffix}.srt`;
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            setTimeout(() => { dlAnchor.remove(); }, 500);
+            return;
+          }
+          if (typeof showPopup === 'function') {
+            showPopup('උපසිරැසි දත්ත හමු නොවීය. කරුණාකර නැවත උත්සාහ කරන්න.', 'Notice', 'warning');
+          } else {
+            alert('No subtitle content available to download.');
+          }
+          return;
+        }
+
+        // Determine safe filename
+        let baseName = 'CapZone_Subtitles';
+        if (window.currentSrtFile && window.currentSrtFile.name) {
+          baseName = window.currentSrtFile.name.replace(/\.[^/.]+$/, '');
+        } else if (window._activeSrtDownload && window._activeSrtDownload.downloadFileName) {
+          baseName = window._activeSrtDownload.downloadFileName.replace(/\.[^/.]+$/, '').replace(/_(FM_Abhaya|Unicode_CapCut|CapZone|Sinhala|English)$/gi, '');
+        }
+        baseName = baseName.replace(/[^a-zA-Z0-9_\u0D80-\u0DFF-]/g, '_');
+        const filename = `${baseName}${extSuffix}.srt`;
+
+        // Direct Browser Blob Download Trigger
+        const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+        const blobUrl = URL.createObjectURL(blob);
+        const downloadAnchor = document.createElement('a');
+        downloadAnchor.style.display = 'none';
+        downloadAnchor.href = blobUrl;
+        downloadAnchor.download = filename;
+        document.body.appendChild(downloadAnchor);
+        downloadAnchor.click();
+
+        setTimeout(() => {
+          downloadAnchor.remove();
+          try { URL.revokeObjectURL(blobUrl); } catch (e) {}
+        }, 1500);
+
+        if (typeof showPopup === 'function') {
+          showPopup(`බාගත කිරීම ආරම්භ විය: ${filename}`, 'බාගත කිරීම සාර්ථකයි', 'success');
+        }
+      } catch (err) {
+        console.error('Download error:', err);
+        if (typeof showPopup === 'function') {
+          showPopup('බාගත කිරීමේදී දෝෂයක් ඇති විය: ' + err.message, 'Error', 'error');
+        }
+      }
+    };
+
+    // ==========================================
     // 🎙️ SRT Sinhala Audio Advisory Modal Controller
     // ==========================================
     function showSrtAudioNotice() {
@@ -3942,21 +4019,21 @@
       }
 
       window.downloadAndDismissSrtPopup = function () {
-        if (!window._activeSrtDownload) {
-          window.closeModal('srtModal');
-          return;
-        }
-        const { blobUrl, downloadFileName } = window._activeSrtDownload;
         try {
-          const downloadAnchor = document.createElement('a');
-          downloadAnchor.style.display = 'none';
-          downloadAnchor.href = blobUrl;
-          downloadAnchor.download = downloadFileName;
-          document.body.appendChild(downloadAnchor);
-          downloadAnchor.click();
-          setTimeout(() => { downloadAnchor.remove(); }, 300);
+          if (typeof window.downloadSrtFormat === 'function') {
+            window.downloadSrtFormat('legacy');
+          } else if (window._activeSrtDownload && window._activeSrtDownload.blobUrl) {
+            const { blobUrl, downloadFileName } = window._activeSrtDownload;
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.style.display = 'none';
+            downloadAnchor.href = blobUrl;
+            downloadAnchor.download = downloadFileName;
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            setTimeout(() => { downloadAnchor.remove(); }, 500);
+          }
         } catch (e) {
-          console.warn('Manual download notice:', e);
+          console.warn('Dismiss download notice:', e);
         }
 
         // Cleanly close modal popup
@@ -3975,9 +4052,6 @@
         const modalBox = document.getElementById('srtForm')?.closest('.glass-card');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
 
-        if (typeof showPopup === 'function') {
-          showPopup(`"${downloadFileName}" ගොනුව සාර්ථකව බාගත විය!`, 'All Done!', 'success');
-        }
         if (typeof window.loadAndRenderProjects === 'function') {
           window.loadAndRenderProjects(true);
         }
