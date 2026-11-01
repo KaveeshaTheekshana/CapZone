@@ -348,7 +348,7 @@
           const fetchFn = window.originalFetch || window.fetch;
           let res = await fetchFn(`${window.API_BASE_URL || ''}/api/user-info?email=${encodeURIComponent(uEmail)}&_t=${Date.now()}`, {
             cache: 'no-store',
-            headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'x-user-email': uEmail }
+            headers: { 'x-user-email': uEmail }
           }).catch(() => null);
 
 
@@ -4913,6 +4913,7 @@
         if (res.ok) {
           const serverProjects = await res.json();
           const cleanProjects = [];
+          const fetchedProjects = Array.isArray(serverProjects) ? serverProjects : (serverProjects && serverProjects.projects ? serverProjects.projects : []);
           fetchedProjects.forEach(p => {
             if (isDeletedItem(p)) {
               // Silently clean up ghost item from server
