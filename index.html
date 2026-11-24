@@ -144,37 +144,60 @@
       const nameEl = document.getElementById('srtFileName');
       if (nameEl) nameEl.textContent = 'Click or Drag & Drop Video / Audio File';
       const sizeEl = document.getElementById('srtFileSize');
-      if (sizeEl) sizeEl.textContent = 'MP4, MOV, MKV, MP3, WAV... up to 500 MB';
+      if (sizeEl) sizeEl.textContent = 'MP4, MOV, MKV, MP3, WAV... up to 1 GB (2-Hour Movies)';
     };
 
 
-    // 🌐 Dynamic API Base URL (Directly routes all API calls to Live VPS Backend)
+    // 🌐 Dynamic API Base URL (capzone.top -> capzone.kaveez.top Backend API; Local 6039 on localhost)
+    window.CAPZONE_VPS_ORIGIN = 'https://capzone.kaveez.top';
     window.API_BASE_URL = (function () {
       const host = (window.location.hostname || '').toLowerCase().trim();
       const port = window.location.port || '';
 
-      // Same-Origin on direct server port 6039 or production domain
-      if (port === '6039' || host === 'capzone.kaveez.top' || host.endsWith('.capzone.kaveez.top') || host === 'capzone.top' || host.endsWith('.capzone.top')) {
+      // Same-Origin when directly on backend port 6039 or API host
+      if (port === '6039' || host === 'capzone.kaveez.top' || host.endsWith('.capzone.kaveez.top')) {
         return '';
       }
 
-      // Local dev via Live Server (5500, 5502, etc.) -> connect directly to local Node server on 6039
+      // Local dev via Live Server (5500, 5599, etc.) -> prefer local Node server on 6039, fallback to Live VPS API if offline
       if (host === 'localhost' || host === '127.0.0.1') {
         return 'http://' + host + ':6039';
       }
 
-      return '';
+      // Public GitHub Pages / static frontend hosts (capzone.top, www.capzone.top, *.github.io) -> always call VPS API
+      return window.CAPZONE_VPS_ORIGIN;
     })();
+
+    const _isLiveDevOrigin = (() => {
+      const h = (window.location.hostname || '').toLowerCase().trim();
+      const p = window.location.port || '';
+      return (h === 'localhost' || h === '127.0.0.1') && p !== '6039';
+    })();
+
+    window._capzoneApiProbePromise = _isLiveDevOrigin ? (async () => {
+      try {
+        const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+        const timer = ctrl ? setTimeout(() => ctrl.abort(), 1100) : null;
+        const r = await (window.fetch ? fetch : function(){})(window.API_BASE_URL + '/api/recent-tasks', {
+          method: 'GET',
+          signal: ctrl ? ctrl.signal : undefined
+        });
+        if (timer) clearTimeout(timer);
+        if (!r || !r.ok) window.API_BASE_URL = window.CAPZONE_VPS_ORIGIN;
+      } catch (e) {
+        window.API_BASE_URL = window.CAPZONE_VPS_ORIGIN;
+      }
+    })() : Promise.resolve();
 
     window.formatMediaUrl = function (url) {
       if (!url || typeof url !== 'string') return '';
       if (url.startsWith('blob:') || url.startsWith('data:')) return url;
       let clean = url.trim();
       if (clean.includes('localhost:6039') || clean.includes('127.0.0.1:6039')) {
-        clean = clean.replace(/https?:\/\/(localhost|127\.0\.0\.1):6039/gi, API_BASE_URL);
+        clean = clean.replace(/https?:\/\/(localhost|127\.0\.0\.1):6039/gi, window.API_BASE_URL);
       }
       if (clean.startsWith('/')) {
-        clean = `${API_BASE_URL}${clean}`;
+        clean = `${window.API_BASE_URL}${clean}`;
       }
       return clean;
     };
@@ -185,7 +208,15 @@
     window.originalFetch = originalFetch;
     window.fetch = async function () {
       let [resource, config] = arguments;
-      if (typeof resource === 'string' && resource.includes('/api/')) {
+      if (typeof resource === 'string' && (resource.includes('/api/') || resource.includes('/uploads/'))) {
+        if (_isLiveDevOrigin && window._capzoneApiProbePromise) {
+          try { await window._capzoneApiProbePromise; } catch (e) {}
+        }
+        if (resource.includes(':6039') && window.API_BASE_URL === window.CAPZONE_VPS_ORIGIN) {
+          resource = resource.replace(/https?:\/\/(localhost|127\.0\.0\.1):6039/gi, window.CAPZONE_VPS_ORIGIN);
+        } else if (resource.startsWith('/') && window.API_BASE_URL) {
+          resource = `${window.API_BASE_URL}${resource}`;
+        }
         config = config || {};
 
         if (window.currentUserEmail) {
@@ -204,19 +235,27 @@
 
         // Add headers
         config.headers = config.headers || {};
-        let customApiKey = localStorage.getItem('capzone_api_type') === 'own' ? (localStorage.getItem('capzone_gemini_key') || '') : '';
         if (config.headers instanceof Headers) {
           if (!config.headers.has('x-capzone-shield')) config.headers.append('x-capzone-shield', 'live_client');
           if (window.currentUserEmail && !config.headers.has('x-user-email')) config.headers.append('x-user-email', window.currentUserEmail);
-          if (customApiKey && !config.headers.has('x-api-key')) config.headers.append('x-api-key', customApiKey);
         } else {
           if (!config.headers['x-capzone-shield']) config.headers['x-capzone-shield'] = 'live_client';
           if (window.currentUserEmail && !config.headers['x-user-email']) config.headers['x-user-email'] = window.currentUserEmail;
-          if (customApiKey && !config.headers['x-api-key']) config.headers['x-api-key'] = customApiKey;
         }
       }
 
-      const response = await originalFetch(resource, config);
+      let response;
+      try {
+        response = await originalFetch(resource, config);
+      } catch (fetchErr) {
+        if (typeof resource === 'string' && /https?:\/\/(localhost|127\.0\.0\.1):6039/i.test(resource)) {
+          window.API_BASE_URL = window.CAPZONE_VPS_ORIGIN;
+          const fallbackResource = resource.replace(/https?:\/\/(localhost|127\.0\.0\.1):6039/gi, window.CAPZONE_VPS_ORIGIN);
+          response = await originalFetch(fallbackResource, config);
+        } else {
+          throw fetchErr;
+        }
+      }
 
       if (response && (response.status === 403 || response.status === 401)) {
         try {
@@ -633,13 +672,8 @@
         }
       }
 
-      // Purge old 'default' dummy key from localStorage
-      if (localStorage.getItem('capzone_gemini_key') === 'default' || localStorage.getItem('capzone_api_key') === 'default') {
-        localStorage.removeItem('capzone_gemini_key');
-        localStorage.removeItem('capzone_api_key');
-        localStorage.removeItem('gemini_api_key');
-        localStorage.setItem('capzone_api_type', 'server');
-      }
+      // Ensure cloud studio mode is always active (100% free local Meta MMS engine)
+      localStorage.setItem('capzone_api_type', 'server');
 
       if (!user) {
         const savedEmail = (localStorage.getItem('capzone_user_email') || sessionStorage.getItem('capzone_user_email') || '').toLowerCase().trim();
@@ -727,14 +761,7 @@
             localStorage.setItem('capzone_user_profile', JSON.stringify(window.currentUserData));
             window.updateUserProfileUI(window.currentUserData);
           }
-          if (data && data.api_key && data.api_key !== 'default') {
-            if (typeof window.syncApiKeys === 'function') window.syncApiKeys(data.api_key);
-          } else {
-            const userApiKey = document.getElementById('userApiKey');
-            const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-            if (userApiKey) userApiKey.value = '';
-            if (geminiApiKeyInput) geminiApiKeyInput.value = '';
-          }
+          // 100% free cloud studio engine requires no user API key
         }).catch(e => console.warn("Could not fetch API key (safe non-blocking):", e));
       }
     });
@@ -815,6 +842,19 @@
     }
 
     /* Studio Card Interactive Styling */
+    #studioCardsGrid .studio-tool-card {
+      width: 100%;
+    }
+    @media (min-width: 640px) {
+      #studioCardsGrid .studio-tool-card {
+        width: calc((100% - 1.5rem) / 2);
+      }
+    }
+    @media (min-width: 1024px) {
+      #studioCardsGrid .studio-tool-card {
+        width: calc((100% - 3rem) / 3);
+      }
+    }
     .studio-tool-card {
       transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease, box-shadow 0.2s ease;
       transform: translate3d(0, 0, 0);
@@ -1106,7 +1146,7 @@
     }
     .caption-preview-text.unicode-font,
     .unicode-font {
-      font-family: 'Noto Sans Sinhala', 'Abhaya Libre', 'Iskoola Pota', sans-serif !important;
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Sinhala', 'Abhaya Libre', 'Iskoola Pota', sans-serif !important;
       letter-spacing: 0.25px;
     }
     .caption-preview-text.unicode-font {
@@ -1209,6 +1249,15 @@
     .cz-hero-timeline span:nth-child(5){animation-delay:-1.1s}.cz-hero-timeline span:nth-child(6){animation-delay:-.7s}
     .cz-hero-timeline span:nth-child(7){animation-delay:-1.3s}.cz-hero-timeline span:nth-child(8){animation-delay:-.4s}
     @keyframes czWave{0%,100%{height:8px}50%{height:22px}}
+    @keyframes czLaserX{0%,100%{left:-6%;opacity:.9}50%{left:98%;opacity:1}}
+    @keyframes czLaserY{0%,100%{top:-4%;opacity:.75}50%{top:96%;opacity:.95}}
+    @keyframes czMagicShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @keyframes czBarWave{0%,100%{transform:scaleY(.35);opacity:.6}50%{transform:scaleY(1);opacity:1}}
+    .cz-scan-beam-x{position:absolute;top:0;bottom:0;width:4px;background:linear-gradient(180deg,transparent,#10b981,#34d399,#6ee7b7,transparent);box-shadow:0 0 22px 6px rgba(16,185,129,.75);animation:czLaserX 1.8s ease-in-out infinite;pointer-events:none;z-index:20}
+    .cz-scan-beam-y{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#34d399,#22d3ee,#34d399,transparent);box-shadow:0 0 18px 4px rgba(34,211,238,.6);animation:czLaserY 2.3s ease-in-out infinite;pointer-events:none;z-index:20}
+    .cz-scan-grid{background-image:linear-gradient(rgba(16,185,129,.12) 1px,transparent 1px),linear-gradient(90deg,rgba(16,185,129,.12) 1px,transparent 1px);background-size:22px 22px}
+    .cz-magic-loader{background-size:200% 200%;animation:czMagicShimmer 2.6s ease infinite}
+    .cz-magic-bar{display:inline-block;width:4px;height:18px;border-radius:9999px;transform-origin:center;animation:czBarWave .9s ease-in-out infinite}
     .cz-hero-logo{box-shadow:0 0 0 3px rgba(251,191,36,.75),0 18px 40px -10px rgba(245,158,11,.55)}
     .cz-quick{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 4px;border-radius:20px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:#fff;font-size:11px;font-weight:800;backdrop-filter:blur(8px);transition:transform .15s,background .15s;cursor:pointer}
     .cz-quick:hover{background:rgba(255,255,255,.16)}.cz-quick:active{transform:scale(.94)}
@@ -1222,6 +1271,7 @@
     .cz-tabbar button.cz-active{color:#fbbf24}
     .cz-tab-ic{font-size:18px;line-height:1}
     .cz-tab-main .cz-tab-ic{width:50px;height:50px;margin-top:-26px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(135deg,#f59e0b,#ec4899);box-shadow:0 12px 24px -8px rgba(236,72,153,.6);border:3px solid #0f172a}
+    @media(min-width:1024px){.cz-tabbar{display:none!important}}
   </style>
 </head>
 
@@ -1258,20 +1308,6 @@
           class="hidden px-3.5 py-1.5 rounded-xl bg-amber-300 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
           <span>Home</span>
-        </button>
-
-        <!-- Projects Drawer Button -->
-        <button type="button" onclick="document.getElementById('projectsSidebarDrawer').classList.remove('hidden'); if(window.loadAndRenderProjects) window.loadAndRenderProjects();"
-          title="My Saved Projects"
-          class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition-colors flex items-center gap-1.5 cursor-pointer">
-          <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
-          <span class="hidden sm:inline">Projects</span>
-        </button>
-
-        <!-- User Profile Avatar -->
-        <button type="button" onclick="openModal('profileModal', event)" title="User Profile & Projects"
-          class="w-8 h-8 rounded-full bg-gradient-to-tr from-amber-200 to-yellow-300 border border-amber-400/80 flex items-center justify-center text-slate-900 font-black text-xs shadow-sm hover:scale-105 transition-transform cursor-pointer">
-          <span id="navProfileInitial">KT</span>
         </button>
 
       </div>
@@ -1336,8 +1372,8 @@
 
       <!-- Category Filter Pills -->
       <div class="flex flex-wrap items-center justify-center gap-2 pb-2 text-xs font-bold">
-        <button type="button" onclick="window.filterStudioCategory('popular', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer">
-          <span>🔥</span> Popular
+        <button type="button" onclick="window.filterStudioCategory('all', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 shadow-sm transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
+          <span>🛠️</span> All tools
         </button>
         <button type="button" onclick="window.filterStudioCategory('video', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer">
           <span>🎬</span> Video
@@ -1348,23 +1384,17 @@
         <button type="button" onclick="window.filterStudioCategory('translate', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer">
           <span>🌐</span> Translate
         </button>
-        <button type="button" onclick="window.filterStudioCategory('font', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
-          <span>🔤</span> Font
-        </button>
         <button type="button" onclick="window.filterStudioCategory('image', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
           <span>🖼️</span> Photo &amp; BG
         </button>
         <button type="button" onclick="window.filterStudioCategory('converter', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
           <span>🔄</span> Docs &amp; Images
         </button>
-        <button type="button" onclick="window.filterStudioCategory('all', this)" class="cat-filter-pill px-4 py-1.5 rounded-full bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition-all flex items-center gap-1.5 cursor-pointer shrink-0">
-          <span>🛠️</span> All tools
-        </button>
       </div>
     </div>
 
-    <!-- STUDIO TOOLS CARDS GRID (NO PHOTO EDITOR!) -->
-    <div id="studioCardsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto w-full mt-6">
+    <!-- STUDIO TOOLS CARDS GRID (Centered Orphan Rows, NO PHOTO EDITOR!) -->
+    <div id="studioCardsGrid" class="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto w-full mt-6">
 
       <!-- 1. AUTO CAPTIONS -->
       <article data-category="video popular all" onclick="window.switchView('view-captions')"
@@ -1491,31 +1521,6 @@
         </div>
       </article>
 
-      <!-- 6. SINHALA FONT & SINGLISH CONVERTER -->
-      <article data-category="font translate all" onclick="window.switchView('view-converter')"
-        class="studio-tool-card group relative rounded-[28px] p-6 bg-gradient-to-br from-teal-100/90 via-cyan-50/60 to-emerald-50/40 border border-teal-200/80 shadow-sm hover:shadow-2xl hover:border-teal-400 hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col justify-between min-h-[175px] overflow-hidden">
-        <div class="flex items-start justify-between relative z-10">
-          <div>
-            <span class="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-teal-500/15 text-teal-800 border border-teal-300/60 mb-2 inline-block">
-              SINGLISH &amp; FM-ABHAYA
-            </span>
-            <h3 class="text-xl font-black text-slate-900 group-hover:text-teal-700 transition-colors">
-              Sinhala Font Studio
-            </h3>
-            <p class="text-xs text-slate-600 mt-1 leading-relaxed max-w-[190px]">
-              Real-time Helakuru Singlish typing + Unicode ⇄ FM-Abhaya Legacy converter.
-            </p>
-          </div>
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-teal-500/30 group-hover:rotate-6 transition-transform shrink-0 font-black text-xl">
-            අA
-          </div>
-        </div>
-        <div class="mt-4 flex items-center text-xs font-bold text-teal-700 gap-1 group-hover:translate-x-1 transition-transform">
-          <span>Open Fullscreen Studio</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </div>
-      </article>
-
       <!-- 7. UNIVERSAL DOCUMENT & IMAGE CONVERTER STUDIO -->
       <article data-category="converter docs popular all" onclick="window.switchView('view-converter-studio')"
         class="studio-tool-card group relative rounded-[28px] p-6 bg-gradient-to-br from-amber-100/90 via-orange-50/60 to-yellow-50/40 border border-amber-200/80 shadow-sm hover:shadow-2xl hover:border-amber-400 hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col justify-between min-h-[175px] overflow-hidden">
@@ -1608,7 +1613,7 @@
         onclick="document.getElementById('srtFileInput').click()"
         class="border-2 border-dashed border-purple-200 hover:border-purple-400 bg-purple-50/30 hover:bg-purple-50/60 rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer group">
         
-        <input type="file" id="srtFileInput" accept="video/*,audio/*,.mp4,.mov,.avi,.mkv,.webm,.mp3,.wav,.m4a" required class="hidden"
+        <input type="file" id="srtFileInput" accept="video/*,audio/*,.mp4,.mov,.avi,.mkv,.webm,.mp3,.wav,.m4a" class="hidden"
           onchange="window.updateSrtFileInfo(this)" />
 
         <div class="w-16 h-16 rounded-2xl bg-purple-100 border border-purple-200 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
@@ -1616,7 +1621,7 @@
         </div>
 
         <h3 class="text-lg font-black text-slate-900 mb-1" id="srtFileName">Click or Drag & Drop Video / Audio File</h3>
-        <p class="text-xs text-slate-500" id="srtFileSize">MP4, MOV, MKV, MP3, WAV... up to 500 MB</p>
+        <p class="text-xs text-slate-500" id="srtFileSize">MP4, MOV, MKV, MP3, WAV... up to 1 GB (2-Hour Movies)</p>
       </div>
 
       <!-- Live Video Player & Subtitle Canvas Container (Permanently Mounted) -->
@@ -1650,7 +1655,7 @@
             
             <!-- LIVE SUBTITLE OVERLAY -->
             <div id="liveSubtitleOverlay" class="caption-preview-overlay" style="display: none;">
-              <span id="liveSubtitleText" class="caption-preview-text legacy-font"></span>
+              <span id="liveSubtitleText" class="caption-preview-text unicode-font"></span>
             </div>
           </div>
 
@@ -1696,11 +1701,11 @@
           </span>
           <div class="flex items-center gap-1.5" id="playerFontToggleGroup">
             <button type="button" onclick="window.setPlayerFont('legacy')" id="btnPlayerFontLegacy"
-              class="px-2.5 py-1 rounded-lg text-[11px] font-black bg-amber-400 text-slate-950 transition-all cursor-pointer">
+              class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer">
               🅰️ FM-Abhaya
             </button>
             <button type="button" onclick="window.setPlayerFont('unicode')" id="btnPlayerFontUnicode"
-              class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-slate-800 text-slate-300 hover:text-white transition-all cursor-pointer">
+              class="px-2.5 py-1 rounded-lg text-[11px] font-black bg-amber-400 text-slate-950 transition-all cursor-pointer">
               🌐 Unicode
             </button>
             <button type="button" onclick="window.setPlayerFont('english')" id="btnPlayerFontEnglish"
@@ -1730,12 +1735,12 @@
             <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
             <span id="srtReadyTitle">🎉 Subtitles Ready! Live Preview Playing</span>
           </span>
-          <span id="srtReadyLangBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 text-[10px] uppercase font-black tracking-wide border border-emerald-300">FM-Abhaya</span>
+          <span id="srtReadyLangBadge" class="px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-900 text-[10px] uppercase font-black tracking-wide border border-emerald-300">Normal Unicode</span>
         </div>
         <button type="button" id="srtSingleDownloadBtn" onclick="window.downloadSelectedSrtFormat()"
           class="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 active:scale-95 cursor-pointer">
           <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
-          <span id="srtSingleDownloadBtnText">📥 Download Legacy (FM-Abhaya) Subtitles (.SRT)</span>
+          <span id="srtSingleDownloadBtnText">📥 Download Normal (Unicode) Subtitles (.SRT)</span>
         </button>
         
         <!-- Clean Post-Generation Action Bar -->
@@ -1763,21 +1768,21 @@
                 <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
                 Subtitle Format & Language
               </label>
-              <span id="srtLangBadge" class="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">FM-Abhaya</span>
+              <span id="srtLangBadge" class="text-[10px] text-blue-900 font-bold bg-blue-100 px-2 py-0.5 rounded-full border border-blue-300">Normal Unicode</span>
             </div>
 
-            <input type="hidden" id="srtLanguage" value="si-legacy" />
+            <input type="hidden" id="srtLanguage" value="si-unicode" />
 
             <div class="grid grid-cols-3 gap-2" id="subFormatButtonGroup">
               <button type="button" onclick="window.selectSubtitleFormat('si-legacy')" id="btnFormatLegacy"
-                class="py-2.5 px-2 rounded-xl text-xs font-bold border transition-all text-center flex flex-col items-center justify-center gap-0.5 bg-amber-500 border-amber-400 text-slate-950 shadow-sm cursor-pointer">
+                class="py-2.5 px-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:border-amber-400 hover:text-slate-950 transition-all text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
                 <span class="flex items-center gap-1 text-xs font-black">🅰️ Legacy</span>
-                <span class="text-[9px] uppercase tracking-wider text-slate-950 font-black">FM-Abhaya</span>
+                <span class="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">FM-Abhaya</span>
               </button>
               <button type="button" onclick="window.selectSubtitleFormat('si-unicode')" id="btnFormatUnicode"
-                class="py-2.5 px-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:border-amber-400 hover:text-slate-950 transition-all text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
+                class="py-2.5 px-2 rounded-xl text-xs font-bold border transition-all text-center flex flex-col items-center justify-center gap-0.5 bg-amber-500 border-amber-400 text-slate-950 shadow-sm cursor-pointer">
                 <span class="flex items-center gap-1 text-xs font-black">🌐 Normal</span>
-                <span class="text-[9px] uppercase tracking-wider text-slate-400 font-semibold">Unicode</span>
+                <span class="text-[9px] uppercase tracking-wider text-slate-950 font-black">Unicode</span>
               </button>
               <button type="button" onclick="window.selectSubtitleFormat('en')" id="btnFormatEnglish"
                 class="py-2.5 px-2 rounded-xl text-xs font-bold border border-slate-200 bg-white text-slate-700 hover:border-amber-400 hover:text-slate-950 transition-all text-center flex flex-col items-center justify-center gap-0.5 shadow-sm cursor-pointer">
@@ -1786,7 +1791,7 @@
               </button>
             </div>
             <p class="text-[10px] text-slate-500 mt-1 leading-tight font-medium" id="srtFormatHelpText">
-              Premiere Pro, After Effects, CapCut, Photoshop සඳහා Legacy FM-Abhaya අකුරු.
+              MX Player, VLC, Premiere Pro, CapCut &amp; Movies සඳහා Sinhala + English (Unicode) උපසිරැසි.
             </p>
           </div>
 
@@ -1897,8 +1902,9 @@
               Paste Link
             </button>
           </label>
-          <input type="url" id="youtubeUrlInput" required placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
-            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-red-500 focus:bg-white transition-colors text-sm placeholder:text-slate-400 font-medium shadow-xs" / onpaste="setTimeout(()=>{this.value=(this.value||'').trim();},10)" style="background-color:#f8fafc !important;color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;">
+          <input type="url" id="youtubeUrlInput" required placeholder="Paste YouTube link here..."
+            onpaste="setTimeout(()=>{this.value=(this.value||'').trim();},10)"
+            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-red-500 focus:bg-white transition-colors text-sm placeholder:text-slate-400 font-medium shadow-xs" style="background-color:#f8fafc !important;color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;">
         </div>
 
         <!-- Format & Real Quality Selection -->
@@ -1984,27 +1990,33 @@
         </button>
       </form>
 
-      <!-- Progress Card -->
-      <div id="youtubeProgressCard" class="p-5 rounded-2xl bg-red-50/60 border border-red-200 space-y-3" style="display: none;">
+      <!-- Magic Progress Card -->
+      <div id="youtubeProgressCard" class="p-6 rounded-3xl cz-magic-loader bg-gradient-to-r from-rose-950 via-slate-900 to-red-950 border border-red-400/35 shadow-xl space-y-4 text-white" style="display: none;">
         <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-900 font-bold flex items-center gap-2" id="youtubeProgressText">
-            <svg class="w-4 h-4 text-red-600 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            Connecting to YouTube & extracting media...
+          <span class="font-black flex items-center gap-2.5 text-rose-100">
+            <span class="flex items-center gap-1">
+              <span class="cz-magic-bar bg-rose-400" style="animation-delay:0s"></span>
+              <span class="cz-magic-bar bg-amber-300" style="animation-delay:.15s"></span>
+              <span class="cz-magic-bar bg-pink-400" style="animation-delay:.3s"></span>
+              <span class="cz-magic-bar bg-red-400" style="animation-delay:.45s"></span>
+            </span>
+            <span id="youtubeProgressText">Extracting YouTube HD Media Stream...</span>
           </span>
+          <span class="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-red-500/20 border border-red-400/30 text-rose-200 animate-pulse">LIVE STREAM</span>
         </div>
-        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-          <div id="youtubeProgressBar" class="bg-gradient-to-r from-red-600 to-rose-500 h-full rounded-full transition-all duration-300 animate-pulse" style="width: 60%"></div>
+        <div class="w-full bg-white/15 h-2.5 rounded-full overflow-hidden">
+          <div id="youtubeProgressBar" class="bg-gradient-to-r from-amber-400 via-rose-500 to-red-400 h-full rounded-full transition-all duration-300" style="width: 35%"></div>
         </div>
       </div>
 
       <!-- Result Card WITH LIVE IN-BROWSER VIDEO / AUDIO PREVIEW PLAYER! -->
-      <div id="youtubeResultCard" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-50 via-white to-red-50/40 border border-slate-200 shadow-xl space-y-5" style="display: block;">
+      <div id="youtubeResultCard" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-50 via-white to-red-50/40 border border-slate-200 shadow-xl space-y-5" style="display: none;">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200/80">
           <div class="flex items-center gap-2 text-slate-900 font-black text-sm sm:text-base">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
             <span>Media Ready! Live Browser Preview</span>
           </div>
-          <div class="flex items-center gap-2"><button type="button" onclick="window.testPlaySampleInStudio('youtube')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black cursor-pointer">▶️ Test Player</button><span id="ytResultQualityBadge" class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200 text-[10px] font-black uppercase tracking-wider">1080p HD</span></div>
+          <div class="flex items-center gap-2"><span id="ytResultQualityBadge" class="px-2.5 py-0.5 rounded-full bg-red-100 text-red-700 border border-red-200 text-[10px] font-black uppercase tracking-wider">1080p HD</span></div>
         </div>
 
         <!-- In-Browser Video Player Preview -->
@@ -2090,8 +2102,9 @@
               Paste Link
             </button>
           </label>
-          <input type="url" id="fbUrlInput" required placeholder="https://www.facebook.com/reel/... or https://fb.watch/..."
-            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition-colors text-sm placeholder:text-slate-400 font-medium shadow-xs" / onpaste="setTimeout(()=>{this.value=(this.value||'').trim();},10)" style="background-color:#f8fafc !important;color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;">
+          <input type="url" id="fbUrlInput" required placeholder="Paste Facebook video or reel link here..."
+            onpaste="setTimeout(()=>{this.value=(this.value||'').trim();},10)"
+            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-blue-500 focus:bg-white transition-colors text-sm placeholder:text-slate-400 font-medium shadow-xs" style="background-color:#f8fafc !important;color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -2108,27 +2121,33 @@
         </div>
       </form>
 
-      <!-- Progress Card -->
-      <div id="fbProgressCard" class="p-5 rounded-2xl bg-blue-50/60 border border-blue-200 space-y-3" style="display: none;">
+      <!-- Magic Progress Card -->
+      <div id="fbProgressCard" class="p-6 rounded-3xl cz-magic-loader bg-gradient-to-r from-indigo-950 via-slate-900 to-blue-950 border border-blue-400/35 shadow-xl space-y-4 text-white" style="display: none;">
         <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-900 font-bold flex items-center gap-2">
-            <svg class="w-4 h-4 text-blue-600 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            Processing Facebook Media...
+          <span class="font-black flex items-center gap-2.5 text-blue-100">
+            <span class="flex items-center gap-1">
+              <span class="cz-magic-bar bg-sky-400" style="animation-delay:0s"></span>
+              <span class="cz-magic-bar bg-indigo-400" style="animation-delay:.15s"></span>
+              <span class="cz-magic-bar bg-cyan-300" style="animation-delay:.3s"></span>
+              <span class="cz-magic-bar bg-blue-400" style="animation-delay:.45s"></span>
+            </span>
+            Extracting Facebook HD Video &amp; Audio...
           </span>
+          <span class="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-sky-200 animate-pulse">SCANNING</span>
         </div>
-        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-          <div id="fbProgressBar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full rounded-full transition-all duration-300 animate-pulse" style="width: 50%"></div>
+        <div class="w-full bg-white/15 h-2.5 rounded-full overflow-hidden">
+          <div id="fbProgressBar" class="bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-400 h-full rounded-full transition-all duration-300" style="width: 40%"></div>
         </div>
       </div>
 
       <!-- Modern 3D Facebook Result Card with Live In-Browser Player -->
-      <div id="fbResultArea" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-50 via-white to-blue-50/40 border border-slate-200 shadow-xl space-y-5" style="display: block;">
+      <div id="fbResultArea" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-50 via-white to-blue-50/40 border border-slate-200 shadow-xl space-y-5" style="display: none;">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200/80">
           <div class="flex items-center gap-2 text-slate-900 font-black text-sm sm:text-base">
             <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
             <span>Facebook Media Ready! Live Browser Preview</span>
           </div>
-          <div class="flex items-center gap-2"><button type="button" onclick="window.testPlaySampleInStudio('facebook')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black cursor-pointer">▶️ Test Player</button><span id="fbResultQualityBadge" class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-black uppercase tracking-wider">HD MP4</span></div>
+          <div class="flex items-center gap-2"><span id="fbResultQualityBadge" class="px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700 border border-blue-200 text-[10px] font-black uppercase tracking-wider">HD MP4</span></div>
         </div>
 
         <!-- Live In-Browser Video Player -->
@@ -2219,8 +2238,9 @@
               Paste Link
             </button>
           </label>
-          <input type="url" id="tiktokUrlInput" required placeholder="https://www.tiktok.com/@.../video/... or https://vm.tiktok.com/..."
-            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-pink-500 focus:bg-white transition-colors text-sm placeholder:text-slate-400 font-medium shadow-xs" / onpaste="setTimeout(()=>{this.value=(this.value||'').trim();},10)" style="background-color:#f8fafc !important;color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;">
+          <input type="url" id="tiktokUrlInput" required placeholder="Paste TikTok video link here..."
+            onpaste="setTimeout(()=>{this.value=(this.value||'').trim();},10)"
+            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-pink-500 focus:bg-white transition-colors text-sm placeholder:text-slate-400 font-medium shadow-xs" style="background-color:#f8fafc !important;color:#0f172a !important;-webkit-text-fill-color:#0f172a !important;">
         </div>
 
         <div class="grid grid-cols-2 gap-3">
@@ -2237,27 +2257,33 @@
         </div>
       </form>
 
-      <!-- Progress Card -->
-      <div id="tiktokProgressCard" class="p-5 rounded-2xl bg-pink-50/60 border border-pink-200 space-y-3" style="display: none;">
+      <!-- Magic Progress Card -->
+      <div id="tiktokProgressCard" class="p-6 rounded-3xl cz-magic-loader bg-gradient-to-r from-fuchsia-950 via-slate-900 to-rose-950 border border-pink-400/35 shadow-xl space-y-4 text-white" style="display: none;">
         <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-900 font-bold flex items-center gap-2">
-            <svg class="w-4 h-4 text-pink-600 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            Extracting TikTok Media...
+          <span class="font-black flex items-center gap-2.5 text-pink-100">
+            <span class="flex items-center gap-1">
+              <span class="cz-magic-bar bg-pink-400" style="animation-delay:0s"></span>
+              <span class="cz-magic-bar bg-fuchsia-400" style="animation-delay:.15s"></span>
+              <span class="cz-magic-bar bg-rose-300" style="animation-delay:.3s"></span>
+              <span class="cz-magic-bar bg-amber-300" style="animation-delay:.45s"></span>
+            </span>
+            Extracting TikTok Watermark-Free Media...
           </span>
+          <span class="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-pink-500/20 border border-pink-400/30 text-pink-200 animate-pulse">MAGIC SYNC</span>
         </div>
-        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-          <div id="tiktokProgressBar" class="bg-gradient-to-r from-pink-500 to-rose-600 h-full rounded-full transition-all duration-300 animate-pulse" style="width: 50%"></div>
+        <div class="w-full bg-white/15 h-2.5 rounded-full overflow-hidden">
+          <div id="tiktokProgressBar" class="bg-gradient-to-r from-pink-500 via-fuchsia-400 to-rose-400 h-full rounded-full transition-all duration-300" style="width: 45%"></div>
         </div>
       </div>
 
       <!-- Modern 3D TikTok Result Card with Live In-Browser Player -->
-      <div id="tiktokResultArea" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-50 via-white to-pink-50/40 border border-slate-200 shadow-xl space-y-5" style="display: block;">
+      <div id="tiktokResultArea" class="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-50 via-white to-pink-50/40 border border-slate-200 shadow-xl space-y-5" style="display: none;">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200/80">
           <div class="flex items-center gap-2 text-slate-900 font-black text-sm sm:text-base">
             <span class="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse"></span>
             <span>TikTok Media Ready! Live Browser Preview</span>
           </div>
-          <div class="flex items-center gap-2"><button type="button" onclick="window.testPlaySampleInStudio('tiktok')" class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black cursor-pointer">▶️ Test Player</button><span id="tiktokResultQualityBadge" class="px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 border border-pink-200 text-[10px] font-black uppercase tracking-wider">No Watermark</span></div>
+          <div class="flex items-center gap-2"><span id="tiktokResultQualityBadge" class="px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 border border-pink-200 text-[10px] font-black uppercase tracking-wider">No Watermark</span></div>
         </div>
 
         <!-- Live In-Browser Video Player -->
@@ -2337,14 +2363,14 @@
     <!-- Center Card -->
     <div class="bg-white border border-slate-200/90 rounded-[32px] p-6 sm:p-10 shadow-xl space-y-6">
       
-      <form id="srtTranslateForm" class="space-y-6" onsubmit="event.preventDefault(); window.handleSrtTranslateSubmit(event);">
+      <form id="srtTranslateForm" class="space-y-6" novalidate onsubmit="event.preventDefault(); window.handleSrtTranslateSubmit(event);">
         
         <!-- File Dropzone -->
         <div id="srtTranslateDropzone"
           onclick="document.getElementById('srtTranslateFileInput').click()"
           class="border-2 border-dashed border-indigo-200 hover:border-indigo-400 bg-indigo-50/30 hover:bg-indigo-50/60 rounded-3xl p-8 sm:p-12 text-center transition-all cursor-pointer group">
           
-          <input type="file" id="srtTranslateFileInput" accept=".srt,text/plain" required class="hidden"
+          <input type="file" id="srtTranslateFileInput" accept=".srt,text/plain,.txt" class="hidden"
             onchange="window.updateSrtTranslateFileInfo(this)" />
 
           <div class="w-16 h-16 rounded-2xl bg-indigo-100 border border-indigo-200 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
@@ -2363,8 +2389,8 @@
           </label>
           <select id="srtTranslateTargetLang"
             class="w-full px-4 py-3.5 bg-white border border-slate-200 rounded-xl text-slate-900 outline-none focus:border-indigo-500 transition-colors shadow-xs text-sm font-semibold">
-            <option value="si-legacy" selected>🇱🇰 Sinhala (Legacy FM-Abhaya - Premiere / Photoshop / Editing)</option>
-            <option value="si-unicode">🌐 Sinhala (Normal Unicode - All Players / VLC / Smart TV / Mobile)</option>
+            <option value="si-unicode" selected>🌐 Sinhala (Normal Unicode - All Players / VLC / Premiere / Mobile)</option>
+            <option value="si-legacy">🇱🇰 Sinhala (Legacy FM-Abhaya - Classic Editing)</option>
             <option value="English">🇬🇧 English (Standard Subtitles)</option>
             <option value="Tamil">🇮🇳 Tamil (தமிழ்)</option>
           </select>
@@ -2374,7 +2400,7 @@
           </p>
         </div>
 
-        <button type="submit" id="srtTranslateSubmitBtn"
+        <button type="button" id="srtTranslateSubmitBtn" onclick="window.handleSrtTranslateSubmit(event)"
           class="w-full py-4 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-black text-sm rounded-2xl hover:shadow-lg hover:shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
           <span>Translate Subtitles Now</span>
@@ -2433,170 +2459,6 @@
         <div class="text-[11px] text-slate-500 font-medium text-center">
           Developed by Kaveesha Theekshana · CapZone Studio
         </div>
-      </div>
-
-    </div>
-  </section>
-
-      <!-- ========================================== -->
-  <!-- 🔤 6. SINHALA FONT CONVERTER & SINGLISH TYPING FULL-PAGE VIEW -->
-  <!-- ========================================== -->
-  <section id="view-converter" class="capzone-view hidden w-full max-w-4xl mx-auto px-4 py-8">
-    
-    <!-- Top Back Navigation -->
-    <div class="mb-6 flex items-center justify-between">
-      <button type="button" onclick="window.switchView('view-home')"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition-colors cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-        <span>Back to Home</span>
-      </button>
-
-      <span class="text-xs font-bold text-teal-700 bg-teal-100 px-3 py-1 rounded-full border border-teal-200 flex items-center gap-1.5">
-        <svg class="w-3.5 h-3.5 fill-none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
-        <span>Singlish & Font Studio</span>
-      </span>
-    </div>
-
-    <!-- Title & Subtitle -->
-    <div class="text-center mb-8">
-      <h1 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-2">
-        Sinhala Font <span class="text-teal-600">Converter & Helakuru Singlish</span>
-      </h1>
-      <p class="text-sm text-slate-500 max-w-lg mx-auto">
-        Type naturally in Singlish (Helakuru Scheme) or paste text to convert between <strong>Sinhala Unicode</strong> and <strong>FM-Abhaya (Legacy)</strong> font.
-      </p>
-
-      <!-- Helakuru Reference Pill -->
-      <div class="mt-3 flex items-center justify-center gap-2">
-        <a href="https://www.helakuru.lk/keyboard" target="_blank" rel="noopener noreferrer"
-          class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-teal-50 text-slate-600 hover:text-teal-700 text-xs font-semibold border border-slate-200 transition-colors">
-          <span>📖 View Official Helakuru Keyboard Scheme (helakuru.lk/keyboard)</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-        </a>
-      </div>
-    </div>
-
-    <!-- Center Card -->
-    <div class="bg-white border border-slate-200/90 rounded-[32px] p-6 sm:p-10 shadow-xl space-y-6">
-      
-      <!-- Direction Mode Switcher -->
-      <div class="p-1.5 bg-slate-100/80 rounded-2xl flex items-center gap-1 border border-slate-200">
-        <button type="button" onclick="window.setConverterMode('uni2legacy')" id="btnModeUniToLegacy"
-          class="flex-1 py-3 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-sm cursor-pointer">
-          <span>🅰️ Unicode / Singlish ➔ FM-Abhaya (Legacy)</span>
-        </button>
-        <button type="button" onclick="window.setConverterMode('legacy2uni')" id="btnModeLegacyToUni"
-          class="flex-1 py-3 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer">
-          <span>🌐 FM-Abhaya (Legacy) ➔ Sinhala Unicode</span>
-        </button>
-      </div>
-
-      <!-- Quick Helakuru Examples Bar -->
-      <div id="helakuruQuickTips" class="p-3 bg-teal-50/70 border border-teal-200/80 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs">
-        <span class="text-teal-900 font-bold flex items-center gap-1.5">
-          <span>💡 Helakuru Scheme:</span>
-        </span>
-        <div class="flex flex-wrap items-center gap-1.5 text-[11px] font-mono text-teal-800">
-          <span class="bg-white px-2 py-0.5 rounded border border-teal-200">amma ➔ අම්මා</span>
-          <span class="bg-white px-2 py-0.5 rounded border border-teal-200">thaththa ➔ තාත්තා</span>
-          <span class="bg-white px-2 py-0.5 rounded border border-teal-200">lanka ➔ ලංකා</span>
-          <span class="bg-white px-2 py-0.5 rounded border border-teal-200">gedara ➔ ගෙදර</span>
-          <span class="bg-white px-2 py-0.5 rounded border border-teal-200">suba ➔ සුබ</span>
-        </div>
-      </div>
-
-      <!-- Input Section with Singlish Live Transliteration -->
-      <div class="space-y-2">
-        <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-slate-700 flex items-center gap-2" id="converterInputLabel">
-            <span>Sinhala Unicode / Singlish Text</span>
-            <span id="singlishActiveBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold border border-teal-200">⌨️ Real-Time Singlish Active</span>
-          </label>
-          <div class="flex items-center gap-3">
-            <button type="button" onclick="navigator.clipboard.readText().then(t => { document.getElementById('converterInputText').value = t; }).catch(()=>{})"
-              class="text-xs text-teal-600 hover:text-teal-700 font-bold underline cursor-pointer">
-              Paste Text
-            </button>
-            <button type="button" onclick="document.getElementById('converterInputText').value = ''; document.getElementById('converterOutputArea').style.display='none';"
-              class="text-xs text-slate-400 hover:text-slate-600 font-bold cursor-pointer">
-              Clear
-            </button>
-          </div>
-        </div>
-
-        <!-- Sinhala Pili & Bandi Akuru Quick Bar -->
-        <div id="sinhalaPiliToolbar" class="flex flex-wrap items-center gap-1.5 p-2 bg-slate-100/90 border border-slate-200/90 rounded-xl">
-          <span class="text-[10px] font-bold text-slate-500 mr-1">පිලි & බැඳි අකුරු:</span>
-          <button type="button" onclick="window.insertPiliAtCursor('්')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="හල් ලකුණ">්</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ා')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="ඇලපිල්ල">ා</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ැ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="ඇදය">ැ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෑ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="දිග ඇදය">ෑ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ි')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="ඉස්පිල්ල">ි</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ී')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="දිග ඉස්පිල්ල">ී</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ු')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="පාපිල්ල">ු</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ූ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="දිග පාපිල්ල">ූ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෘ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-teal-800 shadow-xs cursor-pointer" title="ගැටය සහිත පාපිල්ල">ෘ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෲ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-teal-800 shadow-xs cursor-pointer" title="දිග ගැටය සහිත පාපිල්ල">ෲ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෙ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="කොම්බුව">ෙ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ේ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="දිග කොම්බුව">ේ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෛ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="කොම්බු දෙක">ෛ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ො')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="කොම්බුව ඇලපිල්ල">ො</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෝ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="කොම්බුව හල්">ෝ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ෞ')" class="px-2 py-1 bg-white hover:bg-teal-50 hover:border-teal-300 border border-slate-200 rounded-lg text-xs font-bold text-slate-800 shadow-xs cursor-pointer" title="ගයනුකිත්ත">ෞ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('්‍ර')" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg text-xs font-bold text-teal-800 shadow-xs cursor-pointer" title="රකාරාංශය">්‍ර</button>
-          <button type="button" onclick="window.insertPiliAtCursor('්‍ය')" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg text-xs font-bold text-teal-800 shadow-xs cursor-pointer" title="යංශය">්‍ය</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ර්‍')" class="px-2 py-1 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg text-xs font-bold text-teal-800 shadow-xs cursor-pointer" title="රේඵය">ර්‍</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ක්ෂ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="ක්ෂයන්න">ක්ෂ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ඥ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="ඥයන්න">ඥ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ඤ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="ඤයන්න">ඤ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ඳ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="සඤ්ඤක ද">ඳ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ඟ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="සඤ්ඤක ග">ඟ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ඬ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="සඤ්ඤක ඩ">ඬ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ඹ')" class="px-2 py-1 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-xs font-bold text-purple-800 shadow-xs cursor-pointer" title="සඤ්ඤක බ">ඹ</button>
-          <button type="button" onclick="window.insertPiliAtCursor('ං')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-lg text-xs font-bold text-amber-800 shadow-xs cursor-pointer" title="අනුස්වාරය / බිංදුව">ං</button>
-        </div>
-
-        <div class="relative">
-          <textarea id="converterInputText" rows="5"
-            onkeydown="window.handleSinglishKeydown(this, event)"
-            onpaste="window.handleSinglishPaste(this, event)"
-            placeholder="මෙතන Singlish (amma, gedara, lanka) හෝ සිංහලෙන් type කරන්න... ස්වයංක්‍රීයව සිංහලට හැරවේ."
-            class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-slate-900 outline-none focus:border-teal-500 focus:bg-white transition-colors text-base font-sans leading-relaxed placeholder:text-slate-400 shadow-xs"></textarea>
-        </div>
-
-        <p class="text-[11px] text-slate-500 flex items-center gap-1.5 font-medium" id="converterHelperHint">
-          <svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          <span>ඔබ Keyboard එකෙන් 'amma' ලෙස type කර Space ඔබන විට එය ඉබේම 'අම්මා' ලෙස Unicode වලට හැරවේ.</span>
-        </p>
-      </div>
-
-      <!-- Convert Button -->
-      <button type="button" onclick="handleConvertFontClick()" id="btnExecuteConvert"
-        class="w-full py-4 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-500 hover:to-cyan-500 text-white font-black text-sm rounded-2xl transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-        <span id="btnExecuteConvertText">Convert to FM-Abhaya Font (Legacy)</span>
-      </button>
-
-      <!-- Output Converted Section -->
-      <div id="converterOutputArea" style="display: none;" class="space-y-3 pt-2">
-        <div class="flex items-center justify-between">
-          <label class="text-xs font-bold text-slate-700 flex items-center gap-2">
-            <span id="converterOutputLabel">FM-Abhaya Converted Text</span>
-            <span id="converterOutputBadge" class="text-[10px] text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200 font-bold">Photoshop / Premiere Pro</span>
-          </label>
-          <button type="button" onclick="copyConverterOutput()" id="copyConverterBtn"
-            class="text-xs bg-teal-100 text-teal-800 font-black px-4 py-1.5 rounded-xl hover:bg-teal-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-            <span>Copy Text</span>
-          </button>
-        </div>
-
-        <textarea id="converterOutputText" readonly rows="5"
-          class="w-full px-5 py-4 bg-teal-50/70 border border-teal-200 rounded-2xl text-slate-900 outline-none text-base font-mono leading-relaxed shadow-xs"></textarea>
-
-        <p class="text-[11px] text-slate-500 font-medium" id="converterOutputFooterNote">
-          💡 මෙය Copy කර ඔබගේ Premiere Pro / CapCut / Photoshop වල Paste කර Font එක <strong>FM-Abhaya</strong> ලෙස තෝරන්න.
-        </p>
       </div>
 
     </div>
@@ -2782,7 +2644,7 @@
         <div id="convResultDetails" class="text-xs text-slate-700 bg-white rounded-2xl p-3.5 border border-slate-200 space-y-1.5"></div>
 
         <!-- Download Button Directly Under Preview -->
-        <a id="convStudioDownloadLink" target="_blank"
+        <a id="convStudioDownloadLink" onclick="return window.handleStudioDirectDownload(event, this)"
           class="group w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm transition-all flex items-center justify-between shadow-xl shadow-emerald-500/20 cursor-pointer">
           <div class="flex items-center gap-3 min-w-0">
             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
@@ -2879,14 +2741,26 @@
         <p class="text-xs text-slate-500" id="bgFileSize">PNG, JPG, WEBP, HEIC, BMP up to 25 MB</p>
       </div>
 
-      <!-- Original Image Preview Box (when selected) -->
+      <!-- Original Image Preview Box with Live Object Scan Stage -->
       <div id="bgOriginalPreviewArea" style="display: none;" class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
         <div class="flex items-center justify-between text-xs font-bold text-slate-700">
-          <span>Original Selected Image</span>
+          <span>Live Image Stage</span>
           <button type="button" onclick="window.resetBgRemover()" class="text-red-500 hover:text-red-700 underline text-[11px] cursor-pointer">Remove</button>
         </div>
-        <div class="rounded-xl overflow-hidden bg-slate-200 flex items-center justify-center max-h-60 p-2">
-          <img id="bgOriginalImg" class="max-h-56 object-contain rounded-lg shadow-sm" />
+        <div id="bgLiveScanStage" class="relative rounded-2xl overflow-hidden bg-slate-900 flex items-center justify-center max-h-72 p-3 border border-slate-700">
+          <img id="bgOriginalImg" class="max-h-64 object-contain rounded-lg shadow-sm relative z-10" />
+          <div id="bgLiveScanOverlay" style="display: none;" class="absolute inset-0 z-20 pointer-events-none cz-scan-grid">
+            <div class="cz-scan-beam-x"></div>
+            <div class="cz-scan-beam-y"></div>
+            <div class="absolute top-2 left-2 w-5 h-5 border-t-2 border-l-2 border-emerald-400 rounded-tl"></div>
+            <div class="absolute top-2 right-2 w-5 h-5 border-t-2 border-r-2 border-emerald-400 rounded-tr"></div>
+            <div class="absolute bottom-2 left-2 w-5 h-5 border-b-2 border-l-2 border-emerald-400 rounded-bl"></div>
+            <div class="absolute bottom-2 right-2 w-5 h-5 border-b-2 border-r-2 border-emerald-400 rounded-br"></div>
+            <div class="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-slate-950/85 border border-emerald-400/50 text-emerald-300 text-[10px] font-black tracking-wider uppercase flex items-center gap-1.5 backdrop-blur-sm whitespace-nowrap">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Scanning &amp; Cutting Background...</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2897,16 +2771,21 @@
         <span>Remove Background (Super Object Cutout)</span>
       </button>
 
-      <!-- Progress Card -->
-      <div id="bgProgressCard" class="p-5 rounded-2xl bg-emerald-50/70 border border-emerald-200 space-y-3" style="display: none;">
+      <!-- Magic Progress Card -->
+      <div id="bgProgressCard" class="p-5 rounded-3xl cz-magic-loader bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border border-emerald-400/35 shadow-xl space-y-3 text-white" style="display: none;">
         <div class="flex items-center justify-between text-xs">
-          <span class="text-slate-900 font-bold flex items-center gap-2" id="bgStatusText">
-            <svg class="w-4 h-4 text-emerald-600 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-            Detecting subjects &amp; removing background...
+          <span class="text-emerald-100 font-black flex items-center gap-2">
+            <span class="flex items-center gap-1">
+              <span class="cz-magic-bar bg-emerald-400" style="animation-delay:0s"></span>
+              <span class="cz-magic-bar bg-teal-300" style="animation-delay:.15s"></span>
+              <span class="cz-magic-bar bg-cyan-400" style="animation-delay:.3s"></span>
+            </span>
+            <span id="bgStatusText">Detecting subjects &amp; scanning edges...</span>
           </span>
+          <span class="text-[10px] font-black uppercase tracking-widest px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 animate-pulse">LIVE SCAN</span>
         </div>
-        <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-          <div id="bgProgressBar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full transition-all duration-300 animate-pulse" style="width: 50%"></div>
+        <div class="w-full bg-white/15 h-2.5 rounded-full overflow-hidden">
+          <div id="bgProgressBar" class="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 h-full rounded-full transition-all duration-300" style="width: 45%"></div>
         </div>
       </div>
 
@@ -2926,7 +2805,7 @@
         </div>
 
         <!-- Download Action Button -->
-        <a id="bgDownloadBtn" target="_blank" download="CapZone_Cutout_CapZone.png"
+        <a id="bgDownloadBtn" download="CapZone_Cutout_CapZone.png" onclick="return window.handleStudioDirectDownload(event, this)"
           class="group relative w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-sm transition-all flex items-center justify-between shadow-xl shadow-emerald-600/25 active:scale-98 cursor-pointer">
           <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
@@ -2994,104 +2873,7 @@
   </nav>
 
 
-  <!-- Modals & Drawers -->
-  <div id="projectsSidebarDrawer" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex justify-end">
-    <div class="w-full max-w-md bg-white h-full shadow-2xl flex flex-col p-6 animate-in slide-in-from-right duration-300">
-      <!-- Drawer Header -->
-      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
-        <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-          </div>
-          <div>
-            <h2 class="text-base font-black text-slate-900">Projects History</h2>
-            <p class="text-xs text-slate-500">Your generated subtitles and media</p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="window.loadAndRenderProjects(true)" title="Refresh Projects" class="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          </button>
-          <button type="button" onclick="document.getElementById('projectsSidebarDrawer').classList.add('hidden')" class="p-2 rounded-xl text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <!-- Filter Chips -->
-      <div class="flex items-center gap-1.5 overflow-x-auto pb-3 mb-3 hide-scrollbar text-[11px] font-bold">
-        <button onclick="window.filterProjects('all')" class="project-filter-btn px-3 py-1 rounded-lg bg-indigo-600 text-white font-medium transition-all shadow-sm" data-filter="all">All</button>
-        <button onclick="window.filterProjects('Video')" class="project-filter-btn px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-filter="Video">Videos</button>
-        <button onclick="window.filterProjects('Audio')" class="project-filter-btn px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-filter="Audio">Audio</button>
-        <button onclick="window.filterProjects('Subtitle')" class="project-filter-btn px-3 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all" data-filter="Subtitle">SRTs</button>
-      </div>
-
-      <!-- Projects Container -->
-      <div id="recentProjectsContainer" class="flex flex-col space-y-2.5 overflow-y-auto flex-1 pr-1">
-        <div class="flex flex-col items-center justify-center py-16 text-center opacity-70">
-          <div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-3 text-slate-400">
-            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/></svg>
-          </div>
-          <p class="text-sm font-bold text-slate-700">No active projects yet</p>
-          <p class="text-xs text-slate-400 mt-1">Generated subtitles and downloads will appear here.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="profileModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" style="display: none;">
-    <div class="bg-white border border-slate-200 w-full max-w-md rounded-3xl p-6 relative max-h-[90vh] overflow-y-auto shadow-2xl text-slate-800" style="scrollbar-width: none;">
-      <button onclick="closeModal('profileModal', event)"
-        class="absolute top-4 right-4 text-slate-400 hover:text-slate-900 bg-slate-100 p-2 rounded-full transition-colors z-10 cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-
-      <!-- User Header -->
-      <div class="text-center mb-6 pt-2">
-        <div class="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-amber-400 to-yellow-500 flex items-center justify-center font-black text-slate-950 text-2xl shadow-lg shadow-amber-400/30 mb-3" id="profileInitial">
-          KT
-        </div>
-        <h3 class="text-xl font-black text-slate-900 tracking-tight" id="profileName">User</h3>
-        <p class="text-xs text-slate-500 font-mono mt-0.5" id="profileEmail">user@example.com</p>
-        <div class="mt-2.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200" id="profileStatusBadge">
-          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Creator
-        </div>
-      </div>
-
-      <!-- Account Metrics -->
-      <div class="grid grid-cols-2 gap-3 mb-5">
-        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Generated SRTs</span>
-          <span class="text-xl font-black text-indigo-600" id="profileSrtCount">0</span>
-        </div>
-        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center">
-          <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Saved Projects</span>
-          <span class="text-xl font-black text-emerald-600" id="profileProjectCount">0</span>
-        </div>
-      </div>
-
-      <!-- Saved Projects Showcase (Names, Types & Quick Actions) -->
-      <div class="mb-5 space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-black text-slate-700">Recent Saved Projects</span>
-          <button type="button" onclick="closeModal('profileModal', event); document.getElementById('projectsSidebarDrawer').classList.remove('hidden'); if(window.loadAndRenderProjects) window.loadAndRenderProjects(true);"
-            class="text-[11px] font-bold text-indigo-600 hover:text-indigo-700 cursor-pointer">View All &rarr;</button>
-        </div>
-        <div id="profileProjectsList" class="max-h-48 overflow-y-auto space-y-2 p-2.5 rounded-2xl bg-slate-50 border border-slate-200/90 text-xs">
-          <p class="text-slate-400 text-center py-4 font-medium">Loading your projects...</p>
-        </div>
-      </div>
-
-      <!-- Actions -->
-      <div class="space-y-2.5">
-        <button type="button" onclick="window.handleLogout()"
-          class="w-full py-3 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-          <span>Log Out (ගිණුමෙන් ඉවත් වන්න)</span>
-        </button>
-      </div>
-    </div>
-  </div>
+  <!-- Clean View Modals Placeholder (Projects/Profile saving disabled as requested) -->
 
 
   
@@ -3137,7 +2919,7 @@
       if (id === 'fbModal') { window.switchView('view-facebook'); return; }
       if (id === 'tiktokModal') { window.switchView('view-tiktok'); return; }
       if (id === 'srtTranslateModal') { window.switchView('view-translate'); return; }
-      if (id === 'converterModal') { window.switchView('view-converter'); return; }
+      if (id === 'converterModal') { window.switchView('view-converter-studio'); return; }
       
       const modal = document.getElementById(id);
       if (modal) modal.style.display = 'flex';
@@ -3456,173 +3238,6 @@
     }
     window.convertLegacyToUnicode = convertLegacyToUnicode;
     window.legacyToUnicode = convertLegacyToUnicode;
-
-    // 🔀 Converter Mode State & Controller
-    window.activeConverterMode = 'uni2legacy';
-
-    window.setConverterMode = function(mode) {
-      window.activeConverterMode = mode;
-      const btn1 = document.getElementById('btnModeUniToLegacy');
-      const btn2 = document.getElementById('btnModeLegacyToUni');
-      const inputLabel = document.getElementById('converterInputLabel');
-      const input = document.getElementById('converterInputText');
-      const singlishBadge = document.getElementById('singlishActiveBadge');
-      const helakuruTips = document.getElementById('helakuruQuickTips');
-      const helperHint = document.getElementById('converterHelperHint');
-      const btnText = document.getElementById('btnExecuteConvertText');
-      const outLabel = document.getElementById('converterOutputLabel');
-      const outBadge = document.getElementById('converterOutputBadge');
-      const outFoot = document.getElementById('converterOutputFooterNote');
-
-      if (mode === 'legacy2uni') {
-        if (btn1) {
-          btn1.className = 'flex-1 py-3 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer';
-        }
-        if (btn2) {
-          btn2.className = 'flex-1 py-3 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-sm cursor-pointer';
-        }
-        if (inputLabel) inputLabel.innerHTML = '<span>FM-Abhaya Legacy Text</span><span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-bold border border-purple-200">Photoshop / Word</span>';
-        if (input) input.placeholder = 'Paste FM-Abhaya text here (e.g. wïud, ;d;a;d, f.or)...';
-        if (singlishBadge) singlishBadge.style.display = 'none';
-        if (helakuruTips) helakuruTips.style.display = 'none';
-        if (helperHint) helperHint.innerHTML = '<span class="text-xs text-purple-700 font-semibold">FM-Abhaya පෙළ ඇතුළත් කර පහත බටනය ඔබන්න. එය සම්පූර්ණ Sinhala Unicode බවට පත්වේ.</span>';
-        if (btnText) btnText.textContent = 'Convert to Sinhala Unicode (Normal)';
-        if (outLabel) outLabel.textContent = 'Sinhala Unicode Converted Text';
-        if (outBadge) { outBadge.textContent = 'CapCut / Web / Mobile'; outBadge.className = 'text-[10px] text-teal-700 bg-teal-100 px-2.5 py-0.5 rounded-full border border-teal-200 font-bold'; }
-        if (outFoot) outFoot.innerHTML = '💡 මෙය Copy කර CapCut, Web, Social Media හෝ ඕනෑම තැනක භාවිතා කළ හැක.';
-      } else {
-        if (btn2) {
-          btn2.className = 'flex-1 py-3 px-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 text-slate-600 hover:text-slate-900 hover:bg-white/60 cursor-pointer';
-        }
-        if (btn1) {
-          btn1.className = 'flex-1 py-3 px-3 rounded-xl font-black text-xs transition-all flex items-center justify-center gap-2 bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-sm cursor-pointer';
-        }
-        if (inputLabel) inputLabel.innerHTML = '<span>Sinhala Unicode / Singlish Text</span><span id="singlishActiveBadge" class="px-2 py-0.5 rounded-full bg-teal-100 text-teal-800 text-[10px] font-bold border border-teal-200">⌨️ Real-Time Singlish Active</span>';
-        if (input) input.placeholder = 'මෙතන Singlish (amma, gedara, lanka) හෝ සිංහලෙන් type කරන්න... ස්වයංක්‍රීයව සිංහලට හැරවේ.';
-        if (helakuruTips) helakuruTips.style.display = 'flex';
-        if (helperHint) helperHint.innerHTML = '<svg class="w-3.5 h-3.5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>ඔබ Keyboard එකෙන් \'amma\' ලෙස type කර Space ඔබන විට එය ඉබේම \'අම්මා\' ලෙස Unicode වලට හැරවේ.</span>';
-        if (btnText) btnText.textContent = 'Convert to FM-Abhaya Font (Legacy)';
-        if (outLabel) outLabel.textContent = 'FM-Abhaya Converted Text';
-        if (outBadge) { outBadge.textContent = 'Photoshop / Premiere Pro'; outBadge.className = 'text-[10px] text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full border border-purple-200 font-bold'; }
-        if (outFoot) outFoot.innerHTML = '💡 මෙය Copy කර ඔබගේ Premiere Pro / CapCut / Photoshop වල Paste කර Font එක <strong>FM-Abhaya</strong> ලෙස තෝරන්න.';
-      }
-    };
-
-    // ⌨️ Live Singlish Typing Engine (Triggered on Space, Enter, or Punctuation)
-    window.handleSinglishKeydown = function(input, e) {
-      if (window.activeConverterMode === 'legacy2uni') return;
-      if (e.key === ' ' || e.key === 'Enter' || e.key === '.' || e.key === ',' || e.key === '?' || e.key === '!') {
-        setTimeout(() => {
-          window.handleWordTransliteration(input);
-        }, 0);
-      }
-    };
-
-    window.handleWordTransliteration = function(input) {
-      if (window.activeConverterMode === 'legacy2uni' || !input) return;
-      const val = input.value;
-      const cursorPos = input.selectionStart;
-      if (cursorPos === null || cursorPos === undefined) return;
-
-      const textBeforeCursor = val.slice(0, cursorPos);
-      const textAfterCursor = val.slice(cursorPos);
-
-      // Match last English Singlish word before cursor (with optional trailing whitespace/punctuation)
-      const match = textBeforeCursor.match(/([a-zA-Z0-9_\.]+)([ \t\n\.\,\?\!]*)$/);
-      if (!match) return;
-
-      const rawWord = match[1];
-      const trailingChars = match[2];
-      const convertedWord = transliterateSinglishWord(rawWord);
-
-      if (convertedWord && convertedWord !== rawWord) {
-        const replaceStart = textBeforeCursor.length - match[0].length;
-        const newBeforeCursor = textBeforeCursor.slice(0, replaceStart) + convertedWord + trailingChars;
-        input.value = newBeforeCursor + textAfterCursor;
-        const newCursorPos = newBeforeCursor.length;
-        try { input.setSelectionRange(newCursorPos, newCursorPos); } catch (e) {}
-      }
-    };
-
-    window.handleSinglishPaste = function(input, e) {
-      if (window.activeConverterMode === 'legacy2uni' || !input) return;
-      setTimeout(() => {
-        const val = input.value;
-        const converted = transliterateSinglishText(val);
-        if (converted !== val) {
-          input.value = converted;
-        }
-      }, 50);
-    };
-
-    window.handleSinglishTyping = function(input) {
-      // Kept for backward compatibility
-      if (window.activeConverterMode === 'legacy2uni' || !input) return;
-    };
-
-    window.handleConvertFontClick = function() {
-      const input = document.getElementById('converterInputText');
-      const output = document.getElementById('converterOutputText');
-      const area = document.getElementById('converterOutputArea');
-      if (!input || !output) return;
-      let text = (input.value || '').trim();
-      if (!text) {
-        if (typeof showPopup === 'function') showPopup('කරුණාකර පෙළ ඇතුළත් කරන්න.', 'Text Required', 'warning');
-        return;
-      }
-
-      if (window.activeConverterMode === 'legacy2uni') {
-        // Convert Legacy FM-Abhaya -> Unicode
-        output.value = window.convertLegacyToUnicode(text);
-      } else {
-        // 1. Transliterate all remaining Singlish words to genuine Sinhala Unicode
-        text = transliterateSinglishText(text);
-        input.value = text;
-
-        // 2. Convert Unicode Sinhala into FM-Abhaya Legacy font
-        if (typeof window.convertUnicodeToLegacy === 'function') {
-          output.value = window.convertUnicodeToLegacy(text);
-        } else {
-          output.value = text;
-        }
-      }
-
-      if (area) {
-        area.style.display = 'block';
-        try { area.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch(e){}
-      }
-    };
-    function handleConvertFontClick() { window.handleConvertFontClick(); }
-
-    window.copyConverterOutput = function() {
-      const output = document.getElementById('converterOutputText');
-      const btn = document.getElementById('copyConverterBtn');
-      if (!output || !output.value) return;
-      navigator.clipboard.writeText(output.value).then(() => {
-        if (typeof showPopup === 'function') showPopup('පෙළ සාර්ථකව Copy විය!', 'Copied', 'success');
-        if (btn) {
-          const original = btn.innerHTML;
-          btn.innerHTML = '<span>✅ Copied!</span>';
-          setTimeout(() => { btn.innerHTML = original; }, 2000);
-        }
-      }).catch(err => {
-        if (typeof showPopup === 'function') showPopup('Copy කිරීමට නොහැකි විය: ' + err.message, 'Error', 'error');
-      });
-    };
-    function copyConverterOutput() { window.copyConverterOutput(); }
-
-    function copyConverterOutput() {
-      const output = document.getElementById('converterOutputText');
-      const btn = document.getElementById('copyConverterBtn');
-      if (!output) return;
-      navigator.clipboard.writeText(output.value).then(() => {
-        if (btn) {
-          const original = btn.innerHTML;
-          btn.innerHTML = '<span>✅ Copied!</span>';
-          setTimeout(() => { btn.innerHTML = original; }, 2000);
-        }
-      });
-    }
   </script>
 
 
@@ -3635,7 +3250,10 @@
       // Strip directory paths and file extensions
       let base = name.split('/').pop().split('\\').pop().replace(/\.[^/.]+$/, '');
       // Strip any existing CapZone suffix/prefix to avoid duplicates like CapZone_CapZone
-      base = base.replace(/capzone/gi, '').replace(/[_\s-]+$/, '');
+      base = base
+        .replace(/(?:www\.)?capzone\.top/gi, '')
+        .replace(/capzone/gi, '')
+        .replace(/[_\s.-]+$/, '');
       // Preserve Unicode Sinhala characters (\u0D80-\u0DFF), English letters, numbers, and dashes
       base = base.replace(/[^\w\s\u0D80-\u0DFF-]/g, '').trim().replace(/\s+/g, '_').replace(/_+/g, '_');
       base = base.replace(/^_+|_+$/g, '');
@@ -3646,31 +3264,31 @@
       const base = sanitizeMediaName(originalName || 'media');
       let cleanExt = (ext || '').replace(/^\./, '');
 
-      // 1. SRT Subtitle Files (Sinhala or English + CapZone)
+      // 1. SRT Subtitle Files (Sinhala or English + www.capzone.top)
       if (type === 'srt' || cleanExt === 'srt') {
         const rawLang = (lang || '').toLowerCase();
         const langLabel = (rawLang.includes('english') || rawLang === 'en') ? 'English' : 'Sinhala';
-        return `${base}_${langLabel}_CapZone.srt`;
+        return `${base}_${langLabel}_www.capzone.top.srt`;
       }
 
       // 2. Background Remover Media
       if (type === 'nobg' || type === 'background') {
         const targetExt = cleanExt || 'png';
-        return `${base}_NoBg_CapZone.${targetExt}`;
+        return `${base}_NoBg_www.capzone.top.${targetExt}`;
       }
 
       // 3. Audio / MP3 Files
       if (type === 'audio' || cleanExt === 'mp3') {
-        return `${base}_CapZone.mp3`;
+        return `${base}_www.capzone.top.mp3`;
       }
 
       // 4. Scripts / Text
       if (type === 'script' || cleanExt === 'txt') {
-        return `${base}_Script_CapZone.txt`;
+        return `${base}_Script_www.capzone.top.txt`;
       }
 
       // 5. Default Media (Videos, etc.)
-      return `${base}_CapZone.${cleanExt || 'mp4'}`;
+      return `${base}_www.capzone.top.${cleanExt || 'mp4'}`;
     }
 
     // ==========================================
@@ -3775,7 +3393,7 @@
     // 🎬 LIVE VIDEO & SUBTITLE OVERLAY PREVIEW ENGINE
     // ==========================================
     window.parsedSubtitles = [];
-    window.currentPreviewFont = 'legacy';
+    window.currentPreviewFont = 'unicode';
 
     // When a video is selected, load it immediately into the Live Canvas player
     window.updateSrtFileInfoWithPreview = function(input) {
@@ -4088,7 +3706,7 @@
             content = window.convertUnicodeToLegacy(window.lastGeneratedSrtUnicode);
           }
           if (!content) content = window.lastGeneratedSrtContent || '';
-          extSuffix = '_FM_Abhaya_CapZone';
+          extSuffix = '_FM_Abhaya_www.capzone.top';
         } else if (format === 'english') {
           content = window.lastGeneratedSrtEnglish || '';
           if (!content && (window.lastGeneratedSrtUnicode || window.lastGeneratedSrtContent)) {
@@ -4111,10 +3729,10 @@
             }
           }
           if (!content) content = window.lastGeneratedSrtContent || '';
-          extSuffix = '_English_CapZone';
+          extSuffix = '_English_www.capzone.top';
         } else {
           content = window.lastGeneratedSrtUnicode || window.lastGeneratedSrtContent || '';
-          extSuffix = '_Unicode_CapZone';
+          extSuffix = '_Unicode_www.capzone.top';
         }
 
         if (!content || !content.trim()) {
@@ -4136,14 +3754,14 @@
           return;
         }
 
-        // Determine safe filename
-        let baseName = 'CapZone_Subtitles';
+        // Determine safe filename ending with www.capzone.top
+        let baseName = 'Subtitles';
         if (window.currentSrtFile && window.currentSrtFile.name) {
           baseName = window.currentSrtFile.name.replace(/\.[^/.]+$/, '');
         } else if (window._activeSrtDownload && window._activeSrtDownload.downloadFileName) {
-          baseName = window._activeSrtDownload.downloadFileName.replace(/\.[^/.]+$/, '').replace(/_(FM_Abhaya|Unicode_CapCut|CapZone|Sinhala|English)$/gi, '');
+          baseName = window._activeSrtDownload.downloadFileName.replace(/\.[^/.]+$/, '').replace(/_(FM_Abhaya|Unicode_CapCut|CapZone|www\.capzone\.top|Sinhala|English)$/gi, '');
         }
-        baseName = baseName.replace(/[^a-zA-Z0-9_\u0D80-\u0DFF-]/g, '_');
+        baseName = baseName.replace(/[^a-zA-Z0-9_\u0D80-\u0DFF-]/g, '_').replace(/_+$/, '') || 'Subtitles';
         const filename = `${baseName}${extSuffix}.srt`;
 
         // Direct Browser Blob Download Trigger
@@ -4213,33 +3831,50 @@
     document.addEventListener("DOMContentLoaded", () => {
       try { if (typeof lucide !== 'undefined') lucide.createIcons(); } catch (e) { }
 
-      // Drag & drop support for SRT Dropzone
-      const dropzone = document.getElementById('srtDropzone');
-      if (dropzone) {
-        ['dragenter', 'dragover'].forEach(eventName => {
-          dropzone.addEventListener(eventName, (e) => {
+      // Prevent accidental browser navigation when dropping files anywhere on the page
+      ['dragover', 'drop'].forEach(evtName => {
+        window.addEventListener(evtName, (e) => {
+          if (e.dataTransfer && Array.from(e.dataTransfer.types || []).includes('Files')) {
+            e.preventDefault();
+          }
+        }, false);
+      });
+
+      // Unified Drag & Drop helper for Caption, Translate, and BG Remover dropzones
+      function bindDropzone(dropzoneId, inputId, getHandler, highlightClasses) {
+        const dz = document.getElementById(dropzoneId);
+        if (!dz) return;
+        ['dragenter', 'dragover'].forEach(evtName => {
+          dz.addEventListener(evtName, (e) => {
             e.preventDefault();
             e.stopPropagation();
-            dropzone.classList.add('border-purple-500', 'bg-purple-500/10');
+            dz.classList.add(...highlightClasses);
           }, false);
         });
-        ['dragleave', 'drop'].forEach(eventName => {
-          dropzone.addEventListener(eventName, (e) => {
+        ['dragleave', 'drop'].forEach(evtName => {
+          dz.addEventListener(evtName, (e) => {
             e.preventDefault();
             e.stopPropagation();
-            dropzone.classList.remove('border-purple-500', 'bg-purple-500/10');
+            dz.classList.remove(...highlightClasses);
           }, false);
         });
-        dropzone.addEventListener('drop', (e) => {
-          if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
-            const input = document.getElementById('srtVideoInput');
-            if (input) {
-              input.files = e.dataTransfer.files;
-              updateSrtFileInfo(input);
-            }
+        dz.addEventListener('drop', (e) => {
+          const droppedFiles = e.dataTransfer && e.dataTransfer.files;
+          if (!droppedFiles || !droppedFiles[0]) return;
+          const input = document.getElementById(inputId);
+          if (input) {
+            try { input.files = droppedFiles; } catch (assignErr) {}
+          }
+          const fn = getHandler();
+          if (typeof fn === 'function') {
+            fn({ files: droppedFiles });
           }
         }, false);
       }
+
+      bindDropzone('srtDropzone', 'srtFileInput', () => window.updateSrtFileInfo || updateSrtFileInfo, ['border-purple-500', 'bg-purple-100/70']);
+      bindDropzone('srtTranslateDropzone', 'srtTranslateFileInput', () => window.updateSrtTranslateFileInfo, ['border-indigo-500', 'bg-indigo-100/70']);
+      bindDropzone('bgDropzone', 'bgFileInput', () => window.handleBgFileSelect, ['border-emerald-500', 'bg-emerald-100/70']);
     });
 
     window.pendingToolModal = null;
@@ -4413,7 +4048,7 @@
     }
 
     // --- Handlers & Progress Tracker ---
-    const API_BASE_URL = window.API_BASE_URL;
+    window.getApiBaseUrl = function () { return window.API_BASE_URL || ''; };
 
     function updateSrtStepUI(activeStep, options = {}) {
       const pct = options.percent !== undefined ? Math.min(100, Math.max(0, options.percent)) : (activeStep === 1 ? 0 : activeStep === 2 ? 35 : activeStep === 3 ? 65 : activeStep === 4 ? 90 : 100);
@@ -4623,7 +4258,7 @@
     window.getFriendlyMediaError = getFriendlyMediaError;
 
     function setupProgressTracker(clientId, stepsPrefix, barId) {
-      const eventSource = new EventSource(`${API_BASE_URL}/api/progress?clientId=${clientId}`);
+      const eventSource = new EventSource(`${window.API_BASE_URL || ''}/api/progress?clientId=${clientId}`);
       if (stepsPrefix === 'srt') {
         window.currentSrtEventSource = eventSource;
       }
@@ -4652,33 +4287,32 @@
 
             // For Images & Background Remover
             if ((data.data.url || data.data.previewUrl) && (stepsPrefix === 'img' || stepsPrefix === 'bg')) {
-              const bgResArea = document.getElementById('bgResultArea');
-              const bgProgCard = document.getElementById('bgProgressCard');
-              const bgSubmitBtn = document.getElementById('bgSubmitBtn');
-              const bgResImg = document.getElementById('bgResultImg');
-              const bgDlBtn = document.getElementById('bgDownloadBtn');
-              const bgDlSub = document.getElementById('bgDlBtnSub');
-              if (bgResArea) {
-                if (bgProgCard) bgProgCard.style.display = 'none';
-                if (bgSubmitBtn) bgSubmitBtn.disabled = false;
-                bgResArea.style.display = 'block';
-                const pUrl = data.data.previewUrl || data.data.url;
-                const dUrl = data.data.downloadUrl || data.data.url;
-                const bUrl = pUrl.includes('?') ? (pUrl + '&t=' + Date.now()) : (pUrl + '?t=' + Date.now());
-                if (bgResImg) bgResImg.src = bUrl;
-                if (bgDlBtn) {
-                  bgDlBtn.href = dUrl;
-                  bgDlBtn.setAttribute('download', data.data.filename || 'cutout_CapZone.png');
-                }
-                if (bgDlSub) bgDlSub.textContent = data.data.filename || 'cutout_CapZone.png';
-              }
               let previewUrl = data.data.previewUrl || data.data.url;
               let downloadUrl = data.data.downloadUrl || data.data.url;
-              if (!previewUrl.startsWith('http')) {
-                previewUrl = `${API_BASE_URL}${previewUrl}`;
-              }
-              if (!downloadUrl.startsWith('http')) {
-                downloadUrl = `${API_BASE_URL}${downloadUrl}`;
+              const baseOrigin = window.API_BASE_URL || '';
+              if (!previewUrl.startsWith('http')) previewUrl = `${baseOrigin}${previewUrl}`;
+              if (!downloadUrl.startsWith('http')) downloadUrl = `${baseOrigin}${downloadUrl}`;
+              if (typeof window.applyBgCutoutResult === 'function' && stepsPrefix === 'bg') {
+                window.applyBgCutoutResult(data.data);
+              } else {
+                const bgResArea = document.getElementById('bgResultArea');
+                const bgProgCard = document.getElementById('bgProgressCard');
+                const bgSubmitBtn = document.getElementById('bgSubmitBtn');
+                const bgResImg = document.getElementById('bgResultImg');
+                const bgDlBtn = document.getElementById('bgDownloadBtn');
+                const bgDlSub = document.getElementById('bgDlBtnSub');
+                if (bgResArea) {
+                  if (bgProgCard) bgProgCard.style.display = 'none';
+                  if (bgSubmitBtn) bgSubmitBtn.disabled = false;
+                  bgResArea.style.display = 'block';
+                  const bUrl = previewUrl.includes('?') ? (previewUrl + '&t=' + Date.now()) : (previewUrl + '?t=' + Date.now());
+                  if (bgResImg) bgResImg.src = bUrl;
+                  if (bgDlBtn) {
+                    bgDlBtn.href = downloadUrl;
+                    bgDlBtn.setAttribute('download', data.data.fileName || data.data.filename || 'cutout_www.capzone.top.png');
+                  }
+                  if (bgDlSub) bgDlSub.textContent = data.data.fileName || data.data.filename || 'cutout_www.capzone.top.png';
+                }
               }
 
               const fileInput = document.getElementById('enhanceImageInput');
@@ -4906,7 +4540,7 @@
       document.getElementById('imgReplyInput').value = '';
 
       try {
-        await fetch(`${API_BASE_URL}/api/reply-image`, {
+        await fetch(`${window.API_BASE_URL || ''}/api/reply-image`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ clientId: window.currentImageClientId, reply })
@@ -4916,35 +4550,7 @@
       }
     }
 
-    window.syncApiKeys = function (key) {
-      if (!key || key === 'default') {
-        localStorage.removeItem('capzone_api_key');
-        localStorage.removeItem('capzone_gemini_key');
-        localStorage.removeItem('gemini_api_key');
-        localStorage.setItem('capzone_api_type', 'server');
-
-        const userApiKey = document.getElementById('userApiKey');
-        const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-        if (userApiKey) userApiKey.value = '';
-        if (geminiApiKeyInput) geminiApiKeyInput.value = '';
-        return;
-      }
-      localStorage.setItem('capzone_api_key', key);
-      localStorage.setItem('capzone_gemini_key', key);
-      localStorage.setItem('gemini_api_key', key);
-      localStorage.setItem('capzone_api_type', 'own');
-
-      const userApiKey = document.getElementById('userApiKey');
-      const geminiApiKeyInput = document.getElementById('geminiApiKeyInput');
-
-      if (userApiKey) userApiKey.value = key;
-      if (geminiApiKeyInput) geminiApiKeyInput.value = key;
-
-      if (typeof window.updateApiToggleUI === 'function') {
-        window.updateApiToggleUI();
-      }
-    };
-
+    window.syncApiKeys = function () {};
     window.clearUserApiKey = function () {};
     function saveApiKeys() {}
 
@@ -4964,15 +4570,18 @@
       const playerTitle = document.getElementById('srtLivePlayerTitle');
       if (playerTitle) playerTitle.textContent = currentSrtFile.name;
 
-      if (videoEl && currentSrtFile.type && (currentSrtFile.type.startsWith('video') || currentSrtFile.type.startsWith('audio') || currentSrtFile.name.match(/\.(mp4|mov|avi|mkv|webm|mp3|wav|m4a)$/i))) {
+      if (videoEl && ((currentSrtFile.type && (currentSrtFile.type.startsWith('video') || currentSrtFile.type.startsWith('audio'))) || /\.(mp4|mov|avi|mkv|webm|mp3|wav|m4a|ogg|aac)$/i.test(currentSrtFile.name || ''))) {
         if (window._currentVideoBlobUrl) {
           try { URL.revokeObjectURL(window._currentVideoBlobUrl); } catch(e){}
         }
         window._currentVideoBlobUrl = URL.createObjectURL(currentSrtFile);
         videoEl.src = window._currentVideoBlobUrl;
+        videoEl.style.display = 'block';
         videoEl.load();
+        const phEl = document.getElementById('srtVideoPlaceholder');
+        if (phEl) phEl.style.display = 'none';
         if (playerContainer) {
-          if (playerContainer) playerContainer.style.display = 'block';
+          playerContainer.style.display = 'block';
           playerContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
@@ -4986,14 +4595,14 @@
 
       if (validationCard) validationCard.style.display = 'block';
 
-      // 1. File size check (500MB max upload limit)
-      if (currentSrtFile.size > 500 * 1024 * 1024) {
+      // 1. File size check (1024MB / 1GB max upload limit for 2-hour movies)
+      if (currentSrtFile.size > 1024 * 1024 * 1024) {
         if (durationEl) durationEl.innerText = '-';
-        if (tierEl) tierEl.innerText = 'Exceeds 500MB Limit';
+        if (tierEl) tierEl.innerText = 'Exceeds 1GB Limit';
         if (statusEl) statusEl.innerText = 'Rejected';
         if (alertEl) {
           alertEl.className = 'p-3 rounded-xl text-xs bg-red-500/15 border border-red-500/30 text-red-300 flex items-start gap-2.5';
-          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 500 MB upload limit. Video rejected.</div>`;
+          alertEl.innerHTML = `<i data-lucide="alert-triangle" class="w-4 h-4 text-red-400 shrink-0 mt-0.5"></i> <div><strong>File Too Large:</strong> File size (${(currentSrtFile.size / (1024 * 1024)).toFixed(1)} MB) exceeds 1024 MB upload limit. Video rejected.</div>`;
         }
         if (submitBtn) submitBtn.disabled = true;
         if (window.lucide) window.lucide.createIcons();
@@ -5116,62 +4725,26 @@
       resultArea.style.display = 'none';
       if (modalBox) modalBox.classList.add('kaveez-glowing-aura');
 
-      const apiType = localStorage.getItem('capzone_api_type');
-      const apiKey = localStorage.getItem('capzone_gemini_key');
       const format = document.getElementById('scriptFormat').value;
-
-      let prompt = `Act as an expert YouTube scriptwriter and produce a highly engaging, super advanced viral video script about '${topic}'. Format: ${format}. CRITICAL INSTRUCTIONS: 1. The script MUST be 100% in natural Sinhala (සිංහල Unicode). 2. Write in PLAIN TEXT ONLY. DO NOT use ANY Markdown formatting (no **, no ##, no bullets). Provide a clean text output. 3. Include a catchy HOOK, a detailed INTRO, a comprehensive BODY with creative visual scene descriptions (B-Roll ideas), and a strong CALL-TO-ACTION OUTRO. 4. Ensure paragraphs are well-separated with blank lines for readability. Make the language highly compelling and professional for content creators.`;
 
       try {
         let scriptText = '';
-
-        if (apiType === 'own' && apiKey) {
-          try {
-            // Direct call using verified high-availability models
-            const candidateModels = ['gemini-flash-latest', 'gemini-3.5-flash', 'gemini-3.6-flash'];
-            for (const model of candidateModels) {
-              try {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-                const requestBody = { contents: [{ parts: [{ text: prompt }] }] };
-
-                document.getElementById('scraperSrtProgressBar').style.width = '50%';
-                const response = await fetch(url, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(requestBody)
-                });
-
-                if (!response.ok) continue;
-                const data = await response.json();
-                if (data.candidates && data.candidates[0].content && data.candidates[0].content.parts[0].text) {
-                  scriptText = data.candidates[0].content.parts[0].text;
-                  break;
-                }
-              } catch (mErr) { }
+        try {
+          document.getElementById('scraperSrtProgressBar').style.width = '50%';
+          const clientId = 'scraper_' + Date.now();
+          const res = await fetch(`${window.API_BASE_URL || ''}/api/generate-script`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ topic, format, clientId })
+          });
+          if (res.ok) {
+            const resData = await res.json();
+            if (resData.script && !resData.script.includes('[SYSTEM DOWN]')) {
+              scriptText = resData.script;
             }
-          } catch (eDirect) {
-            console.warn('Direct key error:', eDirect);
           }
-        }
-
-        if (!scriptText) {
-          // Server proxy call
-          try {
-            const clientId = 'scraper_' + Date.now();
-            const res = await fetch(`${API_BASE_URL}/api/generate-script`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ topic, format, clientId })
-            });
-            if (res.ok) {
-              const resData = await res.json();
-              if (resData.script && !resData.script.includes('[SYSTEM DOWN]')) {
-                scriptText = resData.script;
-              }
-            }
-          } catch (eServer) {
-            console.warn('Server script call notice:', eServer);
-          }
+        } catch (eServer) {
+          console.warn('Server script call notice:', eServer);
         }
 
         if (!scriptText) {
@@ -5403,6 +4976,9 @@
         modalBox.classList.add('kaveez-glowing-aura');
         modalBox.scrollTo({ top: 0, behavior: 'smooth' });
       }
+      if (window._capzoneApiProbePromise) {
+        try { await window._capzoneApiProbePromise; } catch (probeErr) {}
+      }
       const clientId = 'srt_' + Date.now();
       window.currentSrtAbortController = new AbortController();
       window._isSrtCancelled = false;
@@ -5410,26 +4986,25 @@
       updateSrtStepUI(1, { percent: 0, statusMsg: 'ගොනුව සකසමින් පවතී... (0%)' });
       const es = setupProgressTracker(clientId, 'srt', 'srtProgressBar');
 
-      // Optimize upload by extracting lightweight 16kHz mono audio from video if possible
+      // Optimize upload for short/small clips (<= 12MB & <= 3m) with strict 5s timeout so long/large videos never freeze Chrome RAM
       let fileToUpload = currentSrtFile;
-      if (currentSrtFile && currentSrtFile.type && (currentSrtFile.type.startsWith('video/') || currentSrtFile.name.match(/\.(mp4|mov|avi|mkv|webm)$/i))) {
-        // Only run browser decoding if file is reasonable (<150MB) to avoid browser tab memory exhaustion
-        if (currentSrtFile.size <= 150 * 1024 * 1024) {
-          updateSrtStepUI(1, { percent: 5, statusMsg: 'ශ්‍රව්‍ය පථය විශ්ලේෂණය කරමින්... (5%)' });
-          try {
-            fileToUpload = await extractOptimizedAudio(currentSrtFile);
-          } catch (audioErr) {
-            console.warn('Audio extraction notice, fallback to original:', audioErr);
-            fileToUpload = currentSrtFile;
-          }
+      const isVideoUpload = currentSrtFile && ((currentSrtFile.type && currentSrtFile.type.startsWith('video/')) || /\.(mp4|mov|avi|mkv|webm)$/i.test(currentSrtFile.name || ''));
+      const withinSafeDuration = (!window.currentMediaDuration || !isFinite(window.currentMediaDuration) || window.currentMediaDuration <= 180);
+      if (isVideoUpload && currentSrtFile.size <= 12 * 1024 * 1024 && withinSafeDuration) {
+        updateSrtStepUI(1, { percent: 5, statusMsg: 'ශ්‍රව්‍ය පථය විශ්ලේෂණය කරමින්... (5%)' });
+        try {
+          fileToUpload = await Promise.race([
+            extractOptimizedAudio(currentSrtFile),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Audio extraction timeout')), 5000))
+          ]);
+        } catch (audioErr) {
+          console.warn('Audio extraction notice, fallback to original:', audioErr);
+          fileToUpload = currentSrtFile;
         }
       }
       if (window._isSrtCancelled) return;
 
-      const isDirectOrLocal = window.location.protocol === 'file:' || 
-        ['localhost', '127.0.0.1', ''].includes(window.location.hostname) || 
-        window.location.port === '6039';
-      const maxAllowedBytes = isDirectOrLocal ? (500 * 1024 * 1024) : (95 * 1024 * 1024);
+      const maxAllowedBytes = 1024 * 1024 * 1024; // 1 GB supported everywhere via chunked upload!
 
       if (fileToUpload.size > maxAllowedBytes) {
         if (es) { try { es.close(); } catch (e) { } }
@@ -5438,7 +5013,7 @@
         window.safeSetDisplay('srtProgressCard', 'none');
         window.safeSetDisplay('srtResultArea', 'none');
         if (modalBox) modalBox.classList.remove('kaveez-glowing-aura');
-        showPopup(`ගොනුවේ ප්‍රමාණය විශාල වැඩිය (උපරිම ${Math.round(maxAllowedBytes / (1024*1024))}MB). කරුණාකර කුඩා වීඩියෝවක් හෝ Audio ගොනුවක් ලබා දෙන්න.`, 'Limit Exceeded', 'warning');
+        showPopup(`ගොනුවේ ප්‍රමාණය විශාල වැඩිය (උපරිම 1024MB). කරුණාකර කුඩා වීඩියෝවක් ලබා දෙන්න.`, 'Limit Exceeded', 'warning');
         return;
       }
 
@@ -5515,7 +5090,7 @@
         updateSrtStepUI(5, { percent: 100, partsText: '4 of 4 parts done' });
 
         // Immediately parse and link subtitle blocks to Live Video Player
-        const activeSelectedLang = document.getElementById('srtLanguage')?.value || 'si-legacy';
+        const activeSelectedLang = document.getElementById('srtLanguage')?.value || 'si-unicode';
         const initialSrtToLoad = (activeSelectedLang === 'si-legacy') ? (data.srtLegacy || data.srt) : (data.srtUnicode || data.srt);
         window.parsedSubtitles = window.parseSrtToBlocks(initialSrtToLoad);
         if (typeof window.setPlayerFont === 'function') {
@@ -5545,7 +5120,7 @@
           type: 'Subtitle',
           title: srtName,
           metadata: `${lang} Subtitles`,
-          media_url: data.downloadUrl ? `${API_BASE_URL}${data.downloadUrl}` : '',
+          media_url: data.downloadUrl ? `${window.API_BASE_URL || ''}${data.downloadUrl}` : '',
           payload: {
             srt: data.srt,
             language: lang,
@@ -5598,7 +5173,7 @@
         if (srtProgCard) srtProgCard.style.display = 'none';
 
         // Display Single Format Download Button directly under the video player
-        const curSelectedLang = document.getElementById('srtLanguage')?.value || 'si-legacy';
+        const curSelectedLang = document.getElementById('srtLanguage')?.value || 'si-unicode';
         const singleBtnText = document.getElementById('srtSingleDownloadBtnText');
         const readyLangBadge = document.getElementById('srtReadyLangBadge');
         if (curSelectedLang === 'si-legacy') {
@@ -5662,7 +5237,8 @@
       window.downloadAndDismissSrtPopup = function () {
         try {
           if (typeof window.downloadSrtFormat === 'function') {
-            window.downloadSrtFormat('legacy');
+            const curFmt = document.getElementById('srtLanguage')?.value || 'si-unicode';
+            window.downloadSrtFormat(curFmt === 'si-legacy' ? 'legacy' : (curFmt === 'en' ? 'english' : 'unicode'));
           } else if (window._activeSrtDownload && window._activeSrtDownload.blobUrl) {
             const { blobUrl, downloadFileName } = window._activeSrtDownload;
             const downloadAnchor = document.createElement('a');
@@ -5811,7 +5387,7 @@
               return;
             }
             try {
-              const pRes = await fetch(`${API_BASE_URL}/api/srt-result?clientId=${clientId}`);
+              const pRes = await fetch(`${window.API_BASE_URL || ''}/api/srt-result?clientId=${clientId}`);
               if (window._isSrtCancelled) return;
               if (pRes.ok) {
                 const pData = await pRes.json();
@@ -5907,8 +5483,59 @@
         showDeveloperWarning();
       };
 
-      const userEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
-      xhr.open('POST', `${API_BASE_URL}/api/gateway?op=srt_generate&clientId=${clientId}`);
+      const userEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.top';
+      // For files > 40MB (e.g. 2-hour movies), stream in 8MB chunks through Cloudflare-safe /api/upload-chunk first
+      if (fileToUpload.size > 40 * 1024 * 1024) {
+        try {
+          const CHUNK_BYTES = 8 * 1024 * 1024;
+          const totalChunks = Math.ceil(fileToUpload.size / CHUNK_BYTES);
+          const uploadId = 'up_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+          let assembledName = '';
+          for (let ci = 0; ci < totalChunks; ci++) {
+            if (window._isSrtCancelled) return;
+            const start = ci * CHUNK_BYTES;
+            const end = Math.min(fileToUpload.size, start + CHUNK_BYTES);
+            const sliceBlob = fileToUpload.slice(start, end);
+            const cRes = await fetch(`${window.API_BASE_URL || ''}/api/upload-chunk?uploadId=${uploadId}&chunkIndex=${ci}&totalChunks=${totalChunks}&fileName=${encodeURIComponent(srtOriginalName)}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/octet-stream', 'x-user-email': userEmail },
+              body: sliceBlob
+            });
+            const cJson = await cRes.json();
+            if (!cRes.ok || !cJson.success) throw new Error(cJson.error || 'Chunk upload failed');
+            assembledName = cJson.serverFile;
+            const upPct = Math.min(35, Math.round(5 + ((ci + 1) / totalChunks) * 30));
+            window._currentSrtPercent = Math.max(window._currentSrtPercent || 0, upPct);
+            updateSrtStepUI(2, {
+              percent: window._currentSrtPercent,
+              statusMsg: `වීඩියෝව Upload වෙමින් පවතී... (${Math.round(((ci + 1) / totalChunks) * 100)}%)`
+            });
+          }
+          xhr.open('POST', `${window.API_BASE_URL || ''}/api/gateway?op=srt_generate&clientId=${clientId}`);
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.setRequestHeader('x-user-email', userEmail);
+          xhr.send(JSON.stringify({
+            serverFile: assembledName,
+            fileName: srtOriginalName,
+            title: srtOriginalName,
+            email: userEmail,
+            language: targetLang,
+            fontFormat: fontFmt,
+            wordsLimit: document.getElementById('srtWordsLimit')?.value || '1'
+          }));
+          return;
+        } catch (chunkErr) {
+          console.warn('[Chunked Upload Error]:', chunkErr);
+          if (es) { try { es.close(); } catch (e) { } }
+          document.getElementById('srtSubmitBtn').disabled = false;
+          window.safeSetDisplay('srtForm', 'block');
+          window.safeSetDisplay('srtProgressCard', 'none');
+          showPopup(chunkErr.message || 'Large file upload failed.', 'Upload Notice', 'error');
+          return;
+        }
+      }
+
+      xhr.open('POST', `${window.API_BASE_URL || ''}/api/gateway?op=srt_generate&clientId=${clientId}`);
       xhr.setRequestHeader('x-user-email', userEmail);
       xhr.send(formData);
     }
@@ -6006,6 +5633,7 @@
     }
 
     async function handleSocialSubmit(type, url, format = 'video', qualityLevel = 'max') {
+      if (window._capzoneApiProbePromise) { try { await window._capzoneApiProbePromise; } catch (pe) {} }
       const btnId = type + 'SubmitBtn';
       const progId = type + 'ProgressCard';
       const resId = type + 'ResultArea';
@@ -6020,7 +5648,7 @@
       const es = setupProgressTracker(clientId, type, barId);
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/gateway?op=${type === 'fb' ? 'fb_dl' : 'tt_dl'}`, {
+        const res = await fetch(`${window.API_BASE_URL || ''}/api/gateway?op=${type === 'fb' ? 'fb_dl' : 'tt_dl'}`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: type === 'fb' ? 'fb_dl' : 'tt_dl', url, clientId, format, qualityLevel })
         });
         const data = await res.json();
@@ -6168,7 +5796,7 @@
       window.isImageTaskRunning = true;
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/generate-image`, {
+        const res = await fetch(`${window.API_BASE_URL || ''}/api/generate-image`, {
           method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ prompt, clientId })
         });
         const data = await res.json();
@@ -6231,7 +5859,7 @@
 
       try {
         formData.append('op', 'bg_remove');
-        const res = await fetch(`${API_BASE_URL}/api/gateway?op=bg_remove&clientId=${clientId}`, { method: 'POST', body: formData });
+        const res = await fetch(`${window.API_BASE_URL || ''}/api/gateway?op=bg_remove&clientId=${clientId}`, { method: 'POST', body: formData });
         const data = await res.json();
 
         if (data.success) {
@@ -6622,74 +6250,8 @@
       return new Date(dateStr).toLocaleDateString([], { month: 'short', day: 'numeric' });
     }
 
-    // Save project universally to fast-cache and SQLite DB
-    window.saveToRecentProjects = function (typeOrObj, title, metadata, fileId = null) {
-      let project = {};
-      if (typeof typeOrObj === 'object' && typeOrObj !== null) {
-        project = Object.assign({}, typeOrObj);
-      } else {
-        let metaStr = metadata;
-        if (fileId) {
-          metaStr = typeof metadata === 'object' ? JSON.stringify(metadata) : metadata;
-        }
-        project = {
-          type: typeOrObj,
-          title: title || 'Untitled Project',
-          metadata: metaStr || '',
-          media_url: typeof fileId === 'string' && (fileId.startsWith('http') || fileId.startsWith('/')) ? fileId : ''
-        };
-      }
-
-      // Universal Media URL normalizer for DB storage
-      if (project.media_url && typeof project.media_url === 'string') {
-        if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(project.media_url)) {
-          project.media_url = project.media_url.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, '');
-        }
-      }
-
-      // Always ensure valid user email with fallback
-      let rawEmail = project.email || window.currentUserEmail || localStorage.getItem('capzone_user_email') || 'creator@capzone.ai';
-      project.email = rawEmail.toLowerCase().trim();
-      project.date = project.date || new Date().toISOString();
-      if (!project.id) project.id = Date.now().toString() + '_' + Math.random().toString(36).substr(2, 4);
-
-      // 1. Instant Fast-Cache in localStorage
-      const cacheKey = 'capzone_projects_' + project.email;
-      let cached = [];
-      try { cached = JSON.parse(localStorage.getItem(cacheKey) || '[]'); } catch (e) { }
-      // Deduplicate strictly by id OR (type + title match)
-      cached = cached.filter(p => p.id !== project.id && !(p.type === project.type && (p.title || '').trim().toLowerCase() === (project.title || '').trim().toLowerCase()));
-      cached.unshift(project);
-      if (cached.length > 50) cached.pop();
-      localStorage.setItem(cacheKey, JSON.stringify(cached));
-      window.allProjects = cached;
-      window.renderRecentProjects();
-
-      // 2. Persist to Backend Server
-      try {
-        fetch(`${API_BASE_URL}/api/user-projects`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-user-email': project.email
-          },
-          body: JSON.stringify(project)
-        }).then(res => res.json()).then(data => {
-          if (data && data.success) {
-            project.id = data.id || project.id;
-            project.synced = true;
-            if (data.telegram_msg_id) project.telegram_msg_id = data.telegram_msg_id;
-            if (data.telegram_file_id) project.telegram_file_id = data.telegram_file_id;
-            const idx = (window.allProjects || []).findIndex(p => p.id === project.id || (p.type === project.type && (p.title || '').trim().toLowerCase() === (project.title || '').trim().toLowerCase()));
-            if (idx !== -1) window.allProjects[idx] = Object.assign({}, window.allProjects[idx], project);
-            localStorage.setItem(cacheKey, JSON.stringify(window.allProjects));
-            window.renderRecentProjects();
-          }
-        }).catch(err => console.warn('Sync project error:', err));
-      } catch (e) {
-        console.error('Save project error:', e);
-      }
-    };
+    // Project saving disabled (no local/server project history storage)
+    window.saveToRecentProjects = function () { return; };
 
     // Filter projects by category chip
     window.filterProjects = function (category) {
@@ -6705,65 +6267,9 @@
     };
 
     // Load projects from fast-cache and backend server (Synced across all devices)
-    window.loadAndRenderProjects = async function (forceRefresh = false) {
-      let rawEmail = window.currentUserEmail || localStorage.getItem('capzone_user_email') || '';
-      if (!rawEmail) return;
-      const email = rawEmail.toLowerCase().trim();
-      const cacheKey = 'capzone_projects_' + email;
-      const deletedKeysKey = 'capzone_deleted_keys_' + email;
-      let deletedKeys = new Set();
-      try {
-        const arr = JSON.parse(localStorage.getItem(deletedKeysKey) || '[]');
-        deletedKeys = new Set(arr.map(String));
-      } catch (e) { }
-
-      const isDeletedItem = (item) => {
-        if (!item) return false;
-        if (item.id && deletedKeys.has(String(item.id))) return true;
-        if (item.telegram_msg_id && deletedKeys.has(String(item.telegram_msg_id))) return true;
-        return false;
-      };
-
-      if (!forceRefresh) {
-        try {
-          const cached = JSON.parse(localStorage.getItem(cacheKey) || '[]');
-          if (cached && cached.length > 0) {
-            window.allProjects = cached.filter(p => !isDeletedItem(p));
-            window.renderRecentProjects();
-          }
-        } catch (e) { }
-      }
-
-      try {
-        const res = await fetch(`${API_BASE_URL}/api/user-projects?email=` + encodeURIComponent(email) + `&_t=${Date.now()}`, {
-          headers: { 'x-user-email': email }
-        });
-        if (res.ok) {
-          const serverProjects = await res.json();
-          const cleanProjects = [];
-          const fetchedProjects = Array.isArray(serverProjects) ? serverProjects : (serverProjects && serverProjects.projects ? serverProjects.projects : []);
-          fetchedProjects.forEach(p => {
-            if (isDeletedItem(p)) {
-              // Silently clean up ghost item from server
-              fetch(`${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(p.id)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(p.telegram_msg_id || '')}`, { method: 'DELETE' }).catch(() => { });
-              return;
-            }
-            const item = Object.assign({}, p);
-            item.synced = true;
-            if (item.payload && typeof item.payload === 'string') {
-              try { item.payload = JSON.parse(item.payload); } catch (e) { }
-            }
-            cleanProjects.push(item);
-          });
-
-          cleanProjects.sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0));
-          window.allProjects = cleanProjects;
-          localStorage.setItem(cacheKey, JSON.stringify(cleanProjects));
-          window.renderRecentProjects();
-        }
-      } catch (e) {
-        console.warn('Could not fetch projects from server:', e);
-      }
+    window.loadAndRenderProjects = async function () {
+      window.allProjects = [];
+      return;
     };
 
     // Render projects list in sidebar with rich preview cards & action buttons
@@ -6872,13 +6378,7 @@
         if (hasThumb) {
           thumbnailHtml = `
             <div class="w-11 h-11 rounded-xl overflow-hidden bg-neutral-900 border border-white/15 flex-shrink-0 shadow-md relative flex items-center justify-center [background-image:radial-gradient(#374151_1px,transparent_1px)] [background-size:8px_8px]">
-              <img src="${formattedMedia}" alt="${p.title}" class="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src='logo.jpg';">
-            </div>`;
-        } else if (displayType === 'Video' && formattedMedia) {
-          thumbnailHtml = `
-            <div class="w-11 h-11 rounded-xl overflow-hidden bg-black/60 border border-blue-500/30 flex-shrink-0 shadow-md relative flex items-center justify-center group">
-              <video src="${formattedMedia}" preload="metadata" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity duration-300"></video>
-              <i data-lucide="play" class="w-4 h-4 text-white absolute z-10 drop-shadow-lg"></i>
+              <img src="${formattedMedia}" loading="lazy" alt="${p.title}" class="w-full h-full object-contain p-0.5 group-hover:scale-110 transition-transform duration-300" onerror="this.onerror=null; this.src='logo.jpg';">
             </div>`;
         } else {
           thumbnailHtml = `
@@ -7337,7 +6837,7 @@
 
         // 3. Send DELETE to server with all matching criteria
         try {
-          const deleteUrl = `${API_BASE_URL}/api/user-projects?id=${encodeURIComponent(projectId)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(pTgMsgId)}&title=${encodeURIComponent(pTitle)}&type=${encodeURIComponent(pType)}`;
+          const deleteUrl = `${window.API_BASE_URL || ''}/api/user-projects?id=${encodeURIComponent(projectId)}&email=${encodeURIComponent(email)}&tg_msg_id=${encodeURIComponent(pTgMsgId)}&title=${encodeURIComponent(pTitle)}&type=${encodeURIComponent(pType)}`;
           fetch(deleteUrl, {
             method: 'DELETE',
             headers: {
@@ -7432,7 +6932,8 @@
       else if (tab === 'facebook' || tab === 'fb') window.switchView('view-facebook');
       else if (tab === 'tiktok' || tab === 'tt') window.switchView('view-tiktok');
       else if (tab === 'translate') window.switchView('view-translate');
-      else if (tab === 'converter' || tab === 'font') window.switchView('view-converter');
+      else if (tab === 'converter') window.switchView('view-converter-studio');
+      else if (tab === 'bg' || tab === 'image') window.switchView('view-bg-remover');
       else window.switchView('view-home');
     };
 
@@ -7454,40 +6955,6 @@
       }, 650);
     });
   </script>
-
-  <!-- Ultra-Modern Mobile Studio App Bottom Navigation Bar (iOS/Android Native Feel) -->
-  <nav class="fixed bottom-2.5 left-2.5 right-2.5 z-40 block lg:hidden pointer-events-auto" aria-label="Mobile Navigation">
-    <div class="px-1.5 py-1.5 rounded-2xl border border-slate-700/70 bg-slate-950/95 backdrop-blur-2xl shadow-[0_12px_36px_rgba(15,23,42,0.55)] grid grid-cols-5 items-center gap-1">
-      <button type="button" onclick="window.switchMobileDockTab('home', 'view-home')" id="mobileDockStudio" data-mobile-tab="home"
-        class="cz-mobile-tab flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl bg-amber-400 text-slate-950 font-black transition-all active:scale-95 cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        <span class="text-[9.5px] tracking-tight">Home</span>
-      </button>
-      <button type="button" onclick="window.switchMobileDockTab('captions', 'view-captions')" data-mobile-tab="captions"
-        class="cz-mobile-tab flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl text-slate-400 hover:text-white font-bold transition-all active:scale-95 cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/></svg>
-        <span class="text-[9.5px] tracking-tight">Captions</span>
-      </button>
-      <button type="button" onclick="window.switchMobileDockTab('youtube', 'view-youtube')" data-mobile-tab="youtube"
-        class="cz-mobile-tab flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl text-slate-400 hover:text-white font-bold transition-all active:scale-95 cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        <span class="text-[9.5px] tracking-tight">Media</span>
-      </button>
-      <button type="button" onclick="window.switchMobileDockTab('converter', 'view-converter-studio')" data-mobile-tab="converter"
-        class="cz-mobile-tab flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl text-slate-400 hover:text-white font-bold transition-all active:scale-95 cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
-        <span class="text-[9.5px] tracking-tight">Convert</span>
-      </button>
-      <button type="button" onclick="document.getElementById('projectsSidebarDrawer').classList.remove('hidden'); if(window.loadAndRenderProjects) window.loadAndRenderProjects(true);" id="mobileDockProjects" data-mobile-tab="projects"
-        class="cz-mobile-tab flex flex-col items-center justify-center gap-0.5 py-1.5 px-1 rounded-xl text-slate-400 hover:text-white font-bold transition-all active:scale-95 relative cursor-pointer">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>
-        <span class="text-[9.5px] tracking-tight">Projects</span>
-        <span id="mobileDockBadge"
-          class="absolute top-0.5 right-2 min-w-[15px] h-3.5 px-1 rounded-full bg-rose-500 text-white text-[8px] font-bold flex items-center justify-center border border-slate-950"
-          style="display: none;">0</span>
-      </button>
-    </div>
-  </nav>
 
   <!-- Mobile Menu Overlay -->
   <div id="mobileMenuOverlay"
@@ -7960,6 +7427,8 @@
           matchesCat = cardCat.includes('audio');
         } else if (cat === 'translate') {
           matchesCat = cardCat.includes('translate');
+        } else if (cat === 'image') {
+          matchesCat = cardCat.includes('image');
         } else if (cat === 'font') {
           matchesCat = cardCat.includes('font');
         } else if (cat === 'converter') {
@@ -8076,6 +7545,7 @@
 
     window.handleSrtTranslateSubmit = async function (e) {
       if (e) e.preventDefault();
+      if (window._capzoneApiProbePromise) { try { await window._capzoneApiProbePromise; } catch (pe) {} }
       const file = window.currentTranslateSrtFile || (document.getElementById('srtTranslateFileInput') ? document.getElementById('srtTranslateFileInput').files[0] : null);
       if (!file) {
         if (typeof showPopup === 'function') showPopup('කරුණාකර .SRT උපසිරැසි ගොනුවක් තෝරන්න.', 'File Required', 'warning');
@@ -8185,9 +7655,12 @@
       }
       baseName = baseName.replace(/[^a-zA-Z0-9_\u0D80-\u0DFF-]/g, '_');
       const suffixTag = targetLang.startsWith('si') ? (mode === 'legacy' ? 'Sinhala_FM_Abhaya' : 'Sinhala_Unicode') : targetLang;
-      const filename = data.filename && mode === (targetLang === 'si-legacy' ? 'legacy' : 'unicode')
+      let filename = data.filename && mode === (targetLang === 'si-legacy' ? 'legacy' : 'unicode')
         ? data.filename
-        : (baseName + '_Translated_' + suffixTag + '_CapZone.srt');
+        : (baseName + '_Translated_' + suffixTag + '_www.capzone.top.srt');
+      if (!/www\.capzone\.top/i.test(filename)) {
+        filename = filename.replace(/(?:_CapZone)?\.srt$/i, '') + '_www.capzone.top.srt';
+      }
 
       const blob = new Blob([srtOut], { type: 'text/plain;charset=utf-8' });
       const blobUrl = URL.createObjectURL(blob);
@@ -8205,6 +7678,7 @@
     // ==========================================
     window.handleYouTubeSubmit = async function (e) {
       if (e) e.preventDefault();
+      if (window._capzoneApiProbePromise) { try { await window._capzoneApiProbePromise; } catch (pe) {} }
       const urlInput = document.getElementById('youtubeUrlInput');
       const url = (urlInput ? urlInput.value : '').trim();
       if (!url) {
@@ -8263,7 +7737,7 @@
           : (qNum === '1080' ? '1080p Full HD MP4' : (qNum === '720' ? '720p HD MP4' : qNum + 'p MP4')));
 
         const qBadge = document.getElementById('ytResultQualityBadge');
-        if (qBadge) qBadge.textContent = isAudioFormat ? ('MP3 ' + qNum + 'k') : (qNum + 'p HD');
+        if (qBadge) qBadge.textContent = displayQuality;
 
         const detailsEl = document.getElementById('youtubeResultDetails');
         if (detailsEl) {
@@ -8618,36 +8092,36 @@
     window._convStudioMode = 'auto';
 
     const CONV_COMPAT_MAP = {
-      png: ['webp', 'jpg', 'avif', 'ico', 'pdf', 'bmp', 'tiff', 'tga', 'svg'],
-      jpg: ['png', 'webp', 'avif', 'pdf', 'ico', 'bmp', 'tiff', 'tga'],
-      jpeg: ['png', 'webp', 'avif', 'pdf', 'ico', 'bmp', 'tiff', 'tga'],
-      webp: ['png', 'jpg', 'avif', 'pdf', 'ico', 'bmp', 'tiff'],
-      avif: ['png', 'jpg', 'webp', 'pdf', 'bmp'],
-      heic: ['jpg', 'png', 'webp', 'avif', 'pdf'],
-      heif: ['jpg', 'png', 'webp', 'avif', 'pdf'],
-      bmp: ['png', 'jpg', 'webp', 'pdf', 'ico', 'tiff'],
-      tiff: ['png', 'jpg', 'webp', 'pdf', 'bmp'],
-      tif: ['png', 'jpg', 'webp', 'pdf', 'bmp'],
+      png: ['webp', 'jpg', 'avif', 'ico', 'pdf', 'bmp', 'tiff', 'tga', 'svg', 'docx', 'pptx', 'html'],
+      jpg: ['png', 'webp', 'avif', 'pdf', 'ico', 'bmp', 'tiff', 'tga', 'docx', 'pptx', 'html'],
+      jpeg: ['png', 'webp', 'avif', 'pdf', 'ico', 'bmp', 'tiff', 'tga', 'docx', 'pptx', 'html'],
+      webp: ['png', 'jpg', 'avif', 'pdf', 'ico', 'bmp', 'tiff', 'docx', 'pptx', 'html'],
+      avif: ['png', 'jpg', 'webp', 'pdf', 'bmp', 'docx', 'pptx'],
+      heic: ['jpg', 'png', 'webp', 'avif', 'pdf', 'docx', 'pptx'],
+      heif: ['jpg', 'png', 'webp', 'avif', 'pdf', 'docx', 'pptx'],
+      bmp: ['png', 'jpg', 'webp', 'pdf', 'ico', 'tiff', 'docx', 'pptx'],
+      tiff: ['png', 'jpg', 'webp', 'pdf', 'bmp', 'docx', 'pptx'],
+      tif: ['png', 'jpg', 'webp', 'pdf', 'bmp', 'docx', 'pptx'],
       tga: ['png', 'jpg', 'webp', 'pdf'],
       ico: ['png', 'jpg', 'webp', 'bmp'],
-      svg: ['png', 'jpg', 'webp', 'pdf'],
-      pdf: ['png', 'jpg', 'docx', 'txt', 'html', 'md', 'webp'],
-      docx: ['pdf', 'html', 'md', 'txt', 'rtf', 'odt', 'png', 'jpg'],
+      svg: ['png', 'jpg', 'webp', 'pdf', 'docx', 'pptx'],
+      pdf: ['png', 'jpg', 'docx', 'pptx', 'txt', 'html', 'md', 'webp', 'rtf', 'odt', 'csv', 'xlsx', 'json'],
+      docx: ['pdf', 'html', 'md', 'txt', 'rtf', 'odt', 'pptx', 'png', 'jpg'],
       doc: ['pdf', 'docx', 'txt', 'html', 'rtf'],
-      odt: ['pdf', 'docx', 'txt', 'html', 'rtf'],
-      rtf: ['pdf', 'docx', 'txt', 'html', 'odt'],
-      xlsx: ['csv', 'json', 'xml', 'html', 'pdf', 'txt'],
+      odt: ['pdf', 'docx', 'pptx', 'txt', 'html', 'rtf'],
+      rtf: ['pdf', 'docx', 'pptx', 'txt', 'html', 'odt'],
+      xlsx: ['csv', 'json', 'xml', 'html', 'pdf', 'docx', 'pptx', 'txt'],
       xls: ['xlsx', 'csv', 'json', 'html', 'pdf', 'txt'],
-      csv: ['xlsx', 'json', 'xml', 'html', 'pdf', 'txt'],
-      json: ['csv', 'xlsx', 'xml', 'html', 'txt', 'pdf'],
-      xml: ['json', 'csv', 'xlsx', 'html', 'txt', 'pdf'],
-      pptx: ['pdf', 'png', 'jpg', 'txt', 'html'],
-      html: ['pdf', 'docx', 'md', 'txt', 'odt'],
-      htm: ['pdf', 'docx', 'md', 'txt'],
-      md: ['pdf', 'docx', 'html', 'txt'],
-      txt: ['pdf', 'docx', 'html', 'md', 'rtf', 'odt'],
-      srt: ['vtt', 'txt', 'json', 'pdf'],
-      vtt: ['srt', 'txt', 'json', 'pdf']
+      csv: ['xlsx', 'json', 'xml', 'html', 'pdf', 'docx', 'pptx', 'txt'],
+      json: ['csv', 'xlsx', 'xml', 'html', 'txt', 'pdf', 'docx', 'pptx'],
+      xml: ['json', 'csv', 'xlsx', 'html', 'txt', 'pdf', 'docx', 'pptx'],
+      pptx: ['pdf', 'png', 'jpg', 'txt', 'html', 'docx', 'md', 'rtf', 'odt'],
+      html: ['pdf', 'docx', 'pptx', 'md', 'txt', 'odt', 'xlsx', 'csv'],
+      htm: ['pdf', 'docx', 'pptx', 'md', 'txt'],
+      md: ['pdf', 'docx', 'pptx', 'html', 'txt', 'rtf', 'odt'],
+      txt: ['pdf', 'docx', 'pptx', 'html', 'md', 'rtf', 'odt', 'srt', 'vtt'],
+      srt: ['vtt', 'txt', 'pdf', 'docx', 'html'],
+      vtt: ['srt', 'txt', 'pdf', 'docx', 'html']
     };
 
     window.setConvStudioMode = function (mode, btn) {
@@ -8727,6 +8201,7 @@
     };
 
     window.handleConvStudioSubmit = async function () {
+      if (window._capzoneApiProbePromise) { try { await window._capzoneApiProbePromise; } catch (pe) {} }
       const files = window._convSelectedFiles || [];
       if (files.length === 0) {
         if (typeof showPopup === 'function') showPopup('කරුණාකර Image හෝ Document ගොනුවක් Upload කරන්න.', 'File Required', 'warning');
@@ -8941,6 +8416,8 @@
       const resArea = document.getElementById('bgResultArea');
       const progCard = document.getElementById('bgProgressCard');
       const btn = document.getElementById('bgSubmitBtn');
+      const scanOverlay = document.getElementById('bgLiveScanOverlay');
+      if (scanOverlay) scanOverlay.style.display = 'none';
       if (nameEl) nameEl.textContent = 'Click or Drag & Drop Image';
       if (sizeEl) sizeEl.textContent = 'PNG, JPG, WEBP, HEIC, BMP up to 25 MB';
       if (prevArea) prevArea.style.display = 'none';
@@ -8950,6 +8427,50 @@
       if (btn) btn.disabled = false;
     };
 
+    window.applyBgCutoutResult = function (resultData) {
+      if (!resultData) return;
+      const rawUrl = resultData.previewUrl || resultData.url || resultData.downloadUrl || '';
+      const rawDlUrl = resultData.downloadUrl || resultData.url || resultData.previewUrl || '';
+      if (!rawUrl) return;
+      const baseOrigin = window.API_BASE_URL || '';
+      const fullImgUrl = rawUrl.startsWith('http') ? rawUrl : (baseOrigin + rawUrl);
+      const fullDlUrl = rawDlUrl.startsWith('http') ? rawDlUrl : (baseOrigin + rawDlUrl);
+      const bustUrl = fullImgUrl + (fullImgUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
+
+      const scanOverlay = document.getElementById('bgLiveScanOverlay');
+      const progCard = document.getElementById('bgProgressCard');
+      const progBar = document.getElementById('bgProgressBar');
+      const resArea = document.getElementById('bgResultArea');
+      const btn = document.getElementById('bgSubmitBtn');
+      const resImg = document.getElementById('bgResultImg');
+      const dlBtn = document.getElementById('bgDownloadBtn');
+      const dlSub = document.getElementById('bgDlBtnSub');
+
+      if (scanOverlay) scanOverlay.style.display = 'none';
+      if (progBar) progBar.style.width = '100%';
+      if (progCard) progCard.style.display = 'none';
+      if (btn) btn.disabled = false;
+      if (resArea) resArea.style.display = 'block';
+      if (resImg) resImg.src = bustUrl;
+
+      const origBgBase = (window.currentBgFile && window.currentBgFile.name)
+        ? window.currentBgFile.name.replace(/\.[^/.]+$/, '').replace(/[^\w\s\u0D80-\u0DFF-]/g, '').trim().replace(/\s+/g, '_')
+        : '';
+      let outName = resultData.fileName || resultData.filename || (origBgBase ? `${origBgBase}_NoBg_www.capzone.top.png` : 'cutout_www.capzone.top.png');
+      if (!/www\.capzone\.top/i.test(outName)) {
+        outName = buildCapZoneFileName({ originalName: origBgBase || outName, type: 'nobg', ext: 'png' });
+      }
+      if (dlBtn) {
+        let dlTarget = fullDlUrl;
+        if (dlTarget.includes('/api/download') && !dlTarget.includes('name=')) {
+          dlTarget += (dlTarget.includes('?') ? '&' : '?') + 'name=' + encodeURIComponent(outName);
+        }
+        dlBtn.href = dlTarget;
+        dlBtn.setAttribute('download', outName);
+      }
+      if (dlSub) dlSub.textContent = outName;
+    };
+
     window.handleBgRemoverSubmit = async function (e) {
       if (e) e.preventDefault();
       if (!window.currentBgFile) {
@@ -8957,25 +8478,34 @@
         return;
       }
 
+      if (window._bgPollTimer) { clearInterval(window._bgPollTimer); window._bgPollTimer = null; }
+      if (window._capzoneApiProbePromise) { try { await window._capzoneApiProbePromise; } catch (pe) {} }
+
       const modelRadio = document.querySelector('input[name="bgModelChoice"]:checked');
       const chosenModel = modelRadio ? modelRadio.value : 'birefnet-general';
 
+      const prevArea = document.getElementById('bgOriginalPreviewArea');
+      const scanOverlay = document.getElementById('bgLiveScanOverlay');
       const progCard = document.getElementById('bgProgressCard');
       const progBar = document.getElementById('bgProgressBar');
-      const statusText = document.getElementById('bgStatusText');
       const resArea = document.getElementById('bgResultArea');
       const btn = document.getElementById('bgSubmitBtn');
-      const resImg = document.getElementById('bgResultImg');
-      const dlBtn = document.getElementById('bgDownloadBtn');
-      const dlSub = document.getElementById('bgDlBtnSub');
 
+      if (prevArea) prevArea.style.display = 'block';
+      if (scanOverlay) scanOverlay.style.display = 'block';
       if (progCard) progCard.style.display = 'block';
-      if (progBar) progBar.style.width = '15%';
+      if (progBar) progBar.style.width = '18%';
       if (resArea) resArea.style.display = 'none';
       if (btn) btn.disabled = true;
 
       const clientId = 'bg_' + Date.now();
       const es = (typeof setupProgressTracker === 'function') ? setupProgressTracker(clientId, 'bg', 'bgProgressBar') : null;
+      let resolved = false;
+
+      const stopPoll = () => {
+        if (window._bgPollTimer) { clearInterval(window._bgPollTimer); window._bgPollTimer = null; }
+        if (es) try { es.close(); } catch(err){}
+      };
 
       try {
         const formData = new FormData();
@@ -8996,23 +8526,53 @@
           throw new Error(data && data.error ? data.error : 'Background removal failed.');
         }
 
-        if (data.downloadUrl) {
-          if (progBar) progBar.style.width = '100%';
-          if (progCard) progCard.style.display = 'none';
-          if (btn) btn.disabled = false;
-          if (resArea) resArea.style.display = 'block';
-          const fullImgUrl = data.downloadUrl.startsWith('http') ? data.downloadUrl : ((window.API_BASE_URL || '') + data.downloadUrl);
-          const bustUrl = fullImgUrl + (fullImgUrl.includes('?') ? '&' : '?') + 't=' + Date.now();
-          if (resImg) resImg.src = bustUrl;
-          if (dlBtn) {
-            dlBtn.href = fullImgUrl;
-            dlBtn.setAttribute('download', data.filename || 'cutout_CapZone.png');
-          }
-          if (dlSub) dlSub.textContent = data.filename || 'cutout_CapZone.png';
+        if (data.downloadUrl || data.url) {
+          resolved = true;
+          stopPoll();
+          window.applyBgCutoutResult(data);
+          return;
         }
 
+        const startedAt = Date.now();
+        window._bgPollTimer = setInterval(async () => {
+          if (resolved || (resArea && resArea.style.display === 'block')) {
+            resolved = true;
+            stopPoll();
+            return;
+          }
+          if (Date.now() - startedAt > 120000) {
+            stopPoll();
+            if (scanOverlay) scanOverlay.style.display = 'none';
+            if (progCard) progCard.style.display = 'none';
+            if (btn) btn.disabled = false;
+            if (typeof showPopup === 'function') showPopup('Background removal timed out. Please try again.', 'Background Remover', 'error');
+            return;
+          }
+          try {
+            const pRes = await fetch((window.API_BASE_URL || '') + '/api/progress-status?clientId=' + encodeURIComponent(clientId));
+            if (!pRes.ok) return;
+            const pData = await pRes.json();
+            if (pData && pData.status === 'completed' && pData.data) {
+              resolved = true;
+              stopPoll();
+              window.applyBgCutoutResult(pData.data);
+            } else if (pData && pData.status === 'error') {
+              resolved = true;
+              stopPoll();
+              if (scanOverlay) scanOverlay.style.display = 'none';
+              if (progCard) progCard.style.display = 'none';
+              if (btn) btn.disabled = false;
+              if (typeof showPopup === 'function') showPopup(pData.message || 'Background removal failed.', 'Background Remover', 'error');
+            } else if (pData && pData.message) {
+              const stEl = document.getElementById('bgStatusText');
+              if (stEl) stEl.textContent = pData.message;
+            }
+          } catch (pollErr) {}
+        }, 1100);
+
       } catch (err) {
-        if (es) try { es.close(); } catch(e){}
+        stopPoll();
+        if (scanOverlay) scanOverlay.style.display = 'none';
         if (progCard) progCard.style.display = 'none';
         if (btn) btn.disabled = false;
         if (typeof showPopup === 'function') showPopup(err.message || 'Background removal error', 'Background Remover', 'error');
@@ -9025,13 +8585,31 @@
     window.handleStudioDirectDownload = async function (e, anchor) {
       if (!anchor) return false;
       const url = anchor.getAttribute('href') || '';
-      const fname = anchor.getAttribute('download') || 'CapZone_Media.mp4';
+      const fname = anchor.getAttribute('download') || 'Media_www.capzone.top.mp4';
       if (!url || url === '#') {
         if (e) e.preventDefault();
         if (typeof showPopup === 'function') showPopup('කරුණාකර පළමුව Link එක paste කර Video හෝ MP3 button එක click කරන්න.', 'Media Not Ready', 'info');
         return false;
       }
       if (e) e.preventDefault();
+      // For direct media/file server streams, let Chrome download natively with Content-Length + Content-Disposition instead of buffering 100MB+ into JS RAM
+      if (url.includes('/api/download') || url.includes('/api/proxy-download')) {
+        try {
+          const headRes = await fetch(url, { method: 'HEAD' });
+          if (!headRes.ok) throw new Error('HTTP ' + headRes.status);
+          const tmp = document.createElement('a');
+          tmp.style.display = 'none';
+          tmp.href = url;
+          tmp.download = fname;
+          tmp.rel = 'noopener';
+          document.body.appendChild(tmp);
+          tmp.click();
+          setTimeout(() => { try { document.body.removeChild(tmp); } catch(err2){} }, 500);
+          return false;
+        } catch (headErr) {
+          console.warn('[StudioDownload] HEAD check fallback:', headErr && headErr.message);
+        }
+      }
       try {
         const res = await fetch(url);
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -9045,49 +8623,9 @@
         tmp.click();
         setTimeout(() => { try { document.body.removeChild(tmp); URL.revokeObjectURL(blobUrl); } catch(err){} }, 2500);
       } catch (err) {
-        const tmp = document.createElement('a');
-        tmp.href = url;
-        tmp.download = fname;
-        document.body.appendChild(tmp);
-        tmp.click();
-        setTimeout(() => { try { document.body.removeChild(tmp); } catch(err2){} }, 500);
+        if (typeof showPopup === 'function') showPopup('Download කිරීමේදී දෝෂයක් ඇති විය (' + (err.message || 'Unavailable') + '). කරුණාකර නැවත Download හෝ Refresh කර උත්සාහ කරන්න.', 'Download Notice', 'warning');
       }
       return false;
-    };
-
-    window.testPlaySampleInStudio = function (platform) {
-      const sampleUrl = (window.API_BASE_URL || '') + '/sample.mp4';
-      if (platform === 'youtube') {
-        const p = document.getElementById('youtubeVideoPlayer');
-        const box = document.getElementById('youtubeVideoPreviewBox');
-        if (box) box.style.display = 'block';
-        if (p) {
-          p.src = sampleUrl;
-          p.load();
-          if (window.CapZonePlayer && typeof window.CapZonePlayer.syncSource === 'function') window.CapZonePlayer.syncSource(p);
-          p.play().catch(() => {});
-        }
-      } else if (platform === 'facebook') {
-        const p = document.getElementById('fbVideoPlayer');
-        const box = document.getElementById('fbVideoPreviewBox');
-        if (box) box.style.display = 'block';
-        if (p) {
-          p.src = sampleUrl;
-          p.load();
-          if (window.CapZonePlayer && typeof window.CapZonePlayer.syncSource === 'function') window.CapZonePlayer.syncSource(p);
-          p.play().catch(() => {});
-        }
-      } else if (platform === 'tiktok') {
-        const p = document.getElementById('tiktokVideoPlayer');
-        const box = document.getElementById('tiktokVideoPreviewBox');
-        if (box) box.style.display = 'block';
-        if (p) {
-          p.src = sampleUrl;
-          p.load();
-          if (window.CapZonePlayer && typeof window.CapZonePlayer.syncSource === 'function') window.CapZonePlayer.syncSource(p);
-          p.play().catch(() => {});
-        }
-      }
     };
   
 </script>
